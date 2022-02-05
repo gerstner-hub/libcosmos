@@ -1,0 +1,31 @@
+Import('env')
+
+libcosmos_srcs = [
+    "Init.cxx",
+    "errors/ApiError.cxx",
+    "errors/CosmosError.cxx",
+    "fs/Directory.cxx",
+    "fs/FileSystem.cxx",
+    "io/Pipe.cxx",
+    "proc/Process.cxx",
+    "proc/Scheduler.cxx",
+    "proc/Signal.cxx",
+    "proc/SubProc.cxx",
+    "proc/WaitRes.cxx",
+    "thread/Condition.cxx",
+    "thread/Mutex.cxx",
+    "time/Clock.cxx",
+]
+
+libenv = env.Clone()
+libenv.Append(CPPPATH = ["."])
+
+libcosmos = libenv.SharedLibrary(
+    "cosmos",
+    [libcosmos_srcs]
+)
+
+env['libs']['libcosmos'] = libcosmos
+
+# required to link against us regarding threading functionality
+env.Append(LINKFLAGS="-pthread")

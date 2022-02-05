@@ -1,0 +1,37 @@
+Import('env')
+import functools
+
+libcosmos = env['libs']['libcosmos']
+
+tests = (
+    "bitmask",
+    "dirs",
+    "exceptions",
+    "pipe",
+    "subproc",
+    "thread_primitives",
+)
+
+for test in tests:
+
+    test_bin = env.Program(
+        "test_{}".format(test),
+        ["{}.cxx".format(test)],
+        LIBS=["libcosmos"],
+        LIBPATH='../src'
+    )
+
+    test_env = env.Clone()
+    test_env['ENV']['LD_LIBRARY_PATH'] = Dir("../src").abspath
+
+    binary = test_bin[0].abspath
+    test_key = f"run_cosmos_test_{test}"
+    logfile = Dir(".").abspath + "/" + test_key + ".log"
+    test_action = test_env.Action(f"{binary} >{logfile} 2>&1")
+    test_env.Command(test_key, None, test_action)
+
+    env.Alias("cosmos_tests", test_bin)
+    env.Alias("run_cosmos_tests", test_key)
+
+env.Alias("tests", "cosmos_tests")
+env.Alias("run_tests", "run_cosmos_tests")
