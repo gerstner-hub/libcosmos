@@ -2,6 +2,7 @@ Import('env')
 
 libcosmos_srcs = [
     "Init.cxx",
+    "string.cxx",
     "errors/ApiError.cxx",
     "errors/CosmosError.cxx",
     "fs/Directory.cxx",

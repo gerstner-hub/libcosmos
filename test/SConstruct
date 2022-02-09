@@ -10,6 +10,7 @@ tests = (
     "pipe",
     "subproc",
     "thread_primitives",
+    "string"
 )
 
 for test in tests:
