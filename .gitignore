@@ -1,3 +1,5 @@
 .scons*
 build
 .tags
+*.swp
+*.swo
