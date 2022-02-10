@@ -20,7 +20,7 @@ class ApiError :
 public: // functions
 
 	//! stores the current errno code in the exception
-	ApiError();
+	explicit ApiError(const char *prefix = nullptr);
 
 	//! stores the given errno code in the exception
 	explicit ApiError(const int p_errno);
@@ -42,6 +42,7 @@ protected: // functions
 
 protected: // data
 
+	const char *m_prefix = nullptr;
 	int m_errno = 0;
 };
 

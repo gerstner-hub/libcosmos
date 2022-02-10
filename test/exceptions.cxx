@@ -13,11 +13,11 @@ int main()
 	errno = ENOENT;
 	try
 	{
-		cosmos_throw( cosmos::ApiError() );
+		cosmos_throw( cosmos::ApiError("Testing ApiError (ENOENT)") );
 	}
 	catch( const cosmos::CosmosError &ce )
 	{
-		std::cerr << "Testing ApiError (ENOENT): " << ce.what() << std::endl;
+		std::cerr << ce.what() << std::endl;
 	}
 
 	try

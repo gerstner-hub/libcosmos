@@ -11,9 +11,10 @@
 namespace cosmos
 {
 
-ApiError::ApiError() :
+ApiError::ApiError(const char *prefix) :
 	ApiError(errno)
 {
+	m_prefix = prefix;
 }
 
 ApiError::ApiError(const int p_errno) :
@@ -24,6 +25,9 @@ ApiError::ApiError(const int p_errno) :
 void ApiError::generateMsg() const
 {
 	std::stringstream ss;
+
+	if( m_prefix )
+		ss << m_prefix << ": ";
 
 	ss << msg(m_errno) << " (" << m_errno << ")";
 
