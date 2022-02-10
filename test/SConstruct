@@ -1,17 +1,15 @@
 Import('env')
 import functools
+import os
 
 libcosmos = env['libs']['libcosmos']
+srcdir = env.Dir('.').srcnode().abspath
 
-tests = (
-    "bitmask",
-    "dirs",
-    "exceptions",
-    "pipe",
-    "subproc",
-    "thread_primitives",
-    "string"
-)
+tests = []
+for f in os.listdir(srcdir):
+    if not f.endswith(".cxx"):
+        continue
+    tests.append( '.'.join(f.split('.')[:-1]) )
 
 for test in tests:
 
