@@ -60,7 +60,9 @@ public: // functions
 	 *	possible up to a maximum size, however. This function returns
 	 *	this size.
 	 **/
-	static size_t maxAtomicWriteSize();
+	static size_t maxAtomicWriteSize() {
+		return MAX_ATOMIC_WRITE;
+	}
 
 protected: // functions
 
@@ -71,7 +73,7 @@ protected: // data
 
 	FileDesc m_read_end = INVALID_FILE_DESC;
 	FileDesc m_write_end = INVALID_FILE_DESC;
-	static size_t MAX_ATOMIC_WRITE;
+	static const size_t MAX_ATOMIC_WRITE;
 };
 
 } // end ns

@@ -9,7 +9,7 @@
 namespace cosmos
 {
 
-size_t Pipe::MAX_ATOMIC_WRITE = PIPE_BUF;
+const size_t Pipe::MAX_ATOMIC_WRITE = PIPE_BUF;
 
 Pipe::Pipe()
 {
