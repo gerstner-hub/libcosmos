@@ -44,7 +44,7 @@ int main()
 			res = 1;
 		}
 
-		if (th.getCurState() != cosmos::Thread::READY) {
+		if (th.getState() != cosmos::Thread::READY) {
 			std::cerr << "initial thread state is unexpected" << std::endl;
 			res = 1;
 		}
@@ -57,7 +57,7 @@ int main()
 			res = 1;
 		}
 
-		if (th.getCurState() != cosmos::Thread::DEAD) {
+		if (th.getState() != cosmos::Thread::DEAD) {
 			std::cerr << "joined thread has unexpected state" << std::endl;
 			res = 1;
 		}
@@ -72,17 +72,17 @@ int main()
 
 	th2.start();
 
-	th2.waitForState(th2.RUN);
+	th2.waitForState(th2.RUNNING);
 
-	if (th2.getCurState() != cosmos::Thread::RUN) {
+	if (th2.getState() != cosmos::Thread::RUNNING) {
 		std::cerr << "running thread has unexpected state" << std::endl;
 		res = 1;
 	}
 
 	th2.requestPause();
-	th2.waitForState(th2.PAUSE);
+	th2.waitForState(th2.PAUSED);
 
-	if (th2.getCurState() != cosmos::Thread::PAUSE) {
+	if (th2.getState() != cosmos::Thread::PAUSED) {
 		std::cerr << "pausing thread has unexpected state" << std::endl;
 		res = 1;
 	}

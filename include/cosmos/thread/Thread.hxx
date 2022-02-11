@@ -15,8 +15,9 @@ namespace cosmos {
  * \brief
  * 	A class representing a POSIX thread and its lifecycle
  * \details
- * 	There's a simple lifecycle modelled for the thread. Refer to
- * 	Thread::State for more details.
+ * 	There's a simple lifecycle modelled for the thread. Furthermore a
+ * 	simple cooperative state model. Refer to Thread::State for more
+ * 	details.
  *
  * 	The thread is created during construction time but only enters the
  * 	specified functions after start() has been called.
@@ -39,21 +40,26 @@ public: // types
 	 *
 	 * 	DEAD -> READY -> DEAD (thread was constructed but never started)
 	 *
-	 * 	DEAD -> READY -> RUN -> EXIT -> DEAD (thread was constructed,
-	 * 	started, has exited and was joined)
+	 * 	DEAD -> READY -> RUNNING -> DEAD (thread was constructed, started, has exited and was joined)
+	 * 	
+	 *	[RUNNING -> PAUSED -> RUNNING]: entering pause and continuing to run
 	 **/
-	enum State
-	{
+	enum State {
 		// thread is created but has not yet been started by the client
 		READY,
 		// runs and performs operation
-		RUN,
-		// stop operation and exit
-		EXIT,
+		RUNNING,
 		// thread is pausing execution
-		PAUSE,
+		PAUSED,
 		// thread never was successfully created or has exited and was joined
 		DEAD
+	};
+
+	//! available state change requests
+	enum Request {
+		PAUSE,
+		EXIT,
+		RUN
 	};
 
 	//! thread IDs for comparison
@@ -94,12 +100,12 @@ public: // functions
 
 	virtual ~Thread();
 
-	State getCurState() const { return this->m_cur_state; }
+	State getState() const { return this->m_state; }
 
-	State getRequestedState() const { return this->m_req_state; }
+	Request getRequest() const { return this->m_request; }
 
 	//! make the thread enter the client function
-	void start() { this->requestState( RUN ); }
+	void start() { this->issueRequest(RUN); }
 
 	/**
 	 * \brief
@@ -108,11 +114,11 @@ public: // functions
 	 * 	If the thread is currently inside client code then the client
 	 * 	code is responsible for reacting to this state change.
 	 **/
-	void requestExit() { this->requestState( EXIT ); }
+	void requestExit() { this->issueRequest(EXIT); }
 
-	void requestPause() { this->requestState( PAUSE ); }
+	void requestPause() { this->issueRequest(PAUSE); }
 
-	void requestRun() { this->requestState( RUN ); }
+	void requestRun() { this->issueRequest(RUN); }
 
 	//! waits until thread leaves the client function and terminates, sets
 	//! state to EXIT
@@ -137,19 +143,18 @@ public: // functions
 	//! returns an opaque thread ID object for the calling thread
 	static ID getCallerID();
 
-	//! enter a Pause state, if requested
-	State enterPause();
-
+	//! enter a Pause state, if requested, returns the new requested state
+	//! after wakeup
+	Request enterPause();
 
 protected: // functions
 
 	//! changes the requested thread state to \c s and signals the
 	//! condition to wake up a possibly waiting thread
-	void requestState(const State &s)
-	{
+	void issueRequest(const Request &r) {
 		{
 			MutexGuard g(m_state_condition);
-			m_req_state = s;
+			m_request = r;
 		}
 
 		m_state_condition.signal();
@@ -157,12 +162,12 @@ protected: // functions
 
 	void stateEntered(const State &s);
 
-	bool callerIsThread() const
-	{
+	bool callerIsThread() const {
 		return getID() == getCallerID();
 	}
 
-	State waitForRequest(const State &old) const;
+	//! waits until a new request is issued, returns the new request
+	Request waitForRequest(const Request &old) const;
 
 	//! POSIX / C entry function for thread. From here the virtual
 	//! threadEntry() will be called
@@ -177,12 +182,12 @@ private: // data
 	pthread_t m_pthread;
 
 	//! the current state the thread is in
-	State m_cur_state;
+	State m_state;
 
-	//! requested state for the thread
-	State m_req_state;
+	//! current requested state for the thread
+	Request m_request;
 
-	//! for waiting for changes to m_cur_state and m_req_state
+	//! for waiting for changes to m_state and m_request
 	ConditionMutex m_state_condition;
 
 	//! The interface for the thread to run in

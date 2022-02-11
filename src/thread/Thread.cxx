@@ -13,12 +13,12 @@ namespace cosmos {
 static std::atomic<size_t> g_num_threads = 0;
 
 Thread::Thread(IThreadEntry &entry, const char *name) :
-	m_cur_state(READY),
-	m_req_state(READY),
+	m_state(READY),
+	m_request(PAUSE),
 	m_entry(entry),
 	// we could also use a counter to make unique anonymous
 	// threads
-	m_name( name ? name : "thread<" + std::to_string(g_num_threads) + ">" )
+	m_name(name ? name : "thread<" + std::to_string(g_num_threads) + ">")
 {
 	const auto error = ::pthread_create(
 		&m_pthread,
@@ -28,7 +28,7 @@ Thread::Thread(IThreadEntry &entry, const char *name) :
 	);
 
 	if (error != 0) {
-		m_cur_state = DEAD;
+		m_state = DEAD;
 		cosmos_throw (cosmos::ApiError("Unable to create thread"));
 	}
 
@@ -39,9 +39,9 @@ Thread::~Thread() {
 	g_num_threads--;
 
 	try {
-		assert (m_cur_state != RUN && m_cur_state != EXIT);
+		assert (m_state != RUNNING && m_state != PAUSED);
 
-		if (m_cur_state == READY) {
+		if (m_state == READY) {
 			// the thread was never state so join thread first
 			this->join();
 		}
@@ -55,9 +55,9 @@ Thread::~Thread() {
 void* Thread::posixEntry(void *par) {
 	auto &thread = *(reinterpret_cast<Thread*>(par));
 
-	const auto req = thread.waitForRequest (READY);
+	const auto req = thread.waitForRequest(PAUSE);
 
-	if (req == RUN || req == PAUSE) {
+	if (req == RUN) {
 		thread.run();
 	}
 
@@ -67,7 +67,7 @@ void* Thread::posixEntry(void *par) {
 }
 
 void Thread::run() {
-	stateEntered(RUN);
+	stateEntered(RUNNING);
 
 	try {
 		// enter client function
@@ -90,7 +90,7 @@ void Thread::join() {
 		cosmos_throw (UsageError("Attempted to join self"));
 	}
 
-	this->requestState(EXIT);
+	this->issueRequest(EXIT);
 
 	void *res = nullptr;
 	const auto join_res = ::pthread_join(m_pthread, &res);
@@ -109,9 +109,9 @@ void Thread::stateEntered(const State &s) {
 
 	{
 		MutexGuard g(m_state_condition);
-		if (m_cur_state == s)
+		if (m_state == s)
 			return;
-		m_cur_state = s;
+		m_state = s;
 	}
 
 	m_state_condition.broadcast();
@@ -120,32 +120,32 @@ void Thread::stateEntered(const State &s) {
 void Thread::waitForState(const Thread::State &s) const {
 	MutexGuard g(m_state_condition);
 
-	while (m_cur_state != s) {
+	while (m_state != s) {
 		m_state_condition.wait();
 	}
 }
 
-Thread::State Thread::waitForRequest(const Thread::State &old) const {
+Thread::Request Thread::waitForRequest(const Thread::Request &old) const {
 	MutexGuard g(m_state_condition);
 
 	// wait for some state change away from READY before we actually run
-	while (getRequestedState() == old) {
+	while (getRequest() == old) {
 		m_state_condition.wait();
 	}
 
-	return m_req_state;
+	return m_request;
 }
 
-Thread::State Thread::enterPause() {
+Thread::Request Thread::enterPause() {
 	if (!callerIsThread()) {
 		cosmos_throw (UsageError("Foreign thread called"));
 	}
 
-	stateEntered(PAUSE);
+	stateEntered(PAUSED);
 
 	auto ret = waitForRequest(PAUSE);
 
-	stateEntered(RUN);
+	stateEntered(RUNNING);
 
 	return ret;
 }
