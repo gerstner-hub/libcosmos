@@ -6,17 +6,14 @@
 #include "cosmos/errors/ApiError.hxx"
 #include "cosmos/io/Pipe.hxx"
 
-namespace cosmos
-{
+namespace cosmos {
 
 const size_t Pipe::MAX_ATOMIC_WRITE = PIPE_BUF;
 
-Pipe::Pipe()
-{
+Pipe::Pipe() {
 	int ends[2];
-	if( pipe2(ends, O_CLOEXEC | O_DIRECT) != 0 )
-	{
-		cosmos_throw( ApiError() );
+	if (pipe2(ends, O_CLOEXEC | O_DIRECT) != 0) {
+		cosmos_throw (ApiError());
 	}
 
 	m_read_end = ends[0];

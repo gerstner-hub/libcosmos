@@ -4,8 +4,7 @@
 // C++ stdlib
 #include <string>
 
-namespace cosmos
-{
+namespace cosmos {
 
 /**
  * \brief

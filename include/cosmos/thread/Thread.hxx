@@ -9,8 +9,7 @@
 #include "cosmos/thread/Condition.hxx"
 #include "cosmos/thread/IThreadEntry.hxx"
 
-namespace cosmos
-{
+namespace cosmos {
 
 /**
  * \brief
@@ -58,7 +57,8 @@ public: // types
 	};
 
 	//! thread IDs for comparison
-	class ID {
+	class ID
+	{
 	protected: // functions
 		friend class Thread;
 		explicit ID(pthread_t id) : m_id(id) {}

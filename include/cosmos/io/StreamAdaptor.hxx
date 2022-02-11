@@ -7,7 +7,12 @@
 #include "cosmos/io/Pipe.hxx"
 #include "cosmos/errors/UsageError.hxx"
 
-#ifndef COSMOS_GNU_CXXLIB
+
+// stdlib
+#include <iostream>
+#ifdef COSMOS_GNU_CXXLIB
+#include <ext/stdio_filebuf.h>
+#else
 /*
  * this currently only works with libstdc++, since the StdioFileBuf is
  * libstdc++ specific. For other standard libraries other hacks may exist
@@ -16,12 +21,7 @@
 #	error "Only GNU libstdc++ is supported right now"
 #endif
 
-// C++
-#include <iostream>
-#include <ext/stdio_filebuf.h>
-
-namespace cosmos
-{
+namespace cosmos {
 
 /**
  * \brief
@@ -54,8 +54,7 @@ public: // functions
 	 * \brief
 	 *	Close the underlying file descriptor
 	 **/
-	virtual void close()
-	{
+	virtual void close() {
 		m_buffer.close();
 	}
 
@@ -66,9 +65,8 @@ protected: // functions
 	StreamAdaptor(FileDesc fd, std::ios_base::openmode mode) :
 		m_buffer(fd, mode)
 	{
-		if( fd == INVALID_FILE_DESC )
-		{
-			cosmos_throw( UsageError("Construct StreamAdaptor for invalid FD") );
+		if (fd == INVALID_FILE_DESC) {
+			cosmos_throw (UsageError("Construct StreamAdaptor for invalid FD"));
 		}
 
 		this->rdbuf(&m_buffer);
@@ -105,8 +103,7 @@ public: // functions
 		OutputStreamAdaptor(p.takeWriteEndOwnership())
 	{}
 
-	void close() override
-	{
+	void close() override {
 		*this << std::flush;
 		StreamAdaptor::close();
 	}

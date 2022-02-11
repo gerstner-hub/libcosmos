@@ -6,27 +6,22 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-namespace cosmos
-{
+namespace cosmos {
 
-void Directory::close()
-{
-	if( !m_stream )
-	{
+void Directory::close() {
+	if (!m_stream) {
 		return;
 	}
 
 	auto ret = closedir(m_stream);
 	m_stream = nullptr;
 
-	if( ret == -1 )
-	{
-		cosmos_throw( ApiError() );
+	if (ret == -1) {
+		cosmos_throw (ApiError());
 	}
 }
 
-void Directory::open(const std::string &path, const bool follow_links)
-{
+void Directory::open(const std::string &path, const bool follow_links) {
 	close();
 
 	/*
@@ -39,43 +34,36 @@ void Directory::open(const std::string &path, const bool follow_links)
 		O_RDONLY | O_CLOEXEC | O_DIRECTORY | (follow_links ? O_NOFOLLOW : 0)
 	);
 
-	if( fd == -1 )
-	{
-		cosmos_throw( ApiError() );
+	if (fd == -1) {
+		cosmos_throw (ApiError());
 	}
 
-	try
-	{
+	try {
 		open(fd);
 	}
-	catch( ... )
-	{
+	catch (...) {
 		// intentionally ignore error conditions here
 		(void)::close(fd);
 		throw;
 	}
 }
 
-void Directory::open(FileDesc fd)
-{
+void Directory::open(FileDesc fd) {
 	close();
 
 	m_stream = fdopendir(fd);
 
-	if( !m_stream )
-	{
-		cosmos_throw( ApiError() );
+	if (!m_stream) {
+		cosmos_throw (ApiError());
 	}
 }
 
-FileDesc Directory::fd() const
-{
+FileDesc Directory::fd() const {
 	requireOpenStream(__FUNCTION__);
 	auto ret = dirfd(m_stream);
 
-	if( ret == -1 )
-	{
-		cosmos_throw( ApiError() );
+	if (ret == -1) {
+		cosmos_throw (ApiError());
 	}
 
 	return ret;
@@ -97,13 +85,11 @@ DirEntry Directory::nextEntry()
 	errno = 0;
 	auto entry = readdir(m_stream);
 
-	if( entry )
-	{
+	if (entry) {
 		return DirEntry(entry);
 	}
 
-	if( errno != 0 )
-	{
+	if (errno != 0) {
 		cosmos_throw( ApiError() );
 	}
 

@@ -4,8 +4,7 @@
 // cosmos
 #include "cosmos/errors/CosmosError.hxx"
 
-namespace cosmos
-{
+namespace cosmos {
 
 /**
  * \brief

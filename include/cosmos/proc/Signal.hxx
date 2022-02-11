@@ -1,15 +1,14 @@
 #ifndef COSMOS_SIGNAL_HXX
 #define COSMOS_SIGNAL_HXX
 
-// C++ stdlib
+// stdlib
 #include <iosfwd>
 #include <string>
 
 // cosmos
 #include "cosmos/ostypes.hxx"
 
-namespace cosmos
-{
+namespace cosmos {
 
 /**
  * \brief

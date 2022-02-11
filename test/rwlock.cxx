@@ -1,7 +1,6 @@
 #include "cosmos/thread/RWLock.hxx"
 
-int main()
-{
+int main() {
 	cosmos::RWLock rwl;
 
 	rwl.readlock();

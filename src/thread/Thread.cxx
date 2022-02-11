@@ -8,8 +8,7 @@
 #include "cosmos/errors/UsageError.hxx"
 #include "cosmos/thread/Thread.hxx"
 
-namespace cosmos
-{
+namespace cosmos {
 
 static std::atomic<size_t> g_num_threads = 0;
 
@@ -21,110 +20,96 @@ Thread::Thread(IThreadEntry &entry, const char *name) :
 	// threads
 	m_name( name ? name : "thread<" + std::to_string(g_num_threads) + ">" )
 {
-	const int error = ::pthread_create(
+	const auto error = ::pthread_create(
 		&m_pthread,
 		nullptr /* keep default attributes */,
 		&posixEntry,
 		(void*)this /* pass pointer to object instance */
 	);
 
-	if( error )
-	{
+	if (error != 0) {
 		m_cur_state = DEAD;
-		cosmos_throw( cosmos::ApiError("Unable to create thread") );
+		cosmos_throw (cosmos::ApiError("Unable to create thread"));
 	}
 
 	g_num_threads++;
 }
 
-Thread::~Thread()
-{
+Thread::~Thread() {
 	g_num_threads--;
 
-	try
-	{
-		assert( m_cur_state != RUN && m_cur_state != EXIT );
+	try {
+		assert (m_cur_state != RUN && m_cur_state != EXIT);
 
-		if( m_cur_state == READY )
-		{
+		if (m_cur_state == READY) {
 			// the thread was never state so join thread first
 			this->join();
 		}
 	}
-	catch( ... )
+	catch (...)
 	{
-		assert("thread_destroy_error" == nullptr);
+		assert ("thread_destroy_error" == nullptr);
 	}
 }
 
-void* Thread::posixEntry(void *par)
-{
+void* Thread::posixEntry(void *par) {
 	auto &thread = *(reinterpret_cast<Thread*>(par));
 
-	const auto req = thread.waitForRequest( READY );
+	const auto req = thread.waitForRequest (READY);
 
-	if( req == RUN || req == PAUSE )
-	{
+	if (req == RUN || req == PAUSE) {
 		thread.run();
 	}
 
-	thread.stateEntered( DEAD );
+	thread.stateEntered(DEAD);
 
 	return nullptr;
 }
 
-void Thread::run()
-{
-	stateEntered( RUN );
-	try
-	{
+void Thread::run() {
+	stateEntered(RUN);
+
+	try {
 		// enter client function
 		m_entry.threadEntry(*this);
 	}
-	catch( const cosmos::CosmosError &e )
-	{
+	catch (const cosmos::CosmosError &e) {
 		std::cerr << "Caught exception in " << __FUNCTION__
 			<< ", thread name = \"" << name() << "\".\nException: "
 			<< e.what() << "\n";
 	}
-	catch( ... )
-	{
+	catch (...) {
 		std::cerr
 			<< "Caught unknown exception in " << __FUNCTION__
 			<< ", thread name = \"" << name() << "\".\n";
 	}
 }
 
-void Thread::join()
-{
-	if( callerIsThread() )
-	{
-		cosmos_throw( UsageError("Attempted to join self") );
+void Thread::join() {
+	if (callerIsThread()) {
+		cosmos_throw (UsageError("Attempted to join self"));
 	}
 
-	this->requestState( EXIT );
+	this->requestState(EXIT);
 
 	void *res = nullptr;
-	const int join_res = ::pthread_join( m_pthread, &res );
+	const auto join_res = ::pthread_join(m_pthread, &res);
 
-	if( join_res != 0 )
-	{
-		cosmos_throw( ApiError("Failed to join thread") );
+	if (join_res != 0) {
+		cosmos_throw (ApiError("Failed to join thread"));
 	}
 }
 
-void Thread::stateEntered(const State &s)
-{
+void Thread::stateEntered(const State &s) {
 #ifndef NDEBUG
-	if( !callerIsThread() )
-	{
-		cosmos_throw( UsageError("Foreign thread modified state") );
+	if (!callerIsThread()) {
+		cosmos_throw (UsageError("Foreign thread modified state"));
 	}
 #endif
 
 	{
 		MutexGuard g(m_state_condition);
-		if( m_cur_state == s )
+		if (m_cur_state == s)
 			return;
 		m_cur_state = s;
 	}
@@ -132,47 +117,40 @@ void Thread::stateEntered(const State &s)
 	m_state_condition.broadcast();
 }
 
-void Thread::waitForState(const Thread::State &s) const
-{
+void Thread::waitForState(const Thread::State &s) const {
 	MutexGuard g(m_state_condition);
 
-	while( m_cur_state != s )
-	{
+	while (m_cur_state != s) {
 		m_state_condition.wait();
 	}
 }
 
-Thread::State Thread::waitForRequest(const Thread::State &old) const
-{
+Thread::State Thread::waitForRequest(const Thread::State &old) const {
 	MutexGuard g(m_state_condition);
 
 	// wait for some state change away from READY before we actually run
-	while( getRequestedState() == old )
-	{
+	while (getRequestedState() == old) {
 		m_state_condition.wait();
 	}
 
 	return m_req_state;
 }
 
-Thread::State Thread::enterPause()
-{
-	if( !callerIsThread() )
-	{
-		cosmos_throw( UsageError("Foreign thread called") );
+Thread::State Thread::enterPause() {
+	if (!callerIsThread()) {
+		cosmos_throw (UsageError("Foreign thread called"));
 	}
 
-	stateEntered( PAUSE );
+	stateEntered(PAUSE);
 
-	auto ret = waitForRequest( PAUSE );
+	auto ret = waitForRequest(PAUSE);
 
-	stateEntered( RUN );
+	stateEntered(RUN);
 
 	return ret;
 }
 
-Thread::ID Thread::getCallerID()
-{
+Thread::ID Thread::getCallerID() {
 	return ID(pthread_self());
 }
 

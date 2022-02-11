@@ -7,12 +7,10 @@
 // cosmos
 #include "cosmos/time/TimeSpec.hxx"
 
-namespace cosmos
-{
+namespace cosmos {
 
 //! available clock types
-enum class ClockType : clockid_t
-{
+enum class ClockType : clockid_t {
 	REALTIME = CLOCK_REALTIME,
 	REALTIME_COARSE = CLOCK_REALTIME_COARSE,
 	MONOTONIC = CLOCK_MONOTONIC,
@@ -27,8 +25,7 @@ enum class ClockType : clockid_t
  * \brief
  *	A C++ wrapper around the POSIX clocks and related functions
  **/
-class Clock
-{
+class Clock {
 public: // functions
 
 	explicit Clock(const ClockType &type) :
@@ -37,8 +34,7 @@ public: // functions
 
 	void now(TimeSpec &ts) const;
 
-	TimeSpec now() const
-	{
+	TimeSpec now() const {
 		TimeSpec ret;
 		now(ret);
 		return ret;
@@ -56,21 +52,18 @@ protected: // data
  * \brief
  * 	A type to measure elapsed time based on a given clock type
  **/
-class StopWatch
-{
+class StopWatch {
 public: // functions
 
 	explicit StopWatch(const ClockType &type) :
 		m_clock(type)
 	{}
 
-	void mark()
-	{
+	void mark() {
 		m_clock.now(m_mark);
 	}
 
-	size_t elapsedMs() const
-	{
+	size_t elapsedMs() const {
 		return (m_clock.now() - m_mark).toMilliseconds();
 	}
 

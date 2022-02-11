@@ -7,8 +7,7 @@
 // Cosmos
 #include "cosmos/ostypes.hxx"
 
-namespace cosmos
-{
+namespace cosmos {
 
 struct sched_attr;
 
@@ -16,8 +15,7 @@ struct sched_attr;
  * \brief
  * 	Available scheduling policies on Linux
  **/
-enum class SchedulerPolicy : int
-{
+enum class SchedulerPolicy : int {
 	FIFO = SCHED_FIFO,
 	ROUND_ROBIN = SCHED_RR,
 	DEADLINE = SCHED_DEADLINE,
@@ -116,12 +114,11 @@ class RealtimeSchedulerSettings :
 {
 public: // functions
 
-	RealtimeSchedulerSettings(const SchedulerPolicy &policy) :
+	explicit RealtimeSchedulerSettings(const SchedulerPolicy &policy) :
 		SchedulerSettings(policy)
 	{}
 
-	void setPriority(const int priority)
-	{
+	void setPriority(const int priority) {
 		m_priority = priority;
 	}
 

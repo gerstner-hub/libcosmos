@@ -5,11 +5,9 @@
 #include <algorithm>
 #include <cctype>
 
-namespace cosmos
-{
+namespace cosmos {
 
-std::string tolower(const std::string &s)
-{
+std::string tolower(const std::string &s) {
 	std::string ret;
 	ret.resize(s.size());
 	// put it all to lower case
@@ -22,12 +20,11 @@ std::string tolower(const std::string &s)
 	return ret;
 }
 
-void strip(std::string &s)
-{
-	while( !s.empty() && std::isspace(s[0]) )
+void strip(std::string &s) {
+	while (!s.empty() && std::isspace(s[0]))
 		s.erase( s.begin() );
 
-	while( !s.empty() && std::isspace(s[s.length()-1]) )
+	while (!s.empty() && std::isspace(s[s.length()-1]))
 		s.pop_back();
 }
 

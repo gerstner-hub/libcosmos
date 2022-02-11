@@ -1,4 +1,4 @@
-// C++ stdlib
+// stdlib
 #include <cstring>
 #include <sstream>
 
@@ -8,8 +8,7 @@
 // cosmos
 #include "cosmos/errors/ApiError.hxx"
 
-namespace cosmos
-{
+namespace cosmos {
 
 ApiError::ApiError(const char *prefix) :
 	ApiError(errno)
@@ -22,11 +21,10 @@ ApiError::ApiError(const int p_errno) :
 	m_errno(p_errno)
 {}
 
-void ApiError::generateMsg() const
-{
+void ApiError::generateMsg() const {
 	std::stringstream ss;
 
-	if( m_prefix )
+	if (m_prefix)
 		ss << m_prefix << ": ";
 
 	ss << msg(m_errno) << " (" << m_errno << ")";
@@ -34,11 +32,10 @@ void ApiError::generateMsg() const
 	m_msg += ss.str();
 }
 
-std::string ApiError::msg(const int no)
-{
+std::string ApiError::msg(const int no) {
 	char error[512];
 
-	const char *text = ::strerror_r( no, &error[0], sizeof(error) );
+	const char *text = ::strerror_r(no, &error[0], sizeof(error));
 
 	return text;
 }

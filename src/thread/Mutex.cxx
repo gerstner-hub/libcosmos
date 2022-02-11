@@ -1,8 +1,10 @@
+// stdlib
+#include <cassert>
+
 // Cosmos
 #include "cosmos/thread/Mutex.hxx"
 
-namespace cosmos
-{
+namespace cosmos {
 
 #ifndef NDEBUG
 constexpr bool DEBUG_MUTEX = true;
@@ -10,30 +12,25 @@ constexpr bool DEBUG_MUTEX = true;
 constexpr bool DEBUG_MUTEX = false;
 #endif
 
-Mutex::Mutex()
-{
+Mutex::Mutex() {
 	::pthread_mutexattr_t* attr = nullptr;
 	int res = -1;
 
-	try
-	{
-		if( DEBUG_MUTEX )
-		{
+	try {
+		if (DEBUG_MUTEX) {
 			::pthread_mutexattr_t debug_attr;
 
 			res = ::pthread_mutexattr_init(&debug_attr);
-			if( res != 0 )
-			{
-				cosmos_throw( ApiError(res) );
+			if (res != 0) {
+				cosmos_throw (ApiError(res));
 			}
 
 			res = ::pthread_mutexattr_settype(
 				&debug_attr, PTHREAD_MUTEX_ERRORCHECK
 			);
 
-			if( res != 0 )
-			{
-				cosmos_throw( ApiError(res) );
+			if (res != 0) {
+				cosmos_throw (ApiError(res));
 			}
 
 
@@ -41,21 +38,17 @@ Mutex::Mutex()
 		}
 
 		res = ::pthread_mutex_init(&m_pmutex, attr);
-		if( res != 0 )
-		{
-			cosmos_throw( ApiError(res) );
+		if (res != 0) {
+			cosmos_throw (ApiError(res));
 		}
 
-		if( DEBUG_MUTEX )
-		{
+		if (DEBUG_MUTEX) {
 			res = ::pthread_mutexattr_destroy(attr);
-			assert( res == 0 );
+			assert (res == 0);
 		}
 	}
-	catch(...)
-	{
-		if(attr)
-		{
+	catch(...) {
+		if (attr) {
 			(void)::pthread_mutexattr_destroy(attr);
 		}
 

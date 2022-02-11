@@ -1,18 +1,17 @@
 #ifndef COSMOS_DIRENTRY_HXX
 #define COSMOS_DIRENTRY_HXX
 
+// stdlib
+#include <cstring>
+
 // Linux
 #include <dirent.h>
 #include <stddef.h>
 
-// C++ stdlib
-#include <cstring>
-
 // cosmos
 #include "cosmos/ostypes.hxx"
 
-namespace cosmos
-{
+namespace cosmos {
 
 /**
  * \brief
@@ -28,8 +27,7 @@ class DirEntry
 
 public: // types
 
-	enum class Type : unsigned char
-	{
+	enum class Type : unsigned char {
 		BLOCK_DEVICE = DT_BLK,
 		CHAR_DEVICE = DT_CHR,
 		DIRECTORY = DT_DIR,
@@ -80,8 +78,7 @@ public: // functions
 	 * 	The returned length is the number of characters in the entry
 	 * 	name minus the null terminator.
 	 **/
-	size_t nameLength() const
-	{
+	size_t nameLength() const {
 		// this actually involves padding, so look from a 8-byte
 		// offset from the end forwards, still faster for long strings.
 		auto len = m_entry->d_reclen - offsetof(struct dirent, d_name) - 1;
@@ -89,9 +86,8 @@ public: // functions
 		len = len < 8 ? 0 : len - 8;
 		auto endp = name() + len;
 
-		for( size_t i = 0; i < 8; i++ )
-		{
-			if( *(endp++) == '\0' )
+		for (size_t i = 0; i < 8; i++) {
+			if (*(endp++) == '\0')
 				return endp - name() - 1;
 		}
 
@@ -114,14 +110,13 @@ public: // functions
 
 	const char* name() const { return m_entry->d_name; }
 
-	auto isDotEntry() const
-	{
+	auto isDotEntry() const {
 		auto name = m_entry->d_name;
-		if( name[0] != '.' )
+		if (name[0] != '.')
 			return false;
-		else if( name[1] == '\0' )
+		else if (name[1] == '\0')
 			return true;
-		else if( name[1] != '.' )
+		else if (name[1] != '.')
 			return false;
 
 		return name[2] == '\0';

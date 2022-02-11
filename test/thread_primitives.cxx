@@ -11,8 +11,7 @@ int main()
 {
 	cosmos::Init init;
 
-	try
-	{
+	try {
 		/*
 		 * lacking actualy threads yet this is a bit of a over
 		 * simplified test, but still better than nothing.
@@ -34,8 +33,7 @@ int main()
 		condmux.lock();
 		auto signaled = condmux.waitTimed(endtime);
 
-		if( signaled )
-		{
+		if (signaled) {
 			std::cerr << "got signaled?!" << std::endl;
 			return 1;
 		}
@@ -43,21 +41,17 @@ int main()
 
 		auto time_spent = clock.now() - starttime;
 
-		if( time_spent.getSeconds() < 5 )
-		{
+		if (time_spent.getSeconds() < 5) {
 			std::cerr << "spent not enough time in waitTimed()?! getSeconds() = " << time_spent.getSeconds() << std::endl;
 			return 1;
 		}
 		// be generous with the upper limit
-		else if( time_spent.getSeconds() > 60 )
-		{
+		else if (time_spent.getSeconds() > 60) {
 			std::cerr << "spent too much time in waitTimed()?!" << std::endl;
 		}
 	}
-	catch( const cosmos::CosmosError &ex )
-	{
+	catch (const cosmos::CosmosError &ex) {
 		std::cerr << ex.what() << std::endl;
 		return 1;
 	}
-
 }

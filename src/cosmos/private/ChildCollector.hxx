@@ -1,14 +1,15 @@
 #ifndef COSMOS_CHILDCOLLECTOR_HXX
 #define COSMOS_CHILDCOLLECTOR_HXX
 
+// stdlib
+#include <cassert>
+#include <map>
+
 // Linux
 #include <limits.h>
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-
-// C++ stdlib
-#include <map>
 
 // Cosmos
 #include "cosmos/errors/UsageError.hxx"
@@ -17,8 +18,7 @@
 #include "cosmos/thread/Condition.hxx"
 #include "cosmos/time/TimeSpec.hxx"
 
-namespace cosmos
-{
+namespace cosmos {
 
 /**
  * \brief
@@ -71,16 +71,14 @@ public: // functions
 
 	bool collect(ProcessID pid, const size_t max_wait_ms, WaitRes &res);
 
-	bool collect(ProcessID pid, WaitRes &res)
-	{
+	bool collect(ProcessID pid, WaitRes &res) {
 		return collect(pid, SIZE_MAX, res);
 	}
 
-	void reportStolenChild(ProcessID pid, const WaitRes &res)
-	{
+	void reportStolenChild(ProcessID pid, const WaitRes &res) {
 		{
 			MutexGuard rg(m_proc_res_condition);
-			m_proc_res_map.insert( std::make_pair(pid, res) );
+			m_proc_res_map.insert(std::make_pair(pid, res));
 		}
 
 		m_proc_res_condition.broadcast();
@@ -93,20 +91,18 @@ protected: // functions
 	ProcessResultMap::iterator
 	doSigTimedWait(ProcessID pid, Clock &clock, const TimeSpec &endtime);
 
-	ProcessResultMap::iterator waitForCachedChildExit(ProcessID pid, const TimeSpec &endtime)
-	{
+	ProcessResultMap::iterator waitForCachedChildExit(ProcessID pid, const TimeSpec &endtime) {
 		auto ret = m_proc_res_map.find(pid);
 		bool timeout = false;
 
 		// if someone else is already waiting for a signal then simply
 		// block on the condition until we're woken up or the timeout
 		// hits
-		while( m_sigtimedwait_running && !timeout )
-		{
-			if( ret != m_proc_res_map.end() )
+		while (m_sigtimedwait_running && !timeout) {
+			if (ret != m_proc_res_map.end())
 				break;
 
-			if(endtime.isZero())
+			if (endtime.isZero())
 				m_proc_res_condition.wait();
 			else
 				timeout = !m_proc_res_condition.waitTimed(endtime);
@@ -117,8 +113,7 @@ protected: // functions
 		return ret;
 	}
 
-	void collectAllChildStatuses()
-	{
+	void collectAllChildStatuses() {
 		pid_t pid = -1;
 		int status = 0;
 
@@ -137,17 +132,15 @@ protected: // functions
 		 * This would allow to detect the situation but we wouldn't be
 		 * able to "put the exit status back".
 		 */
-		while( (pid = ::waitpid(-1, &status, WNOHANG)) != 0 )
-		{
-			if( pid == -1 )
-			{
-				if( errno == ECHILD )
+		while ((pid = ::waitpid(-1, &status, WNOHANG)) != 0) {
+			if (pid == -1) {
+				if (errno == ECHILD)
 					// no more child processes, just as
 					// good as a zero return, no?
 					break;
 				// something went wrong, clean up our state,
 				// the child is probably lost in some way.
-				cosmos_throw( ApiError() );
+				cosmos_throw (ApiError());
 			}
 
 			m_proc_res_map.insert( std::make_pair(pid, WaitRes(status)) );
@@ -169,18 +162,16 @@ protected: // data
 	bool m_sigtimedwait_running = false;
 };
 
-bool ChildCollector::collect(ProcessID pid, const size_t max_wait_ms, WaitRes &res)
-{
-	if( ! libInitialized() )
-	{
-		cosmos_throw( UsageError("libcosmos was not initialized") );
+bool ChildCollector::collect(ProcessID pid, const size_t max_wait_ms, WaitRes &res) {
+	if (! libInitialized()) {
+		cosmos_throw (UsageError("libcosmos was not initialized"));
 	}
 
 	auto clock = Clock(Condition::clockType());
 	TimeSpec endtime;
 	const bool use_timeout = max_wait_ms != SIZE_MAX;
 
-	if( use_timeout )
+	if (use_timeout)
 		// for the Condition API we need to carry around an absolute
 		// endpoint in time until which we want to be finished
 		endtime = clock.now() + TimeSpec().setAsMilliseconds(max_wait_ms);
@@ -193,14 +184,12 @@ bool ChildCollector::collect(ProcessID pid, const size_t max_wait_ms, WaitRes &r
 
 	// if the wait result was already fetched by someone else then we can
 	// return right away
-	if( it != m_proc_res_map.end() )
-	{
+	if (it != m_proc_res_map.end()) {
 		res = it->second;
 		m_proc_res_map.erase(it);
 		return true;
 	}
-	else if( use_timeout && clock.now() >= endtime )
-	{
+	else if (use_timeout && clock.now() >= endtime) {
 		// timed out in stage1
 		return false;
 	}
@@ -210,8 +199,7 @@ bool ChildCollector::collect(ProcessID pid, const size_t max_wait_ms, WaitRes &r
 	it = doSigTimedWait(pid, clock, endtime);
 
 	// so we finally got something
-	if( it != m_proc_res_map.end() )
-	{
+	if (it != m_proc_res_map.end()) {
 		res = it->second;
 		m_proc_res_map.erase(it);
 		return true;
@@ -226,19 +214,16 @@ ChildCollector::doSigTimedWait(ProcessID pid, Clock &clock, const TimeSpec &endt
 {
 	// if we reach this spot then nobody else should be waiting for a
 	// SIGCHLD at the moment
-	assert( m_sigtimedwait_running == false );
+	assert (m_sigtimedwait_running == false);
 
 	m_sigtimedwait_running = true;
 	auto it = m_proc_res_map.end();
 
-	try
-	{
-		while( it == m_proc_res_map.end() )
-		{
+	try {
+		while (it == m_proc_res_map.end()) {
 			{
 				MutexReverseGuard rg(m_proc_res_condition);
-				if( waitForChildSignal(clock, endtime) != true )
-				{
+				if (waitForChildSignal(clock, endtime) != true) {
 					// timed out
 					break;
 				}
@@ -254,8 +239,7 @@ ChildCollector::doSigTimedWait(ProcessID pid, Clock &clock, const TimeSpec &endt
 			m_proc_res_condition.broadcast();
 		}
 	}
-	catch(...)
-	{
+	catch (...) {
 		// the child is probably lost in some way
 		m_sigtimedwait_running = false;
 		throw;
@@ -269,8 +253,7 @@ ChildCollector::doSigTimedWait(ProcessID pid, Clock &clock, const TimeSpec &endt
 	return it;
 }
 
-bool ChildCollector::waitForChildSignal(Clock &clock, const TimeSpec &endtime) const
-{
+bool ChildCollector::waitForChildSignal(Clock &clock, const TimeSpec &endtime) const {
 	sigset_t sigs;
 	sigemptyset(&sigs);
 	sigaddset(&sigs, SIGCHLD);
@@ -289,13 +272,10 @@ bool ChildCollector::waitForChildSignal(Clock &clock, const TimeSpec &endtime) c
 
 	int res = -1;
 
-	while(true)
-	{
-		if( ts )
-		{
+	while (true) {
+		if (ts) {
 			relwait = endtime - clock.now();
-			if( relwait <= TimeSpec(0) )
-			{
+			if (relwait <= TimeSpec(0)) {
 				// nothing happened within time
 				return false;
 			}
@@ -303,8 +283,7 @@ bool ChildCollector::waitForChildSignal(Clock &clock, const TimeSpec &endtime) c
 
 		res = sigtimedwait(&sigs, nullptr, ts);
 
-		if( res != -1 )
-		{
+		if (res != -1) {
 			return true;
 		}
 
@@ -317,7 +296,7 @@ bool ChildCollector::waitForChildSignal(Clock &clock, const TimeSpec &endtime) c
 			// timed out
 			return false;
 		default:
-			cosmos_throw( ApiError() );
+			cosmos_throw (ApiError());
 		}
 	}
 }

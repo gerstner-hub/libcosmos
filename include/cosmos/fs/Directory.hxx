@@ -1,7 +1,7 @@
 #ifndef COSMOS_DIRECTORY_HXX
 #define COSMOS_DIRECTORY_HXX
 
-// C++
+// stdlib
 #include <exception>
 #include <iostream>
 
@@ -14,8 +14,7 @@
 #include "cosmos/fs/DirEntry.hxx"
 #include "cosmos/ostypes.hxx"
 
-namespace cosmos
-{
+namespace cosmos {
 
 /**
  * \brief
@@ -45,9 +44,8 @@ public: // functions
 	 * \see
 	 * 	open(FileDesc fd)
 	 **/
-	explicit Directory(FileDesc fd = INVALID_FILE_DESC)
-	{
-		if( fd != INVALID_FILE_DESC )
+	explicit Directory(FileDesc fd = INVALID_FILE_DESC) {
+		if (fd != INVALID_FILE_DESC)
 			open(fd);
 	}
 
@@ -56,19 +54,15 @@ public: // functions
 	 * 	Create a Directory object operating on the directory present
 	 * 	at the given path location in the file system
 	 **/
-	explicit Directory(const std::string &path)
-	{
+	explicit Directory(const std::string &path) {
 		open(path);
 	}
 
-	~Directory()
-	{
-		try
-		{
+	~Directory() {
+		try {
 			close();
 		}
-		catch(const std::exception &ex)
-		{
+		catch (const std::exception &ex) {
 			// ignore otherwise
 			std::cerr << __FUNCTION__
 				<< ": failed to close Directory stream: "
@@ -147,15 +141,13 @@ public: // functions
 	 * 	assumptions should be made about it. It can merely be used to
 	 * 	seek() at a later point in time.
 	 **/
-	DirPos tell() const
-	{
+	DirPos tell() const {
 		requireOpenStream("tell");
 
 		auto ret = telldir(m_stream);
 
-		if( ret == -1 )
-		{
-			cosmos_throw( ApiError() );
+		if (ret == -1) {
+			cosmos_throw (ApiError());
 		}
 
 		return ret;
@@ -167,8 +159,7 @@ public: // functions
 	 * \details
 	 * 	\c pos needs to be previously obtained from tell()
 	 **/
-	void seek(const DirPos &pos)
-	{
+	void seek(const DirPos &pos) {
 		requireOpenStream("seek");
 
 		seekdir(m_stream, pos);
@@ -191,11 +182,9 @@ public: // functions
 
 protected: // functions
 
-	void requireOpenStream(const char *context) const
-	{
-		if( !isOpen() )
-		{
-			cosmos_throw( UsageError(std::string(context) + " on unassociated Directory") );
+	void requireOpenStream(const char *context) const {
+		if (!isOpen()) {
+			cosmos_throw (UsageError(std::string(context) + " on unassociated Directory"));
 		}
 	}
 

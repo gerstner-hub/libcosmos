@@ -1,8 +1,7 @@
 #ifndef COSMOS_INIT_HXX
 #define COSMOS_INIT_HXX
 
-namespace cosmos
-{
+namespace cosmos {
 
 /**
  * \brief

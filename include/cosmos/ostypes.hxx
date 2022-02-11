@@ -5,8 +5,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 
-namespace cosmos
-{
+namespace cosmos {
 
 /*
  * these are not part of the SubProc class, because then we'd get mutual

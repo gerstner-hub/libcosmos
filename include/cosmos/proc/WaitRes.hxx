@@ -1,7 +1,7 @@
 #ifndef COSMOS_WAITRES_HXX
 #define COSMOS_WAITRES_HXX
 
-// C++ stdlib
+// stdlib
 #include <iosfwd>
 
 // Linux
@@ -12,8 +12,7 @@
 #include "cosmos/proc/Signal.hxx"
 #include "cosmos/proc/ptrace.hxx"
 
-namespace cosmos
-{
+namespace cosmos {
 
 /**
  * \brief
@@ -49,16 +48,14 @@ public: // functions
 	 *	The returned value is only valid in case exited() returns \c
 	 *	true.
 	 **/
-	int exitStatus() const { return exited() ?  WEXITSTATUS(m_status) : -1; }
+	int exitStatus() const { return exited() ? WEXITSTATUS(m_status) : -1; }
 
 	/**
 	 * \brief
 	 * 	Returns the signal that caused the child to stop if stopped()
 	 **/
-	Signal stopSignal() const
-	{
-		return stopped() ?
-			Signal(WSTOPSIG(m_status) & (~0x80)) : Signal(0);
+	Signal stopSignal() const {
+		return stopped() ? Signal(WSTOPSIG(m_status) & (~0x80)) : Signal(0);
 	}
 
 	/**
@@ -66,9 +63,8 @@ public: // functions
 	 * 	Returns the signal that caused the child to terminate if
 	 * 	signaled()
 	 **/
-	Signal termSignal() const
-	{
-		return signaled() ?  Signal(WTERMSIG(m_status)) : Signal(0);
+	Signal termSignal() const {
+		return signaled() ? Signal(WTERMSIG(m_status)) : Signal(0);
 	}
 
 	/**
@@ -77,8 +73,7 @@ public: // functions
 	 * \note
 	 * 	This only works if the TRACESYSGOOD option was set
 	 **/
-	bool syscallTrace() const
-	{
+	bool syscallTrace() const {
 		return stopped() && WSTOPSIG(m_status) == (SIGTRAP | 0x80);
 	}
 
@@ -89,16 +84,14 @@ public: // functions
 	 * 	These events only occur if the corresponding TraceOpts have
 	 * 	been set on the tracee
 	 **/
-	bool checkEvent(const TraceEvent &event)
-	{
-		if( ! stopped() )
+	bool checkEvent(const TraceEvent &event) {
+		if (! stopped())
 			return false;
 
 		return (m_status >> 8) == (SIGTRAP | ((int)event << 8));
 	}
 
-	bool exitedSuccessfully() const
-	{
+	bool exitedSuccessfully() const {
 		return exited() && exitStatus() == 0;
 	}
 

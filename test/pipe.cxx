@@ -8,8 +8,7 @@
 #include "cosmos/proc/SubProc.hxx"
 #include "cosmos/Init.hxx"
 
-int main()
-{
+int main() {
 	cosmos::Init init;
 	cosmos::Pipe pip;
 	cosmos::OutputStreamAdaptor pip_out(pip);
@@ -20,8 +19,7 @@ int main()
 	std::string s;
 	pip_in >> s;
 
-	if( s != "test" )
-	{
+	if (s != "test") {
 		std::cerr << "Didn't get exact copy back from pipe!\n" << std::endl;
 		std::cerr << "Got '" << s << "' instead\n" << std::endl;
 		return 1;

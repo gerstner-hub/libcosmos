@@ -1,15 +1,16 @@
 #ifndef COSMOS_MUTEX_HXX
 #define COSMOS_MUTEX_HXX
 
-// Linux
+// stdlib
+#include <cassert>
+
+// POSIX
 #include <pthread.h>
-#include <assert.h>
 
 // cosmos
 #include "cosmos/errors/ApiError.hxx"
 
-namespace cosmos
-{
+namespace cosmos {
 
 // fwd. decl.
 class Condition;
@@ -30,7 +31,6 @@ class Mutex
 
 public: // functions
 
-
 	/**
 	 * \brief
 	 *	The only supported mutex type for the moment is non-recursive
@@ -41,30 +41,25 @@ public: // functions
 	 **/
 	Mutex();
 
-	~Mutex()
-	{
-		const int destroy_res = ::pthread_mutex_destroy(&m_pmutex);
+	~Mutex() {
+		const auto destroy_res = ::pthread_mutex_destroy(&m_pmutex);
 
-		assert( !destroy_res );
+		assert (!destroy_res);
 	}
 
-	void lock() const
-	{
-		const int lock_res = ::pthread_mutex_lock(&m_pmutex);
+	void lock() const {
+		const auto lock_res = ::pthread_mutex_lock(&m_pmutex);
 
-		if( lock_res )
-		{
-			cosmos_throw( ApiError(lock_res) );
+		if (lock_res) {
+			cosmos_throw (ApiError(lock_res));
 		}
 	}
 
-	void unlock() const
-	{
+	void unlock() const {
 		const int unlock_res = ::pthread_mutex_unlock(&m_pmutex);
 
-		if( unlock_res )
-		{
-			cosmos_throw( ApiError(unlock_res) );
+		if (unlock_res) {
+			cosmos_throw (ApiError(unlock_res));
 		}
 	}
 
@@ -92,8 +87,7 @@ public: // functions
 		m_mutex.lock();
 	}
 
-	~MutexGuard()
-	{
+	~MutexGuard() {
 		m_mutex.unlock();
 	}
 
@@ -117,8 +111,7 @@ public: // functions
 		m_mutex.unlock();
 	}
 
-	~MutexReverseGuard()
-	{
+	~MutexReverseGuard() {
 		m_mutex.lock();
 	}
 

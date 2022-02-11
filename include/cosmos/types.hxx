@@ -7,8 +7,7 @@
 #include <string>
 #include <vector>
 
-namespace cosmos
-{
+namespace cosmos {
 
 /*
  * some general types used across cosmos
@@ -24,11 +23,9 @@ typedef std::vector<const char*> CStringVector;
  * 	Output all the elements of a vector as a comma separated list
  **/
 template <typename T>
-inline std::ostream& operator<<(std::ostream &o, const std::vector<T> &sv)
-{
-	for( auto it = sv.begin(); it != sv.end(); it++ )
-	{
-		if( it != sv.begin() )
+inline std::ostream& operator<<(std::ostream &o, const std::vector<T> &sv) {
+	for (auto it = sv.begin(); it != sv.end(); it++) {
+		if (it != sv.begin())
 			o << ", ";
 		o << *it;
 	}
@@ -42,10 +39,8 @@ inline std::ostream& operator<<(std::ostream &o, const std::vector<T> &sv)
  * 	list
  **/
 template <typename K, typename V>
-inline std::ostream& operator<<(std::ostream &o, const std::map<K,V> &m)
-{
-	for( auto it: m )
-	{
+inline std::ostream& operator<<(std::ostream &o, const std::map<K,V> &m) {
+	for (auto it: m) {
 		o << it.first << ": " << it.second << "\n";
 	}
 

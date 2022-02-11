@@ -20,12 +20,10 @@ public:
 	}
 
 
-	int testBasicLogic()
-	{
+	int testBasicLogic() {
 		cosmos::Directory dir;
 
-		if( dir.isOpen() )
-		{
+		if (dir.isOpen()) {
 			std::cerr << "default constructed Directory isOpen() ?!" << std::endl;
 			return 1;
 		}
@@ -33,50 +31,42 @@ public:
 		// should do nothing
 		dir.close();
 
-		try
-		{
+		try {
 			dir.fd();
 			std::cerr << "Directory.fd() returned something for closed dir?!" << std::endl;
 			return 1;
 		}
-		catch(...)
-		{
+		catch(...) {
 			// error is expected
 		}
 
-		try
-		{
+		try {
 			dir.tell();
 			std::cerr << "Directory.tell() returned something for closed dir?!" << std::endl;
 			return 1;
 		}
-		catch(...)
-		{
+		catch(...) {
 			// error is expected
 		}
 
-		try
-		{
+		try {
 			dir.nextEntry();
 			std::cerr << "Directory.nextEntry() returned something for closed dir?!" << std::endl;
 			return 1;
 		}
-		catch(...)
-		{
+		catch(...) {
 			// error is expected
 		}
 
 		return 0;
 	}
 
-	int testOpenDir()
-	{
+	int testOpenDir() {
 		cosmos::Directory dir;
 
 		dir.open(m_dir_path);
 
-		if( dir.isOpen() != true )
-		{
+		if (dir.isOpen() != true) {
 			std::cerr << "Directory was opened but isOpen() returns false?!" << std::endl;
 			return 1;
 		}
@@ -88,36 +78,29 @@ public:
 
 		cosmos::DirEntry entry;
 
-		while( (entry = dir.nextEntry()).isValid() )
-		{
+		while ((entry = dir.nextEntry()).isValid()) {
 			std::cout << entry.name() << std::endl;
 
 			auto sname = std::string(entry.name());
 
-			if(first_name.empty())
-			{
+			if (first_name.empty()) {
 				first_name = sname;
 			}
 
-			if( sname == "." || sname == ".." )
-			{
-				if( entry.isDotEntry() != true )
-				{
+			if (sname == "." || sname == "..") {
+				if (entry.isDotEntry() != true) {
 					std::cerr << sname << " != isDotEntry()?!" << std::endl;
 					return 1;
 				}
 			}
-			else
-			{
-				if( entry.isDotEntry() != false )
-				{
+			else {
+				if (entry.isDotEntry() != false) {
 					std::cerr << sname << " == isDotEntry()?!" << std::endl;
 					return 1;
 				}
 			}
 
-			if( sname.size() != entry.nameLength() )
-			{
+			if (sname.size() != entry.nameLength()) {
 				std::cerr << "len(" << sname << ") == " << entry.nameLength() << "?!" << std::endl;
 				return 1;
 			}
@@ -126,8 +109,7 @@ public:
 		dir.seek(startpos);
 		entry = dir.nextEntry();
 
-		if( first_name != entry.name() )
-		{
+		if (first_name != entry.name()) {
 			std::cerr << "tell() / seek() failed ?!" << std::endl;
 
 			return 1;
@@ -136,8 +118,7 @@ public:
 		dir.close();
 		struct stat s;
 
-		if( ::fstat(fd, &s) != -1 || errno != EBADF )
-		{
+		if (::fstat(fd, &s) != -1 || errno != EBADF) {
 			std::cerr << "fd() still valid after close() ?!" << std::endl;
 			return 1;
 		}
@@ -145,11 +126,10 @@ public:
 		return 0;
 	}
 
-	int run()
-	{
+	int run() {
 		auto ret = testBasicLogic();
 
-		if(ret != 0)
+		if (ret != 0)
 			return ret;
 
 		ret = testOpenDir();
@@ -164,13 +144,11 @@ protected:
 
 int main()
 {
-	try
-	{
+	try {
 		DirsTest test;
 		return test.run();
 	}
-	catch(const std::exception &ex)
-	{
+	catch (const std::exception &ex) {
 		std::cerr << "test failed: " << ex.what() << std::endl;
 	}
 }

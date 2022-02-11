@@ -8,21 +8,19 @@
 // C++
 #include <stdint.h>
 
-// ptrace
+// Linux
 #include <sys/ptrace.h>
 
 // cosmos
 #include "cosmos/BitMask.hxx"
 
-namespace cosmos
-{
+namespace cosmos {
 
 /**
  * \brief
  * 	Different modes to continue a tracee
  **/
-enum class ContinueMode
-{
+enum class ContinueMode {
 	//! continues the tracee without special side-effects
 	NORMAL = PTRACE_CONT,
 	//! continues, but stops it at the next entry/exit to a system call
@@ -35,8 +33,7 @@ enum class ContinueMode
  * \brief
  * 	Different options we can set for a tracee
  **/
-enum class TraceOpts : intptr_t /* is a void* in ptrace(2), so we need pointer width */
-{
+enum class TraceOpts : intptr_t { /* is a void* in ptrace(2), so we need pointer width */
 	//! when the tracer exits all tracees will be sent SIGKILL
 	EXITKILL = PTRACE_O_EXITKILL,
 	//! stop on clone(2) and trace the newly cloned process
@@ -61,8 +58,7 @@ typedef BitMask<TraceOpts> TraceOptsMask;
  * \brief
  * 	Different events that can occur in a tracee
  **/
-enum class TraceEvent
-{
+enum class TraceEvent {
 	//! vfork or clone with VFORK flag is upcoming
 	VFORK = PTRACE_EVENT_VFORK,
 	//! fork or clone is upcoming

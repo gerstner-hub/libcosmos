@@ -1,8 +1,7 @@
 // Cosmos
 #include "cosmos/thread/Condition.hxx"
 
-namespace cosmos
-{
+namespace cosmos {
 
 Condition::Condition(Mutex &lock) :
 	m_lock(lock)
@@ -13,13 +12,11 @@ Condition::Condition(Mutex &lock) :
 
 	res = pthread_condattr_init(&attr);
 
-	if( res != 0 )
-	{
-		cosmos_throw( ApiError(res) );
+	if (res != 0) {
+		cosmos_throw (ApiError(res));
 	}
 
-	try
-	{
+	try {
 		/*
 		 * we need the monotonic clock for time based wait
 		 * operations on the condition, it's the most robust
@@ -27,20 +24,17 @@ Condition::Condition(Mutex &lock) :
 		 */
 		res = pthread_condattr_setclock(&attr, Clock(clockType()).rawType());
 
-		if( res != 0 )
-		{
-			cosmos_throw( ApiError(res) );
+		if (res != 0) {
+			cosmos_throw (ApiError(res));
 		}
 
 		res = ::pthread_cond_init(&m_pcond, &attr);
 
-		if( res != 0 )
-		{
-			cosmos_throw( ApiError(res) );
+		if (res != 0) {
+			cosmos_throw (ApiError(res));
 		}
 	}
-	catch(...)
-	{
+	catch(...) {
 		(void)pthread_condattr_destroy(&attr);
 		throw;
 	}

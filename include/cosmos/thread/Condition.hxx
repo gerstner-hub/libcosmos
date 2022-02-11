@@ -10,8 +10,7 @@
 #include "cosmos/thread/Mutex.hxx"
 #include "cosmos/time/Clock.hxx"
 
-namespace cosmos
-{
+namespace cosmos {
 
 /**
  * \brief
@@ -20,8 +19,7 @@ namespace cosmos
  * 	The current implementation only provides the most basic condition
  * 	operations. Refer to the POSIX man pages for more information.
  **/
-class Condition
-{
+class Condition {
 	// disallow copy-assignment
 	Condition(const Condition&) = delete;
 	Condition& operator=(const Condition&) = delete;
@@ -39,21 +37,18 @@ public: // functions
 	 **/
 	explicit Condition(Mutex &lock);
 
-	~Condition()
-	{
-		const int destroy_res = ::pthread_cond_destroy(&m_pcond);
+	~Condition() {
+		const auto destroy_res = ::pthread_cond_destroy(&m_pcond);
 
-		assert( ! destroy_res );
+		assert (!destroy_res);
 	}
 
 	//! The associated lock must already be locked at entry
-	void wait() const
-	{
+	void wait() const {
 		auto res = ::pthread_cond_wait(&m_pcond, &(m_lock.m_pmutex));
 
-		if( res != 0 )
-		{
-			cosmos_throw( ApiError(res) );
+		if (res != 0) {
+			cosmos_throw (ApiError(res));
 		}
 	}
 
@@ -68,13 +63,12 @@ public: // functions
 	 *	\c true If a signal was received, \c false if a timeout
 	 *	occured.
 	 **/
-	bool waitTimed(const TimeSpec &ts) const
-	{
+	bool waitTimed(const TimeSpec &ts) const {
 		auto res = ::pthread_cond_timedwait(&m_pcond, &(m_lock.m_pmutex), &ts);
 
 		switch(res)
 		{
-		default: cosmos_throw( ApiError(res) ); return false;
+		default: cosmos_throw (ApiError(res)); return false;
 		case 0: return true;
 		case ETIMEDOUT: return false;
 		}
@@ -83,23 +77,19 @@ public: // functions
 	//! returns the clock type used for waitTimed()
 	static ClockType clockType() { return ClockType::MONOTONIC; }
 
-	void signal()
-	{
+	void signal() {
 		auto res = ::pthread_cond_signal(&m_pcond);
 
-		if( res != 0 )
-		{
-			cosmos_throw( ApiError(res) );
+		if (res != 0) {
+			cosmos_throw (ApiError(res));
 		}
 	}
 
-	void broadcast()
-	{
+	void broadcast() {
 		auto res = ::pthread_cond_broadcast(&m_pcond);
 
-		if( res != 0 )
-		{
-			cosmos_throw( ApiError(res) );
+		if (res != 0) {
+			cosmos_throw (ApiError(res));
 		}
 	}
 

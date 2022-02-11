@@ -8,16 +8,14 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-namespace cosmos
-{
+namespace cosmos {
 
-bool FileSystem::existsFile(const std::string &path)
-{
+bool FileSystem::existsFile(const std::string &path) {
 	struct stat s;
-	if( lstat(path.c_str(), &s) == 0 )
+	if (lstat(path.c_str(), &s) == 0)
 		return true;
-	else if( errno != ENOENT )
-		cosmos_throw( ApiError() );
+	else if (errno != ENOENT)
+		cosmos_throw (ApiError());
 
 	return false;
 }

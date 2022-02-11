@@ -4,15 +4,13 @@
 // C
 #include <stdint.h>
 
-namespace cosmos
-{
+namespace cosmos {
 
 /*
  * this structure is actually not declared in the userspace headers so it
  * seems we have to declare it ourselves
  */
-struct sched_attr
-{
+struct sched_attr {
 	//! size of this structure
 	uint32_t size;
 	//! Policy (SCHED_*)

@@ -4,8 +4,7 @@
 // cosmos
 #include "cosmos/Init.hxx"
 
-namespace cosmos
-{
+namespace cosmos {
 
 /**
  * \brief
@@ -14,8 +13,7 @@ namespace cosmos
  *	Each new library facility in need of initialization that derives from
  *	Initable needs to enter its individual priority here.
  **/
-enum class InitPrio : std::size_t
-{
+enum class InitPrio : std::size_t {
 	CHILD_COLLECTOR
 };
 
@@ -38,8 +36,7 @@ class Initable
 
 protected: // functions
 
-	explicit Initable(const InitPrio prio)
-	{
+	explicit Initable(const InitPrio prio) {
 		registerInitable(prio);
 	}
 

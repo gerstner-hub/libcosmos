@@ -4,8 +4,7 @@
 // cosmos
 #include "cosmos/ostypes.hxx"
 
-namespace cosmos
-{
+namespace cosmos {
 
 /**
  * \brief
@@ -21,20 +20,16 @@ public: // functions
 	 * \brief
 	 *	Returns the process ID of the current process
 	 **/
-	ProcessID getPid() const
-	{
-		return m_own_pid == INVALID_PID ?
-			cachePid() : m_own_pid;
+	ProcessID getPid() const {
+		return m_own_pid == INVALID_PID ? cachePid() : m_own_pid;
 	}
 
 	/**
 	 * \brief
 	 *	Returns the process ID of the parent of the current process
 	 **/
-	ProcessID getPPid() const
-	{
-		return m_parent_pid == INVALID_PID ?
-			cachePPid() : m_parent_pid;
+	ProcessID getPPid() const {
+		return m_parent_pid == INVALID_PID ?  cachePPid() : m_parent_pid;
 	}
 
 	/**

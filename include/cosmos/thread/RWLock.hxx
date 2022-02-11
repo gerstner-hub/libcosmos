@@ -1,13 +1,16 @@
 #ifndef COSMOS_RWLOCK_HXX
 #define COSMOS_RWLOCK_HXX
 
-#include <pthread.h>
-#include <assert.h>
+// stdlib
+#include <cassert>
 
+// POSIX
+#include <pthread.h>
+
+// cosmos
 #include "cosmos/errors/ApiError.hxx"
 
-namespace cosmos
-{
+namespace cosmos {
 
 /**
  * \brief
@@ -27,42 +30,35 @@ class RWLock
 	RWLock& operator=(const RWLock&) = delete;
 public: // functions
 
-	RWLock()
-	{
-		if( ::pthread_rwlock_init( &m_prwlock, nullptr) != 0 )
-		{
-			cosmos_throw( ApiError("Error creating rwlock") );
+	RWLock() {
+		if (::pthread_rwlock_init( &m_prwlock, nullptr) != 0) {
+			cosmos_throw (ApiError("Error creating rwlock"));
 		}
 	}
 
-	~RWLock()
-	{
-		const int destroy_res = ::pthread_rwlock_destroy(&m_prwlock);
+	~RWLock() {
+		const auto destroy_res = ::pthread_rwlock_destroy(&m_prwlock);
 
-		assert( !destroy_res );
+		assert (!destroy_res);
 	}
 
-	void readlock() const
-	{
-		if( ::pthread_rwlock_rdlock(&m_prwlock) != 0 )
-		{
-			cosmos_throw( ApiError("Error read-locking rwlock") );
+	void readlock() const {
+		if (::pthread_rwlock_rdlock(&m_prwlock) != 0) {
+			cosmos_throw (ApiError("Error read-locking rwlock"));
 		}
 	}
 
 	void writelock() const
 	{
-		if( ::pthread_rwlock_wrlock(&m_prwlock) != 0 )
-		{
-			cosmos_throw( ApiError("Error write-locking rwlock") );
+		if (::pthread_rwlock_wrlock(&m_prwlock) != 0) {
+			cosmos_throw (ApiError("Error write-locking rwlock"));
 		}
 	}
 
 	void unlock() const
 	{
-		if( ::pthread_rwlock_unlock(&m_prwlock) != 0 )
-		{
-			cosmos_throw( ApiError("Error unlocking rw-lock") );
+		if (::pthread_rwlock_unlock(&m_prwlock) != 0) {
+			cosmos_throw (ApiError("Error unlocking rw-lock"));
 		}
 	}
 
@@ -81,14 +77,13 @@ class ReadLockGuard
 {
 public: // functions
 
-	ReadLockGuard(const RWLock &rwl) :
+	explicit ReadLockGuard(const RWLock &rwl) :
 		m_rwl(rwl)
 	{
 		rwl.readlock();
 	}
 
-	~ReadLockGuard()
-	{
+	~ReadLockGuard() {
 		m_rwl.unlock();
 	}
 private: // data
@@ -104,14 +99,13 @@ class WriteLockGuard
 {
 public: // functions
 
-	WriteLockGuard(const RWLock &rwl) :
+	explicit WriteLockGuard(const RWLock &rwl) :
 		m_rwl(rwl)
 	{
 		rwl.writelock();
 	}
 
-	~WriteLockGuard()
-	{
+	~WriteLockGuard() {
 		m_rwl.unlock();
 	}
 

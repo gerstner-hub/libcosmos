@@ -1,14 +1,13 @@
 #ifndef COSMOS_PIPE_HXX
 #define COSMOS_PIPE_HXX
 
-// linux
+// Linux
 #include <unistd.h>
 
 // cosmos
 #include "cosmos/ostypes.hxx"
 
-namespace cosmos
-{
+namespace cosmos {
 
 /**
  * \brief
@@ -36,15 +35,13 @@ public: // functions
 	bool haveReadEnd() const { return m_read_end != INVALID_FILE_DESC; }
 	bool haveWriteEnd() const { return m_write_end != INVALID_FILE_DESC; }
 
-	FileDesc takeReadEndOwnership()
-	{
+	FileDesc takeReadEndOwnership() {
 		auto ret = readEnd();
 		invalidateReadEnd();
 		return ret;
 	}
 
-	FileDesc takeWriteEndOwnership()
-	{
+	FileDesc takeWriteEndOwnership() {
 		auto ret = writeEnd();
 		invalidateWriteEnd();
 		return ret;

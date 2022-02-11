@@ -30,20 +30,17 @@ public:
 
 	~RedirectOutputTestBase()
 	{
-		if( unlink(m_tmp_file_path.c_str()) != 0 )
-		{
+		if (unlink(m_tmp_file_path.c_str()) != 0) {
 			std::cerr << "Failed to remove " << m_tmp_file_path << std::endl;
 		}
 	}
 
-	cosmos::FileDesc getTempFile()
-	{
+	cosmos::FileDesc getTempFile() {
 		m_tmp_file_path = "/tmp/subproc_test.XXXXXX";
 		auto ret = mkostemp(&m_tmp_file_path[0], O_CLOEXEC);
 
-		if( ret == cosmos::INVALID_FILE_DESC )
-		{
-			cosmos_throw( cosmos::ApiError() );
+		if (ret == cosmos::INVALID_FILE_DESC) {
+			cosmos_throw (cosmos::ApiError());
 		}
 
 		std::cout << "Using temporary file: " << m_tmp_file_path << std::endl;
@@ -66,8 +63,7 @@ public:
 		m_cat_file("/etc/fstab")
 	{}
 
-	void run()
-	{
+	void run() {
 		cosmos::InputStreamAdaptor file(getTempFile());
 
 		/*
@@ -83,47 +79,41 @@ public:
 		m_proc.run();
 		auto res = m_proc.wait();
 
-		if( ! res.exitedSuccessfully() )
-		{
-			cosmos_throw( cosmos::InternalError("Child process with redirected stdout failed") );
+		if (! res.exitedSuccessfully()) {
+			cosmos_throw (cosmos::InternalError("Child process with redirected stdout failed"));
 		}
 
 		compareFiles(file);
 	}
 
-	void compareFiles(std::istream &copy)
-	{
+	void compareFiles(std::istream &copy) {
 		std::ifstream orig(m_cat_file);
 		// we share the open file description with the child, thus we
 		// need to rewind
 		copy.seekg(0);
 
-		if( ! copy.good() || !orig.good() )
-		{
-			cosmos_throw( cosmos::InternalError("bad stream state(s)") );
+		if (!copy.good() || !orig.good()) {
+			cosmos_throw (cosmos::InternalError("bad stream state(s)"));
 		}
 
 		std::string line1, line2;
 
-		while(true)
-		{
+		while (true) {
 			std::getline(orig, line1);
 			std::getline(copy, line2);
 
-			if( orig.eof() && copy.eof() )
+			if (orig.eof() && copy.eof())
 				break;
-			else if( orig.fail() || copy.fail() )
-			{
+			else if (orig.fail() || copy.fail()) {
 				std::cout << "orig.fail(): " << orig.fail() << std::endl;
 				std::cout << "copy.fail(): " << copy.fail() << std::endl;
-				cosmos_throw( cosmos::InternalError("inconsistent stream state(s)") );
+				cosmos_throw (cosmos::InternalError("inconsistent stream state(s)"));
 			}
-			else if( line1 != line2 )
-			{
+			else if (line1 != line2) {
 				std::cerr
 					<< "output file doesn't match input file\n"
 					<< line1 << " != " << line2 << std::endl;
-				cosmos_throw( cosmos::InternalError("file comparison failed") );
+				cosmos_throw (cosmos::InternalError("file comparison failed"));
 			}
 
 			//std::cout << line1 << " == " << line2 << "\n";
@@ -145,8 +135,7 @@ public:
 		m_nonexisting_file("/non/existing/file")
 	{}
 
-	void run()
-	{
+	void run() {
 		cosmos::InputStreamAdaptor file(getTempFile());
 
 		/*
@@ -162,10 +151,9 @@ public:
 		m_proc.run();
 		auto res = m_proc.wait();
 
-		if( ! res.exited() || res.exitStatus() != 1 )
-		{
+		if (! res.exited() || res.exitStatus() != 1) {
 			std::cerr << res << std::endl;
-			cosmos_throw( cosmos::InternalError("Child process with redirected stderr ended in unexpected state") );
+			cosmos_throw (cosmos::InternalError("Child process with redirected stderr ended in unexpected state"));
 		}
 
 		checkErrorMessage(file);
@@ -178,21 +166,19 @@ public:
 		std::string line;
 		std::getline(errfile, line);
 
-		if( errfile.fail() )
-		{
-			cosmos_throw( cosmos::InternalError("Failed to read back cat error message") );
+		if (errfile.fail()) {
+			cosmos_throw (cosmos::InternalError("Failed to read back cat error message"));
 		}
 
 		// TODO: be aware of locale settings that might change the
 		// error message content
 		const std::string errmsg("No such file or directory");
-		for( const auto &item: {m_nonexisting_file, m_cat_path, errmsg} )
-		{
-			if( line.find(item) != line.npos )
+		for (const auto &item: {m_nonexisting_file, m_cat_path, errmsg}) {
+			if (line.find(item) != line.npos)
 				continue;
 
 			std::cerr << "Couldn't find '" << item << "' in error message: '" << line << "'\n";
-			cosmos_throw( cosmos::InternalError("Couldn't find expected item in error message") );
+			cosmos_throw (cosmos::InternalError("Couldn't find expected item in error message"));
 		}
 
 		std::cout << "error message contains expected elements" << std::endl;
@@ -211,8 +197,7 @@ public:
 		m_test_file("/etc/services")
 	{}
 
-	void run()
-	{
+	void run() {
 		std::stringstream ss;
 		ss << m_expected_lines;
 		/*
@@ -235,12 +220,10 @@ public:
 		// same here vice-versa
 		m_pipe_to_head.closeReadEnd();
 
-		try
-		{
+		try {
 			performPipeIO();
 		}
-		catch(...)
-		{
+		catch (...) {
 			m_proc.kill(cosmos::Signal(SIGTERM));
 			m_proc.wait();
 			throw;
@@ -248,17 +231,14 @@ public:
 
 		auto res = m_proc.wait();
 
-		if( ! res.exitedSuccessfully() )
-		{
-			cosmos_throw( cosmos::InternalError("Child process with redirected stdin failed") );
+		if (!res.exitedSuccessfully()) {
+			cosmos_throw (cosmos::InternalError("Child process with redirected stdin failed"));
 		}
 	}
 
-	void performPipeIO()
-	{
+	void performPipeIO() {
 		cosmos::StringVector test_lines;
-		for(size_t i = 0; i < m_expected_lines * 2; i++ )
-		{
+		for (size_t i = 0; i < m_expected_lines * 2; i++ ) {
 			std::stringstream ss;
 			ss << "Test line " << i << "\n";
 			test_lines.push_back(ss.str());
@@ -267,11 +247,10 @@ public:
 		cosmos::InputStreamAdaptor from_head(m_pipe_from_head);
 		cosmos::OutputStreamAdaptor to_head(m_pipe_to_head);
 
-		for(const auto &line: test_lines)
-		{
+		for (const auto &line: test_lines) {
 			to_head.write(line.c_str(), line.size());
 
-			if( to_head.fail() )
+			if (to_head.fail())
 				// probably head exited after the maximum
 				// number of lines
 				break;
@@ -282,36 +261,31 @@ public:
 		std::string copy_line;
 		size_t received_lines = 0;
 
-		while(true)
-		{
+		while (true) {
 			std::getline(from_head, copy_line);
 
-			if( from_head.eof() )
+			if (from_head.eof())
 				break;
-			else if( from_head.fail() )
-			{
-				cosmos_throw( cosmos::InternalError("bad stream state") );
+			else if (from_head.fail()) {
+				cosmos_throw (cosmos::InternalError("bad stream state"));
 			}
 
 			// re-add the newline for comparison
 			copy_line += "\n";
 
-			if( test_lines.at(received_lines) != copy_line )
-			{
+			if (test_lines.at(received_lines) != copy_line) {
 				std::cerr << "'" << copy_line << "' != '" << test_lines[received_lines] << "'" << std::endl;
-				cosmos_throw( cosmos::InternalError("received bad line copy") );
+				cosmos_throw (cosmos::InternalError("received bad line copy"));
 			}
-			else
-			{
+			else {
 				//std::cout << "line nr. " << received_lines << " is correct" << std::endl;
 			}
 
 			++received_lines;
 		}
 
-		if( received_lines != m_expected_lines )
-		{
-			cosmos_throw( cosmos::InternalError("Didn't receive back the expected amount of lines") );
+		if (received_lines != m_expected_lines) {
+			cosmos_throw (cosmos::InternalError("Didn't receive back the expected amount of lines"));
 		}
 
 		from_head.close();
@@ -338,8 +312,7 @@ public:
 	{
 	}
 
-	void run()
-	{
+	void run() {
 		// let the child sleep some seconds
 		m_proc.setArgs({m_sleep_bin, "5"});
 		m_proc.run();
@@ -347,30 +320,25 @@ public:
 		size_t num_timeouts = 0;
 		cosmos::WaitRes res;
 
-		while(true)
-		{
+		while (true) {
 			// wait at max one second
 			auto exited = m_proc.waitTimed(500, res);
 
-			if( !exited )
-			{
+			if (!exited) {
 				num_timeouts++;
 				continue;
 			}
-			else if( res.exited() && res.exitStatus() == 0 )
-			{
+			else if (res.exited() && res.exitStatus() == 0) {
 				// correctly exited
 				break;
 			}
-			else
-			{
-				cosmos_throw( cosmos::InternalError("Child process unexpectedly exited unsuccesfully") );
+			else {
+				cosmos_throw (cosmos::InternalError("Child process unexpectedly exited unsuccesfully"));
 			}
 		}
 
-		if( num_timeouts == 0 )
-		{
-			cosmos_throw( cosmos::InternalError("Child process waitTimed() unexpectedly didn't timeout") );
+		if (num_timeouts == 0) {
+			cosmos_throw (cosmos::InternalError("Child process waitTimed() unexpectedly didn't timeout"));
 		}
 
 		std::cout << "Child process wait timed out " << num_timeouts << " times. Successfully tested timeouts" << std::endl;
@@ -400,8 +368,7 @@ public:
 
 	}
 
-	void collectResults()
-	{
+	void collectResults() {
 		cosmos::WaitRes wr;
 		/*
 		 * this should time out but in the problematic case still
@@ -412,16 +379,14 @@ public:
 		const auto short_pid = m_short_proc.pid();
 		const auto long_pid = m_long_proc.pid();
 
-		if( exited )
-		{
-			cosmos_throw( cosmos::InternalError("long running proc unexpectedly returned early") );
+		if (exited) {
+			cosmos_throw (cosmos::InternalError("long running proc unexpectedly returned early"));
 		}
 
 		exited = m_long_proc.waitTimed(10000, wr);
 
-		if( !exited )
-		{
-			cosmos_throw( cosmos::InternalError("long running proc unexpectedly didn't return in time") );
+		if (!exited) {
+			cosmos_throw (cosmos::InternalError("long running proc unexpectedly didn't return in time"));
 		}
 
 		std::cout << "PID " << long_pid << " returned:\n" << wr << "\n\n";
@@ -429,17 +394,14 @@ public:
 		// this should long have exited
 		exited = m_short_proc.waitTimed(10000, wr);
 
-		if( !exited )
-
-		{
-			cosmos_throw( cosmos::InternalError("short running proc seemingly didn't return in time") );
+		if (!exited) {
+			cosmos_throw (cosmos::InternalError("short running proc seemingly didn't return in time"));
 		}
 
 		std::cout << "PID " << short_pid << " returned:\n" << wr << "\n\n";
 	}
 
-	void run()
-	{
+	void run() {
 		m_short_proc.setArgs({m_sleep_bin, "5"});
 		m_long_proc.setArgs({m_sleep_bin, "10"});
 
@@ -449,19 +411,16 @@ public:
 		std::cout << "started " << m_short_proc.args() << " with PID " << m_short_proc.pid() << std::endl;
 		std::cout << "started " << m_long_proc.args() << " with PID " << m_long_proc.pid() << std::endl;
 
-		try
-		{
+		try {
 			collectResults();
 		}
-		catch( const std::exception &ex )
-		{
+		catch (const std::exception &ex) {
 			std::cerr << "Failed: " << ex.what() << std::endl;
 
 			const auto sig = cosmos::Signal(SIGKILL);
 
-			for( auto *proc: { &m_short_proc, &m_long_proc } )
-			{
-				if(!proc->running())
+			for (auto *proc: { &m_short_proc, &m_long_proc }) {
+				if (!proc->running())
 					continue;
 				proc->kill(sig);
 				proc->wait();
@@ -478,8 +437,7 @@ protected:
 
 int main()
 {
-	try
-	{
+	try {
 		cosmos::Init init;
 		/*
 		 * test redirection of each std. file descriptor
@@ -520,8 +478,7 @@ int main()
 
 		return 0;
 	}
-	catch( const cosmos::CosmosError &ex )
-	{
+	catch (const cosmos::CosmosError &ex) {
 		std::cerr << ex.what() << std::endl;
 		return 1;
 	}

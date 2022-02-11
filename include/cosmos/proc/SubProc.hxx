@@ -1,7 +1,7 @@
 #ifndef COSMOS_SUBPROC_HXX
 #define COSMOS_SUBPROC_HXX
 
-// C++ stdlib
+// stdlib
 #include <iosfwd>
 #include <string>
 
@@ -14,16 +14,14 @@
 #include "cosmos/proc/WaitRes.hxx"
 #include "cosmos/proc/Scheduler.hxx"
 
-namespace cosmos
-{
+namespace cosmos {
 	class SubProc;
 	class Signal;
 }
 
 std::ostream& operator<<(std::ostream&, const cosmos::SubProc &);
 
-namespace cosmos
-{
+namespace cosmos {
 
 /**
  * \brief
@@ -56,14 +54,12 @@ public: // functions
 
 	bool running() const { return m_pid != INVALID_PID; }
 
-	std::string exe() const
-	{
+	std::string exe() const {
 		return m_argv.empty() ? std::string("") : m_argv[0];
 	}
 
-	void setExe(const std::string &exe)
-	{
-		if( ! m_argv.empty() )
+	void setExe(const std::string &exe) {
+		if (! m_argv.empty())
 			m_argv[0] = exe;
 		else
 			m_argv.emplace_back(exe);
@@ -75,11 +71,10 @@ public: // functions
 
 	void setArgs(const StringVector &sv) { m_argv = sv; }
 
-	void clearArgs(const bool and_exe = false)
-	{
-		if( and_exe )
+	void clearArgs(const bool and_exe = false) {
+		if (and_exe)
 			m_argv.clear();
-		else if( m_argv.size() > 1 )
+		else if (m_argv.size() > 1)
 			m_argv.erase( m_argv.begin() + 1 );
 	}
 
@@ -154,8 +149,7 @@ public: // functions
 	void setStdout(FileDesc fd) { m_stdout = fd; }
 	void setStdin(FileDesc fd) { m_stdin = fd; }
 
-	void resetStdFiles()
-	{
+	void resetStdFiles() {
 		m_stderr = m_stdout = m_stdin = INVALID_FILE_DESC;
 	}
 

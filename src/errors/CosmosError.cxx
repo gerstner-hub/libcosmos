@@ -1,15 +1,13 @@
-// C++ stdlib
+// stdlib
 #include <sstream>
 
 // cosmos
 #include "cosmos/errors/CosmosError.hxx"
 
-namespace cosmos
-{
+namespace cosmos {
 
-const char* CosmosError::what() const throw()
-{
-	if( !m_msg.empty() )
+const char* CosmosError::what() const throw() {
+	if (!m_msg.empty())
 		return m_msg.c_str();
 
 	generateMsg();

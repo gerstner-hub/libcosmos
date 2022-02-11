@@ -9,8 +9,7 @@
 // calling context has been added
 #define cosmos_throw(e) (e.setInfo(__FILE__, __LINE__, __FUNCTION__).raise())
 
-namespace cosmos
-{
+namespace cosmos {
 
 /**
  * \brief
@@ -38,8 +37,7 @@ public: // functions
 	explicit CosmosError(const char *error_class) :
 		m_error_class(error_class) {}
 
-	CosmosError& setInfo(const char *file, const size_t line, const char *func)
-	{
+	CosmosError& setInfo(const char *file, const size_t line, const char *func) {
 		m_line = line;
 		m_file = file;
 		m_func = func;

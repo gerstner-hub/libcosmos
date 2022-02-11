@@ -1,8 +1,7 @@
 #ifndef COSMOS_ITHREADENTRY_HXX
 #define COSMOS_ITHREADENTRY_HXX
 
-namespace cosmos
-{
+namespace cosmos {
 
 class Thread;
 
