@@ -47,7 +47,7 @@ public: // functions
 	}
 
 	//! The associated lock must already be locked at entry
-	void wait()
+	void wait() const
 	{
 		auto res = ::pthread_cond_wait(&m_pcond, &(m_lock.m_pmutex));
 
@@ -68,7 +68,7 @@ public: // functions
 	 *	\c true If a signal was received, \c false if a timeout
 	 *	occured.
 	 **/
-	bool waitTimed(const TimeSpec &ts)
+	bool waitTimed(const TimeSpec &ts) const
 	{
 		auto res = ::pthread_cond_timedwait(&m_pcond, &(m_lock.m_pmutex), &ts);
 
@@ -81,10 +81,7 @@ public: // functions
 	}
 
 	//! returns the clock type used for waitTimed()
-	static ClockType clockType()
-	{
-		return ClockType::MONOTONIC;
-	}
+	static ClockType clockType() { return ClockType::MONOTONIC; }
 
 	void signal()
 	{
@@ -110,7 +107,8 @@ public: // functions
 
 protected: // data
 
-	pthread_cond_t m_pcond;
+	// mutable to allow const semantics in wait*()
+	mutable pthread_cond_t m_pcond;
 	Mutex &m_lock;
 };
 
