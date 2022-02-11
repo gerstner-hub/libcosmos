@@ -15,6 +15,7 @@ libcosmos_srcs = [
     "proc/WaitRes.cxx",
     "thread/Condition.cxx",
     "thread/Mutex.cxx",
+    "thread/Thread.cxx",
     "time/Clock.cxx",
 ]
 
