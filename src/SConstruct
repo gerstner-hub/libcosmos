@@ -1,30 +1,32 @@
 Import('env')
+import bisect
+import os
 
-libcosmos_srcs = [
-    "Init.cxx",
-    "string.cxx",
-    "errors/ApiError.cxx",
-    "errors/CosmosError.cxx",
-    "fs/Directory.cxx",
-    "fs/FileSystem.cxx",
-    "io/Pipe.cxx",
-    "proc/Process.cxx",
-    "proc/Scheduler.cxx",
-    "proc/Signal.cxx",
-    "proc/SubProc.cxx",
-    "proc/WaitRes.cxx",
-    "thread/Condition.cxx",
-    "thread/Mutex.cxx",
-    "thread/Thread.cxx",
-    "time/Clock.cxx",
-]
+srcdir = env.Dir('.').srcnode().abspath
+
+SRC_SUFFIXES = [".cxx"]
+
+# dynamically determine source list
+libcosmos_srcs = []
+for root, _, files in os.walk(srcdir):
+    for file in files:
+        for SUFFIX in SRC_SUFFIXES:
+            if file.endswith(SUFFIX):
+                break
+        else:
+            continue
+
+        relpath = os.path.join(root, file)[len(srcdir)+1:]
+
+        # maintain a sorted list of sources for determinism
+        bisect.insort(libcosmos_srcs, relpath)
 
 libenv = env.Clone()
 libenv.Append(CPPPATH = ["."])
 
 libcosmos = libenv.SharedLibrary(
     "cosmos",
-    [libcosmos_srcs]
+    libcosmos_srcs
 )
 
 env['libs']['libcosmos'] = libcosmos
