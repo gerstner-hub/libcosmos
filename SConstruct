@@ -20,8 +20,6 @@ env = Environment(**env_options)
 
 env.Append(CXXFLAGS = "-std=c++17")
 
-if "CXXFLAGS" in os.environ:
-    env.MergeFlags(os.environ["CXXFLAGS"])
 env.Append(CCFLAGS = "-g -flto")
 # automatically include the export header to create less noise
 env.Append(CCFLAGS = "-include include/cosmos/dso_export.h")
@@ -29,6 +27,8 @@ env.Append(CCFLAGS = "-Wall -Wextra -Wno-unused-parameter -Wduplicated-cond -Wdu
 env.Append(CPPPATH = "../../include")
 env.Append(LINKFLAGS = "-Wl,--as-needed")
 env.VariantDir("build", ".", duplicate=False)
+if "CXXFLAGS" in os.environ:
+    env.MergeFlags(os.environ["CXXFLAGS"])
 
 Export("env")
 
