@@ -19,7 +19,7 @@ struct TermDimension {
  * \brief
  * 	Access to Terminal information
  **/
-class Terminal
+class COSMOS_API Terminal
 {
 public:
 	explicit Terminal(FileDesc fd) : m_fd(fd) {}

@@ -22,7 +22,7 @@ namespace cosmos {
  * 	The thread is created during construction time but only enters the
  * 	specified functions after start() has been called.
  **/
-class Thread
+class COSMOS_API Thread
 {
 	// forbid copy-assignment
 	Thread(const Thread&) = delete;

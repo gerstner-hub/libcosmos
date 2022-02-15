@@ -10,10 +10,10 @@
 namespace cosmos {
 
 //! returns an all lower case version of \c s
-std::string tolower(const std::string &s);
+std::string COSMOS_API tolower(const std::string &s);
 
 //! strips leading and trailing whitespace from the given string in-place
-void strip(std::string &s);
+void COSMOS_API strip(std::string &s);
 
 //! returns a version of the given string with stripped off leading and trailing whitespace
 inline std::string stripped(const std::string &s) {

@@ -18,7 +18,7 @@ namespace cosmos {
  *	child process or otherwise be used e.g. as a wakeup mechanism for
  *	select() calls etc.
  **/
-class Pipe
+class COSMOS_API Pipe
 {
 public: // functions
 

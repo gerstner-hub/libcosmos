@@ -66,7 +66,7 @@ typedef BitMask<OpenSettings> OpenFlags;
  * \brief
  * 	Representation of open file objects
  **/
-class File
+class COSMOS_API File
 {
 public: // functions
 

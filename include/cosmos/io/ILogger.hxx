@@ -25,7 +25,7 @@ namespace cosmos {
  * 	This base class additionally provides means to write colored text and
  * 	detect whether an ostream is connected to a terminal.
  **/
-class ILogger {
+class COSMOS_API ILogger {
 public: // functions
 
 	virtual ~ILogger() {};

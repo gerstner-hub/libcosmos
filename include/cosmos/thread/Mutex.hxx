@@ -23,7 +23,7 @@ class Condition;
  * 	details about the semantics refer to `man pthread_mutex_init` and `man
  * 	pthread_mutex_destroy`.
  **/
-class Mutex
+class COSMOS_API Mutex
 {
 	// disallow copy/assignment
 	Mutex(const Mutex&) = delete;

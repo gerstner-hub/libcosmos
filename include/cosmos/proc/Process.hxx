@@ -10,7 +10,7 @@ namespace cosmos {
  * \brief
  *	Various process related functionality
  **/
-class Process
+class COSMOS_API Process
 {
 public: // functions
 
@@ -62,7 +62,7 @@ protected: // data
 };
 
 //! a central instance for quick access to process information
-extern Process g_process;
+extern COSMOS_API Process g_process;
 
 }; // end ns
 

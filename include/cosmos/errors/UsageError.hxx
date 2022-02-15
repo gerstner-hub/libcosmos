@@ -10,7 +10,7 @@ namespace cosmos {
  * \brief
  * 	Exception type for logical usage errors within the application
  **/
-class UsageError :
+class COSMOS_API UsageError :
 	public CosmosError
 {
 public: // functions

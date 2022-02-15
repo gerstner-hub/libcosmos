@@ -21,7 +21,7 @@ namespace cosmos {
  * 	returned from is valid and as long as Directory::nextEntry() isn't
  * 	called again.
  **/
-class DirEntry
+class COSMOS_API DirEntry
 {
 	friend class Directory;
 

@@ -13,7 +13,7 @@ namespace cosmos {
  * 	To be used in case e.g. elemental preconditions that are considered a
  * 	given are not fulfilled.
  **/
-class InternalError :
+class COSMOS_API InternalError :
 	public CosmosError
 {
 public: // functions

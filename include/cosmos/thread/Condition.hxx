@@ -19,7 +19,7 @@ namespace cosmos {
  * 	The current implementation only provides the most basic condition
  * 	operations. Refer to the POSIX man pages for more information.
  **/
-class Condition {
+class COSMOS_API Condition {
 	// disallow copy-assignment
 	Condition(const Condition&) = delete;
 	Condition& operator=(const Condition&) = delete;

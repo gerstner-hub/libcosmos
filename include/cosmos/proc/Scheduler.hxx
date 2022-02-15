@@ -25,7 +25,7 @@ enum class SchedulerPolicy : int {
 	INVALID = -1
 };
 
-class SchedulerSettings
+class COSMOS_API SchedulerSettings
 {
 public: // functions
 
@@ -57,7 +57,7 @@ protected: // data
 	SchedulerPolicy m_policy = SchedulerPolicy::INVALID;
 };
 
-class OtherSchedulerSettings :
+class COSMOS_API OtherSchedulerSettings :
 	public SchedulerSettings
 {
 public: // functions
@@ -109,7 +109,7 @@ protected: // data
 	int m_nice_prio = INVALID_NICE_PRIO;
 };
 
-class RealtimeSchedulerSettings :
+class COSMOS_API RealtimeSchedulerSettings :
 	public SchedulerSettings
 {
 public: // functions
@@ -136,7 +136,7 @@ protected: // data
 	int m_priority = 0;
 };
 
-class FifoSchedulerSettings :
+class COSMOS_API FifoSchedulerSettings :
 	public RealtimeSchedulerSettings
 {
 public: // functions
@@ -146,7 +146,7 @@ public: // functions
 	{}
 };
 
-class RoundRobinSchedulerSettings :
+class COSMOS_API RoundRobinSchedulerSettings :
 	public RealtimeSchedulerSettings
 {
 public: // functions

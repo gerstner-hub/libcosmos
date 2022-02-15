@@ -22,6 +22,8 @@ for root, _, files in os.walk(srcdir):
         bisect.insort(libcosmos_srcs, relpath)
 
 libenv = env.Clone()
+libenv.Append(CCFLAGS = "-fvisibility=hidden")
+libenv.Append(CCFLAGS = "-DCOSMOS_EXPORT")
 libenv.Append(CPPPATH = ["."])
 
 libcosmos = libenv.SharedLibrary(

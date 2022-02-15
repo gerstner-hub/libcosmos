@@ -16,9 +16,9 @@ namespace cosmos {
  * 	Multiple initializations can be performed but finishLibcosmos() needs
  * 	to be called the same number of times for cleanup to occur.
  **/
-void initLibCosmos();
+void COSMOS_API initLibCosmos();
 
-void finishLibCosmos();
+void COSMOS_API finishLibCosmos();
 
 /**
  * \brief
@@ -27,9 +27,7 @@ void finishLibCosmos();
  * 	During the lifetime of this object the cosmos library remains
  * 	initialized.
  **/
-class Init
-{
-public:
+struct COSMOS_API Init {
 	Init() { initLibCosmos(); }
 
 	~Init() { finishLibCosmos(); }

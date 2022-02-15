@@ -14,7 +14,7 @@ namespace cosmos {
  * \brief
  * 	Represents a POSIX signal number
  **/
-class Signal
+class COSMOS_API Signal
 {
 public: // types
 
@@ -65,6 +65,6 @@ protected: // data
 
 } // end ns
 
-std::ostream& operator<<(std::ostream &o, const cosmos::Signal &sig);
+COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::Signal &sig);
 
 #endif // inc. guard

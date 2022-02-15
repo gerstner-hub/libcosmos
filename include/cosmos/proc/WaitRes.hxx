@@ -18,7 +18,7 @@ namespace cosmos {
  * \brief
  * 	Represents the result from a wait() call
  **/
-class WaitRes
+class COSMOS_API WaitRes
 {
 	friend class SubProc;
 public: // types
@@ -108,6 +108,6 @@ protected: // data
 
 } // end ns
 
-std::ostream& operator<<(std::ostream &o, const cosmos::WaitRes &res);
+COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::WaitRes &res);
 
 #endif // inc. guard

@@ -19,7 +19,7 @@ namespace cosmos {
 	class Signal;
 }
 
-std::ostream& operator<<(std::ostream&, const cosmos::SubProc &);
+COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::SubProc &);
 
 namespace cosmos {
 
@@ -44,7 +44,7 @@ namespace cosmos {
  * 	file descriptors then you will need to set them each time before you
  * 	call run().
  **/
-class SubProc
+class COSMOS_API SubProc
 {
 public: // functions
 

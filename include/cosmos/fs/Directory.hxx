@@ -29,7 +29,7 @@ namespace cosmos {
  * 	sorted). Also entries for "." and ".." by convention should show
  * 	up and often need to be filtered by applications.
  **/
-class Directory
+class COSMOS_API Directory
 {
 public: // types
 

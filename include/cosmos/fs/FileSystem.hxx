@@ -10,7 +10,7 @@ namespace cosmos {
  * \brief
  * 	Access to various file system information
  **/
-class FileSystem
+class COSMOS_API FileSystem
 {
 public: // functions
 

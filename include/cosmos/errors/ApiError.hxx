@@ -13,7 +13,7 @@ namespace cosmos {
  * 	This exception type will store a well known errno code as a member and
  * 	format a human readable error message from it.
  **/
-class ApiError :
+class COSMOS_API ApiError :
 	public CosmosError
 {
 public: // functions

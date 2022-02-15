@@ -29,7 +29,7 @@ namespace cosmos {
  * 	defer expensive calculations until the time the actual exception
  * 	message content is accessed.
  **/
-class CosmosError :
+class COSMOS_API CosmosError :
 	public std::exception
 {
 public: // functions

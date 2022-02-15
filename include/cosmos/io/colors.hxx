@@ -106,9 +106,9 @@ enum class TermControl : size_t {
 /**
  * This can throw an exception on unexpected input.
  **/
-TermControl getOffControl(const TermControl &ctrl);
+TermControl COSMOS_API getOffControl(const TermControl &ctrl);
 /// Returns the actual ANSI escape code number for the given color specification.
-size_t getANSIColorCode(const ColorSpec &color);
+size_t COSMOS_API getANSIColorCode(const ColorSpec &color);
 
 /// Base class to build nested ANSI feature objects.
 /**
@@ -259,8 +259,8 @@ typedef TextOnColorT<TermColor::WHITE, ColorIntensity::BRIGHT> OnBrightWhite;
 
 } // end ns
 
-std::ostream& operator<<(std::ostream &o, const cosmos::term::ColorSpec &fc);
-std::ostream& operator<<(std::ostream &o, const cosmos::term::TermControl &p);
-std::ostream& operator<<(std::ostream &o, const cosmos::term::FeatureBase &fb);
+COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::term::ColorSpec &fc);
+COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::term::TermControl &p);
+COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::term::FeatureBase &fb);
 
 #endif // inc. guard

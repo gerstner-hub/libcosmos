@@ -25,7 +25,7 @@ enum class ClockType : clockid_t {
  * \brief
  *	A C++ wrapper around the POSIX clocks and related functions
  **/
-class Clock {
+class COSMOS_API Clock {
 public: // functions
 
 	explicit Clock(const ClockType &type) :
