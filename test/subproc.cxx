@@ -5,6 +5,7 @@
 #include "cosmos/errors/CosmosError.hxx"
 #include "cosmos/errors/InternalError.hxx"
 #include "cosmos/errors/ApiError.hxx"
+#include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/types.hxx"
 #include "cosmos/Init.hxx"
 
@@ -35,11 +36,13 @@ public:
 		}
 	}
 
-	cosmos::FileDesc getTempFile() {
+	cosmos::FileDescriptor getTempFile() {
 		m_tmp_file_path = "/tmp/subproc_test.XXXXXX";
-		auto ret = mkostemp(&m_tmp_file_path[0], O_CLOEXEC);
+		auto fd = mkostemp(&m_tmp_file_path[0], O_CLOEXEC);
 
-		if (ret == cosmos::INVALID_FILE_DESC) {
+		cosmos::FileDescriptor ret(fd);
+
+		if (ret.invalid()) {
 			cosmos_throw (cosmos::ApiError());
 		}
 

@@ -12,7 +12,7 @@
 #include "cosmos/errors/ApiError.hxx"
 #include "cosmos/errors/UsageError.hxx"
 #include "cosmos/fs/DirEntry.hxx"
-#include "cosmos/ostypes.hxx"
+#include "cosmos/fs/FileDescriptor.hxx"
 
 namespace cosmos {
 
@@ -29,8 +29,7 @@ namespace cosmos {
  * 	sorted). Also entries for "." and ".." by convention should show
  * 	up and often need to be filtered by applications.
  **/
-class COSMOS_API Directory
-{
+class COSMOS_API Directory {
 public: // types
 
 	typedef long DirPos;
@@ -42,10 +41,10 @@ public: // functions
 	 *	Create a Directory using the given file descriptor or an
 	 *	unassociated Directory
 	 * \see
-	 * 	open(FileDesc fd)
+	 * 	open(FileDescriptor fd)
 	 **/
-	explicit Directory(FileDesc fd = INVALID_FILE_DESC) {
-		if (fd != INVALID_FILE_DESC)
+	explicit Directory(const FileDescriptor &fd = FileDescriptor()) {
+		if (fd.valid())
 			open(fd);
 	}
 
@@ -101,7 +100,7 @@ public: // functions
 	 * 	another directory then this previous association will be
 	 * 	implicitly close()'d.
 	 **/
-	void open(FileDesc fd);
+	void open(const FileDescriptor &fd);
 
 	/**
 	 * \brief
@@ -131,7 +130,7 @@ public: // functions
 	 * 	will result in undefined behaviour. The file descriptor will
 	 * 	become invalid after close() is invoked.
 	 **/
-	FileDesc fd() const;
+	FileDescriptor fd() const;
 
 	/**
 	 * \brief

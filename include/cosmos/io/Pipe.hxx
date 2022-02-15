@@ -5,7 +5,7 @@
 #include <unistd.h>
 
 // cosmos
-#include "cosmos/ostypes.hxx"
+#include "cosmos/fs/FileDescriptor.hxx"
 
 namespace cosmos {
 
@@ -18,30 +18,29 @@ namespace cosmos {
  *	child process or otherwise be used e.g. as a wakeup mechanism for
  *	select() calls etc.
  **/
-class COSMOS_API Pipe
-{
+class COSMOS_API Pipe {
 public: // functions
 
 	explicit Pipe();
 
 	~Pipe() { closeReadEnd(); closeWriteEnd(); }
 
-	void closeReadEnd() { haveReadEnd() && close(m_read_end); }
-	void closeWriteEnd() { haveWriteEnd() && close(m_write_end); }
+	void closeReadEnd() { if (haveReadEnd()) m_read_end.close(); }
+	void closeWriteEnd() { if (haveWriteEnd()) m_write_end.close(); }
 
-	FileDesc readEnd() { return m_read_end; }
-	FileDesc writeEnd() { return m_write_end; }
+	FileDescriptor readEnd() { return m_read_end; }
+	FileDescriptor writeEnd() { return m_write_end; }
 
-	bool haveReadEnd() const { return m_read_end != INVALID_FILE_DESC; }
-	bool haveWriteEnd() const { return m_write_end != INVALID_FILE_DESC; }
+	bool haveReadEnd() const { return m_read_end.valid(); }
+	bool haveWriteEnd() const { return m_write_end.valid(); }
 
-	FileDesc takeReadEndOwnership() {
+	FileDescriptor takeReadEndOwnership() {
 		auto ret = readEnd();
 		invalidateReadEnd();
 		return ret;
 	}
 
-	FileDesc takeWriteEndOwnership() {
+	FileDescriptor takeWriteEndOwnership() {
 		auto ret = writeEnd();
 		invalidateWriteEnd();
 		return ret;
@@ -63,13 +62,13 @@ public: // functions
 
 protected: // functions
 
-	void invalidateReadEnd() { m_read_end = INVALID_FILE_DESC; }
-	void invalidateWriteEnd() { m_write_end = INVALID_FILE_DESC; }
+	void invalidateReadEnd() { m_read_end.reset(); }
+	void invalidateWriteEnd() { m_write_end.reset(); }
 
 protected: // data
 
-	FileDesc m_read_end = INVALID_FILE_DESC;
-	FileDesc m_write_end = INVALID_FILE_DESC;
+	FileDescriptor m_read_end;
+	FileDescriptor m_write_end;
 	static const size_t MAX_ATOMIC_WRITE;
 };
 

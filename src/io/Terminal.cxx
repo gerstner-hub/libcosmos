@@ -9,7 +9,7 @@
 namespace cosmos {
 
 bool Terminal::isTTY() const {
-	if (::isatty(m_fd) == 1) {
+	if (::isatty(m_fd.raw()) == 1) {
 		return true;
 	}
 
@@ -24,7 +24,7 @@ bool Terminal::isTTY() const {
 
 TermDimension Terminal::getSize() const {
 	struct winsize ws;
-	int rc = ::ioctl(m_fd, TIOCGWINSZ, &ws);
+	int rc = ::ioctl(m_fd.raw(), TIOCGWINSZ, &ws);
 	if (rc != 0) {
 		cosmos_throw (ApiError("ioctl(GWINSZ)"));
 	}

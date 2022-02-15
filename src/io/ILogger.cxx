@@ -7,6 +7,7 @@
 // Cosmos
 #include "cosmos/io/ILogger.hxx"
 #include "cosmos/io/Terminal.hxx"
+#include "cosmos/fs/FileDescriptor.hxx"
 
 namespace cosmos {
 
@@ -25,13 +26,13 @@ bool ILogger::isTTY(const std::ostream &o) {
 	 * ostream thus we have to use some heuristics ...
 	 */
 
-	int fd_to_check = -1;
+	FileDescriptor fd_to_check;
 
 	if (&o == &std::cout) {
-		fd_to_check = STDOUT_FILENO;
+		fd_to_check.setFD(STDOUT_FILENO);
 	}
 	else if (&o == &std::cerr) {
-		fd_to_check = STDERR_FILENO;
+		fd_to_check.setFD(STDERR_FILENO);
 	}
 	else {
 		return false;

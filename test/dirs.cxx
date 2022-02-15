@@ -118,7 +118,7 @@ public:
 		dir.close();
 		struct stat s;
 
-		if (::fstat(fd, &s) != -1 || errno != EBADF) {
+		if (::fstat(fd.raw(), &s) != -1 || errno != EBADF) {
 			std::cerr << "fd() still valid after close() ?!" << std::endl;
 			return 1;
 		}

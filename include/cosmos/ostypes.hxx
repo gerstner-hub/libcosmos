@@ -14,10 +14,6 @@ namespace cosmos {
 typedef pid_t ProcessID;
 constexpr pid_t INVALID_PID = -1;
 
-//! a plain integer file descriptor
-typedef int FileDesc;
-constexpr int INVALID_FILE_DESC = -1;
-
 typedef uid_t UserID;
 
 typedef ino_t Inode;

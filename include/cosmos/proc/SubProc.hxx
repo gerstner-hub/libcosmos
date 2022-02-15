@@ -10,7 +10,7 @@
 
 // cosmos
 #include "cosmos/types.hxx"
-#include "cosmos/ostypes.hxx"
+#include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/proc/WaitRes.hxx"
 #include "cosmos/proc/Scheduler.hxx"
 
@@ -145,12 +145,14 @@ public: // functions
 	//! returns the PID of the currently running child process or INVALID_PID
 	ProcessID pid() const { return m_pid; }
 
-	void setStderr(FileDesc fd) { m_stderr = fd; }
-	void setStdout(FileDesc fd) { m_stdout = fd; }
-	void setStdin(FileDesc fd) { m_stdin = fd; }
+	void setStderr(FileDescriptor fd) { m_stderr = fd; }
+	void setStdout(FileDescriptor fd) { m_stdout = fd; }
+	void setStdin(FileDescriptor fd) { m_stdin = fd; }
 
 	void resetStdFiles() {
-		m_stderr = m_stdout = m_stdin = INVALID_FILE_DESC;
+		m_stderr.reset();
+		m_stdin.reset();
+		m_stdout.reset();
 	}
 
 	/**
@@ -215,7 +217,7 @@ protected: // functions
 	 * \param[in] orig
 	 * 	The file descriptor that should be replaced by redirect
 	 **/
-	void redirectFD(FileDesc orig, FileDesc redirect);
+	void redirectFD(FileDescriptor orig, FileDescriptor redirect);
 
 protected: // data
 
@@ -233,11 +235,11 @@ protected: // data
 	const SchedulerSettings *m_sched_settings = nullptr;
 
 	//! file descriptor to use as child's stdin
-	FileDesc m_stdout = INVALID_FILE_DESC;
+	FileDescriptor m_stdout;
 	//! file descriptor to use as child's stderr
-	FileDesc m_stderr = INVALID_FILE_DESC;
+	FileDescriptor m_stderr;
 	//! file descriptor to use as child's stdin
-	FileDesc m_stdin = INVALID_FILE_DESC;
+	FileDescriptor m_stdin;
 
 	friend std::ostream& ::operator<<(std::ostream&, const SubProc &);
 };

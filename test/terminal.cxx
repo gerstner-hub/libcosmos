@@ -6,16 +6,20 @@
 int main()
 {
 	int res = 0;
-	cosmos::Terminal sin(STDIN_FILENO);
+	cosmos::Terminal sin(cosmos::stdin);
 
 	if (sin.isTTY() != true) {
 		std::cerr << "stdin is not a terminal?!" << std::endl;
 		res = 1;
 	}
 
-	auto dim = sin.getSize();
-
-	std::cout << "terminal dimension is " << dim.width << " x " << dim.height << std::endl;
+	try {
+		auto dim = sin.getSize();
+		std::cout << "terminal dimension is " << dim.width << " x " << dim.height << std::endl;
+	} catch (const std::exception &e) {
+		std::cerr << "failed to get terminal dimension: " << e.what() << std::endl;
+		res = 1;
+	}
 
 	cosmos::File f("/etc/fstab", cosmos::OpenMode::READ_ONLY);
 	cosmos::Terminal fstab(f);

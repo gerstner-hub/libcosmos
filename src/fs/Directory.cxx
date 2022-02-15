@@ -25,16 +25,18 @@ void Directory::open(const std::string &path, const bool follow_links) {
 	close();
 
 	/*
-	 * reuse the open(FileDesc) logic and only open the file descriptor
-	 * before. This allows us to pass needful flags like O_CLOEXEC. This
-	 * gives us more control than when using opendir().
+	 * reuse the open(FileDescriptor) logic and only open the file
+	 * descriptor before. This allows us to pass needful flags like
+	 * O_CLOEXEC. This gives us more control than when using opendir().
 	 */
-	auto fd = ::open(
+	auto res = ::open(
 		path.c_str(),
 		O_RDONLY | O_CLOEXEC | O_DIRECTORY | (follow_links ? O_NOFOLLOW : 0)
 	);
 
-	if (fd == -1) {
+	FileDescriptor fd(res);
+
+	if (fd.invalid()) {
 		cosmos_throw (ApiError());
 	}
 
@@ -43,26 +45,29 @@ void Directory::open(const std::string &path, const bool follow_links) {
 	}
 	catch (...) {
 		// intentionally ignore error conditions here
-		(void)::close(fd);
+		try {
+			fd.close();
+		} catch(...) {}
 		throw;
 	}
 }
 
-void Directory::open(FileDesc fd) {
+void Directory::open(const FileDescriptor &fd) {
 	close();
 
-	m_stream = fdopendir(fd);
+	m_stream = fdopendir(fd.raw());
 
 	if (!m_stream) {
 		cosmos_throw (ApiError());
 	}
 }
 
-FileDesc Directory::fd() const {
+FileDescriptor Directory::fd() const {
 	requireOpenStream(__FUNCTION__);
-	auto ret = dirfd(m_stream);
+	auto fd = dirfd(m_stream);
+	FileDescriptor ret(fd);
 
-	if (ret == -1) {
+	if (ret.invalid()) {
 		cosmos_throw (ApiError());
 	}
 

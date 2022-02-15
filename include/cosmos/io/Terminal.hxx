@@ -2,8 +2,8 @@
 #define COSMOS_TERMINAL_HXX
 
 // Cosmos
-#include "cosmos/ostypes.hxx"
 #include "cosmos/fs/File.hxx"
+#include "cosmos/fs/FileDescriptor.hxx"
 
 namespace cosmos {
 
@@ -22,7 +22,7 @@ struct TermDimension {
 class COSMOS_API Terminal
 {
 public:
-	explicit Terminal(FileDesc fd) : m_fd(fd) {}
+	explicit Terminal(FileDescriptor fd) : m_fd(fd) {}
 	explicit Terminal(const File &f) : m_fd(f.getFD()) {}
 
 	//! returns whether the associated file descriptor is a TTY
@@ -32,7 +32,7 @@ public:
 	TermDimension getSize() const;
 
 protected: // data
-	FileDesc m_fd;
+	FileDescriptor m_fd;
 };
 
 } // end ns

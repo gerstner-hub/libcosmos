@@ -141,9 +141,9 @@ void SubProc::postFork() {
 		}
 	}
 
-	redirectFD(STDOUT_FILENO, m_stdout);
-	redirectFD(STDERR_FILENO, m_stderr);
-	redirectFD(STDIN_FILENO, m_stdin);
+	redirectFD(cosmos::stdout, m_stdout);
+	redirectFD(cosmos::stderr, m_stderr);
+	redirectFD(cosmos::stdin, m_stdin);
 
 	resetStdFiles();
 
@@ -165,22 +165,11 @@ void SubProc::postFork() {
 	}
 }
 
-void SubProc::redirectFD(FileDesc orig, FileDesc redirect) {
-	if (redirect == INVALID_FILE_DESC)
+void SubProc::redirectFD(FileDescriptor orig, FileDescriptor redirect) {
+	if (redirect.invalid())
 		return;
 
-	/*
-	 * the second parameter is newfd, the number under which the first
-	 * parameter will be known in the future. a bit confusing naming
-	 * scheme.
-	 *
-	 * note that dup2 automatically removes any O_CLOEXEC flag from the
-	 * orig file descriptor, so inheriting it across exec*() is not a
-	 * problem.
-	 */
-	if (dup2(redirect, orig) == -1) {
-		cosmos_throw (ApiError());
-	}
+	redirect.duplicate(orig, false /* no close on-exec */);
 }
 
 void SubProc::exec(CStringVector &v) {

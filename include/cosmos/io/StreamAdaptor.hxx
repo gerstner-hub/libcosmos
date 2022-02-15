@@ -4,6 +4,7 @@
 // Cosmos
 #include "cosmos/compiler.hxx"
 #include "cosmos/types.hxx"
+#include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/io/Pipe.hxx"
 #include "cosmos/errors/UsageError.hxx"
 
@@ -58,15 +59,15 @@ public: // functions
 		m_buffer.close();
 	}
 
-	FileDesc fileDesc() { return m_buffer.fd(); }
+	FileDescriptor fileDesc() { return FileDescriptor(m_buffer.fd()); }
 
 protected: // functions
 
-	StreamAdaptor(FileDesc fd, std::ios_base::openmode mode) :
-		m_buffer(fd, mode)
+	StreamAdaptor(FileDescriptor fd, std::ios_base::openmode mode) :
+		m_buffer(fd.raw(), mode)
 	{
-		if (fd == INVALID_FILE_DESC) {
-			cosmos_throw (UsageError("Construct StreamAdaptor for invalid FD"));
+		if (fd.invalid()) {
+			cosmos_throw (UsageError("Attempt to construct StreamAdaptor for invalid FD"));
 		}
 
 		this->rdbuf(&m_buffer);
@@ -81,7 +82,7 @@ class InputStreamAdaptor :
 {
 public: // functions
 
-	explicit InputStreamAdaptor(FileDesc fd) :
+	explicit InputStreamAdaptor(FileDescriptor fd) :
 		StreamAdaptor<std::istream>(fd, std::ios_base::in)
 	{}
 
@@ -95,7 +96,7 @@ class OutputStreamAdaptor :
 {
 public: // functions
 
-	explicit OutputStreamAdaptor(FileDesc fd) :
+	explicit OutputStreamAdaptor(FileDescriptor fd) :
 		StreamAdaptor<std::ostream>(fd, std::ios_base::out)
 	{}
 
@@ -114,7 +115,7 @@ class InputOutputStreamAdaptor :
 {
 public: // functions
 
-	explicit InputOutputStreamAdaptor(FileDesc fd) :
+	explicit InputOutputStreamAdaptor(FileDescriptor fd) :
 		StreamAdaptor<std::iostream>(
 			fd, std::ios_base::in | std::ios_base::out
 		)

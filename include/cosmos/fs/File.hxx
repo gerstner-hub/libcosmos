@@ -7,6 +7,7 @@
 // cosmos
 #include "cosmos/BitMask.hxx"
 #include "cosmos/ostypes.hxx"
+#include "cosmos/fs/FileDescriptor.hxx"
 
 namespace cosmos {
 
@@ -66,8 +67,7 @@ typedef BitMask<OpenSettings> OpenFlags;
  * \brief
  * 	Representation of open file objects
  **/
-class COSMOS_API File
-{
+class COSMOS_API File {
 public: // functions
 
 	File() {}
@@ -94,19 +94,24 @@ public: // functions
 
 	void open(const char *path, const OpenMode &mode, const OpenFlags &flags);
 
-	void close();
+	void close() {
+		if (!isOpen())
+			return;
 
-	bool isOpen() const { return m_fd != INVALID_FILE_DESC; }
+		m_fd.close();
+	}
+
+	bool isOpen() const { return m_fd.valid(); }
 
 protected: // functions
 
 	friend class Terminal;
 
-	//! allow befriended classes to get the FD with const semantics
-	FileDesc getFD() const { return m_fd; }
+	/// Allow befriended classes to get the FD with const semantics.
+	const FileDescriptor& getFD() const { return m_fd; }
 
 protected: // data
-	FileDesc m_fd = INVALID_FILE_DESC;
+	FileDescriptor m_fd;
 };
 
 } // end ns
