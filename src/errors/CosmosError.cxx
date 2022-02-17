@@ -7,10 +7,11 @@
 namespace cosmos {
 
 const char* CosmosError::what() const throw() {
-	if (!m_msg.empty())
+	if (m_msg_generated)
 		return m_msg.c_str();
 
 	generateMsg();
+	m_msg_generated = true;
 
 	std::stringstream ss;
 	ss << m_file << ":" << m_line

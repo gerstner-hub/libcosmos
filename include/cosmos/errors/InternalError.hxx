@@ -18,20 +18,11 @@ class COSMOS_API InternalError :
 {
 public: // functions
 
-	explicit InternalError(const char *msg) :
-		CosmosError("InternalError"),
-		m_error_msg(msg)
-	{}
+	explicit InternalError(const char *msg) : CosmosError("InternalError") {
+		m_msg = msg;
+	}
 
 	COSMOS_ERROR_IMPL;
-
-protected: // functions
-
-	void generateMsg() const override { m_msg += m_error_msg; }
-
-protected: // data
-
-	std::string m_error_msg;
 };
 
 } // end ns

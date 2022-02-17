@@ -19,7 +19,8 @@ namespace cosmos {
  * \details
  * 	This base class carries the file, line and function contextual
  * 	information from where it was thrown. Furthermore it stores a
- * 	dynamically allocated string with runtime information.
+ * 	dynamically allocated string with optional additional runtime
+ * 	information.
  *
  * 	The cosmos_throw macro allows to transparently throw any type derived
  * 	from this base class, all contextual information filled in.
@@ -38,6 +39,13 @@ public: // functions
 
 	explicit CosmosError(const char *error_class) :
 		m_error_class(error_class) {}
+
+	CosmosError(const char *error_class, const char *fixed_text) : CosmosError(error_class) {
+		m_msg = fixed_text;
+	}
+
+	CosmosError(const char *error_class, const std::string &fixed_text) :
+		CosmosError(error_class, fixed_text.c_str()) {}
 
 	CosmosError& setInfo(const char *file, const size_t line, const char *func) {
 		m_line = line;
@@ -82,6 +90,7 @@ protected: // data
 
 	const char *m_error_class = nullptr;
 	mutable std::string m_msg;
+	mutable bool m_msg_generated = false;
 	const char *m_file = nullptr;
 	const char *m_func = nullptr;
 	size_t m_line = 0;

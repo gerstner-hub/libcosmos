@@ -15,24 +15,15 @@ class COSMOS_API UsageError :
 {
 public: // functions
 
-	explicit UsageError(const char *msg) :
-		CosmosError("UsageError"),
-		m_error_msg(msg)
-	{}
+	explicit UsageError(const char *msg) : CosmosError("UsageError") {
+		m_msg = msg;
+	}
 
 	explicit UsageError(const std::string &msg) :
 		UsageError(msg.c_str())
 	{}
 
 	COSMOS_ERROR_IMPL;
-
-protected: // functions
-
-	void generateMsg() const override { m_msg += m_error_msg; }
-
-protected: // data
-
-	std::string m_error_msg;
 };
 
 } // end ns
