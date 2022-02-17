@@ -24,7 +24,7 @@ public: // functions
 		UsageError(msg.c_str())
 	{}
 
-	[[ noreturn ]] void raise() override { throw *this; }
+	COSMOS_ERROR_IMPL;
 
 protected: // functions
 

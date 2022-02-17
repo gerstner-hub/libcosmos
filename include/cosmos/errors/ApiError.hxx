@@ -24,8 +24,6 @@ public: // functions
 	//! stores the given errno code in the exception
 	explicit ApiError(const int p_errno);
 
-	[[ noreturn ]] void raise() override { throw *this; }
-
 	std::string msg() const { return msg(m_errno); }
 
 	/**
@@ -34,6 +32,8 @@ public: // functions
 	 * 	code
 	 **/
 	static std::string msg(const int no);
+
+	COSMOS_ERROR_IMPL;
 
 protected: // functions
 

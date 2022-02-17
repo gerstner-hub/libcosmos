@@ -23,7 +23,7 @@ public: // functions
 		m_error_msg(msg)
 	{}
 
-	[[ noreturn ]] void raise() override { throw *this; }
+	COSMOS_ERROR_IMPL;
 
 protected: // functions
 

@@ -5,9 +5,11 @@
 #include <exception>
 #include <string>
 
-// throw the given Exception type after contextual information from the
-// calling context has been added
+//! Throws the given Exception type after contextual information from the
+//! calling context has been added.
 #define cosmos_throw(e) (e.setInfo(__FILE__, __LINE__, __FUNCTION__).raise())
+//! use this in each type derived from CosmosError to apply mandatory overrides
+#define COSMOS_ERROR_IMPL [[ noreturn ]] void raise() override { throw *this; }
 
 namespace cosmos {
 
