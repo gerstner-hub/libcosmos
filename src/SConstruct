@@ -1,37 +1,24 @@
 Import('env')
-import bisect
-import os
-
-srcdir = env.Dir('.').srcnode().abspath
-
-SRC_SUFFIXES = [".cxx"]
-
-# dynamically determine source list
-libcosmos_srcs = []
-for root, _, files in os.walk(srcdir):
-    for file in files:
-        for SUFFIX in SRC_SUFFIXES:
-            if file.endswith(SUFFIX):
-                break
-        else:
-            continue
-
-        relpath = os.path.join(root, file)[len(srcdir)+1:]
-
-        # maintain a sorted list of sources for determinism
-        bisect.insort(libcosmos_srcs, relpath)
 
 libenv = env.Clone()
-libenv.Append(CCFLAGS = "-fvisibility=hidden")
-libenv.Append(CCFLAGS = "-DCOSMOS_EXPORT")
-libenv.Append(CPPPATH = ["."])
+public_includes = Dir(".").srcnode().abspath + "/../include"
+# automatically include the export header to reduce noise in headers
+libenv.Append(CCFLAGS = ["-include",  "cosmos/dso_export.h"])
+libenv.Append(CCFLAGS="-fvisibility=hidden")
+libenv.Append(CCFLAGS="-DCOSMOS_EXPORT")
+libenv.Append(LINKFLAGS="-pthread")
+libenv.Append(CPPPATH=["."])
+libenv.Append(CPPPATH = public_includes)
+
+libcosmos_srcs = env.GatherSources(suffixes=[".cxx"])
 
 libcosmos = libenv.SharedLibrary(
     "cosmos",
     libcosmos_srcs
 )
 
-env['libs']['libcosmos'] = libcosmos
-
-# required to link against us regarding threading functionality
-env.Append(LINKFLAGS="-pthread")
+env.RegisterLibConfig('libcosmos', libcosmos, {
+    "CCFLAGS": ["-DCOSMOS_API="],
+    "CPPPATH": [public_includes],
+    "LINKFLAGS": ["-pthread"]
+})

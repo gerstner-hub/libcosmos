@@ -9,7 +9,9 @@ tests = []
 for f in os.listdir(srcdir):
     if not f.endswith(".cxx"):
         continue
-    tests.append( '.'.join(f.split('.')[:-1]) )
+    tests.append('.'.join(f.split('.')[:-1]))
+
+env.ConfigureForLib('libcosmos')
 
 for test in tests:
 
