@@ -1,5 +1,6 @@
 from SCons.Script import *
 import os
+from pathlib import Path
 
 def gatherSources(self, suffixes, path='.'):
     """Recursively walks through the given path (by default the current
@@ -45,10 +46,24 @@ def configureForLib(self, name):
     libflags = self['libflags'][name]
     self.Append(**libflags)
 
+def configureRunForLib(self, name):
+    """This helper adjust the runtime environment of the environment so that
+    the given library is found for execuring e.g. test programs."""
+    lib = self['libs'][name]
+    full_path = File(lib)[0].abspath
+    libdir = str(Path(full_path).parent)
+
+    ld_library_path = self['ENV'].get('LD_LIBRARY_PATH', '')
+    paths = ld_library_path.split(':')
+    if libdir not in paths:
+        paths.append(libdir)
+    self['ENV']['LD_LIBRARY_PATH'] = ':'.join(paths)
+
 def enhanceEnv(env):
     env.AddMethod(gatherSources, "GatherSources")
     env.AddMethod(registerLibConfig, "RegisterLibConfig")
     env.AddMethod(configureForLib, "ConfigureForLib")
+    env.AddMethod(configureRunForLib, "ConfigureRunForLib")
 
 def initSCons(project):
     """Initializes a generic C++ oriented SCons build environment.
