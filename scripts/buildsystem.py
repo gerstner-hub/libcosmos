@@ -3,6 +3,14 @@ import os
 import subprocess
 from pathlib import Path
 
+def sequencify(arg):
+    for _type in (tuple, list):
+        if isinstance(arg, _type):
+            return arg
+
+    # return a tuple by default
+    return (arg,)
+
 def gatherSources(self, suffixes, path='.'):
     """Recursively walks through the given path (by default the current
     SConscript directory) and returns relative paths to
@@ -64,22 +72,24 @@ def configureRunForLib(self, name):
         paths.append(libdir)
     self['ENV']['LD_LIBRARY_PATH'] = ':'.join(paths)
 
-def configureForPackage(self, name):
+def configureForPackage(self, seq):
     """This helpers adds flags obtained from the pkg-config utility for the
     given system package."""
 
-    # cache pkg-config results in the environment to avoid multiple pkg-config
-    # invocations for the same package
-    pkgs = self['pkgs']
-    flags = self['pkgs'].get(name, None)
+    rootenv = self['rootenv']
 
-    if not flags:
-        flags = subprocess.check_output(["pkg-config", "--cflags", "--libs", name])
-        flags = flags.decode('utf8').strip().split()
-        rootenv = self['rootenv']
-        rootenv['pkgs'][name] = flags
+    for name in sequencify(seq):
+        # cache pkg-config results in the environment to avoid multiple
+        # pkg-config invocations for the same package
+        pkgs = self['pkgs']
+        flags = self['pkgs'].get(name, None)
 
-    self.MergeFlags(flags)
+        if not flags:
+            flags = subprocess.check_output(["pkg-config", "--cflags", "--libs", name])
+            flags = flags.decode('utf8').strip().split()
+            rootenv['pkgs'][name] = flags
+
+        self.MergeFlags(flags)
 
 def enhanceEnv(env):
     env.AddMethod(gatherSources, "GatherSources")
