@@ -1,5 +1,6 @@
 from SCons.Script import *
 import os
+import subprocess
 from pathlib import Path
 
 def gatherSources(self, suffixes, path='.'):
@@ -27,7 +28,7 @@ def gatherSources(self, suffixes, path='.'):
 
     return sources
 
-def registerLibConfig(self, name, node, flags):
+def registerLibConfig(self, name, node, flags, config={}):
     """This helper takes care of recording the given library in the root
     environment object together with some metadata for other parts of the
     project being able to successfully build and link against it."""
@@ -38,6 +39,7 @@ def registerLibConfig(self, name, node, flags):
     flags["LIBPATH"] = [Dir(".").abspath]
     rootenv['libs'][name] = node
     rootenv['libflags'][name] = flags
+    rootenv['libconfigs'][name] = config
 
 def configureForLib(self, name):
     """This helper adds flags and other requirements to the environment to
@@ -45,6 +47,9 @@ def configureForLib(self, name):
 
     libflags = self['libflags'][name]
     self.Append(**libflags)
+    config = self['libconfigs'][name]
+    for pkg in config.get('pkgs', []):
+        self.ConfigureForPackage(pkg)
 
 def configureRunForLib(self, name):
     """This helper adjust the runtime environment of the environment so that
@@ -59,11 +64,29 @@ def configureRunForLib(self, name):
         paths.append(libdir)
     self['ENV']['LD_LIBRARY_PATH'] = ':'.join(paths)
 
+def configureForPackage(self, name):
+    """This helpers adds flags obtained from the pkg-config utility for the
+    given system package."""
+
+    # cache pkg-config results in the environment to avoid multiple pkg-config
+    # invocations for the same package
+    pkgs = self['pkgs']
+    flags = self['pkgs'].get(name, None)
+
+    if not flags:
+        flags = subprocess.check_output(["pkg-config", "--cflags", "--libs", name])
+        flags = flags.decode('utf8').strip().split()
+        rootenv = self['rootenv']
+        rootenv['pkgs'][name] = flags
+
+    self.MergeFlags(flags)
+
 def enhanceEnv(env):
     env.AddMethod(gatherSources, "GatherSources")
     env.AddMethod(registerLibConfig, "RegisterLibConfig")
     env.AddMethod(configureForLib, "ConfigureForLib")
     env.AddMethod(configureRunForLib, "ConfigureRunForLib")
+    env.AddMethod(configureForPackage, "ConfigureForPackage")
 
 def initSCons(project):
     """Initializes a generic C++ oriented SCons build environment.
@@ -116,6 +139,9 @@ def initSCons(project):
 
     env['buildroot'] = buildroot
     env['libs'] = dict()
+    env['bins'] = dict()
+    env['pkgs'] = dict()
+    env['libconfigs'] = dict()
 
     enhanceEnv(env)
 
