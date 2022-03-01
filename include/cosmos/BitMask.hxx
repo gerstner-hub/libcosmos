@@ -38,7 +38,7 @@ public:
 
 	//! sets exactly the given bit to one
 	explicit BitMask(const ENUM &bit) :
-		m_flags( static_cast<EnumBaseType>(bit) )
+		m_flags(static_cast<EnumBaseType>(bit))
 	{}
 
 	//! sets exactly the given primitive type bitmask
@@ -63,7 +63,7 @@ public:
 		// append each bit starting with the highest one
 		for (int bit = size() - 1; bit >= 0; bit--) {
 			const auto val = 1 << bit;
-			ret.push_back( this->test(static_cast<ENUM>(val)) ? '1' : '0' );
+			ret.push_back(this->test(static_cast<ENUM>(val)) ? '1' : '0');
 		}
 
 		return ret;
