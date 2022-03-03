@@ -28,5 +28,12 @@ int main() {
 		res = 1;
 	}
 
+	size_t unsig = 3;
+
+	if (cosmos::in_range(unsig, 10, 20)) {
+		std::cerr << "bad\n";
+		res = 1;
+	}
+
 	return res;
 }

@@ -3,12 +3,17 @@
 
 namespace cosmos {
 
+template<typename T>
+struct identity { typedef T type; };
+
+template<typename T>
+using identity_t = typename identity<T>::type;
+
 /// checks whether \c is within the given range, inclusive
-// allow the ranger type to differ from the compare type to avoid issues with
-// literal numbers comparing against compatible integer variables. The range
-// types should match each other, though
-template <typename T1, typename T2>
-bool in_range(const T1 &v, const T2 &_min, const T2 &_max) {
+// the stunt with identity_t is required to avoid deduction problems when e.g.
+// literal integer constants are involved.
+template <typename T1>
+bool in_range(const T1 &v, const identity_t<T1> &_min, const identity_t<T1> &_max) {
 	return _min <= v && v <= _max;
 }
 
