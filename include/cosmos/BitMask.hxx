@@ -22,12 +22,23 @@ namespace cosmos {
 template <typename ENUM>
 class BitMask
 {
-public:
+public: // types
+
+	//! helper type for setting all bits during construction time of BitMask
+	struct All {};
+	static constexpr All all{};
 
 	typedef typename std::underlying_type<ENUM>::type EnumBaseType;
 
+public: // functions
+
 	//! sets all bits to zero
 	BitMask() {}
+
+	//! sets all bits zo one
+	explicit BitMask(const All &) {
+		setAll();
+	}
 
 	//! sets only the flags found in the given initializer list
 	explicit BitMask(const std::initializer_list<ENUM> &init_list) {
@@ -48,9 +59,6 @@ public:
 
 	EnumBaseType get() const { return m_flags; }
 
-	// conversion operator to the underlying enum type
-	operator EnumBaseType() const { return m_flags; }
-
 	// return a string representation of the bit mask
 	operator std::string() const { return to_string(); }
 
@@ -70,7 +78,7 @@ public:
 	}
 
 	//! sets all bits it the set
-	BitMask& set() {
+	BitMask& setAll() {
 		m_flags = ~EnumBaseType(0);
 		return *this;
 	}
@@ -90,11 +98,34 @@ public:
 
 	//! zeroes the given bit position
 	BitMask& reset(const ENUM &bit) {
-		m_flags = m_flags & ~static_cast<EnumBaseType>(bit);
+		reset({bit});
 		return *this;
 	}
 
-	//! flip each bit in the bit mask
+	//! zeroes all of the given bit flags
+	BitMask& reset(const std::initializer_list<ENUM> &flags) {
+		for (auto bit: flags) {
+			m_flags &= ~static_cast<EnumBaseType>(bit);
+		}
+		return *this;
+	}
+
+	//! sets all bits to zero except the given flags
+	BitMask& limit(const std::initializer_list<ENUM> &flags) {
+		EnumBaseType mask = 0;
+		for (auto bit: flags) {
+			mask |= static_cast<EnumBaseType>(bit);
+		}
+
+		m_flags &= mask;
+		return *this;
+	}
+
+	BitMask& limit(const ENUM &flag) {
+		return limit({flag});
+	}
+
+	//! flip every bit in the bit mask
 	BitMask& flip() {
 		m_flags = ~m_flags;
 		return *this;
@@ -126,7 +157,12 @@ public:
 
 	//! returns whether the given bit position is set
 	bool test(const ENUM &bit) const {
-	    return (m_flags & static_cast<EnumBaseType>(bit)) != 0;
+		return (m_flags & static_cast<EnumBaseType>(bit)) != 0;
+	}
+
+	//! returns whether this is the only bit set
+	bool only(const ENUM &bit) const {
+		return m_flags == static_cast<EnumBaseType>(bit);
 	}
 
 	//! returns whether any bit in the bitset is set
@@ -136,7 +172,20 @@ public:
 
 	//! returns whether no bit in the bitset is set
 	bool none() const {
-	    return !this->any();
+		return !this->any();
+	}
+
+	bool operator==(const BitMask &other) const {
+		return m_flags == other.m_flags;
+	}
+
+	bool operator!=(const BitMask &other) const {
+		return !(*this == other);
+	}
+
+	//! checks whether the given bit is set
+	bool operator&(const ENUM &bit) const {
+		return test(bit);
 	}
 
 protected: // data

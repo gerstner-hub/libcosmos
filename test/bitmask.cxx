@@ -34,11 +34,8 @@ int main() {
 
 	{
 		MyBitMask bitmask({MyEnum::VAL2, MyEnum::VAL3});
-		const auto val = static_cast<int>(MyEnum::VAL2) | static_cast<int>(MyEnum::VAL3);
-		assert (static_cast<int>(bitmask) == val);
 
-		for (const auto bit: { MyEnum::VAL1, MyEnum::VAL2, MyEnum::VAL3, MyEnum::VAL4, MyEnum::VAL5 })
-		{
+		for (const auto bit: { MyEnum::VAL1, MyEnum::VAL2, MyEnum::VAL3, MyEnum::VAL4, MyEnum::VAL5 }) {
 			bool expected = false;
 			if (bit == MyEnum::VAL2 || bit == MyEnum::VAL3)
 				expected = true;
@@ -53,7 +50,7 @@ int main() {
 
 	{
 		MyBitMask bitmask;
-		bitmask.set();
+		bitmask.setAll();
 		assert (bitmask.to_string() == std::string(32, '1'));
 
 		bitmask.reset();
@@ -81,6 +78,29 @@ int main() {
 		bitmask.reset();
 		assert (bitmask.any() == false);
 		assert (bitmask.none() == true);
+	}
+
+	{
+		MyBitMask full(MyBitMask::all);
+		for (const auto bit: { MyEnum::VAL1, MyEnum::VAL2, MyEnum::VAL3, MyEnum::VAL4, MyEnum::VAL5 }) {
+			assert (full.test(bit) == true);
+		}
+
+		assert (full.only(MyEnum::VAL1) == false);
+
+		full.limit({MyEnum::VAL1});
+
+		for (const auto bit: { MyEnum::VAL1, MyEnum::VAL2, MyEnum::VAL3, MyEnum::VAL4, MyEnum::VAL5 }) {
+			bool expected = false;
+			if (bit == MyEnum::VAL1) {
+				expected = true;
+			}
+
+			assert (full[bit] == expected);
+		}
+
+
+		assert (full.only(MyEnum::VAL1) == true);
 	}
 
 	return 0;
