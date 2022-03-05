@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cassert>
 
 #include "cosmos/algs.hxx"
 
@@ -34,6 +35,10 @@ int main() {
 		std::cerr << "bad\n";
 		res = 1;
 	}
+
+	const int ARR[5] = {1, 2, 3, 4, 5};
+
+	assert (cosmos::num_elements(ARR) == 5);
 
 	return res;
 }

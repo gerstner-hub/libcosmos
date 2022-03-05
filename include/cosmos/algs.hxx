@@ -17,6 +17,12 @@ bool in_range(const T1 &v, const identity_t<T1> &_min, const identity_t<T1> &_ma
 	return _min <= v && v <= _max;
 }
 
+/// returns the number of elements in a C style array
+template <typename T>
+constexpr size_t num_elements(const T &v) {
+	return sizeof(v) / sizeof(v[0]);
+}
+
 }
 
 #endif // inc. guard
