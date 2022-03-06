@@ -6,6 +6,7 @@
 // Cosmos
 #include "cosmos/errors/ApiError.hxx"
 #include "cosmos/errors/UsageError.hxx"
+#include "cosmos/errors/RuntimeError.hxx"
 #include "cosmos/fs/File.hxx"
 #include "cosmos/Init.hxx"
 
