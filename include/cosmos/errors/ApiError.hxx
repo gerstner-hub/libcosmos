@@ -41,7 +41,6 @@ protected: // functions
 
 protected: // data
 
-	const char *m_prefix = nullptr;
 	int m_errno = 0;
 };
 
