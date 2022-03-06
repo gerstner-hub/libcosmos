@@ -15,7 +15,7 @@ void check(int &res, std::stringstream &ss, const std::string &cmp) {
 	res = 1;
 }
 
-int main() {
+int testHexnum() {
 	int res = 0;
 	std::stringstream ss;
 
@@ -27,6 +27,33 @@ int main() {
 	// make sure neither hex nor fill character nor field width got stuck
 	// on the original stream
 	check(res, ss, "110");
+
+	return res;
+}
+
+void check(int &res, const std::string &val, const std::string &cmp)
+{
+	if (val == cmp)
+		return;
+
+	std::cerr << val << " != " << cmp << std::endl;
+	res = 1;
+}
+
+int testSprintf() {
+	int res = 0;
+
+	auto printed = cosmos::sprintf("this is a test string: %s %zd\n", "varstring", 50UL);
+
+	check(res, printed, "this is a test string: varstring 50\n");
+	
+	return res;
+}
+
+int main() {
+	int res = testHexnum();
+
+	res = testSprintf() && res;
 
 	return res;
 }

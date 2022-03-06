@@ -2,8 +2,12 @@
 #define COSMOS_FORMATTING_HXX
 
 // stdlib
-#include <ostream>
 #include <iomanip>
+#include <ostream>
+#include <string>
+
+// cosmos
+#include "cosmos/compiler.hxx"
 
 namespace cosmos {
 
@@ -29,6 +33,9 @@ protected: // data
 	size_t m_width = 0;
 	bool m_show_base = true;
 };
+
+/// this is C++ variant of the libc sprintf() function
+COSMOS_API std::string sprintf(const char *fmt, ...) COMOS_FORMAT_PRINTF(1, 2);
 
 }
 
