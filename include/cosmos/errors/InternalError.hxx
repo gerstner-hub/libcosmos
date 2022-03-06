@@ -22,6 +22,8 @@ public: // functions
 		m_msg = msg;
 	}
 
+	explicit InternalError(const std::string &msg) : InternalError(msg.c_str()) {}
+
 	COSMOS_ERROR_IMPL;
 };
 

@@ -22,6 +22,8 @@ public: // functions
 		m_msg = msg;
 	}
 
+	explicit RuntimeError(const std::string &msg) : RuntimeError(msg.c_str()) {}
+
 	COSMOS_ERROR_IMPL;
 };
 
