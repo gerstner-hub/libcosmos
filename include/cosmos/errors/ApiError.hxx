@@ -1,6 +1,9 @@
 #ifndef COSMOS_APIERROR_HXX
 #define COSMOS_APIERROR_HXX
 
+// stdlib
+#include <string>
+
 // cosmos
 #include "cosmos/errors/CosmosError.hxx"
 
@@ -20,6 +23,8 @@ public: // functions
 
 	//! stores the current errno code in the exception
 	explicit ApiError(const char *prefix = nullptr);
+
+	explicit ApiError(const std::string &s) : ApiError(s.c_str()) {}
 
 	//! stores the given errno code in the exception
 	explicit ApiError(const int p_errno);
