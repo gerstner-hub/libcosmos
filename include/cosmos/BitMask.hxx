@@ -170,6 +170,16 @@ public: // functions
 		return m_flags != 0;
 	}
 
+	//! returns whether any of the given bits is set
+	bool anyOf(const std::initializer_list<ENUM> &flags) const {
+		for (auto bit: flags) {
+			if (test(bit))
+				return true;
+		}
+
+		return false;
+	}
+
 	//! returns whether no bit in the bitset is set
 	bool none() const {
 		return !this->any();
