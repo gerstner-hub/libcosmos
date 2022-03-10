@@ -26,6 +26,8 @@ public: // functions
 	//! Creates a Signal object for the given primitive signal number
 	explicit Signal(const Type &sig) : m_sig(sig) {}
 
+	Signal(const Signal &o) { *this = o; }
+
 	Signal& operator=(const Signal &o) { m_sig = o.m_sig; return *this; }
 
 	bool operator==(const Signal &o) const { return m_sig == o.m_sig; }
