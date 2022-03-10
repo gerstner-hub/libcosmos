@@ -1,7 +1,10 @@
+#include <cassert>
 #include <iostream>
+#include <limits.h>
 
 #include "cosmos/errors/CosmosError.hxx"
 #include "cosmos/fs/File.hxx"
+#include "cosmos/fs/StreamFile.hxx"
 
 int main()
 {
@@ -33,6 +36,36 @@ int main()
 		res = 1;
 	} catch (const cosmos::CosmosError &e) {
 		std::cout << "non-existing file correctly threw error: " << e.what() << "\n";
+	}
+
+	std::string hosts;
+
+	{
+		cosmos::StreamFile sf;
+		sf.open("/etc/hosts", cosmos::OpenMode::READ_ONLY);
+
+		char line[LINE_MAX];
+		while (true) {
+			auto bytes = sf.read(line, LINE_MAX);
+			if (!bytes)
+				break;
+			hosts.append(line, bytes);
+		}
+
+		std::cout << hosts << std::endl;
+	}
+
+	{
+		cosmos::StreamFile sf;
+		sf.open("/tmp", cosmos::OpenMode::READ_WRITE, cosmos::OpenFlags({cosmos::OpenSettings::TMPFILE}), cosmos::FileMode(0700));
+		sf.writeAll(hosts.data(), hosts.size());
+		sf.seekFromStart(0);
+		std::string hosts2;
+		hosts2.resize(hosts.size());
+		sf.readAll(hosts2.data(), hosts2.size());
+		assert( hosts == hosts2 );
+		auto read = sf.read(hosts2.data(), 1);
+		assert( read == 0 );
 	}
 
 	return res;
