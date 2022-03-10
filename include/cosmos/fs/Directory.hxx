@@ -4,6 +4,7 @@
 // stdlib
 #include <exception>
 #include <iostream>
+#include <string_view>
 
 // Linux
 #include <dirent.h>
@@ -53,7 +54,7 @@ public: // functions
 	 * 	Create a Directory object operating on the directory present
 	 * 	at the given path location in the file system
 	 **/
-	explicit Directory(const std::string &path) {
+	explicit Directory(const std::string_view &path) {
 		open(path);
 	}
 
@@ -111,7 +112,7 @@ public: // functions
 	 * 	another directory then this previous associaton will be
 	 * 	implicitly close()'d.
 	 **/
-	void open(const std::string &path, const bool follow_links = false);
+	void open(const std::string_view &path, const bool follow_links = false);
 
 	/**
 	 * \brief
@@ -181,7 +182,7 @@ public: // functions
 
 protected: // functions
 
-	void requireOpenStream(const char *context) const {
+	void requireOpenStream(const std::string_view &context) const {
 		if (!isOpen()) {
 			cosmos_throw (UsageError(std::string(context) + " on unassociated Directory"));
 		}

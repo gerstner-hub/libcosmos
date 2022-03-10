@@ -58,7 +58,7 @@ public: // functions
 		return m_argv.empty() ? std::string("") : m_argv[0];
 	}
 
-	void setExe(const std::string &exe) {
+	void setExe(const std::string_view &exe) {
 		if (! m_argv.empty())
 			m_argv[0] = exe;
 		else
@@ -125,7 +125,7 @@ public: // functions
 	 * 	This only affects yet to be started child processes. If empty
 	 * 	then the parent process's CWD is inherited to the child.
 	 **/
-	void setCWD(const std::string &cwd) { m_cwd = cwd; }
+	void setCWD(const std::string_view &cwd) { m_cwd = cwd; }
 
 	const std::string& cwd() const { return m_cwd; }
 
@@ -137,7 +137,7 @@ public: // functions
 	 * 	then the parent process's environment is inherited to the
 	 * 	child.
 	 **/
-	void setEnv(const std::string &block) { m_env = block; }
+	void setEnv(const std::string_view &block) { m_env = block; }
 
 	void setTrace(const bool trace) { m_trace = trace; }
 	bool trace() const { return m_trace; }
@@ -246,6 +246,6 @@ protected: // data
 
 } // end ns
 
-cosmos::SubProc& operator<<(cosmos::SubProc &proc, const std::string &arg);
+cosmos::SubProc& operator<<(cosmos::SubProc &proc, const std::string_view &arg);
 
 #endif // inc. guard

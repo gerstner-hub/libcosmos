@@ -10,11 +10,11 @@
 
 namespace cosmos {
 
-ApiError::ApiError(const char *prefix) :
+ApiError::ApiError(const std::optional<std::string_view> &prefix) :
 	ApiError(errno)
 {
 	if (prefix) {
-		m_msg = prefix;
+		m_msg = prefix.value();
 		m_msg += ": ";
 	}
 }

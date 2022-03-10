@@ -10,9 +10,9 @@
 
 namespace cosmos {
 
-bool FileSystem::existsFile(const std::string &path) {
+bool FileSystem::existsFile(const std::string_view &path) {
 	struct stat s;
-	if (lstat(path.c_str(), &s) == 0)
+	if (lstat(path.data(), &s) == 0)
 		return true;
 	else if (errno != ENOENT)
 		cosmos_throw (ApiError());

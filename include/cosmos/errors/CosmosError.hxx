@@ -4,6 +4,7 @@
 // C++
 #include <exception>
 #include <string>
+#include <string_view>
 
 //! Throws the given Exception type after contextual information from the
 //! calling context has been added.
@@ -40,12 +41,9 @@ public: // functions
 	explicit CosmosError(const char *error_class) :
 		m_error_class(error_class) {}
 
-	CosmosError(const char *error_class, const char *fixed_text) : CosmosError(error_class) {
+	CosmosError(const char *error_class, const std::string_view &fixed_text) : CosmosError(error_class) {
 		m_msg = fixed_text;
 	}
-
-	CosmosError(const char *error_class, const std::string &fixed_text) :
-		CosmosError(error_class, fixed_text.c_str()) {}
 
 	CosmosError& setInfo(const char *file, const size_t line, const char *func) {
 		m_line = line;

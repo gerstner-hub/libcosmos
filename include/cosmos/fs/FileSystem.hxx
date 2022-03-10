@@ -2,7 +2,7 @@
 #define COSMOS_FILESYSTEM_HXX
 
 // C++ stdlib
-#include <string>
+#include <string_view>
 
 namespace cosmos {
 
@@ -34,7 +34,7 @@ public: // functions
 	 * 	different than "ENOENT" is returned by the operating system
 	 * 	then an exception is thrown.
 	 **/
-	static bool existsFile(const std::string &path);
+	static bool existsFile(const std::string_view &path);
 };
 
 } // end ns

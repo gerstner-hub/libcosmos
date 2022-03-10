@@ -2,6 +2,7 @@
 #define COSMOS_APIERROR_HXX
 
 // stdlib
+#include <optional>
 #include <string>
 
 // cosmos
@@ -22,13 +23,12 @@ class COSMOS_API ApiError :
 public: // functions
 
 	//! stores the current errno code in the exception
-	explicit ApiError(const char *prefix = nullptr);
-
-	explicit ApiError(const std::string &s) : ApiError(s.c_str()) {}
+	explicit ApiError(const std::optional<std::string_view> &prefix = {});
 
 	//! stores the given errno code in the exception
 	explicit ApiError(const int p_errno);
 
+	//! returns the plain operating system error message
 	std::string msg() const { return msg(m_errno); }
 
 	/**

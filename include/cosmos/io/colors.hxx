@@ -3,6 +3,7 @@
 
 // stdlib
 #include <iosfwd>
+#include <string_view>
 #include <variant>
 
 /** \file
@@ -127,12 +128,12 @@ class FeatureBase {
 public:
 	size_t getOnCode() const { return m_on_code; }
 	size_t getOffCode() const { return m_off_code; }
-	bool hasText() const { return std::holds_alternative<const std::string*>(m_info); }
-	const std::string& getText() const { return *std::get<const std::string*>(m_info); }
+	bool hasText() const { return std::holds_alternative<const std::string_view*>(m_info); }
+	const std::string_view& getText() const { return *std::get<const std::string_view*>(m_info); }
 	bool hasNextFeature() const { return std::holds_alternative<const FeatureBase*>(m_info); }
 	const FeatureBase& getNextFeature() const { return *std::get<const FeatureBase*>(m_info); }
 protected:
-	FeatureBase(const std::string &text, const size_t on_code, const size_t off_code) :
+	FeatureBase(const std::string_view &text, const size_t on_code, const size_t off_code) :
 		m_info(&text), m_on_code(on_code), m_off_code(off_code)
 	{}
 
@@ -141,7 +142,7 @@ protected:
 	{}
 protected:
 	// either a terminal string or a pointer to the next feature to apply
-	std::variant<const std::string*, const FeatureBase*> m_info;
+	std::variant<const std::string_view*, const FeatureBase*> m_info;
 	const size_t m_on_code;
 	const size_t m_off_code;
 };
@@ -149,7 +150,7 @@ protected:
 /// Base class for easy feature TermControl application on ostreams.
 class TextEffect : public FeatureBase {
 protected:
-	TextEffect(const TermControl feature, const std::string &text) :
+	TextEffect(const TermControl feature, const std::string_view &text) :
 		FeatureBase(text, static_cast<size_t>(feature), static_cast<size_t>(getOffControl(feature)))
 	{}
 
@@ -161,7 +162,7 @@ protected:
 /// Template for definition of concrete text effect helpers.
 template <TermControl effect>
 struct TextEffectT : public TextEffect {
-	explicit TextEffectT(const std::string &text) :
+	explicit TextEffectT(const std::string_view &text) :
 		TextEffect(effect, text) {}
 	explicit TextEffectT(const FeatureBase &next) :
 		TextEffect(effect, next) {}
@@ -176,7 +177,7 @@ typedef TextEffectT<TermControl::INVERSE_ON> Inversed;
 
 /// Base class for easy colored text application on ostreams.
 struct ColoredText : public FeatureBase {
-	explicit ColoredText(const std::string &text, const TermColor &c, const ColorKind &kind, const ColorIntensity &intensity) :
+	explicit ColoredText(const std::string_view &text, const TermColor &c, const ColorKind &kind, const ColorIntensity &intensity) :
 		FeatureBase(text, getANSIColorCode(ColorSpec(c, kind, intensity)), static_cast<size_t>(getOffCode(kind)))
 	{}
 
@@ -194,14 +195,14 @@ protected: // functions
 /// Template for definition of concrete color text helpers.
 template <TermColor color, ColorIntensity intensity=ColorIntensity::NORMAL>
 struct ColoredTextT : public ColoredText {
-	explicit ColoredTextT(const std::string &text) : ColoredText(text, color, ColorKind::FRONT, intensity) {}
+	explicit ColoredTextT(const std::string_view &text) : ColoredText(text, color, ColorKind::FRONT, intensity) {}
 	explicit ColoredTextT(const FeatureBase &next) : ColoredText(next, color, ColorKind::FRONT, intensity) {}
 };
 
 /// Template for definition of concrete background color helpers.
 template <TermColor color, ColorIntensity intensity=ColorIntensity::NORMAL>
 struct TextOnColorT : public ColoredText {
-	explicit TextOnColorT(const std::string &text) : ColoredText(text, color, ColorKind::BACK, intensity) {}
+	explicit TextOnColorT(const std::string_view &text) : ColoredText(text, color, ColorKind::BACK, intensity) {}
 	explicit TextOnColorT(const FeatureBase &next) : ColoredText(next, color, ColorKind::BACK, intensity) {}
 };
 

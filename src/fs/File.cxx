@@ -17,14 +17,14 @@ File::~File() {
 	}
 }
 
-void File::open(const char *path, const OpenMode &mode, const OpenFlags &flags) {
+void File::open(const std::string_view &path, const OpenMode &mode, const OpenFlags &flags) {
 	int raw_flags = flags.get() | static_cast<int>(mode);
 
 	if (flags.test(OpenSettings::CREATE)) {
 		cosmos_throw (InternalError("open with O_CREAT not yet covered"));
 	}
 
-	auto fd = ::open(path, raw_flags, 0);
+	auto fd = ::open(path.data(), raw_flags, 0);
 
 	m_fd.setFD(fd);
 

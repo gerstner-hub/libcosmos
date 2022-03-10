@@ -21,7 +21,7 @@ void Directory::close() {
 	}
 }
 
-void Directory::open(const std::string &path, const bool follow_links) {
+void Directory::open(const std::string_view &path, const bool follow_links) {
 	close();
 
 	/*
@@ -30,7 +30,7 @@ void Directory::open(const std::string &path, const bool follow_links) {
 	 * O_CLOEXEC. This gives us more control than when using opendir().
 	 */
 	auto res = ::open(
-		path.c_str(),
+		path.data(),
 		O_RDONLY | O_CLOEXEC | O_DIRECTORY | (follow_links ? O_NOFOLLOW : 0)
 	);
 

@@ -72,27 +72,20 @@ public: // functions
 
 	File() {}
 
-	File(const std::string &path, const OpenMode &mode) :
+	File(const std::string_view &path, const OpenMode &mode) :
 		File(path, mode, OpenFlags({OpenSettings::CLOEXEC})) {}
 
-	File(const std::string &path, const OpenMode &mode, const OpenFlags &flags) :
-		File(path.c_str(), mode, flags) {}
-
-	File(const char *path, const OpenMode &mode, const OpenFlags &flags) {
+	File(const std::string_view &path, const OpenMode &mode, const OpenFlags &flags) {
 		open(path, mode, flags);
 	}
 
 	virtual ~File();
 
-	void open(const std::string &path, const OpenMode &mode) {
-		return open(path.c_str(), mode);
-	}
-
-	void open(const char *path, const OpenMode &mode) {
+	void open(const std::string_view &path, const OpenMode &mode) {
 		return open(path, mode, OpenFlags({OpenSettings::CLOEXEC}));
 	}
 
-	void open(const char *path, const OpenMode &mode, const OpenFlags &flags);
+	void open(const std::string_view &path, const OpenMode &mode, const OpenFlags &flags);
 
 	void close() {
 		if (!isOpen())
