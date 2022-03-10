@@ -1,10 +1,15 @@
 #ifndef COSMOS_PROCESS_HXX
 #define COSMOS_PROCESS_HXX
 
+// stdlib
+#include <optional>
+
 // cosmos
 #include "cosmos/ostypes.hxx"
 
 namespace cosmos {
+
+class SigSet;
 
 /**
  * \brief
@@ -16,38 +21,47 @@ public: // functions
 
 	explicit Process() {}
 
-	/**
-	 * \brief
-	 *	Returns the process ID of the current process
-	 **/
+	/// Returns the process ID of the current process
 	ProcessID getPid() const {
 		return m_own_pid == INVALID_PID ? cachePid() : m_own_pid;
 	}
 
-	/**
-	 * \brief
-	 *	Returns the process ID of the parent of the current process
-	 **/
+	/// Returns the process ID of the parent of the current process
 	ProcessID getPPid() const {
 		return m_parent_pid == INVALID_PID ?  cachePPid() : m_parent_pid;
 	}
 
-	/**
-	 * \brief
-	 * 	Returns the real user ID the current process is running as
-	 **/
+	/// Returns the real user ID the current process is running as
 	UserID getRealUserID() const;
 
+	/// Returns the effective user ID the current process is running as
 	/**
-	 * \brief
-	 * 	Returns the effective user ID the current process is running
-	 * 	as
-	 * \details
-	 * 	This ID may differ from getRealUserID() if a privileged
-	 * 	process temporarily drops privileges or an unprivileged user
-	 * 	calls a privileged program with setuid bit.
+	 * This ID may differ from getRealUserID() if a privileged process
+	 * temporarily drops privileges or an unprivileged user calls a
+	 * privileged program with setuid bit.
 	 **/
 	UserID getEffectiveUserID() const;
+
+	/// Blocks the given set of signals in the current process's signal mask
+	/**
+	 * Blocked signals won't be delivered asynchronously to the process
+	 * i.e. no asynchronous signal handler will be invoked, also the
+	 * default action will not be executed. This allows to collect the
+	 * information synchronously e.g. by using a SignalFD.
+	 *
+	 * If \c old is provided then the previous signal mask is returned
+	 * into this SigSet object.
+	 **/
+	void blockSignals(const SigSet &s, std::optional<SigSet *> old = {});
+
+	/// Unblocks the given set of signals in the current process's signal mask
+	void unblockSignals(const SigSet &s, std::optional<SigSet *> old = {});
+
+	/// Assigns exactly the given signal mask to the current process
+	void setSigMask(const SigSet &s, std::optional<SigSet *> old = {});
+
+	/// returns the currently active signal mask for the calling thread
+	SigSet getSigMask();
 
 protected: // functions
 
