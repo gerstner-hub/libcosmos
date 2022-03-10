@@ -1,6 +1,8 @@
 #ifndef COSMOS_ALGS_HXX
 #define COSMOS_ALGS_HXX
 
+#include <vector>
+
 namespace cosmos {
 
 template<typename T>
@@ -21,6 +23,13 @@ bool in_range(const T1 &v, const identity_t<T1> &_min, const identity_t<T1> &_ma
 template <typename T>
 constexpr size_t num_elements(const T &v) {
 	return sizeof(v) / sizeof(v[0]);
+}
+
+/// append sequence v2 to sequence v1
+template <typename T1, typename T2>
+T1& append(T1 &v1, const T2 &v2) {
+	v1.insert(std::end(v1), std::begin(v2), std::end(v2));
+	return v1;
 }
 
 }
