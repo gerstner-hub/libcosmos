@@ -19,7 +19,7 @@ public: // types
 public: // functions
 
 	//! creates an empty signal set
-	SigSet() { clear(); }
+	SigSet() {}
 	//! creates a fully set signal set
 	explicit SigSet(const fill_t &f) { fill(); }
 	//! creates a signal set with the given signals set
@@ -46,7 +46,7 @@ public: // functions
 	const sigset_t* raw() const { return &m_set; }
 
 protected: // data
-	sigset_t m_set;
+	sigset_t m_set{};
 };
 
 } // end ns
