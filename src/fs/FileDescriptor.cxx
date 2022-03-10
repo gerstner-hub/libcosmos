@@ -12,6 +12,8 @@
 namespace cosmos {
 
 void FileDescriptor::close() {
+	if(!valid())
+		return;
 	const auto fd = m_fd;
 	m_fd = INVALID_FD;
 	if (::close(fd) == 0) {

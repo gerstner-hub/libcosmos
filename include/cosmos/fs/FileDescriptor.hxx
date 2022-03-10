@@ -52,7 +52,7 @@ public: // functions
 	 * This asks the operating system to close the associated file. The
 	 * stored file descriptor will be reset().
 	 *
-	 * On rare occasions closing a file can file. The most prominent error
+	 * On rare occasions closing a file can fail. The most prominent error
 	 * is "invalid file descriptor" but there can be other situations,
 	 * like when during close() outstanding writes are performed.
 	 *
