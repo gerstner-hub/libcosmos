@@ -1,8 +1,12 @@
 #ifndef COSMOS_FILE_HXX
 #define COSMOS_FILE_HXX
 
+// stdlib
+#include <optional>
+
 // POSIX
 #include <fcntl.h>
+#include <sys/stat.h>
 
 // cosmos
 #include "cosmos/BitMask.hxx"
@@ -63,9 +67,54 @@ enum class OpenSettings : int {
 
 typedef BitMask<OpenSettings> OpenFlags;
 
+/// Represents a file type and mode
+class FileMode {
+public:
+	/// constructs a file mode from a fully specified numerical value
+	explicit FileMode(mode_t mode = 0) : m_mode(mode) {}
+
+	bool isRegular() const { return S_ISREG(m_mode); }
+	bool isDir() const { return S_ISDIR(m_mode); }
+	bool isCharDev() const { return S_ISCHR(m_mode); }
+	bool isBlockDev() const { return S_ISBLK(m_mode); }
+	bool isFIFO() const { return S_ISFIFO(m_mode); }
+	bool isLink() const { return S_ISLNK(m_mode); }
+	bool isSocket() const { return S_ISSOCK(m_mode); }
+
+	bool hasSetUID() const { return (m_mode & S_ISUID) != 0; }
+	bool hasSetGID() const { return (m_mode & S_ISGID) != 0; }
+	bool hasSticky() const { return (m_mode & S_ISVTX) != 0; }
+
+	bool canOwnerRead() const { return (m_mode & S_IRUSR) != 0; }
+	bool canOwnerWrite() const { return (m_mode & S_IWUSR) != 0; }
+	bool canOwnerExec() const { return (m_mode & S_IXUSR) != 0; }
+
+	bool canGroupRead() const { return (m_mode & S_IRGRP) != 0; }
+	bool canGroupWrite() const { return (m_mode & S_IWGRP) != 0; }
+	bool canGroupExec() const { return (m_mode & S_IXGRP) != 0; }
+
+	bool canOthersRead() const { return (m_mode & S_IROTH) != 0; }
+	bool canOthersWrite() const { return (m_mode & S_IWOTH) != 0; }
+	bool canOthersExec() const { return (m_mode & S_IXOTH) != 0; }
+
+	//! returns the file permissions bits only (file type stripped off)
+	mode_t getPermBits() const { return m_mode & (~S_IFMT); }
+
+	mode_t raw() const { return m_mode; }
+protected: // data
+	//! plain file mode value
+	mode_t m_mode;
+};
+
+/// Representation of open file objects
 /**
- * \brief
- * 	Representation of open file objects
+ * On the level of this type mainly the means to open a file are provided
+ * (usually by path name or by using an existing file descriptor). Some
+ * operations on file descriptor level may be implemented here as well.
+ *
+ * There is no actual interface to interface with the file content. See e.g.
+ * StreamFile for a specialization of this class that implements streaming
+ * I/O.
  **/
 class COSMOS_API File {
 public: // functions
@@ -79,19 +128,47 @@ public: // functions
 		open(path, mode, flags);
 	}
 
+	File(const std::string_view &path, const OpenMode &mode, const OpenFlags &flags, const FileMode &fmode) {
+		open(path, mode, flags, fmode);
+	}
+
+	explicit File(FileDescriptor fd, bool close_fd) {
+		open(fd, close_fd);
+	}
+
 	virtual ~File();
 
 	void open(const std::string_view &path, const OpenMode &mode) {
 		return open(path, mode, OpenFlags({OpenSettings::CLOEXEC}));
 	}
 
-	void open(const std::string_view &path, const OpenMode &mode, const OpenFlags &flags);
+	void open(const std::string_view &path, const OpenMode &mode, const OpenFlags &flags, const std::optional<FileMode> &fmode = {});
+
+	/// takes the already open file descriptor fd and operates on it
+	/**
+	 * The caller is responsible for invalidating \c fd, if desired, and
+	 * that the file descriptor is not used in conflicting ways.
+	 *
+	 * The parameter \c close_fd determines whether the File object will
+	 * take ownership of the file descriptor, or not. If so then the file
+	 * descriptor is closed if deemded necessary by the File object.
+	 **/
+	void open(FileDescriptor fd, bool close_fd) {
+		m_fd = fd;
+		m_close_fd = close_fd;
+	}
 
 	void close() {
 		if (!isOpen())
 			return;
 
-		m_fd.close();
+		if (m_close_fd) {
+			m_fd.close();
+		} else {
+			m_fd.reset();
+		}
+
+		m_close_fd = true;
 	}
 
 	bool isOpen() const { return m_fd.valid(); }
@@ -104,6 +181,8 @@ protected: // functions
 	const FileDescriptor& getFD() const { return m_fd; }
 
 protected: // data
+
+	bool m_close_fd = true;
 	FileDescriptor m_fd;
 };
 

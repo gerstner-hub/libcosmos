@@ -4,6 +4,7 @@
 // cosmos
 #include "cosmos/errors/ApiError.hxx"
 #include "cosmos/errors/InternalError.hxx"
+#include "cosmos/errors/UsageError.hxx"
 #include "cosmos/fs/File.hxx"
 
 namespace cosmos {
@@ -17,14 +18,14 @@ File::~File() {
 	}
 }
 
-void File::open(const std::string_view &path, const OpenMode &mode, const OpenFlags &flags) {
+void File::open(const std::string_view &path, const OpenMode &mode, const OpenFlags &flags, const std::optional<FileMode> &fmode) {
 	int raw_flags = flags.get() | static_cast<int>(mode);
 
-	if (flags.test(OpenSettings::CREATE)) {
-		cosmos_throw (InternalError("open with O_CREAT not yet covered"));
+	if (flags.anyOf({OpenSettings::CREATE, OpenSettings::TMPFILE}) && !fmode) {
+		cosmos_throw (UsageError("the given open flags required an fmode argument"));
 	}
 
-	auto fd = ::open(path.data(), raw_flags, 0);
+	auto fd = ::open(path.data(), raw_flags, fmode ? fmode.value().raw() : 0);
 
 	m_fd.setFD(fd);
 
