@@ -35,9 +35,9 @@ public: // types
 
 		//! returns the PID of the process that sent or caused this
 		//! signal, if applicable
-		auto getSenderPID() const  { return ssi_pid; }
+		auto getSenderPID() const  { return static_cast<pid_t>(ssi_pid); }
 
-		//! for SIGCHLD this returns the childs exit status or the
+		//! for SIGCHLD this returns the child's exit status or the
 		//! signal that caused the child process to change state
 		auto getChildStatus() const { return ssi_status; }
 	};
