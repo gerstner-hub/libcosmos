@@ -3,6 +3,7 @@
 
 // stdlib
 #include <iosfwd>
+#include <functional>
 #include <string>
 
 // Linux
@@ -46,6 +47,8 @@ namespace cosmos {
  **/
 class COSMOS_API SubProc
 {
+public: // types
+	typedef std::function<void (const SubProc&)> Callback;
 public: // functions
 
 	SubProc();
@@ -171,6 +174,20 @@ public: // functions
 
 	const SchedulerSettings* schedulerSettings() const { return m_sched_settings; }
 
+	/// sets a callback function to be invoked in the child process context
+	/**
+	 * This function will be invoked in the child process after the fork
+	 * happened but before the new program is executed. It can be used to
+	 * perform custom child process setup, but care should be taken not to
+	 * interfere with the SubProc's internal child process setup.
+	 *
+	 * This callback is invoked *before* any redirections or other
+	 * settings are setup by SubPRoc.
+	 **/
+	void setPostForkCB(Callback cb) {
+		m_post_fork_cb = cb;
+	}
+
 	/**
 	 * \brief
 	 * 	Report a child process WaitRes to the SubProc engine
@@ -240,6 +257,8 @@ protected: // data
 	FileDescriptor m_stderr;
 	//! file descriptor to use as child's stdin
 	FileDescriptor m_stdin;
+
+	Callback m_post_fork_cb = nullptr;
 
 	friend std::ostream& ::operator<<(std::ostream&, const SubProc &);
 };

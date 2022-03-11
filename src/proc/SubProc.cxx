@@ -119,6 +119,9 @@ void SubProc::resetSignals() {
 }
 
 void SubProc::postFork() {
+	if (m_post_fork_cb) {
+		m_post_fork_cb(*this);
+	}
 	if (m_sched_settings) {
 		try {
 			m_sched_settings->apply(0);

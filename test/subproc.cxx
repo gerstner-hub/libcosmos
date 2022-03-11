@@ -438,6 +438,43 @@ protected:
 	const std::string m_sleep_bin;
 };
 
+class PostForkTest {
+public:
+	PostForkTest() {
+
+	}
+
+	void postFork(const cosmos::SubProc &proc) {
+		if (&proc != &m_true_proc) {
+			std::cerr << "proc != m_true_proc ?!" << std::endl;
+			std::cerr << (void*)&proc << " != " << (void*)&m_true_proc << std::endl;
+			_exit(2);
+		}
+
+		// let's exit with this status instead of actually executing
+		// true, this will signal us that that the postFork() actually
+		// run.
+		_exit(REPLACE_EXIT);
+	}
+
+	void run() {
+		m_true_proc.setExe("/usr/bin/true");
+		cosmos::SubProc::Callback cb = std::bind( &PostForkTest::postFork, this, std::placeholders::_1 );
+		m_true_proc.setPostForkCB(cb);
+		m_true_proc.run();
+		auto res = m_true_proc.wait();
+		if (!res.exited() || res.exitStatus() != REPLACE_EXIT) {
+			cosmos_throw (cosmos::InternalError("post fork child didn't act as expected"));
+		}
+
+		std::cout << "/usr/bin/true child has been shortcut by postFork CB()" << std::endl;
+	}
+
+protected:
+	cosmos::SubProc m_true_proc;
+	static constexpr int REPLACE_EXIT = 40;
+};
+
 int main()
 {
 	try {
@@ -477,6 +514,13 @@ int main()
 		{
 			MixedWaitInvocationTest mixed_test;
 			mixed_test.run();
+		}
+
+		std::cout << "\n\n";
+
+		{
+			PostForkTest post_fork_test;
+			post_fork_test.run();
 		}
 
 		return 0;
