@@ -20,6 +20,47 @@
 
 namespace cosmos {
 
+namespace {
+
+// creates a vector of string pointers suitable to pass as envp to execve() and friends
+auto setupEnv(const StringVector &vars) {
+	CStringVector ret;
+
+	for (const auto &var: vars) {
+		ret.push_back(var.c_str());
+	}
+
+	ret.push_back(nullptr);
+
+	return ret;
+}
+
+void exec(CStringVector &v) {
+	if (v.empty()) {
+		cosmos_throw (InternalError("called with empty argument vector"));
+	}
+
+	::execvp (v[0], const_cast<char**>(v.data()));
+
+	cosmos_throw (ApiError("execvp failed"));
+}
+
+void exec(CStringVector &v, CStringVector &e) {
+	if (v.empty()) {
+		cosmos_throw (InternalError("called with empty argument vector"));
+	}
+	else if(e.empty()) {
+		// needs to contain at least a terminating nullptr
+		cosmos_throw (InternalError("called with empty environment vector"));
+	}
+
+	::execvpe (v[0], const_cast<char**>(v.data()), const_cast<char**>(e.data()));
+
+	cosmos_throw (ApiError("execvpe failed"));
+}
+
+} // end anon ns
+
 static ChildCollector g_collector;
 
 ChildCollector::ChildCollector() :
@@ -96,7 +137,13 @@ void SubProc::run(const StringVector &sv) {
 
 		argv.push_back(nullptr);
 
-		this->exec(argv);
+		if (!m_env) {
+			exec(argv);
+		} else {
+			auto envp = setupEnv(m_env.value());
+			exec(argv, envp);
+		}
+
 	}
 	catch (const CosmosError &ce) {
 		std::cerr
@@ -175,16 +222,6 @@ void SubProc::redirectFD(FileDescriptor orig, FileDescriptor redirect) {
 	redirect.duplicate(orig, false /* no close on-exec */);
 }
 
-void SubProc::exec(CStringVector &v) {
-	if (v.empty()) {
-		cosmos_throw (InternalError("called with empty argument vector"));
-	}
-
-	::execvp (v[0], const_cast<char**>(v.data()));
-
-	cosmos_throw (ApiError("execvp failed"));
-}
-
 void SubProc::kill(const Signal &s) {
 	Signal::sendSignal(m_pid, s);
 }
@@ -199,9 +236,7 @@ WaitRes SubProc::wait() {
 	return wr;
 }
 
-bool SubProc::waitTimed(const size_t max_ms, WaitRes &res) {
-	res.reset();
-	bool exited = false;
+std::optional<WaitRes> SubProc::waitTimed(const size_t max_ms) {
 
 	if (max_ms == SIZE_MAX) {
 		// this conflicts with the interpretation of SIZE_MAX in
@@ -210,7 +245,12 @@ bool SubProc::waitTimed(const size_t max_ms, WaitRes &res) {
 	}
 
 	try {
-		exited = g_collector.collect(m_pid, max_ms, res);
+		WaitRes res;
+		const auto exited = g_collector.collect(m_pid, max_ms, res);
+		if (exited) {
+			m_pid = INVALID_PID;
+			return res;
+		}
 	}
 	catch(...) {
 		// probably the child can't be saved
@@ -218,11 +258,7 @@ bool SubProc::waitTimed(const size_t max_ms, WaitRes &res) {
 		throw;
 	}
 
-	if (exited) {
-		m_pid = INVALID_PID;
-	}
-
-	return exited;
+	return std::nullopt;
 }
 
 void SubProc::gone(const WaitRes &r) {

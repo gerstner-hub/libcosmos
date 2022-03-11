@@ -12,6 +12,7 @@
 // C++
 #include <iostream>
 #include <fstream>
+#include <set>
 #include <sstream>
 #include <string>
 
@@ -321,17 +322,16 @@ public:
 		m_proc.run();
 
 		size_t num_timeouts = 0;
-		cosmos::WaitRes res;
 
 		while (true) {
 			// wait at max one second
-			auto exited = m_proc.waitTimed(500, res);
+			auto res = m_proc.waitTimed(500);
 
-			if (!exited) {
+			if (!res) {
 				num_timeouts++;
 				continue;
 			}
-			else if (res.exited() && res.exitStatus() == 0) {
+			else if (res->exited() && res->exitStatus() == 0) {
 				// correctly exited
 				break;
 			}
@@ -372,36 +372,35 @@ public:
 	}
 
 	void collectResults() {
-		cosmos::WaitRes wr;
 		/*
 		 * this should time out but in the problematic case still
 		 * collect the result from the short running process, causing
 		 * it "never to return".
 		 */
-		bool exited = m_long_proc.waitTimed(3000, wr);
+		auto wr = m_long_proc.waitTimed(3000);
 		const auto short_pid = m_short_proc.pid();
 		const auto long_pid = m_long_proc.pid();
 
-		if (exited) {
+		if (wr) {
 			cosmos_throw (cosmos::InternalError("long running proc unexpectedly returned early"));
 		}
 
-		exited = m_long_proc.waitTimed(10000, wr);
+		wr = m_long_proc.waitTimed(10000);
 
-		if (!exited) {
+		if (!wr) {
 			cosmos_throw (cosmos::InternalError("long running proc unexpectedly didn't return in time"));
 		}
 
-		std::cout << "PID " << long_pid << " returned:\n" << wr << "\n\n";
+		std::cout << "PID " << long_pid << " returned:\n" << *wr << "\n\n";
 
 		// this should long have exited
-		exited = m_short_proc.waitTimed(10000, wr);
+		wr = m_short_proc.waitTimed(10000);
 
-		if (!exited) {
+		if (!wr) {
 			cosmos_throw (cosmos::InternalError("short running proc seemingly didn't return in time"));
 		}
 
-		std::cout << "PID " << short_pid << " returned:\n" << wr << "\n\n";
+		std::cout << "PID " << short_pid << " returned:\n" << *wr << "\n\n";
 	}
 
 	void run() {
@@ -475,6 +474,60 @@ protected:
 	static constexpr int REPLACE_EXIT = 40;
 };
 
+class EnvironmentTest {
+public:
+
+	void run() {
+		// run the env tool to inspect via pipe redirection whether
+		// the child process has got the expected environment
+		m_env_proc.setStdout(m_pipe_from_env.writeEnd());
+		m_env_proc.setExe("/usr/bin/env");
+		cosmos::StringVector env({"this=that", "misc=other"});
+		std::set<std::string> env_set;
+
+		for (const auto &e: env) {
+			env_set.insert(e);
+		}
+
+		m_env_proc.setEnv(env);
+		m_env_proc.run();
+
+		m_pipe_from_env.closeWriteEnd();
+
+		cosmos::InputStreamAdaptor from_env(m_pipe_from_env);
+
+		std::string env_line;
+		size_t hits = 0;
+
+		while (true) {
+			std::getline(from_env, env_line);
+
+			if (from_env.eof())
+				break;
+			else if (from_env.fail())
+				cosmos_throw (cosmos::InternalError("bad stream state"));
+
+			if (env_set.find(env_line) == env_set.end()) {
+				cosmos_throw (cosmos::InternalError("unexpected environment variable found"));
+			}
+
+			hits++;
+		}
+
+		if (hits != env_set.size()) {
+			cosmos_throw (cosmos::InternalError("environment variable missing from env output"));
+		}
+
+		std::cout << "found all expected environment variables in child process" << std::endl;
+
+		m_env_proc.wait();
+	}
+
+protected:
+	cosmos::Pipe m_pipe_from_env;
+	cosmos::SubProc m_env_proc;
+};
+
 int main()
 {
 	try {
@@ -521,6 +574,13 @@ int main()
 		{
 			PostForkTest post_fork_test;
 			post_fork_test.run();
+		}
+
+		std::cout << "\n\n";
+
+		{
+			EnvironmentTest env_test;
+			env_test.run();
 		}
 
 		return 0;
