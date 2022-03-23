@@ -77,6 +77,14 @@ public: // functions
 	/// Returns the primitive file descriptor contained.
 	fd_t raw() const { return m_fd; }
 
+	bool operator==(const FileDescriptor &other) const {
+		return m_fd == other.m_fd;
+	}
+
+	bool operator!=(const FileDescriptor &other) const {
+		return !(*this == other);
+	}
+
 protected: // data
 
 	fd_t m_fd = INVALID_FD;
