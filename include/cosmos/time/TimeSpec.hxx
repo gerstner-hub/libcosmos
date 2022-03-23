@@ -1,6 +1,9 @@
 #ifndef COSMOS_TIMESPEC_HXX
 #define COSMOS_TIMESPEC_HXX
 
+// stdlib
+#include <chrono>
+
 // Linux
 #include <time.h>
 
@@ -17,6 +20,11 @@ public:
 	explicit TimeSpec(time_t seconds, long nano_seconds = 0) {
 		this->tv_sec = seconds;
 		this->tv_nsec = nano_seconds;
+	}
+
+	explicit TimeSpec(const std::chrono::milliseconds &ms) {
+		this->tv_sec = ms.count() / 1000;
+		this->tv_nsec = (ms.count() % 1000) * 1000 * 1000;
 	}
 
 	//! deliberately don't initialize the members for performance reasons
