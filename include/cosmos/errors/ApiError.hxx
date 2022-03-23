@@ -38,6 +38,9 @@ public: // functions
 	 **/
 	static std::string msg(const int no);
 
+	//! returns the plain errno stored in the exception
+	auto errnum() const { return m_errno; }
+
 	COSMOS_ERROR_IMPL;
 
 protected: // functions
