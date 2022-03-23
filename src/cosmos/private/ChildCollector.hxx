@@ -20,43 +20,43 @@
 
 namespace cosmos {
 
+/// Helper for timeout based child processing termination waiting
 /**
- * \brief
- * 	Helper for timeout based child waiting operatior
- * \details
- * 	The wait() family of Linux APIs is not very well designed when it
- * 	comes to waiting with a timeout and when it comes to different
- * 	non-related modules wanting to interact with their child processes.
+ * The wait() family of Linux APIs is not very well designed when it comes to
+ * waiting with a timeout and when it comes to different non-related modules
+ * wanting to interact with their child processes.
  *
- * 	The generic wait(-1, ...) collects (or "steals") any child exit
- * 	results without us knowing if the child is actually one of the ones we
- * 	started. The waitpid() allows to wait for exactly one process but only
- * 	while blocking forever or in non-blocking mode (WNOHANG).
+ * The generic wait(-1, ...) collects (or "steals") any child exit results
+ * without us knowing if the child is actually one of the ones we started. The
+ * waitpid() allows to wait for exactly one process but only while blocking
+ * forever or in non-blocking mode (WNOHANG).
  *
- * 	Each terminating child generates a SIGCHLD signal in the parent
- * 	process (this signal is actually also configurable on Linux). So we
- * 	can wait on the signal with timeout using sigtimedwait(). However the
- * 	SIGCHLD is not queued i.e. if multiple processes exit without the
- * 	signals being collected then some signals will be lost. Generally
- * 	signal handling is also a pain when multi-threading and multiple
- * 	unrelated modules are involved. Also some initialization code is
- * 	required to block the SIGCHLD before using the SubProc functionality.
+ * Each terminating child generates a SIGCHLD signal in the parent process
+ * (this signal is actually also configurable on Linux). So we can wait on the
+ * signal with timeout using sigtimedwait(). However the SIGCHLD is not queued
+ * i.e. if multiple processes exit without the signals being collected then
+ * some signals will be lost. Generally signal handling is also a pain when
+ * multi-threading and multiple unrelated modules are involved. Also some
+ * initialization code is required to block the SIGCHLD before using the
+ * SubProc functionality.
  *
- * 	One approach is to run a dedicated thread that exclusively collects
- * 	*all* child exit statuses and thus also allows to run asynchronous
- * 	callbacks once this happens.
+ * One approach is to run a dedicated thread that exclusively collects *all*
+ * child exit statuses and thus also allows to run asynchronous callbacks once
+ * this happens.
  *
- * 	Another approach is to use the sigwaitinfo approach with timeout and
- * 	once any signal arrives use wait(-1, ...) with WNOHANG until no more
- * 	exit statuses are available.
+ * Another approach is to use the sigwaitinfo approach with timeout and once
+ * any signal arrives use wait(-1, ...) with WNOHANG until no more exit
+ * statuses are available.
  *
- * 	At the moment this class here helps with implementing the latter
- * 	approach. This also requires that waits w/o timeout need to go through
- * 	the same route, otherwise the associated SIGCHLD signals will not be
- * 	collected by those blocking waitpid() calls.
- * \note
- *	Future Linux kernels (as of mid-2019) will contain a pidfd API that
- *	might finally allow a more elegant way of waiting for a child process.
+ * At the moment this class here helps with implementing the latter approach.
+ * This also requires that waits w/o timeout need to go through the same
+ * route, otherwise the associated SIGCHLD signals will not be collected by
+ * those blocking waitpid() calls.
+ *
+ * Linux kernels 5.6 contain a pidfd API that finally allow a more elegant way
+ * of waiting for a child process. It is still tricky to get a pidfd for a
+ * child process in a race free way. For this the bare clone() system call
+ * instead of fork() needs to be employed.
  **/
 class ChildCollector :
 	public Initable
