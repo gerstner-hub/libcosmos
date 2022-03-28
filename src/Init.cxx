@@ -51,6 +51,9 @@ void initLibCosmos() {
 	if (g_init_counter++ != 0)
 		return;
 
+	if (!g_init_map)
+		return;
+
 	// okay we need to perform initialization
 	for (auto &pair: *g_init_map) {
 		auto initable = pair.second;
@@ -62,6 +65,9 @@ void initLibCosmos() {
 void finishLibCosmos() {
 
 	if (--g_init_counter != 0)
+		return;
+
+	if (!g_init_map)
 		return;
 
 	// okay we need to perform cleanup
