@@ -135,6 +135,12 @@ def initSCons(project):
     env.Append(CCFLAGS = ["-g", "-flto"])
     env.Append(LINKFLAGS = "-Wl,--as-needed")
 
+    if ARGUMENTS.get('sanitizer', 0):
+        sanitizers = ["address", "return", "undefined", "leak"]
+        sanitizers = ["-fsanitize={}".format(f) for f in sanitizers]
+        env.Append(CXXFLAGS = sanitizers)
+        env.Append(LIBS = ["asan", "ubsan"])
+
     warnings = (
         "all", "extra", "no-unused-parameter", "duplicated-cond",
         "duplicated-branches", "logical-op", "shadow", "format=2",
