@@ -528,6 +528,17 @@ protected:
 	cosmos::SubProc m_env_proc;
 };
 
+template <class T>
+void runTest() {
+	T test;
+	try {
+		test.run();
+		std::cout << "\n\n";
+	} catch (const std::exception &ex) {
+		std::cerr << "failed to run test: " << ex.what() << std::endl;
+	}
+}
+
 int main()
 {
 	try {
@@ -536,52 +547,13 @@ int main()
 		 * test redirection of each std. file descriptor
 		 */
 
-		{
-			RedirectStdoutTest out_test;
-			out_test.run();
-		}
-
-		std::cout << "\n\n";
-
-		{
-			RedirectStderrTest err_test;
-			err_test.run();
-		}
-
-		std::cout << "\n\n";
-
-		{
-			PipeInTest in_test;
-			in_test.run();
-		}
-
-		std::cout << "\n\n";
-
-		{
-			TimeoutTest to_test;
-			to_test.run();
-		}
-
-		std::cout << "\n\n";
-
-		{
-			MixedWaitInvocationTest mixed_test;
-			mixed_test.run();
-		}
-
-		std::cout << "\n\n";
-
-		{
-			PostForkTest post_fork_test;
-			post_fork_test.run();
-		}
-
-		std::cout << "\n\n";
-
-		{
-			EnvironmentTest env_test;
-			env_test.run();
-		}
+		runTest<RedirectStdoutTest>();
+		runTest<RedirectStderrTest>();
+		runTest<PipeInTest>();
+		runTest<TimeoutTest>();
+		runTest<MixedWaitInvocationTest>();
+		runTest<PostForkTest>();
+		runTest<EnvironmentTest>();
 
 		return 0;
 	}
