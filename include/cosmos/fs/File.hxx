@@ -173,10 +173,6 @@ public: // functions
 
 	bool isOpen() const { return m_fd.valid(); }
 
-protected: // functions
-
-	friend class Terminal;
-
 	/// Allow befriended classes to get the FD with const semantics.
 	const FileDescriptor& getFD() const { return m_fd; }
 
