@@ -325,7 +325,7 @@ public:
 
 		while (true) {
 			// wait at max one second
-			auto res = m_proc.waitTimed(500);
+			auto res = m_proc.waitTimed(std::chrono::milliseconds(500));
 
 			if (!res) {
 				num_timeouts++;
@@ -377,7 +377,7 @@ public:
 		 * collect the result from the short running process, causing
 		 * it "never to return".
 		 */
-		auto wr = m_long_proc.waitTimed(3000);
+		auto wr = m_long_proc.waitTimed(std::chrono::milliseconds(3000));
 		const auto short_pid = m_short_proc.pid();
 		const auto long_pid = m_long_proc.pid();
 
@@ -385,7 +385,7 @@ public:
 			cosmos_throw (cosmos::InternalError("long running proc unexpectedly returned early"));
 		}
 
-		wr = m_long_proc.waitTimed(10000);
+		wr = m_long_proc.waitTimed(std::chrono::milliseconds(10000));
 
 		if (!wr) {
 			cosmos_throw (cosmos::InternalError("long running proc unexpectedly didn't return in time"));
@@ -394,7 +394,7 @@ public:
 		std::cout << "PID " << long_pid << " returned:\n" << *wr << "\n\n";
 
 		// this should long have exited
-		wr = m_short_proc.waitTimed(10000);
+		wr = m_short_proc.waitTimed(std::chrono::milliseconds(10000));
 
 		if (!wr) {
 			cosmos_throw (cosmos::InternalError("short running proc seemingly didn't return in time"));

@@ -2,6 +2,7 @@
 #define COSMOS_SUBPROC_HXX
 
 // stdlib
+#include <chrono>
 #include <iosfwd>
 #include <functional>
 #include <optional>
@@ -56,7 +57,7 @@ public: // functions
 	 * This can return \c true even if the child process already exited,
 	 * in case the child process's exit status was not yet collected.
 	 **/
-	auto running() const { return m_pid != INVALID_PID; }
+	auto running() const { return m_child_fd.valid(); }
 
 	/// returns the currently set executable name, or an empty string if
 	/// none is set
@@ -122,7 +123,7 @@ public: // functions
 	 * The exit status if the child exited. Nothing if the timeout
 	 * occured.
 	 **/
-	std::optional<WaitRes> waitTimed(const size_t max_ms);
+	std::optional<WaitRes> waitTimed(const std::chrono::milliseconds &max);
 
 	/// Send the specified signal to the child process
 	void kill(const Signal &signal);
@@ -159,6 +160,15 @@ public: // functions
 	/// returns the PID of the currently running child process or INVALID_PID
 	ProcessID pid() const { return m_pid; }
 
+	/// returns a pidfd refering to the currently running child
+	/**
+	 * This file descriptor can be used for efficiently waiting for child
+	 * exit using poll() or select() APIs, see `man pidfd_open`. This
+	 * somewhat breaks encapsulation, so take care not to misuse this file
+	 * descriptor in a way that could break the SubProc class logic.
+	 **/
+	const FileDescriptor& pidFD() const { return m_child_fd; }
+
 	void setStderr(FileDescriptor fd) { m_stderr = fd; }
 	void setStdout(FileDescriptor fd) { m_stdout = fd; }
 	void setStdin(FileDescriptor fd) { m_stdin = fd; }
@@ -194,21 +204,6 @@ public: // functions
 	 **/
 	void setPostForkCB(Callback cb) { m_post_fork_cb = cb; }
 
-	/**
-	 * \brief
-	 * 	Report a child process WaitRes to the SubProc engine
-	 * \details
-	 * 	In case a third-party component collects a child status exit
-	 * 	status via a native system call then this function can be used
-	 * 	to re-inject the information into the SubProc engine to avoid
-	 * 	inconsistencies that could lead to infinite waits when
-	 * 	somebody calls wait().
-	 * \note
-	 * 	This functionality is experimental and may not work in a
-	 * 	robust way when multi-threading is involved.
-	 **/
-	static void reportStolenWaitRes(ProcessID pid, const WaitRes &wr);
-
 protected: // functions
 
 	//! performs settings done after forking i.e. in the child process but
@@ -216,20 +211,6 @@ protected: // functions
 	void postFork();
 
 	void resetSignals();
-
-	/**
-	 * \brief
-	 * 	Called from TracedProc if we've started a tracee subprocess
-	 * 	and an external wait was done for it that we don't know of
-	 * \details
-	 * 	The WaitRes \c r is the result the child process delivered, if
-	 * 	we need to know something from it ...
-	 *
-	 * 	Otherwise the function resets the information about the
-	 * 	running process in the SubProc object so no errors occur upon
-	 * 	destruction etc.
-	 **/
-	void gone(const WaitRes &r);
 
 	/// redirects the given old file descriptor to _new (used in child context)
 	/**
@@ -258,6 +239,8 @@ protected: // data
 	FileDescriptor m_stderr;
 	//! file descriptor to use as child's stdin
 	FileDescriptor m_stdin;
+	//! pidfd refering to the active child, if any
+	FileDescriptor m_child_fd;
 
 	Callback m_post_fork_cb = nullptr;
 

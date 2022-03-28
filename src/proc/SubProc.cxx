@@ -3,9 +3,12 @@
 #include <iostream>
 
 // Linux
+#include <linux/sched.h>
+#include <sched.h>
 #include <signal.h>
 #include <sys/ptrace.h>
 #include <sys/resource.h>
+#include <sys/syscall.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -14,7 +17,7 @@
 #include "cosmos/errors/ApiError.hxx"
 #include "cosmos/errors/InternalError.hxx"
 #include "cosmos/errors/UsageError.hxx"
-#include "cosmos/private/ChildCollector.hxx"
+#include "cosmos/io/Poller.hxx"
 #include "cosmos/private/Scheduler.hxx"
 #include "cosmos/proc/SubProc.hxx"
 
@@ -59,42 +62,18 @@ void exec(CStringVector &v, CStringVector &e) {
 	cosmos_throw (ApiError("execvpe failed"));
 }
 
+// for clone(3) there is no glibc wrapper yet so we need to wrap it ourselves
+pid_t clone3(struct clone_args &args) {
+	return syscall(SYS_clone3, &args, sizeof(args));
+}
+
 } // end anon ns
-
-static ChildCollector g_collector;
-
-ChildCollector::ChildCollector() :
-	Initable(InitPrio::CHILD_COLLECTOR)
-{}
-
-void ChildCollector::libInit() {
-	// currently a prerequisite for using the ChildCollector
-	// sigtimedwait() based approach
-	sigset_t sigs;
-	sigemptyset(&sigs);
-	sigaddset(&sigs, SIGCHLD);
-
-	if (sigprocmask(SIG_BLOCK, &sigs, nullptr) != 0) {
-		cosmos_throw (cosmos::ApiError());
-	}
-}
-
-void ChildCollector::libExit() {
-	// restore the default block unmask for SIGCHLD
-	sigset_t sigs;
-	sigemptyset(&sigs);
-	sigaddset(&sigs, SIGCHLD);
-
-	if (sigprocmask(SIG_UNBLOCK, &sigs, nullptr) != 0) {
-		std::cerr << "failed to unblock SIGCHLD: " << ApiError().msg() << "\n";
-	}
-}
 
 SubProc::SubProc()
 {}
 
 SubProc::~SubProc() {
-	if (m_pid != INVALID_PID) {
+	if (m_child_fd.valid()) {
 		std::cerr << "child process still running: " << m_pid << "\n";
 		std::abort();
 	}
@@ -109,12 +88,31 @@ void SubProc::run(const StringVector &sv) {
 		));
 	}
 
-	switch ((m_pid = ::fork()))
-	{
+	// use clone3() instead of fork():
+	//
+	// clone() allows us to get a pid fd for the child in a race free
+	// fashion
+	//
+	// clone3() has fork() semantics and is easier to use for this case
+	// than the older clone syscalls.
+	//
+	// NOTE: it turns out that clone3() is not yet supported in Valgrind,
+	// meaning we won't be able to run programs through Valgrind any more
+	// that employ this system call. clone2() is annoying to use because
+	// it doesn't have fork() semantics though ... maybe we can sit this
+	// out until Valgrind gets supports for clone3().
+	int pfd = 0;
+	struct clone_args clone_args{};
+	clone_args.pidfd = reinterpret_cast<uint64_t>(&pfd);
+	clone_args.exit_signal = SIGCHLD;
+	clone_args.flags = CLONE_CLEAR_SIGHAND | CLONE_PIDFD;
+
+	switch ((m_pid = clone3(clone_args))) {
 	default: // parent process with child pid
 		// as documented, to prevent future inheritance of undefined
 		// file descriptor state
 		resetStdFiles();
+		m_child_fd.setFD(pfd);
 		return;
 	case -1: // an error occured
 		// see above, same for error case
@@ -223,50 +221,41 @@ void SubProc::redirectFD(FileDescriptor orig, FileDescriptor redirect) {
 }
 
 void SubProc::kill(const Signal &s) {
-	Signal::sendSignal(m_pid, s);
+	Signal::sendSignal(m_child_fd, s);
 }
+
+// seems also not part of userspace headers yet
+// this is actually an enum, even worse ...
+#ifndef P_PIDFD
+#	define P_PIDFD 3
+#endif
 
 WaitRes SubProc::wait() {
 	WaitRes wr;
-	auto pid = m_pid;
+
 	m_pid = INVALID_PID;
 
-	g_collector.collect(pid, wr);
+	if (waitid((idtype_t)P_PIDFD, m_child_fd.raw(), &wr, WEXITED) != 0) {
+		try {
+			m_child_fd.close();
+		} catch(...) {}
+		cosmos_throw (ApiError());
+	}
+
+	m_child_fd.close();
 
 	return wr;
 }
 
-std::optional<WaitRes> SubProc::waitTimed(const size_t max_ms) {
+std::optional<WaitRes> SubProc::waitTimed(const std::chrono::milliseconds &max) {
 
-	if (max_ms == SIZE_MAX) {
-		// this conflicts with the interpretation of SIZE_MAX in
-		// ChildCollector as "use no timeout".
-		cosmos_throw (UsageError("max_ms parameter is too large"));
+	Poller poller(8);
+	poller.addFD(m_child_fd, Poller::MonitorMask(Poller::MonitorSetting::INPUT));
+	if (poller.wait(max).empty()) {
+		return std::nullopt;
 	}
 
-	try {
-		WaitRes res;
-		const auto exited = g_collector.collect(m_pid, max_ms, res);
-		if (exited) {
-			m_pid = INVALID_PID;
-			return res;
-		}
-	}
-	catch(...) {
-		// probably the child can't be saved
-		m_pid = INVALID_PID;
-		throw;
-	}
-
-	return std::nullopt;
-}
-
-void SubProc::gone(const WaitRes &r) {
-	m_pid = INVALID_PID;
-}
-
-void SubProc::reportStolenWaitRes(ProcessID pid, const WaitRes &wr) {
-	g_collector.reportStolenChild(pid, wr);
+	return wait();
 }
 
 } // end ns

@@ -3,11 +3,13 @@
 
 // cosmos
 #include "cosmos/errors/ApiError.hxx"
+#include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/proc/Signal.hxx"
 
 // Linux
 #include <signal.h>
 #include <string.h>
+#include <sys/syscall.h>
 
 namespace cosmos {
 
@@ -23,6 +25,17 @@ void Signal::raiseSignal(const Signal &s) {
 
 void Signal::sendSignal(const ProcessID &proc, const Signal &s) {
 	if (::kill(proc, s.raw())) {
+		cosmos_throw (ApiError());
+	}
+}
+
+void Signal::sendSignal(const FileDescriptor &pidfd, const Signal &s) {
+	// there's no glibc wrapper for this yet
+	//
+	// the third siginfo_t argument allows more precise control of the
+	// signal auxiliary data, but the defaults are just like kill(), so
+	// let's use them for now.
+	if (syscall(SYS_pidfd_send_signal, pidfd.raw(), s.raw(), nullptr, 0) != 0) {
 		cosmos_throw (ApiError());
 	}
 }

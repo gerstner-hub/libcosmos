@@ -16,55 +16,35 @@ namespace cosmos {
 
 /**
  * \brief
- * 	Represents the result from a wait() call
+ * 	Represents the result from a waitid() call
  **/
-class COSMOS_API WaitRes
-{
+class COSMOS_API WaitRes : siginfo_t {
 	friend class SubProc;
-public: // types
-
-	//! the primitive wait result type
-	typedef int Type;
-
 public: // functions
 
-	explicit WaitRes(const Type &status = 0) :
-		m_status(status)
-	{}
-
 	//! returns whether the child stopped
-	bool stopped() const { return WIFSTOPPED(m_status) != 0; }
+	bool stopped() const { return si_code == CLD_STOPPED; }
 
 	//! returns whether the child exited
-	bool exited() const { return WIFEXITED(m_status) != 0; }
+	bool exited() const { return si_code == CLD_EXITED; }
 
 	//! returns whether the child was terminated by a signal
-	bool signaled() const { return WIFSIGNALED(m_status) != 0; }
+	bool signaled() const { return si_code == CLD_KILLED || si_code == CLD_DUMPED; }
 
+	/// Returns the exit status of the child
 	/**
-	 * \brief
-	 *	Returns the exit status of the child
-	 * \details
-	 *	The returned value is only valid in case exited() returns \c
-	 *	true.
+	 * The returned value is only valid in case exited() returns \c true.
 	 **/
-	int exitStatus() const { return exited() ? WEXITSTATUS(m_status) : -1; }
+	int exitStatus() const { return exited() ? si_status : -1; }
 
-	/**
-	 * \brief
-	 * 	Returns the signal that caused the child to stop if stopped()
-	 **/
+	/// Returns the signal that caused the child to stop if stopped()
 	Signal stopSignal() const {
-		return stopped() ? Signal(WSTOPSIG(m_status) & (~0x80)) : Signal(0);
+		return stopped() ? Signal(si_status) : Signal(0);
 	}
 
-	/**
-	 * \brief
-	 * 	Returns the signal that caused the child to terminate if
-	 * 	signaled()
-	 **/
+	/// Returns the signal that caused the child to terminate if signaled()
 	Signal termSignal() const {
-		return signaled() ? Signal(WTERMSIG(m_status)) : Signal(0);
+		return signaled() ? Signal(si_status) : Signal(0);
 	}
 
 	/**
@@ -73,9 +53,7 @@ public: // functions
 	 * \note
 	 * 	This only works if the TRACESYSGOOD option was set
 	 **/
-	bool syscallTrace() const {
-		return stopped() && WSTOPSIG(m_status) == (SIGTRAP | 0x80);
-	}
+	bool syscallTrace() const { return si_code == CLD_TRAPPED; }
 
 	/**
 	 * \brief
@@ -85,25 +63,17 @@ public: // functions
 	 * 	been set on the tracee
 	 **/
 	bool checkEvent(const TraceEvent &event) {
-		if (! stopped())
+		if (!stopped())
 			return false;
 
-		return (m_status >> 8) == (SIGTRAP | ((int)event << 8));
+		return (si_status >> 8) == (SIGTRAP | ((int)event << 8));
 	}
 
 	bool exitedSuccessfully() const {
 		return exited() && exitStatus() == 0;
 	}
 
-	void reset() { m_status = 0; }
-
-	Type* raw() { return &m_status; }
-	const Type* raw() const { return &m_status; }
-
-protected: // data
-
-	//! the raw status
-	Type m_status = 0;
+	void reset() { si_status = 0; }
 };
 
 } // end ns
