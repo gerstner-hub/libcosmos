@@ -51,6 +51,15 @@ public:
 	//! sets the terminal dimension according to the given values
 	void setSize(const TermDimension &dim);
 
+	/// sends a stream of zero bits for a certain duration
+	/**
+	 * If duration is zero then the stream will last between 0.25 and 0.50
+	 * seconds. If non-zero then the stream will last for an
+	 * implementation defined time (on Linux the given duration in
+	 * milliseconds).
+	 **/
+	void sendBreak(int duration);
+
 protected: // data
 	FileDescriptor m_fd;
 };

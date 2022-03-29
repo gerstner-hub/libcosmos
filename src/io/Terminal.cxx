@@ -1,6 +1,7 @@
 // POSIX
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <termios.h>
 
 // cosmos
 #include "cosmos/errors/ApiError.hxx"
@@ -36,6 +37,12 @@ void Terminal::setSize(const TermDimension &dim) {
 	int rc = ::ioctl(m_fd.raw(), TIOCSWINSZ, &dim);
 	if (rc != 0) {
 		cosmos_throw (ApiError("ioctl(SWINSZ)"));
+	}
+}
+
+void Terminal::sendBreak(int duration) {
+	if (::tcsendbreak(m_fd.raw(), duration) != 0) {
+		cosmos_throw (ApiError("tcsendbreak"));
 	}
 }
 
