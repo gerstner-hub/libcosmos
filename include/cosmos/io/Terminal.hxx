@@ -22,15 +22,26 @@ struct TermDimension : winsize {
 	unsigned short getRows() const { return ws_row; }
 };
 
+/// Access to Terminal information and ioctls
 /**
- * \brief
- * 	Access to Terminal information
+ * This simply wraps a FileDescriptor for performing terminal related ioctls
+ * on it. It will not take ownership of the file descriptor i.e. it will never
+ * be closed by this class.
  **/
 class COSMOS_API Terminal
 {
 public:
+	Terminal() {}
 	explicit Terminal(FileDescriptor fd) : m_fd(fd) {}
 	explicit Terminal(const File &f) : m_fd(f.getFD()) {}
+
+	void setFD(const File &f) {
+		m_fd = f.getFD();
+	}
+
+	void setFD(FileDescriptor fd) {
+		m_fd = fd;
+	}
 
 	//! returns whether the associated file descriptor is a TTY
 	bool isTTY() const;
