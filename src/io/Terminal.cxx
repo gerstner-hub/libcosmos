@@ -23,13 +23,20 @@ bool Terminal::isTTY() const {
 }
 
 TermDimension Terminal::getSize() const {
-	struct winsize ws;
+	TermDimension ws;
 	int rc = ::ioctl(m_fd.raw(), TIOCGWINSZ, &ws);
 	if (rc != 0) {
 		cosmos_throw (ApiError("ioctl(GWINSZ)"));
 	}
 
-	return TermDimension(ws.ws_col, ws.ws_row);
+	return ws;
+}
+
+void Terminal::setSize(const TermDimension &dim) {
+	int rc = ::ioctl(m_fd.raw(), TIOCSWINSZ, &dim);
+	if (rc != 0) {
+		cosmos_throw (ApiError("ioctl(SWINSZ)"));
+	}
 }
 
 } // end ns

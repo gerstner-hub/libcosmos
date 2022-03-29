@@ -1,6 +1,9 @@
 #ifndef COSMOS_TERMINAL_HXX
 #define COSMOS_TERMINAL_HXX
 
+// POSIX
+#include <sys/ioctl.h>
+
 // Cosmos
 #include "cosmos/fs/File.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
@@ -8,11 +11,15 @@
 namespace cosmos {
 
 //! represents a terminal dimension in characters
-struct TermDimension {
-	size_t width;
-	size_t height;
+struct TermDimension : winsize {
 
-	TermDimension(size_t w, size_t h) : width(w), height(h) {}
+	TermDimension(size_t cols = 0, size_t rows = 0) {
+		ws_col = cols;
+		ws_row = rows;
+	}
+
+	unsigned short getCols() const { return ws_col; }
+	unsigned short getRows() const { return ws_row; }
 };
 
 /**
@@ -30,6 +37,8 @@ public:
 
 	//! returns the terminal dimension in character width x height
 	TermDimension getSize() const;
+	//! sets the terminal dimension according to the given values
+	void setSize(const TermDimension &dim);
 
 protected: // data
 	FileDescriptor m_fd;

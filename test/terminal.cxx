@@ -15,7 +15,7 @@ int main()
 
 	try {
 		auto dim = sin.getSize();
-		std::cout << "terminal dimension is " << dim.width << " x " << dim.height << std::endl;
+		std::cout << "terminal dimension is " << dim.getCols() << " x " << dim.getRows() << std::endl;
 	} catch (const std::exception &e) {
 		std::cerr << "failed to get terminal dimension: " << e.what() << std::endl;
 		res = 1;
