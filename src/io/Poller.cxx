@@ -69,14 +69,20 @@ std::vector<Poller::PollEvent> Poller::wait(const std::optional<std::chrono::mil
 	// NOTE: there exists epoll_pwait2 taking a timespec with nanosecond
 	// granularity, but glibc doesn't wrap that yet. If necessary we could
 	// invoke it using syscall() to get the finer granularity.
-	const auto num_events = epoll_wait(
-		m_poll_fd.raw(), m_events.data(), m_events.size(), timeout ? timeout->count() : -1);
 
-	if (num_events < 0) {
-		cosmos_throw (ApiError("Failed to epoll_wait()"));
+	while (true) {
+		const auto num_events = epoll_wait(
+			m_poll_fd.raw(), m_events.data(), m_events.size(), timeout ? timeout->count() : -1);
+
+		if (num_events < 0) {
+			if (m_restart_on_intr && errno == EINTR)
+				// transparent restart
+				continue;
+			cosmos_throw (ApiError("Failed to epoll_wait()"));
+		}
+
+		return std::vector<PollEvent>(m_events.begin(), m_events.begin() + num_events);
 	}
-
-	return std::vector<PollEvent>(m_events.begin(), m_events.begin() + num_events);
 }
 
 } // end ns

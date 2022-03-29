@@ -6,13 +6,18 @@
 namespace cosmos {
 
 size_t StreamFile::read(void *buf, size_t length) {
-	auto res = ::read(m_fd.raw(), buf, length);
+	while (true) {
+		auto res = ::read(m_fd.raw(), buf, length);
 
-	if (res < 0) {
-		cosmos_throw (ApiError("reading from file"));
+		if (res < 0) {
+			// transparent restart
+			if (m_restart_on_intr && errno == EINTR)
+				continue;
+			cosmos_throw (ApiError("reading from file"));
+		}
+
+		return static_cast<size_t>(res);
 	}
-
-	return static_cast<size_t>(res);
 }
 
 void StreamFile::readAll(void *buf, size_t length) {
@@ -29,13 +34,18 @@ void StreamFile::readAll(void *buf, size_t length) {
 }
 
 size_t StreamFile::write(const void *buf, size_t length) {
-	auto res = ::write(m_fd.raw(), buf, length);
+	while (true) {
+		auto res = ::write(m_fd.raw(), buf, length);
 
-	if (res < 0) {
-		cosmos_throw (ApiError("writing to file"));
+		if (res < 0) {
+			// transparent restart
+			if (m_restart_on_intr && errno == EINTR)
+				continue;
+			cosmos_throw (ApiError("writing to file"));
+		}
+
+		return static_cast<size_t>(res);
 	}
-
-	return static_cast<size_t>(res);
 }
 
 void StreamFile::writeAll(const void *buf, size_t length) {

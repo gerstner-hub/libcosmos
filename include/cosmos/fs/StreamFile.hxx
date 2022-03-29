@@ -93,6 +93,22 @@ public: // functions
 	off_t seekFromStart(off_t off) { return seek(SeekType::SET, off); }
 	off_t seekFromCurrent(off_t off) { return seek(SeekType::CUR, off); }
 	off_t seekFromEnd(off_t off) { return seek(SeekType::END, off); }
+
+	/// controls the auto-restart behaviour on EINTR due to signals
+	/**
+	 * If during reador write operations an EINTR system call result is
+	 * encountered, then the implementation will transparently restart the
+	 * system call if this boolean flag is set (the default). Otherwise
+	 * the error is returned to the caller by means of an ApiError
+	 * exception.
+	 **/
+	void setRestartOnIntr(const bool restart) {
+		m_restart_on_intr = restart;
+	}
+
+protected: // data
+
+	bool m_restart_on_intr = true;
 };
 
 }
