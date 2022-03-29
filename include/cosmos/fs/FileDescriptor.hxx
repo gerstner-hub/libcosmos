@@ -72,7 +72,7 @@ public: // functions
 	 * \param[in] cloexec Denotes whether the duplicate file descriptor
 	 * will have the close-on-exec flag set.
 	 **/
-	void duplicate(const FileDescriptor &new_fd, const bool cloexec=true);
+	void duplicate(const FileDescriptor &new_fd, const bool cloexec=true) const;
 
 	/// Returns the primitive file descriptor contained.
 	fd_t raw() const { return m_fd; }
