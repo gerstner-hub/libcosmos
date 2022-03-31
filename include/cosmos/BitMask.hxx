@@ -90,6 +90,13 @@ public: // functions
 		return *this;
 	}
 
+	BitMask& set(const std::initializer_list<ENUM> &flags) {
+		for (auto flag: flags) {
+			set(flag);
+		}
+		return *this;
+	}
+
 	//! sets all bits to zero
 	BitMask& reset() {
 		m_flags = EnumBaseType(0);
