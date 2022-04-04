@@ -23,8 +23,7 @@ public:
 	}
 
 	explicit TimeSpec(const std::chrono::milliseconds &ms) {
-		this->tv_sec = ms.count() / 1000;
-		this->tv_nsec = (ms.count() % 1000) * 1000 * 1000;
+		setAsMilliseconds(ms);
 	}
 
 	//! deliberately don't initialize the members for performance reasons
@@ -54,11 +53,21 @@ public:
 		return *this;
 	}
 
+	TimeSpec& setAsMilliseconds(const std::chrono::milliseconds &ms) {
+		this->tv_sec = ms.count() / 1000;
+		this->tv_nsec = (ms.count() % 1000) * 1000 * 1000;
+		return *this;
+	}
+
 	//! converts the time representation into a single milliseconds value
 	size_t toMilliseconds() const {
 		size_t ret = this->tv_sec * 1000;
 		ret += (this->tv_nsec / 1000 / 1000);
 		return ret;
+	}
+
+	explicit operator std::chrono::milliseconds() const {
+		return std::chrono::milliseconds{toMilliseconds()};
 	}
 
 	bool operator<(const TimeSpec &other) const {
