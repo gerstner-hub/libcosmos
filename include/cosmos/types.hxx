@@ -16,6 +16,43 @@ namespace cosmos {
 typedef std::vector<std::string> StringVector;
 typedef std::vector<const char*> CStringVector;
 
+/// Strong template type to wrap boolean values in a named type
+/**
+ * This type is intended as a replacement for primitive bool values in for
+ * constructor and function arguments. The purpose is to increase readability
+ * and avoid programming mistakes by passing a bool value for something else
+ * than intended.
+ *
+ * In the absence of named parameter passing in C++ like `MyObj(do_this=true)`
+ * one can use a specialization of this template type: `MyObj(DoThis(true))`.
+ *
+ * To use it you need to define an arbitrary tag type and the default boolean
+ * value to apply like:
+ *
+ *     class my_setting_t {};
+ *     using MySetting = NamedBool<my_setting_t, true>;
+ *
+ *     void myfunc(const MySetting &setting = MySetting());
+ *
+ *     // will be called with a true default value
+ *     myfunc();
+ *     // will be called with a false value
+ *     myfunc(MySetting(false));
+ *
+ * By providing the bool cast operator the type should behave mostly like a
+ * regular bool when querying its value.
+ **/
+template <typename _, bool def>
+class NamedBool {
+public:
+	explicit NamedBool(bool val=def) :
+		m_val(val) {}
+
+	operator bool() const { return m_val; }
+protected:
+	bool m_val = def;
+};
+
 } // end ns
 
 /**

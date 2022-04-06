@@ -6,6 +6,7 @@
 
 // cosmos
 #include "cosmos/time/TimeSpec.hxx"
+#include "cosmos/types.hxx"
 
 namespace cosmos {
 
@@ -56,7 +57,18 @@ using RealtimeClock = Clock<ClockType::REALTIME>;
  **/
 template <ClockType CLOCK>
 class StopWatch {
+public: // types
+
+	class mark_t {};
+	using InitialMark = NamedBool<mark_t, false>;
+
 public: // functions
+
+	/// construct and optionally set an initial mark()
+	explicit StopWatch(const InitialMark &do_mark = InitialMark()) {
+		if (do_mark)
+			mark();
+	}
 
 	void mark() {
 		m_clock.now(m_mark);
