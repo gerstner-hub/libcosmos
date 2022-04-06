@@ -26,7 +26,7 @@ int main()
 		cond.broadcast();
 
 		cosmos::ConditionMutex condmux;
-		cosmos::Clock clock(condmux.clockType());
+		cosmos::Condition::Clock clock;
 		auto starttime = clock.now();
 		auto endtime = starttime + cosmos::TimeSpec(5);
 

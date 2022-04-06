@@ -74,9 +74,6 @@ public: // functions
 		}
 	}
 
-	//! returns the clock type used for waitTimed()
-	static ClockType clockType() { return ClockType::MONOTONIC; }
-
 	void signal() {
 		auto res = ::pthread_cond_signal(&m_pcond);
 
@@ -94,6 +91,11 @@ public: // functions
 	}
 
 	Mutex& getMutex() { return m_lock; }
+
+public: // types
+
+	//! the clock type used by waitTimed()
+	using Clock = MonotonicClock;
 
 protected: // data
 

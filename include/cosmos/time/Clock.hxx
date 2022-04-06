@@ -21,18 +21,22 @@ enum class ClockType : clockid_t {
 	INVALID
 };
 
+class COSMOS_API ClockBase {
+protected:
+	void nowFromClock(TimeSpec &ts, ClockType clock) const;
+};
+
 /**
  * \brief
  *	A C++ wrapper around the POSIX clocks and related functions
  **/
-class COSMOS_API Clock {
+template <ClockType CLOCK>
+class Clock : public ClockBase {
 public: // functions
 
-	explicit Clock(const ClockType &type) :
-		m_type(type)
-	{}
-
-	void now(TimeSpec &ts) const;
+	void now(TimeSpec &ts) const {
+		return this->nowFromClock(ts, CLOCK);
+	}
 
 	TimeSpec now() const {
 		TimeSpec ret;
@@ -40,24 +44,19 @@ public: // functions
 		return ret;
 	}
 
-	clockid_t rawType() const { return static_cast<clockid_t>(m_type); }
-
-protected: // data
-
-	//! the clock type to operate on
-	const ClockType m_type = ClockType::INVALID;
+	static clockid_t rawType() { return static_cast<clockid_t>(CLOCK); }
 };
+
+using MonotonicClock = Clock<ClockType::MONOTONIC>;
+using RealtimeClock = Clock<ClockType::REALTIME>;
 
 /**
  * \brief
  * 	A type to measure elapsed time based on a given clock type
  **/
+template <ClockType CLOCK>
 class StopWatch {
 public: // functions
-
-	explicit StopWatch(const ClockType &type) :
-		m_clock(type)
-	{}
 
 	void mark() {
 		m_clock.now(m_mark);
@@ -74,8 +73,11 @@ public: // functions
 protected: // data
 
 	TimeSpec m_mark;
-	Clock m_clock;
+	Clock<CLOCK> m_clock;
 };
+
+using MonotonicStopWatch = StopWatch<ClockType::MONOTONIC>;
+using RealtimeStopWatch = StopWatch<ClockType::REALTIME>;
 
 } // end ns
 

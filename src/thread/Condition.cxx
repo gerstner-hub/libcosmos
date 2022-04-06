@@ -22,7 +22,7 @@ Condition::Condition(Mutex &lock) :
 		 * operations on the condition, it's the most robust
 		 * clock available
 		 */
-		res = pthread_condattr_setclock(&attr, Clock(clockType()).rawType());
+		res = pthread_condattr_setclock(&attr, Condition::Clock::rawType());
 
 		if (res != 0) {
 			cosmos_throw (ApiError(res));
