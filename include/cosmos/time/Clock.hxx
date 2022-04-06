@@ -67,6 +67,10 @@ public: // functions
 		return (m_clock.now() - m_mark).toMilliseconds();
 	}
 
+	std::chrono::milliseconds elapsed() const {
+		return static_cast<std::chrono::milliseconds>(m_clock.now() - m_mark);
+	}
+
 protected: // data
 
 	TimeSpec m_mark;
