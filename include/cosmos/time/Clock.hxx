@@ -70,6 +70,11 @@ public: // functions
 		return static_cast<std::chrono::milliseconds>(m_clock.now() - m_mark);
 	}
 
+	//! returns the currently set mark (undefined if mark() was never called!)
+	const TimeSpec& currentMark() const {
+		return m_mark;
+	}
+
 protected: // data
 
 	TimeSpec m_mark;
