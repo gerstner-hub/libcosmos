@@ -2,6 +2,13 @@
 #include <cassert>
 
 #include "cosmos/algs.hxx"
+#include "cosmos/types.hxx"
+
+struct CharPtrGuard : public cosmos::ResourceGuard<char*> {
+	explicit CharPtrGuard(char *p) :
+		ResourceGuard(p, [](char *_p) { delete[] _p; })
+	{}
+};
 
 int main() {
 	int res = 0;
@@ -39,6 +46,19 @@ int main() {
 	const int ARR[5] = {1, 2, 3, 4, 5};
 
 	assert (cosmos::num_elements(ARR) == 5);
+
+	{
+		char *stuff = new char[500];
+		CharPtrGuard stuff_guard(stuff);
+	}
+
+	{
+		char *stuff = new char[500];
+		CharPtrGuard stuff_guard(stuff);
+		stuff_guard.disarm();
+		delete[] stuff;
+	}
+
 
 	return res;
 }

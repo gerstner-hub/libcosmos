@@ -9,6 +9,7 @@
 
 // cosmos
 #include "cosmos/errors/ApiError.hxx"
+#include "cosmos/types.hxx"
 
 namespace cosmos {
 
@@ -23,8 +24,7 @@ namespace cosmos {
  * 	Only the most basic operations are provided by now. For more
  * 	information please refer to the POSIX man pages.
  **/
-class RWLock
-{
+class RWLock {
 	// forbid copy-assignment
 	RWLock(const RWLock&) = delete;
 	RWLock& operator=(const RWLock&) = delete;
@@ -68,49 +68,24 @@ protected: // data
 	mutable pthread_rwlock_t m_prwlock;
 };
 
-/**
- * \brief
- * 	A lock-guard object that locks an RWLock for reading until it is
- * 	destroyed
- **/
-class ReadLockGuard
-{
-public: // functions
+/// A lock-guard object that locks an RWLock for reading until it is destroyed
+struct ReadLockGuard : public ResourceGuard<const RWLock&> {
 
 	explicit ReadLockGuard(const RWLock &rwl) :
-		m_rwl(rwl)
+		ResourceGuard(rwl, [](const RWLock &_rwl) { _rwl.unlock(); })
 	{
 		rwl.readlock();
 	}
-
-	~ReadLockGuard() {
-		m_rwl.unlock();
-	}
-private: // data
-	const RWLock &m_rwl;
 };
 
-/**
- * \brief
- * 	A lock-guard object that locks an RWLock for writing until it is
- * 	destroyed
- **/
-class WriteLockGuard
-{
-public: // functions
+/// A lock-guard object that locks an RWLock for writing until it is destroyed
+struct WriteLockGuard : public ResourceGuard<const RWLock&> {
 
 	explicit WriteLockGuard(const RWLock &rwl) :
-		m_rwl(rwl)
+		ResourceGuard(rwl, [](const RWLock &_rwl) { _rwl.unlock(); })
 	{
 		rwl.writelock();
 	}
-
-	~WriteLockGuard() {
-		m_rwl.unlock();
-	}
-
-private: // data
-	const RWLock &m_rwl;
 };
 
 } // end ns

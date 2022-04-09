@@ -2,6 +2,7 @@
 #define COSMOS_TYPES_HXX
 
 // C++ stdlib
+#include <functional>
 #include <map>
 #include <ostream>
 #include <string>
@@ -51,6 +52,43 @@ public:
 	operator bool() const { return m_val; }
 protected:
 	bool m_val = def;
+};
+
+/// Helper class to guard arbitrary resources
+/**
+ * For non-heap resources (for which stdlib smart pointers should be used)
+ * a specialization of this type can be used which takes a custom cleanup
+ * function to be run during destruction.
+ **/
+template <typename R>
+class ResourceGuard {
+public: // types
+
+	using CleanFunc = void (R);
+
+public: // functions
+
+	ResourceGuard(const ResourceGuard &) = delete;
+	ResourceGuard& operator=(const ResourceGuard &) = delete;
+
+	ResourceGuard(R r, std::function<CleanFunc> cleaner) :
+		m_res(r),
+		m_cleaner(cleaner)
+	{}
+
+	~ResourceGuard() {
+		if (!m_disarmed) {
+			m_cleaner(m_res);
+		}
+	}
+
+	void disarm() { m_disarmed = true; }
+
+protected: // data
+
+	bool m_disarmed = false;
+	R m_res;
+	std::function<CleanFunc> m_cleaner;
 };
 
 } // end ns

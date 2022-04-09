@@ -9,6 +9,7 @@
 
 // cosmos
 #include "cosmos/errors/ApiError.hxx"
+#include "cosmos/types.hxx"
 
 namespace cosmos {
 
@@ -23,8 +24,7 @@ class Condition;
  * 	details about the semantics refer to `man pthread_mutex_init` and `man
  * 	pthread_mutex_destroy`.
  **/
-class COSMOS_API Mutex
-{
+class COSMOS_API Mutex {
 	// disallow copy/assignment
 	Mutex(const Mutex&) = delete;
 	Mutex& operator=(const Mutex&) = delete;
@@ -72,52 +72,24 @@ protected: // data
 	friend class Condition;
 };
 
-/**
- * \brief
- * 	A mutex guard object that locks a Mutex for the lifetime of the guard
- * 	object
- **/
-class MutexGuard
-{
-public: // functions
+/// A mutex guard object that locks a Mutex for the lifetime of the guard object
+struct MutexGuard : public ResourceGuard<const Mutex&> {
 
 	explicit MutexGuard(const Mutex &m) :
-		m_mutex(m)
+		ResourceGuard(m, [](const Mutex &_m) { _m.unlock(); })
 	{
-		m_mutex.lock();
+		m.lock();
 	}
-
-	~MutexGuard() {
-		m_mutex.unlock();
-	}
-
-private: // data
-
-	const Mutex &m_mutex;
 };
 
-/**
- * \brief
- * 	A reversed mutex guard object that unlocks a Mutex for the lifetime of
- * 	the guard object
- **/
-class MutexReverseGuard
-{
-public: // functions
+/// A reversed mutex guard object that unlocks a Mutex for the lifetime of the guard object
+struct MutexReverseGuard : public ResourceGuard<const Mutex&> {
 
 	explicit MutexReverseGuard(const Mutex &m) :
-		m_mutex(m)
+		ResourceGuard(m, [](const Mutex &_m) { _m.lock(); })
 	{
-		m_mutex.unlock();
+		m.unlock();
 	}
-
-	~MutexReverseGuard() {
-		m_mutex.lock();
-	}
-
-private: // data
-
-	const Mutex &m_mutex;
 };
 
 } // end ns
