@@ -142,7 +142,7 @@ def initSCons(project):
         env.Append(LIBS = ["asan", "ubsan"])
 
     warnings = (
-        "all", "extra", "no-unused-parameter", "duplicated-cond",
+        "all", "extra", "duplicated-cond",
         "duplicated-branches", "logical-op", "shadow", "format=2",
         "double-promotion", "null-dereference"
     )
