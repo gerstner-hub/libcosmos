@@ -49,6 +49,9 @@ def registerLibConfig(self, name, node, flags, config={}):
     rootenv['libflags'][name] = flags
     rootenv['libconfigs'][name] = config
 
+def existsLib(self, name):
+    return name in self['libs']
+
 def configureForLib(self, name):
     """This helper adds flags and other requirements to the environment to
     make it possible to build against the given library name."""
@@ -97,6 +100,7 @@ def enhanceEnv(env):
     env.AddMethod(configureForLib, "ConfigureForLib")
     env.AddMethod(configureRunForLib, "ConfigureRunForLib")
     env.AddMethod(configureForPackage, "ConfigureForPackage")
+    env.AddMethod(existsLib, "ExistsLib")
 
 def initSCons(project):
     """Initializes a generic C++ oriented SCons build environment.
