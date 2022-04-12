@@ -145,6 +145,11 @@ def initSCons(project):
         env.Append(CXXFLAGS = sanitizers)
         env.Append(LIBS = ["asan", "ubsan"])
 
+    if not ARGUMENTS.get('debug', 0):
+        env.Append(CXXFLAGS = ["-O2"])
+    else:
+        env.Append(CXXFLAGS = ["-O0"])
+
     warnings = (
         "all", "extra", "duplicated-cond",
         "duplicated-branches", "logical-op", "shadow", "format=2",
