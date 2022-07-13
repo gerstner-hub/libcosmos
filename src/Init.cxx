@@ -70,7 +70,7 @@ void finishLibCosmos() {
 	if (!g_init_map)
 		return;
 
-	// okay we need to perform cleanup
+	// okay we need to perform cleanup - in reverse order
 	for (auto it = g_init_map->rbegin(); it != g_init_map->rend(); it++) {
 		auto initable = it->second;
 		initable->libExit();

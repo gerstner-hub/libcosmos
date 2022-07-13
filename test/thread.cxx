@@ -5,11 +5,11 @@
 
 
 // cosmos
+#include "cosmos/Init.hxx"
 #include "cosmos/thread/Thread.hxx"
 
 class ThreadUser :
-	public cosmos::IThreadEntry
-{
+	public cosmos::IThreadEntry {
 public:
 	bool wasRunning() const { return m_was_running; }
 protected:
@@ -31,8 +31,8 @@ protected:
 	bool m_was_running = false;
 };
 
-int main()
-{
+int main() {
+	cosmos::Init ci;
 	ThreadUser tu;
 	int res = 0;
 

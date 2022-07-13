@@ -14,7 +14,7 @@ namespace cosmos {
  *	Initable needs to enter its individual priority here.
  **/
 enum class InitPrio : std::size_t {
-	CHILD_COLLECTOR
+	MUTEX_ATTR
 };
 
 /**
