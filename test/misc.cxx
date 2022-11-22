@@ -59,6 +59,19 @@ int main() {
 		delete[] stuff;
 	}
 
+	{
+		const int i = 5;
+
+		if (!cosmos::in_list(i, {1, 5, 20})) {
+			std::cerr << "in_list returned bad negative result\n";
+			res = 1;
+		}
+		else if (cosmos::in_list(i, {1, 20})) {
+			std::cerr << "in_list returned bad positive result\n";
+			res = 1;
+		}
+	}
+
 
 	return res;
 }

@@ -19,6 +19,17 @@ bool in_range(const T1 &v, const identity_t<T1> &_min, const identity_t<T1> &_ma
 	return _min <= v && v <= _max;
 }
 
+/// checks whether the value \c v is found in the given list of values \c l
+template <typename T>
+bool in_list(const T &v, const std::initializer_list<T> &l) {
+	for (const auto &cmp: l) {
+		if (v == cmp)
+			return true;
+	}
+
+	return false;
+}
+
 /// returns the number of elements in a C style array
 template <typename T>
 constexpr size_t num_elements(const T &v) {
