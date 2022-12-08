@@ -1,6 +1,8 @@
 #ifndef COSMOS_ALGS_HXX
 #define COSMOS_ALGS_HXX
 
+// C++
+#include <cstddef>
 #include <vector>
 
 namespace cosmos {
