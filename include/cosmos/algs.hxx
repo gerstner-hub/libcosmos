@@ -3,6 +3,7 @@
 
 // C++
 #include <cstddef>
+#include <type_traits>
 #include <vector>
 
 namespace cosmos {
@@ -43,6 +44,12 @@ template <typename T1, typename T2>
 T1& append(T1 &v1, const T2 &v2) {
 	v1.insert(std::end(v1), std::begin(v2), std::end(v2));
 	return v1;
+}
+
+/// casts an enum constant value into its underlying primitive type
+template<typename ENUM>
+constexpr auto to_integral(const ENUM e) -> typename std::underlying_type<ENUM>::type {
+   return static_cast<typename std::underlying_type<ENUM>::type>(e);
 }
 
 }
