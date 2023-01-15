@@ -102,7 +102,7 @@ def enhanceEnv(env):
     env.AddMethod(configureForPackage, "ConfigureForPackage")
     env.AddMethod(existsLib, "ExistsLib")
 
-def initSCons(project):
+def initSCons(project, rtti=True):
     """Initializes a generic C++ oriented SCons build environment.
 
     If the SCons environment is already setup then that one is returned.
@@ -145,10 +145,15 @@ def initSCons(project):
         env.Append(CXXFLAGS = sanitizers)
         env.Append(LIBS = ["asan", "ubsan"])
 
-    if not ARGUMENTS.get('debug', 0):
-        env.Append(CXXFLAGS = ["-O2"])
-    else:
+    if ARGUMENTS.get('debug', 0):
         env.Append(CXXFLAGS = ["-O0"])
+    elif ARGUMENTS.get('optforsize', 0):
+        env.Append(CXXFLAGS = ["-Os"])
+    else:
+        env.Append(CXXFLAGS = ["-O2"])
+
+    if not rtti:
+        env.Append(CXXFLAGS = ["-fno-rtti"])
 
     warnings = (
         "all", "extra", "duplicated-cond",
