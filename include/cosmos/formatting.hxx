@@ -18,6 +18,8 @@ namespace cosmos {
  **/
 template <typename NUM>
 struct hexnum {
+	// TODO: BUG: if NUM is a `char` type then this breaks and outputs
+	// characters instead of numbers
 	explicit hexnum(const NUM &num, size_t width) : m_num(num), m_width(width) {}
 
 	/// if we should prefix '0x' to the number (default yes)
