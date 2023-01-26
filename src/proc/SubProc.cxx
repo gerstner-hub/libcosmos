@@ -217,7 +217,7 @@ void SubProc::redirectFD(FileDescriptor orig, FileDescriptor redirect) {
 	if (redirect.invalid())
 		return;
 
-	redirect.duplicate(orig, false /* no close on-exec */);
+	redirect.duplicate(orig, CloseOnExec(false));
 }
 
 void SubProc::kill(const Signal &s) {

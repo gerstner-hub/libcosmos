@@ -1,7 +1,13 @@
 #ifndef COSMOS_FILEDESCRIPTOR_HXX
 #define COSMOS_FILEDESCRIPTOR_HXX
 
+// libcosmos
+#include "cosmos/types.hxx"
+
 namespace cosmos {
+
+/// strong boolean to indicate CloseOnExec behaviour on file descriptors
+using CloseOnExec = NamedBool<struct cloexec_t, true>;
 
 /// Thin Wrapper around OS File Descriptors.
 /**
@@ -72,7 +78,7 @@ public: // functions
 	 * \param[in] cloexec Denotes whether the duplicate file descriptor
 	 * will have the close-on-exec flag set.
 	 **/
-	void duplicate(const FileDescriptor &new_fd, const bool cloexec=true) const;
+	void duplicate(const FileDescriptor &new_fd, const CloseOnExec cloexec = CloseOnExec(true)) const;
 
 	/// Returns the primitive file descriptor contained.
 	fd_t raw() const { return m_fd; }
