@@ -12,6 +12,7 @@
 #include "cosmos/BitMask.hxx"
 #include "cosmos/ostypes.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
+#include "cosmos/types.hxx"
 
 namespace cosmos {
 
@@ -117,6 +118,11 @@ protected: // data
  * I/O.
  **/
 class COSMOS_API File {
+public: // types
+
+	// strong boolean type for specifying close-file responsibility
+	using CloseFile = NamedBool<struct close_file_t, true>;
+
 public: // functions
 
 	File() {}
@@ -132,7 +138,7 @@ public: // functions
 		open(path, mode, flags, fmode);
 	}
 
-	explicit File(FileDescriptor fd, bool close_fd) {
+	explicit File(FileDescriptor fd, const CloseFile close_fd) {
 		open(fd, close_fd);
 	}
 
@@ -153,7 +159,7 @@ public: // functions
 	 * take ownership of the file descriptor, or not. If so then the file
 	 * descriptor is closed if deemded necessary by the File object.
 	 **/
-	void open(FileDescriptor fd, bool close_fd) {
+	void open(FileDescriptor fd, const CloseFile close_fd) {
 		m_fd = fd;
 		m_close_fd = close_fd;
 	}
@@ -168,7 +174,7 @@ public: // functions
 			m_fd.reset();
 		}
 
-		m_close_fd = true;
+		m_close_fd = CloseFile(true);
 	}
 
 	bool isOpen() const { return m_fd.valid(); }
@@ -178,7 +184,7 @@ public: // functions
 
 protected: // data
 
-	bool m_close_fd = true;
+	CloseFile m_close_fd;
 	FileDescriptor m_fd;
 };
 
