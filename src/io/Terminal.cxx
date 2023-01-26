@@ -1,7 +1,9 @@
+// BSD
+#include <pty.h>
 // POSIX
-#include <unistd.h>
 #include <sys/ioctl.h>
 #include <termios.h>
+#include <unistd.h>
 
 // cosmos
 #include "cosmos/errors/ApiError.hxx"
@@ -44,6 +46,21 @@ void Terminal::sendBreak(int duration) {
 	if (::tcsendbreak(m_fd.raw(), duration) != 0) {
 		cosmos_throw (ApiError("tcsendbreak"));
 	}
+}
+
+std::pair<FileDescriptor, FileDescriptor> openPTY() {
+	int master, slave;
+
+	// the name parameter is unsafe since there is no standardized
+	// dimension limit.
+	// the other parameters are for setting initial TTY properties and
+	// terminal sizes.
+
+	if (::openpty(&master, &slave, nullptr, nullptr, nullptr) < 0) {
+		cosmos_throw (ApiError("openpty failed"));
+	}
+
+	return {cosmos::FileDescriptor(master), cosmos::FileDescriptor(slave)};
 }
 
 } // end ns

@@ -4,6 +4,9 @@
 // POSIX
 #include <sys/ioctl.h>
 
+// stdlib
+#include <utility>
+
 // Cosmos
 #include "cosmos/fs/File.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
@@ -63,6 +66,25 @@ public:
 protected: // data
 	FileDescriptor m_fd;
 };
+
+/// Creates a new pseudo terminal device and returns master/slave file descriptors for it
+/**
+ * A pseudo terminal is a virtual terminal where the slave end behaves like an
+ * actual terminal device and can be passed to applications that expect one.
+ * The master end drives the application using the slave end.
+ *
+ * Any writes to the master end will appear as input from a keyboard to the
+ * slave, any writes to the slave end will appear as output data from a
+ * program on the master end.
+ *
+ * See openpty(2) and pty(7) man pages for more information.
+ *
+ * \return a pair of the master and slave file descriptor belonging to the new
+ *         PTY. The caller is responsible for managing the lifetime of the
+ *         returned file descriptors (i.e. closing them at the appropriate
+ *         time). On error an ApiError exception is thrown.
+ **/
+COSMOS_API std::pair<cosmos::FileDescriptor, cosmos::FileDescriptor> openPTY();
 
 } // end ns
 
