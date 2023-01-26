@@ -15,6 +15,7 @@ typedef pid_t ProcessID;
 constexpr pid_t INVALID_PID = -1;
 
 typedef uid_t UserID;
+typedef gid_t GroupID;
 
 typedef ino_t Inode;
 
