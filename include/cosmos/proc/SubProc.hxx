@@ -87,6 +87,13 @@ public: // functions
 	/// found in the first argument
 	void setArgs(const StringVector &sv) { m_argv = sv; }
 
+	/// \see setArgs(const StringVector &)
+	void setArgsFromView(const StringViewVector &svv) {
+		m_argv.clear();
+		for (const auto s: svv)
+			m_argv.push_back(std::string(s));
+	}
+
 	/// clears any currently set parameters, optionally also the
 	/// executable name
 	void clearArgs(const bool and_exe = false) {

@@ -6,6 +6,7 @@
 #include <map>
 #include <ostream>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace cosmos {
@@ -15,6 +16,7 @@ namespace cosmos {
  */
 
 typedef std::vector<std::string> StringVector;
+typedef std::vector<std::string_view> StringViewVector;
 typedef std::vector<const char*> CStringVector;
 
 /// Strong template type to wrap boolean values in a named type
