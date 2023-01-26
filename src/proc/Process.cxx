@@ -50,6 +50,16 @@ void Process::setSigMask(const SigSet &s, std::optional<SigSet*> old) {
 	setSignalMask(SIG_SETMASK, s.raw(), old ? old.value()->raw() : nullptr);
 }
 
+ProcessID Process::createNewSession() {
+	auto res = ::setsid();
+
+	if (res == INVALID_PID) {
+		cosmos_throw (ApiError());
+	}
+
+	return res;
+}
+
 SigSet Process::getSigMask() {
 	SigSet ret;
 	setSignalMask(SIG_SETMASK, nullptr, ret.raw());

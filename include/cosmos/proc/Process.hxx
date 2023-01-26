@@ -4,19 +4,19 @@
 // stdlib
 #include <optional>
 
+// Linux
+#include <signal.h>
+
 // cosmos
 #include "cosmos/ostypes.hxx"
+#include "cosmos/proc/Signal.hxx"
 
 namespace cosmos {
 
 class SigSet;
 
-/**
- * \brief
- *	Various process related functionality
- **/
-class COSMOS_API Process
-{
+/// Various process related functionality
+class COSMOS_API Process {
 public: // functions
 
 	explicit Process() {}
@@ -60,8 +60,26 @@ public: // functions
 	/// Assigns exactly the given signal mask to the current process
 	void setSigMask(const SigSet &s, std::optional<SigSet *> old = {});
 
+	/// restores the default signal handling behaviour for the given signal
+	void restoreSignal(const Signal &sig) {
+		::signal(sig.raw(), SIG_DFL);
+	}
+
 	/// returns the currently active signal mask for the calling thread
 	SigSet getSigMask();
+
+	/// creates a new session with the current process as leader
+	/**
+	 * The session will also receive a new process group of which the
+	 * current process also is the leader. The new session ID is returned
+	 * from this function.
+	 *
+	 * This will not work if the current process is already a process
+	 * group leader, which will cause an exception to the thrown.
+	 *
+	 * The new session will not yet have a controlling terminal.
+	 **/
+	ProcessID createNewSession();
 
 protected: // functions
 

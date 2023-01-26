@@ -5,6 +5,9 @@
 #include <iosfwd>
 #include <string>
 
+// Linux
+#include <signal.h>
+
 // cosmos
 #include "cosmos/ostypes.hxx"
 
@@ -13,8 +16,7 @@ namespace cosmos {
 class FileDescriptor;
 
 /// Represents a POSIX signal number and offers signal related APIs
-class COSMOS_API Signal
-{
+class COSMOS_API Signal {
 public: // types
 
 	//! the basic signal type
@@ -23,7 +25,7 @@ public: // types
 public: // functions
 
 	//! Creates a Signal object for the given primitive signal number
-	explicit Signal(const Type &sig) : m_sig(sig) {}
+	constexpr explicit Signal(const Type &sig) : m_sig(sig) {}
 
 	Signal(const Signal &o) { *this = o; }
 
