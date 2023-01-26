@@ -36,8 +36,8 @@ protected: // data
 	bool m_show_base = true;
 };
 
-/// this is C++ variant of the libc sprintf() function
-COSMOS_API std::string sprintf(const char *fmt, ...) COMOS_FORMAT_PRINTF(1, 2);
+/// this is a C++ variant of the libc sprintf() function
+COSMOS_API std::string sprintf(const char *fmt, ...) COSMOS_FORMAT_PRINTF(1, 2);
 
 }
 

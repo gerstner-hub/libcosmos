@@ -15,13 +15,13 @@
 #ifdef __GNUC__
 #	define COSMOS_GCC
 #elif defined(__clang__)
-#	define COMOS_CLANG
+#	define COSMOS_CLANG
 #endif
 
 #ifdef COSMOS_GCC
 // if the compiler supports it then this macro causes printf function style
 // sanity checks to be performed for the function this is attached to.
-#define COMOS_FORMAT_PRINTF(format_index, first_vararg_index) __attribute__((format(printf, (format_index), (first_vararg_index))))
+#define COSMOS_FORMAT_PRINTF(format_index, first_vararg_index) __attribute__((format(printf, (format_index), (first_vararg_index))))
 #else
 #define COSMOS_FORMAT_PRINTF(format_index, first_Vararg_index)
 #endif
