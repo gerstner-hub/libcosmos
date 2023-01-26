@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <ostream>
 #include <string>
+#include <sstream>
 #include <type_traits>
 
 // cosmos
@@ -28,6 +29,11 @@ struct hexnum {
 	bool showBase() const { return m_show_base; }
 	auto getNum() const { return m_num; }
 
+	explicit operator std::string() const {
+		std::stringstream ss;
+		ss << *this;
+		return ss.str();
+	}
 protected: // data
 
 	NUM m_num;
