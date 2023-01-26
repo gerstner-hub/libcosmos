@@ -48,6 +48,13 @@ void Terminal::sendBreak(int duration) {
 	}
 }
 
+void Terminal::makeControllingTerminal(bool force) {
+	int rc = ::ioctl(m_fd.raw(), TIOCSCTTY, force ? 1 : 0);
+	if (rc != 0) {
+		cosmos_throw (ApiError("ioctl(TIOCSCTTY)"));
+	}
+}
+
 std::pair<FileDescriptor, FileDescriptor> openPTY() {
 	int master, slave;
 

@@ -63,6 +63,19 @@ public:
 	 **/
 	void sendBreak(int duration);
 
+	/// attempt to make the terminal the controlling terminal of the current process
+	/**
+	 * This only works if the current process is a session leader and does
+	 * not yet have a controlling terminal.
+	 *
+	 * If the caller has CAP_SYS_ADMIN capability and \c force is true
+	 * then the terminal is "stolen" and all processes that had this
+	 * terminal as controlling terminal before, lose it.
+	 *
+	 * On error an exception is thrown by this call.
+	 **/
+	void makeControllingTerminal(bool force = false);
+
 protected: // data
 	FileDescriptor m_fd;
 };
