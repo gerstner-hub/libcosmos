@@ -11,6 +11,8 @@ namespace cosmos {
 
 //! returns an all lower case version of \c s
 std::string COSMOS_API tolower(const std::string &s);
+/// returns an all upper case veersion of \c s
+std::string COSMOS_API toupper(const std::string &s);
 
 //! strips leading and trailing whitespace from the given string in-place
 void COSMOS_API strip(std::string &s);

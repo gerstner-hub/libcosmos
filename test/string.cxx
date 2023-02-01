@@ -13,6 +13,13 @@ int main() {
 		ret = 1;
 	}
 
+	auto upper_string = cosmos::toupper(test_string);
+
+	if (upper_string != "A TEST STRING. HAVE A NICE DAY!") {
+		std::cerr << "toupper() returned unexpected result '" << upper_string << "'\n";
+		ret = 1;
+	}
+
 	const std::string spacy_string(" how is that ? ");
 
 	auto stripped = cosmos::stripped(spacy_string);

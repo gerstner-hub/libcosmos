@@ -20,6 +20,19 @@ std::string tolower(const std::string &s) {
 	return ret;
 }
 
+std::string toupper(const std::string &s) {
+	std::string ret;
+	ret.resize(s.size());
+	// put it all to lower case
+	std::transform(
+		s.begin(), s.end(),
+		ret.begin(),
+		::toupper
+	);
+
+	return ret;
+}
+
 void strip(std::string &s) {
 	while (!s.empty() && std::isspace(s[0]))
 		s.erase( s.begin() );
