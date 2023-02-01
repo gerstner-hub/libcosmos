@@ -17,4 +17,5 @@ except Exception:
 SConscript(env['buildroot'] + 'src/SConstruct')
 if env['project'] == "libcosmos":
     SConscript(env['buildroot'] + 'test/SConstruct')
+    SConscript(env['buildroot'] + 'doc/SConstruct')
     Default(env['libs']['libcosmos'])
