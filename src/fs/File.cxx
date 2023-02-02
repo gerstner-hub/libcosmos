@@ -2,7 +2,7 @@
 #include <iostream>
 
 // cosmos
-#include "cosmos/errors/ApiError.hxx"
+#include "cosmos/errors/FileError.hxx"
 #include "cosmos/errors/InternalError.hxx"
 #include "cosmos/errors/UsageError.hxx"
 #include "cosmos/fs/File.hxx"
@@ -30,9 +30,7 @@ void File::open(const std::string_view &path, const OpenMode &mode, const OpenFl
 	m_fd.setFD(fd);
 
 	if (!isOpen()) {
-		// TODO: introduce specific file open error that carries that
-		// problematic path
-		cosmos_throw (ApiError(path));
+		cosmos_throw (FileError(path));
 	}
 }
 

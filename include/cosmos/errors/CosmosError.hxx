@@ -40,10 +40,10 @@ class COSMOS_API CosmosError :
 {
 public: // functions
 
-	explicit CosmosError(const char *error_class) :
+	explicit CosmosError(const std::string_view &error_class) :
 		m_error_class(error_class) {}
 
-	CosmosError(const char *error_class, const std::string_view &fixed_text) :
+	CosmosError(const std::string_view &error_class, const std::string_view &fixed_text) :
 			CosmosError(error_class) {
 		m_msg = fixed_text;
 	}
@@ -89,10 +89,15 @@ protected: // functions
 	 **/
 	virtual void generateMsg() const {};
 
+	/// allows to override error class to allow simpler implementation of derived types
+	void setErrorClass(const std::string_view error_class) {
+		m_error_class = error_class;
+	}
+
 protected: // data
 
 	/// Descriptive, unique error class label
-	const char *m_error_class = nullptr;
+	std::string_view m_error_class;
 	/// Runtime generated error message
 	mutable std::string m_msg;
 	/// Whether m_msg has been assembled yet
