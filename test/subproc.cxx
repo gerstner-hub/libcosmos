@@ -174,8 +174,9 @@ public:
 			cosmos_throw (cosmos::InternalError("Failed to read back cat error message"));
 		}
 
-		// TODO: be aware of locale settings that might change the
-		// error message content
+		// be aware of locale settings that might change the error message content
+		// -
+		// but the default locale should be active for us
 		const std::string errmsg("No such file or directory");
 		for (const auto &item: {m_nonexisting_file, m_cat_path, errmsg}) {
 			if (line.find(item) != line.npos)
