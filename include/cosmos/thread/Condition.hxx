@@ -12,12 +12,23 @@
 
 namespace cosmos {
 
+/// A class to represent a pthread condition
 /**
- * \brief
- * 	A class to represent a pthread condition
- * \details
- * 	The current implementation only provides the most basic condition
- * 	operations. Refer to the POSIX man pages for more information.
+ * The current implementation only provides the most basic condition
+ * operations. Refer to the POSIX man pages for more information.
+ *
+ * A condition allows to efficiently wait for a certain program condition to
+ * be reached. A thread typically evaluates some program state, owning a Lock,
+ * and if there is no work to be done it invokes wait() on the Condition which
+ * atomically unlocks the lock and waits for another thread to signal the
+ * condition.
+ *
+ * There are some caveats to be considered:
+ *
+ * - A condition can only ever be used with the same Mutex it is coupled to.
+ * - A condition can experience "spurious wakeups" i.e. it will be signaled
+ *   but the program state did not actually change. Therefore you always need
+ *   to check after wakeup whether the condition actually is as expected.
  **/
 class COSMOS_API Condition {
 	// disallow copy-assignment
@@ -26,14 +37,12 @@ class COSMOS_API Condition {
 
 public: // functions
 
+	/// Create a condition coupled with the given \c lock
 	/**
-	 * \brief
-	 * 	Create a condition coupled with \c lock
-	 * \details
-	 *	The given lock will be associated with the Condition for the
-	 *	complete lifetime of the object. You need to make sure that
-	 *	\c lock is never destroyed before the associated Condition
-	 *	object is destroyed.
+	 * The given lock will be associated with the Condition for the
+	 * complete lifetime of the object. You need to make sure that \c lock
+	 * is never destroyed before the associated Condition object is
+	 * destroyed.
 	 **/
 	explicit Condition(Mutex &lock);
 
@@ -43,7 +52,11 @@ public: // functions
 		assert (!destroy_res);
 	}
 
-	//! The associated lock must already be locked at entry
+	/// Wait for the Condition to be signaled
+	/**
+	 * The associated lock must already be locked at entry, otherwise
+	 * undefined behaviour is the result.
+	 **/
 	void wait() const {
 		auto res = ::pthread_cond_wait(&m_pcond, &(m_lock.m_pmutex));
 
@@ -52,22 +65,20 @@ public: // functions
 		}
 	}
 
+	/// Wait for the Condition to be signaled with timeout
 	/**
-	 * \brief
-	 *	Like wait() but waits at most until the given absolute time
-	 *	has been reached
-	 * \details
-	 * 	The timeout operation is based on the clock returned by
-	 * 	clockType().
-	 * \return
-	 *	\c true If a signal was received, \c false if a timeout
-	 *	occured.
+	 * This is like wait() but waits at most until the given absolute time
+	 * has been reached.
+	 *
+	 * The timeout operation is based on the clock defined in
+	 * Condition::Clock.
+	 *
+	 * \return \c true If a signal was received, \c false if a timeout occured
 	 **/
 	bool waitTimed(const TimeSpec &ts) const {
 		auto res = ::pthread_cond_timedwait(&m_pcond, &(m_lock.m_pmutex), &ts);
 
-		switch(res)
-		{
+		switch(res) {
 		default: cosmos_throw (ApiError(res)); return false;
 		case 0: return true;
 		case ETIMEDOUT: return false;
@@ -94,7 +105,7 @@ public: // functions
 
 public: // types
 
-	//! the clock type used by waitTimed()
+	/// The clock type used by waitTimed()
 	using Clock = MonotonicClock;
 
 protected: // data
@@ -104,11 +115,7 @@ protected: // data
 	Mutex &m_lock;
 };
 
-/**
- * \brief
- *	An aggregate of a Mutex and a Condition coupled together for typical
- *	usage
- **/
+/// An aggregate of a Mutex and a Condition coupled together for typical Condition usage
 class ConditionMutex :
 	public Mutex,
 	public Condition

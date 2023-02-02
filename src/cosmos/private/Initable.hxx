@@ -6,31 +6,25 @@
 
 namespace cosmos {
 
+/// Priority type for getting a defined initialization order
 /**
- * \brief
- *	Priority type for getting a defined initialization order
- * \details
- *	Each new library facility in need of initialization that derives from
- *	Initable needs to enter its individual priority here.
+ * Each new library facility in need of initialization that derives from
+ * Initable needs to enter its individual priority here.
  **/
 enum class InitPrio : std::size_t {
 	MUTEX_ATTR
 };
 
+/// Pure virtual base class for the library init system
 /**
- * \brief
- *	Pure virtual base class for the library init system
- * \details
- *	Each library facility in need of library pre-initizalization can
- *	inherit from this base class and instantiate a globally statically
- *	initialized object from it.
+ * Each library facility in need of library pre-initizalization can inherit
+ * from this base class and instantiate a globally statically initialized
+ * object from it.
  *
- *	It will automatically register at the libraries' init system and the
- *	init system will call libInit() and libExit() at the appropriate
- *	times.
+ * It will automatically register at the libraries' init system and the init
+ * system will call libInit() and libExit() at the appropriate times.
  **/
-class Initable
-{
+class Initable {
 	friend void initLibCosmos();
 	friend void finishLibCosmos();
 

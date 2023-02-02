@@ -1,6 +1,12 @@
 #ifndef COSMOS_COMPILER_HXX
 #define COSMOS_COMPILER_HXX
 
+/**
+ * @file
+ * This header determines compilation environment related information and
+ * provides compiler or C++ standard library specific features
+ **/
+
 // needed for stdlib preprocessor defines to become available
 #include <iosfwd>
 
@@ -25,6 +31,5 @@
 #else
 #define COSMOS_FORMAT_PRINTF(format_index, first_Vararg_index)
 #endif
-
 
 #endif // inc. guard

@@ -5,9 +5,9 @@
 #include <unistd.h> // STD*_FILENO
 
 // Cosmos
+#include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/io/ILogger.hxx"
 #include "cosmos/io/Terminal.hxx"
-#include "cosmos/fs/FileDescriptor.hxx"
 
 namespace cosmos {
 
@@ -30,11 +30,9 @@ bool ILogger::isTTY(const std::ostream &o) {
 
 	if (&o == &std::cout) {
 		fd_to_check.setFD(STDOUT_FILENO);
-	}
-	else if (&o == &std::cerr) {
+	} else if (&o == &std::cerr) {
 		fd_to_check.setFD(STDERR_FILENO);
-	}
-	else {
+	} else {
 		return false;
 	}
 
@@ -48,9 +46,8 @@ void ILogger::setStream(std::ostream &s, StreamState &state) {
 }
 
 void ILogger::setStreams(
-	std::ostream &debug, std::ostream &info,
-	std::ostream &warn, std::ostream &err)
-{
+		std::ostream &debug, std::ostream &info,
+		std::ostream &warn, std::ostream &err) {
 	setStream(debug, m_debug);
 	setStream(err, m_err);
 	setStream(info, m_info);

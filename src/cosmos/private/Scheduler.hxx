@@ -11,14 +11,14 @@ namespace cosmos {
  * seems we have to declare it ourselves
  */
 struct sched_attr {
-	//! size of this structure
+	/// Size of this structure
 	uint32_t size;
-	//! Policy (SCHED_*)
+	/// Policy (SCHED_*)
 	uint32_t sched_policy;
 	uint64_t sched_flags;
-	//! nice value for OTHER, BATCH
+	/// Nice value for OTHER, BATCH
 	int32_t sched_nice;
-	//! static priority for FIFO, RR
+	/// Static priority for FIFO, RR
 	uint32_t sched_priority;
 	/* Remaining fields are for SCHED_DEADLINE */
 	uint64_t sched_runtime;

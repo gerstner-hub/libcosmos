@@ -16,6 +16,15 @@ void testFileError() {
 	f.open(to_open, cosmos::OpenMode::READ_ONLY);
 }
 
+struct DerivedError : public cosmos::CosmosError {
+	COSMOS_ERROR_IMPL;
+	DerivedError() : CosmosError("looks bad") {}
+};
+
+void test_func() {
+	cosmos_throw(DerivedError());
+}
+
 int main() {
 	cosmos::Init init;
 	errno = ENOENT;
@@ -38,6 +47,12 @@ int main() {
 	}
 	catch (const cosmos::ApiError &e) {
 		std::cerr << "Testing ApiError: " << e.what() << std::endl;
+	}
+
+	try {
+		test_func();
+	} catch(const DerivedError &e) {
+		std::cerr << "Testing DerivedError: " << e.what() << std::endl;
 	}
 
 	return 0;

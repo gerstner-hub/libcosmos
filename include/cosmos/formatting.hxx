@@ -11,9 +11,15 @@
 // cosmos
 #include "cosmos/compiler.hxx"
 
+/**
+ * @file
+ *
+ * C stdio and C++ iostream related helper types and functions.
+ **/
+
 namespace cosmos {
 
-/// helper to output a primitive integer as hexadecimal
+/// Helper to output a primitive integer as hexadecimal
 /**
  * the stream state will be maintained i.e. after the output operation
  * finished the previous/default stream state will be applied
@@ -22,7 +28,7 @@ template <typename NUM>
 struct hexnum {
 	explicit hexnum(const NUM &num, size_t width) : m_num(num), m_width(width) {}
 
-	/// if we should prefix '0x' to the number (default yes)
+	/// If we should prefix '0x' to the number (default yes)
 	const hexnum& showBase(bool yes_no) { m_show_base = yes_no; return *this; }
 
 	size_t getWidth() const { return m_width; }
@@ -41,10 +47,10 @@ protected: // data
 	bool m_show_base = true;
 };
 
-/// this is a C++ variant of the libc sprintf() function
+/// This is a C++ variant of the libc sprintf() function
 COSMOS_API std::string sprintf(const char *fmt, ...) COSMOS_FORMAT_PRINTF(1, 2);
 
-/// this helper makes sure that any integer is turned into a printable integer
+/// This helper makes sure that any integer is turned into a printable integer
 /**
  * Attempting to output a `char` related type onto an ostream will print its
  * symbolic value as opposed to its numerical representation. To avoid this

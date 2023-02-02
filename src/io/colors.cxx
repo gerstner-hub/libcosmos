@@ -45,7 +45,7 @@ TermControl getOffControl(const TermControl &ctrl) {
 	case TermControl::UNDERLINE_ON: return TermControl::UNDERLINE_OFF;
 	case TermControl::BLINK_ON: return TermControl::BLINK_OFF;
 	case TermControl::INVERSE_ON: return TermControl::INVERSE_OFF;
-	default: cosmos_throw (UsageError("bad value for getOffControl()"));
+	default: cosmos_throw (UsageError("bad value"));
 		 return TermControl::RESET; /* to silence compiler warning */
 	}
 }

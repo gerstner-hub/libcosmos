@@ -9,12 +9,11 @@
 
 namespace cosmos {
 
+// see man(7) sched for details about these policies
+
 struct sched_attr;
 
-/**
- * \brief
- * 	Available scheduling policies on Linux
- **/
+/// Available scheduling policies on Linux
 enum class SchedulerPolicy : int {
 	FIFO = SCHED_FIFO,
 	ROUND_ROBIN = SCHED_RR,
@@ -25,8 +24,13 @@ enum class SchedulerPolicy : int {
 	INVALID = -1
 };
 
-class COSMOS_API SchedulerSettings
-{
+/// Base class for changing process scheduling options
+/**
+ * Specializations of this type can be used to create child processes with
+ * adjusted scheduling settings or to adjust the scheduling settings or
+ * existing processes.
+ **/
+class COSMOS_API SchedulerSettings {
 public: // functions
 
 	SchedulerSettings() {}
@@ -37,26 +41,26 @@ public: // functions
 
 	SchedulerPolicy policy() const { return m_policy; }
 
+	/// Apply the current scheduler settings to the given process
 	/**
-	 * \brief
-	 * 	Apply the current scheduler settings to the given process
-	 * \details
-	 * 	If the operation fails then an ApiError is thrown.
+	 * If the operation fails then an ApiError is thrown.
 	 *
-	 * 	If \c pid is zero then the settings are applied to the calling
-	 * 	process/thread.
+	 * If \c pid is zero then the settings are applied to the calling
+	 * process/thread.
 	 **/
 	void apply(ProcessID pid) const;
 
 protected: // functions
 
-	virtual void fillStruct(struct sched_attr &attr) const;
+	/// Fill the given low level sched_attr struct with the current settings
+	virtual void fillStruct(struct sched_attr &attr) const = 0;
 
 protected: // data
 
 	SchedulerPolicy m_policy = SchedulerPolicy::INVALID;
 };
 
+/// "OTHER" Scheduling Policy Settings
 class COSMOS_API OtherSchedulerSettings :
 	public SchedulerSettings
 {
@@ -70,28 +74,25 @@ public: // functions
 	static constexpr int minNiceValue() { return -20; }
 	static constexpr int maxNiceValue() { return 19; }
 
+	/// Sets the nice priority for the child process
 	/**
-	 * \brief
-	 * 	Sets the nice priority for the child process
-	 * \details
-	 * 	The nice value provides some basic CPU time
-	 * 	prioritization for processes. It doesn't offer any hard
-	 * 	guarantees but provides some general tendency for prefer or
-	 * 	disregard a process when it comes to scheduling CPU time.
+	 * The nice value provides some basic CPU time prioritization for
+	 * processes. It doesn't offer any hard guarantees but provides some
+	 * general tendency for prefering or disregarding a process when it
+	 * comes to scheduling CPU time.
 	 *
-	 * 	Currently this setting only affects newly created child
-	 * 	processes, not one that is already running.
+	 * Currently this setting only affects newly created child processes,
+	 * not one that is already running.
 	 *
-	 * 	Lower nice values mean more CPU time resources for the
-	 * 	process. See minNiceValue() and maxNiceValue() for the lower
-	 * 	and upper bound of this value.
+	 * Lower nice values mean more CPU time resources for the process. See
+	 * minNiceValue() and maxNiceValue() for the lower and upper bound of
+	 * this value.
 	 *
-	 * 	Note that on Linux this setting affects only a single thread
-	 * 	as opposed to the complete process as POSIX mandates. Since
-	 * 	this call currently only supports this setting for newly
-	 * 	created child processes this aspect doesn't matter much,
-	 * 	however, because the nice value will be inherited by child
-	 * 	threads and processes alike.
+	 * Note that on Linux this setting affects only a single thread as
+	 * opposed to the complete process as POSIX mandates. Since this call
+	 * currently only supports this setting for newly created child
+	 * processes this aspect doesn't matter much, however, because the
+	 * nice value will be inherited by child threads and processes alike.
 	 **/
 	void setNiceValue(int value) { m_nice_prio = value; }
 
@@ -103,12 +104,22 @@ protected: // functions
 
 protected: // data
 
-	//! an arbitrary constant to denote an invalide nice value
+	/// A constant denoting an invalide nice value
 	static const int INVALID_NICE_PRIO;
-	//! nice priority to apply to the child process, if any
+	/// The nice priority to apply to the child process, if any
 	int m_nice_prio = INVALID_NICE_PRIO;
 };
 
+/// Base class for realtime scheduling policies
+/**
+ * Realtime scheduling uses priorities between an integer min priority and an
+ * integer max priority. These boundaries are determines during runtime but
+ * are currently set on Linux to 1 .. 99. Higher values mean hihger
+ * priorities.
+ *
+ * A thread with realtime scheduling always has a higher priority than threads
+ * with non-realtime scheduling.
+ **/
 class COSMOS_API RealtimeSchedulerSettings :
 	public SchedulerSettings
 {
@@ -136,6 +147,14 @@ protected: // data
 	int m_priority = 0;
 };
 
+/// FIFO Scheduling Policy Settings
+/**
+ * FIFO realtime scheduling means that a process will only be preempted with
+ * another process with higher priority is avilable. If multiple processes
+ * share the same (highest) priority then one of them is selected for running
+ * and it is only preempted by another thread with the same priority if the
+ * running thread * becomes blocked.
+ **/
 class COSMOS_API FifoSchedulerSettings :
 	public RealtimeSchedulerSettings
 {
@@ -146,6 +165,14 @@ public: // functions
 	{}
 };
 
+/// Round Robin Scheduling Policy Settings
+/**
+ * RR scheduling is similar to FIFO scheduling with the addition that threads
+ * sharing the same (highest) priority will participate in a time slicing
+ * algorithm i.e. even if a currently running thread does not become blocked
+ * it will be preempted by another process sharing the same priority after the
+ * time slice elapsed.
+ **/
 class COSMOS_API RoundRobinSchedulerSettings :
 	public RealtimeSchedulerSettings
 {

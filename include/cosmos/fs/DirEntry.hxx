@@ -3,6 +3,7 @@
 
 // stdlib
 #include <cstring>
+#include <string_view>
 
 // Linux
 #include <dirent.h>
@@ -13,20 +14,18 @@
 
 namespace cosmos {
 
+/// A single Directory entry as returned from Directory::nextEntry()
 /**
- * \brief
- * 	A single Directory entry as returned from Directory::nextEntry()
- * \details
- * 	The stored data is only valid as long as the Directory object it was
- * 	returned from is valid and as long as Directory::nextEntry() isn't
- * 	called again.
+ * The stored data is only valid as long as the Directory object it was
+ * returned from is valid and as long as Directory::nextEntry() isn't called
+ * again.
  **/
-class COSMOS_API DirEntry
-{
+class COSMOS_API DirEntry {
 	friend class Directory;
 
 public: // types
 
+	/// Strong enum type expressing the dir entry file type
 	enum class Type : unsigned char {
 		BLOCK_DEVICE = DT_BLK,
 		CHAR_DEVICE = DT_CHR,
@@ -47,36 +46,29 @@ public: // functions
 
 	auto isValid() const { return m_entry != nullptr; }
 
+	/// Returns the inode of the directory entry
 	/**
-	 * \brief
-	 * 	Returns the inode of the directory entry
-	 * \details
-	 * 	The inode is a unique ID for the file system object on the
-	 * 	file system it resides on.
+	 * The inode is a unique ID for the file system object on the file
+	 * system it resides on.
 	 **/
 	Inode inode() const { return m_entry->d_ino; }
 
+	/// Returns the position of this entry in its associated Directory object
 	/**
-	 * \brief
-	 * 	Returns the position of this entry in its associated Directory
-	 * 	object
-	 * \details
-	 * 	This is the same as Directory::tell(), it can be used in
-	 * 	Directory::seek() at a later time to return to the original
-	 * 	position.
+	 * This is the same as Directory::tell(), it can be used in
+	 * Directory::seek() at a later time to return to the original
+	 * position.
 	 **/
 	off_t dirPos() const { return m_entry->d_off; }
 
+	/// Returns the length of the directory entry name
 	/**
-	 * \brief
-	 * 	Returns the length of the directory entry name
-	 * \details
-	 * 	In pure POSIX the length of the name can only be determined
-	 * 	using strlen(). This Linux specific information makes it
-	 * 	easier and more efficient to determine the length.
+	 * In pure POSIX the length of the name can only be determined using
+	 * strlen(). This Linux specific information makes it easier and more
+	 * efficient to determine the length.
 	 *
-	 * 	The returned length is the number of characters in the entry
-	 * 	name minus the null terminator.
+	 * The returned length is the number of characters in the entry name
+	 * excluding the null terminator.
 	 **/
 	size_t nameLength() const {
 		// this actually involves padding, so look from a 8-byte
@@ -95,23 +87,24 @@ public: // functions
 		return std::strlen(this->name());
 	}
 
+	/// Returns the file type of this directory entry
 	/**
-	 * \brief
-	 * 	Returns the file type of this directory entry
-	 * \details
-	 * 	For increased efficiency the file type of directory entries
-	 * 	can be delivered directly with the Directory readdir() data.
-	 * 	This is not supported by all underlying file systems, however.
-	 * 	Therefore be prepared to receive Type::UNKNOWN at all times in
-	 * 	which case you will need to perform an explicit fstatat() or
-	 * 	similar call to obtain the required information.
+	 * For increased efficiency the file type of directory entries can be
+	 * delivered directly with the Directory readdir() data. This is not
+	 * supported by all underlying file systems, however.  Therefore be
+	 * prepared to receive Type::UNKNOWN at all times in which case you
+	 * will need to perform an explicit fstatat() or similar call to
+	 * obtain the required information.
 	 **/
 	auto type() const { return static_cast<Type>(m_entry->d_type); }
 
 	const char* name() const { return m_entry->d_name; }
 
+	std::string_view view() const { return std::string_view{m_entry->d_name, nameLength()}; }
+
+	/// Returns whether this entry is a "dot file entry" i.e. "." or ".."
 	auto isDotEntry() const {
-		auto name = m_entry->d_name;
+		auto name = this->name();
 		if (name[0] != '.')
 			return false;
 		else if (name[1] == '\0')

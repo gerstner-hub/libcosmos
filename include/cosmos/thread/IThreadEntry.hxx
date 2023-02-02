@@ -5,14 +5,10 @@ namespace cosmos {
 
 class Thread;
 
-/**
- * \brief
- *	Interface used for threads to run in
- **/
-class IThreadEntry
-{
+/// Interface used for threads to run in
+class IThreadEntry {
 public:
-	//! entry function for a thread
+	/// Entry function for a thread
 	virtual void threadEntry(Thread &t) = 0;
 };
 

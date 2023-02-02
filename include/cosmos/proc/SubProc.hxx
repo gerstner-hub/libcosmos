@@ -3,8 +3,8 @@
 
 // stdlib
 #include <chrono>
-#include <iosfwd>
 #include <functional>
+#include <iosfwd>
 #include <optional>
 #include <string>
 
@@ -12,19 +12,21 @@
 #include <unistd.h>
 
 // cosmos
-#include "cosmos/types.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
-#include "cosmos/proc/WaitRes.hxx"
 #include "cosmos/proc/Scheduler.hxx"
+#include "cosmos/proc/WaitRes.hxx"
+#include "cosmos/types.hxx"
 
 namespace cosmos {
 	class SubProc;
 	class Signal;
 }
 
+/// Outputs a summary of the SubProc's configuration
 COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::SubProc &);
 
 namespace cosmos {
+
 /// Sub process creation facility
 /**
  * By default the child process will inherit the current process's stdout,
@@ -42,49 +44,54 @@ namespace cosmos {
  * if you want to create multiple childs with redirected std file descriptors
  * then you will need to set them each time before you call run().
  **/
-class COSMOS_API SubProc
-{
+class COSMOS_API SubProc {
 public: // types
+
 	typedef std::function<void (const SubProc&)> Callback;
+
 public: // functions
 
 	SubProc();
 
 	~SubProc();
 
-	/// returns whether a child process is still active
+	/// Returns whether a child process is still active
 	/**
 	 * This can return \c true even if the child process already exited,
-	 * in case the child process's exit status was not yet collected.
+	 * in case the child process's exit status was not yet collected via
+	 * wait().
 	 **/
 	auto running() const { return m_child_fd.valid(); }
 
-	/// returns the currently set executable name, or an empty string if
-	/// none is set
-	auto exe() const {
-		return m_argv.empty() ? std::string("") : m_argv[0];
+	/// Returns the currently set executable name of {} if none is set
+	std::optional<std::string> exe() const {
+		if (m_argv.empty())
+			return {};
+
+		return m_argv[0];
 	}
 
-	/// sets the executable path (argv0)
+	/// Sets the executable argument (argv0)
 	/**
 	 * Currently the actual executable path and argv0 will always be the
 	 * same.
 	 **/
 	void setExe(const std::string_view &exe) {
-		if (! m_argv.empty())
+		if (!m_argv.empty())
 			m_argv[0] = exe;
 		else
 			m_argv.emplace_back(exe);
 	}
 
-	/// returns the currently configured argument vector, including the
-	/// executable name as first argument
+	/// Returns the currently configured argument vector
+	/**
+	 * This vector is including the executable name as first argument.
+	 **/
 	const auto& args() const { return m_argv; }
 
 	StringVector& args() { return m_argv; }
 
-	/// sets the argument vector to be used including the executable name
-	/// found in the first argument
+	/// Sets the argument vector to be used including the executable name
 	void setArgs(const StringVector &sv) { m_argv = sv; }
 
 	/// \see setArgs(const StringVector &)
@@ -94,8 +101,11 @@ public: // functions
 			m_argv.push_back(std::string(s));
 	}
 
-	/// clears any currently set parameters, optionally also the
-	/// executable name
+	/// Clears any currently set parameters
+	/**
+	 * Clears all currently set arguments but keeps the executable, unless
+	 * \p and_exe is set to \c true.
+	 **/
 	void clearArgs(const bool and_exe = false) {
 		if (and_exe)
 			m_argv.clear();
@@ -114,7 +124,7 @@ public: // functions
 	/// Performs a blocking wait until the child process exits
 	WaitRes wait();
 
-	/// Wait for sub process exit withing a timeout in milliseconds
+	/// Wait for sub process exit within a timeout in milliseconds
 	/**
 	 * This currently requires that the SIGCHLD signal is blocked for
 	 * all threads in the process to work. Otherwise undefined
@@ -123,11 +133,7 @@ public: // functions
 	 * This also requires that no other threads in the process
 	 * consume the SIGCHLD signal, otherwise a lost wakeup can occur.
 	 *
-	 * If the timeout occured then WaitRes.anyEvent() returns \c
-	 * false.
-	 *
-	 * \return
-	 * The exit status if the child exited. Nothing if the timeout
+	 * \return The exit status if the child exited. Nothing if the timeout
 	 * occured.
 	 **/
 	std::optional<WaitRes> waitTimed(const std::chrono::milliseconds &max);
@@ -148,8 +154,8 @@ public: // functions
 	/// Sets explicit environment variables for the child process
 	/**
 	 * This only affects yet to be started child processes. By default
-	 * parent process's environment is inherited to the child (see also
-	 * setInheritEnv()).
+	 * the parent process's environment is inherited to the child (see
+	 * also setInheritEnv()).
 	 *
 	 * Each entry in the provided vector should be of the form
 	 * "name=value". The provided variables will make up the *complete*
@@ -157,17 +163,17 @@ public: // functions
 	 **/
 	void setEnv(const StringVector &vars) { m_env = vars; }
 
-	/// clears any previously set environment variables and let's
+	/// Clears any previously set environment variables and let's
 	/// to-be-started child processes inherit the parent's environment
 	void setInheritEnv() { m_env = {}; }
 
 	void setTrace(const bool trace) { m_trace = trace; }
-	bool trace() const { return m_trace; }
+	bool getTrace() const { return m_trace; }
 
-	/// returns the PID of the currently running child process or INVALID_PID
+	/// Returns the PID of the currently running child process or INVALID_PID
 	ProcessID pid() const { return m_pid; }
 
-	/// returns a pidfd refering to the currently running child
+	/// Returns a pidfd refering to the currently running child
 	/**
 	 * This file descriptor can be used for efficiently waiting for child
 	 * exit using poll() or select() APIs, see `man pidfd_open`. This
@@ -176,15 +182,31 @@ public: // functions
 	 **/
 	const FileDescriptor& pidFD() const { return m_child_fd; }
 
+	/// Redirect the child's stderr to the given file descriptor
+	/**
+	 * This only affects yet to be started child processes. The file
+	 * descriptor is expected to have the close-on-exec flag set, the
+	 * inheritance to the child process will be performed appropriately by
+	 * the implementation.
+	 **/
 	void setStderr(FileDescriptor fd) { m_stderr = fd; }
+	/// \c see setStderr()
 	void setStdout(FileDescriptor fd) { m_stdout = fd; }
+	/// \c see setStderr()
 	void setStdin(FileDescriptor fd) { m_stdin = fd; }
 
+	/// Restore the default inheritance behaviour for stdin/stderr/stdout
+	/**
+	 * This only affects yet to be started child processes. Any previously
+	 * set file descriptor overrides will be reset and the child process
+	 * will inherit the parent process's std file descriptors.
+	 **/
 	void resetStdFiles() {
 		m_stderr.reset();
 		m_stdin.reset();
 		m_stdout.reset();
 	}
+
 	/// Sets scheduler type and settings for newly created childs
 	/**
 	 * By default the parent's scheduling settings will be inherited. If
@@ -197,9 +219,10 @@ public: // functions
 	 **/
 	void setSchedulerSettings(const SchedulerSettings *ss) { m_sched_settings = ss; };
 
+	/// Returns the current scheduler settings
 	auto schedulerSettings() const { return m_sched_settings; }
 
-	/// sets a callback function to be invoked in the child process context
+	/// Sets a callback function to be invoked in the child process context
 	/**
 	 * This function will be invoked in the child process after the fork
 	 * happened but before the new program is executed. It can be used to
@@ -207,19 +230,18 @@ public: // functions
 	 * interfere with the SubProc's internal child process setup.
 	 *
 	 * This callback is invoked *before* any redirections or other
-	 * settings are setup by SubPRoc.
+	 * settings are performed by the implementation.
 	 **/
 	void setPostForkCB(Callback cb) { m_post_fork_cb = cb; }
 
 protected: // functions
 
-	//! performs settings done after forking i.e. in the child process but
-	//! before exec()'ing
+	/// Performs settings done after forking i.e. in the child process but before exec()'ing
 	void postFork();
 
 	void resetSignals();
 
-	/// redirects the given old file descriptor to _new (used in child context)
+	/// Redirects the given \p orig file descriptor to \p redirect (used in child context)
 	/**
 	 * \param[in] orig The file descriptor that should be replaced by redirect
 	 **/
@@ -227,26 +249,26 @@ protected: // functions
 
 protected: // data
 
-	//! the pid of the child process, if any
+	/// The pid of the child process, if any
 	ProcessID m_pid = INVALID_PID;
-	//! executable plus arguments to use
+	/// Executable plus arguments to use
 	StringVector m_argv;
-	//! path to an explicit working directory, if any
+	/// Path to an explicit working directory, if any
 	std::string m_cwd;
-	//! explicit environment child environment variables, if any
+	/// Explicit environment child environment variables, if any
 	std::optional<StringVector> m_env;
-	//! whether the child process shall become a tracee for us
+	/// Whether the child process shall become a tracee for us
 	bool m_trace = false;
-	//! scheduler policy settings, if any
+	/// Scheduler policy settings, if any
 	const SchedulerSettings *m_sched_settings = nullptr;
 
-	//! file descriptor to use as child's stdin
+	/// File descriptor to use as child's stdin
 	FileDescriptor m_stdout;
-	//! file descriptor to use as child's stderr
+	/// File descriptor to use as child's stderr
 	FileDescriptor m_stderr;
-	//! file descriptor to use as child's stdin
+	/// File descriptor to use as child's stdin
 	FileDescriptor m_stdin;
-	//! pidfd refering to the active child, if any
+	/// Pidfd refering to the active child, if any
 	FileDescriptor m_child_fd;
 
 	Callback m_post_fork_cb = nullptr;

@@ -16,13 +16,11 @@ namespace cosmos {
 // fwd. decl.
 class Condition;
 
+/// A class to represent a pthread mutex
 /**
- * \brief
- * 	A class to represent a pthread mutex
- * \details
- * 	Only the most basic operations are implemented by now. For more
- * 	details about the semantics refer to `man pthread_mutex_init` and `man
- * 	pthread_mutex_destroy`.
+ * Only the most basic operations are implemented by now. For more details
+ * about the semantics refer to `man pthread_mutex_init` and `man
+ * pthread_mutex_destroy`.
  **/
 class COSMOS_API Mutex {
 	// disallow copy/assignment
@@ -31,13 +29,13 @@ class COSMOS_API Mutex {
 
 public: // functions
 
+	/// Create a non-recursive Mutex
 	/**
-	 * \brief
-	 *	The only supported mutex type for the moment is non-recursive
-	 *	as others aren't needed
-	 * \details
-	 *	If NDEBUG is not set then additional error checks are in
-	 *	effect that allow detection of deadlocks etc.
+	 * Other mutex types are not currently provided.
+	 *
+	 * If the \c NDEBUG define is not set (during libcosmos build) then
+	 * additional error checks are in effect that allow detection of
+	 * deadlocks etc.
 	 **/
 	Mutex();
 

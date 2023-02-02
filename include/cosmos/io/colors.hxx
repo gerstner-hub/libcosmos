@@ -6,21 +6,23 @@
 #include <string_view>
 #include <variant>
 
-/** \file
+/**
+ * @file
+ *
  * This header provides ANSI terminal features for printing colored or
  * otherwise marked up text. The ostream operators work only for terminal
  * devices, see Terminal::isTTY().
  *
  * This is in a separate namespace due to a lot of symbol pollution. Since a
  * lot of types are in here a `using namespace cosmos::term` can help making
- * code more compact by * importing this limited namespace.
+ * code more compact by selectively importing this namespace.
  **/
 
 namespace cosmos::term {
 
-/// Primitive Colors for ANSI Terminals.
+/// Primitive Colors for ANSI Terminals
 /**
- *  There are 16 differen colors when taking bright variants into account.
+ *  There are 16 different colors when taking bright variants into account.
  *  The colors can be used both for text color and background color.
  **/
 enum class TermColor : size_t {
@@ -36,19 +38,19 @@ enum class TermColor : size_t {
 	WHITE
 };
 
-/// Differentiation between text (front) and background color.
+/// Differentiation between text (front) and background color
 enum class ColorKind {
 	FRONT,
 	BACK
 };
 
-/// Differentiation of normal and bright color intensity.
+/// Differentiation of normal and bright color intensity
 enum class ColorIntensity {
 	NORMAL,
 	BRIGHT
 };
 
-/// Complete color specification for ANSI terminals.
+/// Complete color specification for ANSI terminals
 /**
  *  This type carries a complete color specification:
  *
@@ -92,15 +94,15 @@ struct BackColor : public ColorSpec {
 
 /// Various feature controls for ANSI terminals.
 enum class TermControl : size_t {
-	RESET = 0, //! remove all attributes currently set (including colors)
-	UNDERLINE_ON = 4, //! underlined text
+	RESET = 0, /// Remove all attributes currently set (including colors)
+	UNDERLINE_ON = 4, /// Underlined text
 	UNDERLINE_OFF = 24,
-	BLINK_ON = 5, //! blinking text
+	BLINK_ON = 5, /// Blinking text
 	BLINK_OFF = 25,
-	INVERSE_ON = 7, //! inverse fg/bg colors
+	INVERSE_ON = 7, /// Inverse fg/bg colors
 	INVERSE_OFF = 27,
-	DEFAULT_FG_COLOR = 39, //! set default fg color
-	DEFAULT_BG_COLOR = 49 //! set default bg color
+	DEFAULT_FG_COLOR = 39, /// Set default fg color
+	DEFAULT_BG_COLOR = 49 /// Set default bg color
 };
 
 /// Returns the matching _OFF value for an _ON value of the TermControl enum.
@@ -147,7 +149,7 @@ protected:
 	const size_t m_off_code;
 };
 
-/// Base class for easy feature TermControl application on ostreams.
+/// Base class for easy feature TermControl application on ostreams
 class TextEffect : public FeatureBase {
 protected:
 	TextEffect(const TermControl feature, const std::string_view &text) :
@@ -207,7 +209,7 @@ struct TextOnColorT : public ColoredText {
 };
 
 /*
- * Helpers to apply colored text and background easily on  an ostream.
+ * Helpers to apply colored text and background easily on an ostream.
  *
  * These only enable the color for the given string argument and disable
  * coloring after the output operation again.

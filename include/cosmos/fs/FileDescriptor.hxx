@@ -6,7 +6,7 @@
 
 namespace cosmos {
 
-/// strong boolean to indicate CloseOnExec behaviour on file descriptors
+/// Strong boolean to indicate CloseOnExec behaviour on file descriptors
 using CloseOnExec = NamedBool<struct cloexec_t, true>;
 
 /// Thin Wrapper around OS File Descriptors.
@@ -49,7 +49,7 @@ public: // functions
 	/**
 	 * This operation simply resets the stored file descriptor to the
 	 * INVALID_FD. No system call will be performed and if the file is not
-	 * closed by other means a file descriptor leak will result.
+	 * closed by other means a file descriptor leak will be the result.
 	 **/
 	void reset() { m_fd = INVALID_FD; }
 
@@ -59,8 +59,9 @@ public: // functions
 	 * stored file descriptor will be reset().
 	 *
 	 * On rare occasions closing a file can fail. The most prominent error
-	 * is "invalid file descriptor" but there can be other situations,
-	 * like when during close() outstanding writes are performed.
+	 * is "invalid file descriptor" (EINVAL) but there can be other
+	 * situations, like when during close() outstanding writes are
+	 * performed.
 	 *
 	 * This member function can thus throw an exception on these
 	 * conditions. In this case the contained file descriptor will still
@@ -80,7 +81,7 @@ public: // functions
 	 **/
 	void duplicate(const FileDescriptor &new_fd, const CloseOnExec cloexec = CloseOnExec(true)) const;
 
-	/// Returns the primitive file descriptor contained.
+	/// Returns the primitive file descriptor contained in the object
 	fd_t raw() const { return m_fd; }
 
 	bool operator==(const FileDescriptor &other) const {
@@ -96,8 +97,11 @@ protected: // data
 	fd_t m_fd = INVALID_FD;
 };
 
+/// Representation of the stdout file descriptor
 extern COSMOS_API FileDescriptor stdout;
+/// Representation of the stderr file descriptor
 extern COSMOS_API FileDescriptor stderr;
+/// Representation of the stdin file descriptor
 extern COSMOS_API FileDescriptor stdin;
 
 } // end ns

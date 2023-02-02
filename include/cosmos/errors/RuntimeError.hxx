@@ -6,19 +6,18 @@
 
 namespace cosmos {
 
+/// Exception type for generic runtime errors
 /**
- * \brief
- * 	Exception type for generic runtime errors
- * \details
- * 	To be used in case where not an immediate system call failed but other
- * 	logical conditions are violated that make continuing impossible.
+ * To be used in cases when not an immediate system call failed but other
+ * logical conditions are violated that make continuing impossible.
  **/
 class COSMOS_API RuntimeError :
 	public CosmosError
 {
 public: // functions
 
-	explicit RuntimeError(const std::string_view &msg) : CosmosError("RuntimeError") {
+	explicit RuntimeError(const std::string_view &msg) :
+			CosmosError("RuntimeError") {
 		m_msg = msg;
 	}
 

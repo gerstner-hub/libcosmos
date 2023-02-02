@@ -40,7 +40,7 @@ bool testBasicPoll() {
 	poller.create();
 	cosmos::Pipe pp;
 
-	poller.addFD(pp.readEnd(), cosmos::Poller::MonitorMask({cosmos::Poller::MonitorSetting::INPUT}));
+	poller.addFD(pp.getReadEnd(), cosmos::Poller::MonitorMask({cosmos::Poller::MonitorSetting::INPUT}));
 	
 	auto ready = poller.wait(std::chrono::milliseconds(500));
 
@@ -49,7 +49,7 @@ bool testBasicPoll() {
 		return false;
 	}
 
-	cosmos::StreamFile pipe_write(pp.writeEnd(), cosmos::StreamFile::CloseFile(false));
+	cosmos::StreamFile pipe_write(pp.getWriteEnd(), cosmos::StreamFile::CloseFile(false));
 
 	pipe_write.write("test", 4);
 
@@ -63,7 +63,7 @@ bool testBasicPoll() {
 	{
 		const auto &ev = ready[0];
 
-		if (ev.fd() != pp.readEnd()) {
+		if (ev.fd() != pp.getReadEnd()) {
 			std::cerr << "poller.wait() returned bad FD in event" << std::endl;
 			return false;
 		}
@@ -86,7 +86,7 @@ bool testBasicPoll() {
 	{
 		const auto &ev = ready[0];
 
-		if (ev.fd() != pp.readEnd()) {
+		if (ev.fd() != pp.getReadEnd()) {
 			std::cerr << "poller.wait() returned bad FD in event" << std::endl;
 			return false;
 		}

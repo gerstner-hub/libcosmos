@@ -11,9 +11,11 @@
 
 namespace cosmos {
 
-/*
- * some general types used across cosmos
- */
+/**
+ * @file
+ *
+ * Some general convenience types used across libcosmos
+ **/
 
 typedef std::vector<std::string> StringVector;
 typedef std::vector<std::string_view> StringViewVector;
@@ -21,19 +23,19 @@ typedef std::vector<const char*> CStringVector;
 
 /// Strong template type to wrap boolean values in a named type
 /**
- * This type is intended as a replacement for primitive bool values in for
+ * This type is intended as a replacement for primitive bool values for
  * constructor and function arguments. The purpose is to increase readability
  * and avoid programming mistakes by passing a bool value for something else
  * than intended.
  *
- * In the absence of named parameter passing in C++ like `MyObj(do_this=true)`
- * one can use a specialization of this template type: `MyObj(DoThis(true))`.
+ * Since right now there is no named parameter passing in C++ like
+ * `MyObj(do_this=true)` one can use a specialization of this template type:
+ * `MyObj(DoThis(true))`.
  *
  * To use it you need to define an arbitrary tag type and the default boolean
  * value to apply like:
  *
- *     class my_setting_t {};
- *     using MySetting = NamedBool<my_setting_t, true>;
+ *     using MySetting = NamedBool<struct my_setting_t, true>;
  *
  *     void myfunc(const MySetting &setting = MySetting());
  *
@@ -42,8 +44,8 @@ typedef std::vector<const char*> CStringVector;
  *     // will be called with a false value
  *     myfunc(MySetting(false));
  *
- * By providing the bool cast operator the type should behave mostly like a
- * regular bool when querying its value.
+ * By providing the bool cast operator the type wille behave like a regular
+ * bool when querying its value.
  **/
 template <typename _, bool def>
 class NamedBool {
@@ -95,10 +97,7 @@ protected: // data
 
 } // end ns
 
-/**
- * \brief
- * 	Output all the elements of a vector as a comma separated list
- **/
+/// Output all the elements of a vector as a comma separated list
 template <typename T>
 inline std::ostream& operator<<(std::ostream &o, const std::vector<T> &sv) {
 	for (auto it = sv.begin(); it != sv.end(); it++) {
@@ -110,11 +109,7 @@ inline std::ostream& operator<<(std::ostream &o, const std::vector<T> &sv) {
 	return o;
 }
 
-/**
- * \brief
- * 	Output all the elements of a map as a "key:value" newline separated
- * 	list
- **/
+/// Output all the elements of a map as a "key:value" newline separated list
 template <typename K, typename V>
 inline std::ostream& operator<<(std::ostream &o, const std::map<K,V> &m) {
 	for (auto it: m) {

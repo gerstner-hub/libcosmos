@@ -265,8 +265,8 @@ std::ostream& operator<<(std::ostream &o, const cosmos::SubProc &proc) {
 	o << "Arguments: " << proc.args() << "\n";
 	if (!proc.cwd().empty())
 		o << "CWD: " << proc.cwd() << "\n";
-	if (!proc.trace())
-		o << "Trace: " << proc.trace() << "\n";
+	if (!proc.getTrace())
+		o << "Trace: " << proc.getTrace() << "\n";
 
 	return o;
 }

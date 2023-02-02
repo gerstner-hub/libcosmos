@@ -6,32 +6,34 @@
 #include <string>
 #include <string_view>
 
-//! Throws the given Exception type after contextual information from the
-//! calling context has been added.
+/// Throws the given Exception type after information from the calling context has been added
 #define cosmos_throw(e) (e.setInfo(__FILE__, __LINE__, __FUNCTION__).raise())
-//! use this in each type derived from CosmosError to apply mandatory overrides
+/// Use this in each type derived from CosmosError to apply mandatory overrides
+/**
+ * since this is a virtual function, the `noreturn` attribute is not enough to
+ * silence "no return in function returning non-void" functions. I didn't find
+ * a way around that yet, meaning that somethings unnecessary returns have to
+ * be added to silence these warnings.
+ **/
 #define COSMOS_ERROR_IMPL [[ noreturn ]] void raise() override { throw *this; }
 
 namespace cosmos {
 
+/// Base class for libcosmos exceptions
 /**
- * \brief
- * 	Base class for Cosmos exceptions
- * \details
- * 	This base class carries the file, line and function contextual
- * 	information from where it was thrown. Furthermore it stores a
- * 	dynamically allocated string with optional additional runtime
- * 	information.
+ * This base class carries the file, line and function contextual information
+ * from where it was thrown. Furthermore it stores a dynamically allocated
+ * string with optional additional runtime information.
  *
- * 	The cosmos_throw macro allows to transparently throw any type derived
- * 	from this base class, all contextual information filled in.
+ * The cosmos_throw macro allows to transparently throw any type derived from
+ * this base class, all contextual information filled in.
  *
- * 	Each derived type must override the raise() virtual function to allow
- * 	to throw the correct specialized type even when only the base class
- * 	type is known. The generateMsg() function can be overwritten to update
- * 	the error message content at the time what() is called. This allows to
- * 	defer expensive calculations until the time the actual exception
- * 	message content is accessed.
+ * Each derived type must override the raise() virtual function to allow to
+ * throw the correct specialized type even when only the base class type is
+ * known. The generateMsg() function can be overwritten to update the error
+ * message content at the time what() is called. This allows to defer
+ * expensive calculations until the time the actual exception message content
+ * is accessed.
  **/
 class COSMOS_API CosmosError :
 	public std::exception
@@ -41,10 +43,17 @@ public: // functions
 	explicit CosmosError(const char *error_class) :
 		m_error_class(error_class) {}
 
-	CosmosError(const char *error_class, const std::string_view &fixed_text) : CosmosError(error_class) {
+	CosmosError(const char *error_class, const std::string_view &fixed_text) :
+			CosmosError(error_class) {
 		m_msg = fixed_text;
 	}
 
+	/// Set exception context information
+	/**
+	 * This function is used by the \c cosmos_throw macro to store
+	 * information about the program location where the exception was
+	 * thrown.
+	 **/
 	CosmosError& setInfo(const char *file, const size_t line, const char *func) {
 		m_line = line;
 		m_file = file;
@@ -53,41 +62,40 @@ public: // functions
 		return *this;
 	}
 
+	/// Implementation of the std::exception interface
 	/**
-	 * \brief
-	 * 	Implementation of the std::exception interface
-	 * \details
-	 * 	Returns a completely formatted message describing this error
-	 * 	instance. The returned string is only valid for the lifetime
-	 * 	of this object.
+	 * Returns a completely formatted message describing this error
+	 * instance. The returned string is only valid for the lifetime of
+	 * this object.
 	 **/
 	const char* what() const throw() override;
 
-	/**
-	 * \brief
-	 * 	throw the most specialized type of this object in the
-	 * 	inheritance hierarchy.
-	 **/
+	/// Throw the most specialized type of this object in the inheritance hierarchy
 	[[ noreturn ]] virtual void raise() = 0;
 
 protected: // functions
 
+	/// Append type specific error information to m_msg
 	/**
-	 * \brief
-	 * 	Append type specific error information to m_msg
-	 * \details
-	 * 	This function is called by this base class implementation when
-	 * 	the m_msg string needs to be appended implementation specific
-	 * 	information.
+	 * This function is called by the implementation when error specific
+	 * information needs to be appened to the the \c m_msg string.
 	 *
-	 * 	When this function is called then m_msg will be empty.
+	 * At entry into this function \c m_msg can already contain data that
+	 * must not be discarded.
+	 *
+	 * This function will be called at most once during the lifetime of an
+	 * object, and only if the error message actually needs to be
+	 * generated due to a call to what().
 	 **/
 	virtual void generateMsg() const {};
 
 protected: // data
 
+	/// Descriptive, unique error class label
 	const char *m_error_class = nullptr;
+	/// Runtime generated error message
 	mutable std::string m_msg;
+	/// Whether m_msg has been assembled yet
 	mutable bool m_msg_generated = false;
 	const char *m_file = nullptr;
 	const char *m_func = nullptr;

@@ -13,16 +13,14 @@
 
 namespace cosmos {
 
+/// This type represents a pthread read-write lock
 /**
- * \brief
- * 	This type represents a pthread read-write lock
- * \details
- *	A read-write lock can be locked in parallel for reading but only by
- *	one thread for writing at the same time. This is helpful if you got
- *	data that is updated rarely but read often.
+ * A read-write lock can be locked in parallel for reading but only by one
+ * thread for writing at the same time. This is helpful if you got data that
+ * is updated rarely but read often.
  *
- * 	Only the most basic operations are provided by now. For more
- * 	information please refer to the POSIX man pages.
+ * Only the most basic operations are provided by now. For more information
+ * please refer to the POSIX man pages.
  **/
 class RWLock {
 	// forbid copy-assignment
@@ -55,6 +53,7 @@ public: // functions
 		}
 	}
 
+	/// Unlock a previously obtained read or write lock
 	void unlock() const
 	{
 		if (::pthread_rwlock_unlock(&m_prwlock) != 0) {

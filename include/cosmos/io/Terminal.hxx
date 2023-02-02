@@ -11,12 +11,19 @@
 #include "cosmos/fs/File.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
 
+/**
+ * @file
+ *
+ * This header contains types and helper concerned with terminal / TTY
+ * features of the operating system.
+ **/
+
 namespace cosmos {
 
-//! represents a terminal dimension in characters
+/// Represents a terminal dimension in characters
 struct TermDimension : winsize {
 
-	TermDimension(size_t cols = 0, size_t rows = 0) {
+	explicit TermDimension(size_t cols = 0, size_t rows = 0) {
 		ws_col = cols;
 		ws_row = rows;
 	}
@@ -31,8 +38,7 @@ struct TermDimension : winsize {
  * on it. It will not take ownership of the file descriptor i.e. it will never
  * be closed by this class.
  **/
-class COSMOS_API Terminal
-{
+class COSMOS_API Terminal {
 public:
 	Terminal() {}
 	explicit Terminal(FileDescriptor fd) : m_fd(fd) {}
@@ -46,15 +52,15 @@ public:
 		m_fd = fd;
 	}
 
-	//! returns whether the associated file descriptor is a TTY
+	/// Returns whether the associated file descriptor is a TTY
 	bool isTTY() const;
 
-	//! returns the terminal dimension in character width x height
+	/// Returns the terminal dimension in character width x height
 	TermDimension getSize() const;
-	//! sets the terminal dimension according to the given values
+	/// Sets the terminal dimension according to the given values
 	void setSize(const TermDimension &dim);
 
-	/// sends a stream of zero bits for a certain duration
+	/// Sends a stream of zero bits for a certain duration
 	/**
 	 * If duration is zero then the stream will last between 0.25 and 0.50
 	 * seconds. If non-zero then the stream will last for an
@@ -63,7 +69,7 @@ public:
 	 **/
 	void sendBreak(int duration);
 
-	/// attempt to make the terminal the controlling terminal of the current process
+	/// Attempt to make the terminal the controlling terminal of the current process
 	/**
 	 * This only works if the current process is a session leader and does
 	 * not yet have a controlling terminal.
@@ -77,6 +83,7 @@ public:
 	void makeControllingTerminal(bool force = false);
 
 protected: // data
+
 	FileDescriptor m_fd;
 };
 

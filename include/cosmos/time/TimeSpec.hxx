@@ -9,10 +9,7 @@
 
 namespace cosmos {
 
-/**
- * \brief
- *	A C++ wrapper around the POSIX struct timespec
- **/
+/// A C++ wrapper around the POSIX struct timespec
 class TimeSpec :
 	public timespec
 {
@@ -26,7 +23,7 @@ public:
 		setAsMilliseconds(ms);
 	}
 
-	//! deliberately don't initialize the members for performance reasons
+	/// Deliberately don't initialize the members for performance reasons
 	TimeSpec() {}
 
 	bool isZero() const { return this->tv_sec == 0 && this->tv_nsec == 0; }
@@ -59,7 +56,7 @@ public:
 		return *this;
 	}
 
-	//! converts the time representation into a single milliseconds value
+	/// Converts the time representation into a single milliseconds value
 	size_t toMilliseconds() const {
 		size_t ret = this->tv_sec * 1000;
 		ret += (this->tv_nsec / 1000 / 1000);
@@ -98,10 +95,6 @@ public:
 		return *this < other || *this == other;
 	}
 
-	constexpr long nanosecondBase() const {
-		return 1000 * 1000 * 1000;
-	}
-
 	TimeSpec operator-(const TimeSpec &other) const {
 		TimeSpec ret;
 
@@ -128,6 +121,12 @@ public:
 		}
 
 		return ret;
+	}
+
+protected: // functions
+
+	constexpr long nanosecondBase() const {
+		return 1000 * 1000 * 1000;
 	}
 };
 

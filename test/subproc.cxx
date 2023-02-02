@@ -213,8 +213,8 @@ public:
 		 * read from the pipe
 		 */
 		m_proc.setArgs({m_head_path, "-n", ss.str()});
-		m_proc.setStdout(m_pipe_from_head.writeEnd());
-		m_proc.setStdin(m_pipe_to_head.readEnd());
+		m_proc.setStdout(m_pipe_from_head.getWriteEnd());
+		m_proc.setStdin(m_pipe_to_head.getReadEnd());
 		m_proc.run();
 
 		// we need to close the write-end to successfully receive an
@@ -480,7 +480,7 @@ public:
 	void run() {
 		// run the env tool to inspect via pipe redirection whether
 		// the child process has got the expected environment
-		m_env_proc.setStdout(m_pipe_from_env.writeEnd());
+		m_env_proc.setStdout(m_pipe_from_env.getWriteEnd());
 		m_env_proc.setExe("/usr/bin/env");
 		cosmos::StringVector env({"this=that", "misc=other"});
 		std::set<std::string> env_set;

@@ -60,15 +60,15 @@ public: // functions
 	/// Assigns exactly the given signal mask to the current process
 	void setSigMask(const SigSet &s, std::optional<SigSet *> old = {});
 
-	/// restores the default signal handling behaviour for the given signal
+	/// Restores the default signal handling behaviour for the given signal
 	void restoreSignal(const Signal &sig) {
 		::signal(sig.raw(), SIG_DFL);
 	}
 
-	/// returns the currently active signal mask for the calling thread
+	/// Returns the currently active signal mask for the calling thread
 	SigSet getSigMask();
 
-	/// creates a new session with the current process as leader
+	/// Creates a new session with the current process as leader
 	/**
 	 * The session will also receive a new process group of which the
 	 * current process also is the leader. The new session ID is returned
@@ -93,7 +93,7 @@ protected: // data
 	mutable ProcessID m_parent_pid = INVALID_PID;
 };
 
-//! a central instance for quick access to process information
+/// A central instance for quick access to process information
 extern COSMOS_API Process g_process;
 
 }; // end ns

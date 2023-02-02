@@ -27,19 +27,20 @@ namespace cosmos {
  * be signaled as ready if currently one of the monitoring conditions is
  * fulfilled. Edge triggered instead means that the condition is only signaled
  * once for a single event and afterwards only triggered again if additional
- * events occur.
+ * events occur, regardless of whether data was actually read/written to the
+ * monitored file descriptors or not.
  *
  * The edge triggered approach can be more efficient as it requires less
  * system calls on high I/O load. However, it also requires more care taken by
  * the implementation of the userspace application. The general recommendation
  * is that all monitored file descriptors should be operated in non-blocking
  * mode in this case and once an event is signaled the respective file
- * descriptor should be read/written until an EAGAIN result is encountered.
- * Only then should the poll API be consulted again for blocking for further
- * events.
+ * descriptor should be read from / written to until an EAGAIN result is
+ * encountered. Only then should the poll API be consulted again for waiting
+ * for further events.
  *
  * Special care also is required when file descriptors that are monitored are
- * closed within the application. The kernel monitors open file descriptions
+ * closed within the application. The kernel monitors open file *descriptions*
  * here, not only open file descriptors. This means if there exist copies of a
  * file descriptor then closing one of the involved file descriptors will not
  * end monitoring of the still open file description.
@@ -57,39 +58,39 @@ namespace cosmos {
 class COSMOS_API Poller {
 public: // types
 
-	/// flags used to declare interest in specific events and options in addFD() and modFD()
+	/// Flags used to declare interest in specific events and options in addFD() and modFD()
 	enum class MonitorSetting : uint32_t {
-		/// monitor for read() operation becoming possible
+		/// Monitor for read() operation becoming possible
 		INPUT = EPOLLIN,
-		/// monitor for write() operation becoming possible
+		/// Monitor for write() operation becoming possible
 		OUTPUT = EPOLLOUT,
-		/// monitor for stream socket peer closed or shutt down the write half of the connection (data may still be pending)
+		/// Monitor for stream socket peer closed or shut down the write half of the connection (data may still be pending)
 		SOCKET_HANGUP = EPOLLRDHUP,
-		/// monitor for exceptional conditions occuring on the file descriptor, depending on the actual file type
+		/// Monitor for exceptional conditions occuring on the file descriptor, depending on the actual file type
 		EXCEPTIONS = EPOLLPRI,
-		/// operate in edge triggered mode instead of level triggered (default), see detailed class description
+		/// Operate in edge triggered mode instead of level triggered (which is the default)
 		EDGE_TRIGGERED = EPOLLET,
-		/// only report events once, then disable monitoring until this flag is set again using modFD()
+		/// Only report events once, then disable monitoring until this flag is set again using modFD()
 		ONESHOT = EPOLLONESHOT,
-		/// if the process has CAP_BLOCK_SUSPEND capability then the system won't enter a suspend state until the process that received this event calls wait() again.
+		/// If the process has the CAP_BLOCK_SUSPEND capability then the system won't enter a suspend state until the process that received this event calls wait() again.
 		STAY_AWAKE = EPOLLWAKEUP
 	};
 
 	typedef BitMask<MonitorSetting> MonitorMask;
 
-	/// flags found in PollEvent that indicate the events that occured on a file descriptor
+	/// Flags found in PollEvent that indicate the events that occured on a file descriptor
 	enum class Event : uint32_t {
-		/// see MonitorSettings::INPUT
+		/// \c see MonitorSettings::INPUT
 		INPUT_READY = EPOLLIN,
-		/// see MonitorSettings::OUTPUT
+		/// \c see MonitorSettings::OUTPUT
 		OUTPUT_READY = EPOLLOUT,
-		/// see MonitorSettings::SOCKET_HANGUP
+		/// \c see MonitorSettings::SOCKET_HANGUP
 		SOCKET_HANGUP = EPOLLRDHUP,
-		/// see MonitorSettings::EXCEPTIONS
+		/// \c see MonitorSettings::EXCEPTIONS
 		EXCEPTION_OCCURED = EPOLLPRI,
-		/// an error condition occured on the file descriptor (this is also reported for the write end of a pipe, if the read end is closed). This event is always reported independently of MonitorSettings.
+		/// An error condition occured on the file descriptor (this is also reported for the write end of a pipe, if the read end is closed). This event is always reported independently of MonitorSettings.
 		ERROR_OCCURED = EPOLLERR,
-		/// socket or pipe peer has hung up. Data may still be pending though. This event is always reported independently of MonitorSettings.
+		/// Socket or pipe peer has hung up. Data may still be pending though. This event is always reported independently of MonitorSettings.
 		HANGUP_OCCURED = EPOLLHUP
 	};
 
@@ -100,7 +101,7 @@ public: // types
 		friend class Poller;
 	public:
 
-		//! the file descriptor this event refers to
+		/// The file descriptor this event refers to
 		FileDescriptor fd() const { return FileDescriptor((this->data).fd); }
 
 		auto getEvents() const { return EventMask(static_cast<Event>(this->events)); }
@@ -108,10 +109,10 @@ public: // types
 
 public: // functions
 
-	/// creates a yet invalid Poller instance
+	/// Creates a yet invalid Poller instance
 	Poller() {}
 
-	/// creates a Poller instance ready for use
+	/// Creates a Poller instance ready for use
 	/**
 	 * \see create()
 	 **/
@@ -119,14 +120,14 @@ public: // functions
 		create(max_events);
 	}
 
-	/// calls close()
+	/// Calls close()
 	~Poller();
 
-	/// avoid copying due to the file descriptor member
+	/// Avoid copying due to the file descriptor member
 	Poller(const Poller&) = delete;
 	Poller& operator=(const Poller&) = delete;
 
-	/// actually create the poll file descriptor backing this object
+	/// Actually create the poll file descriptor backing this object
 	/**
 	 * If the file descriptor already exists this does nothing.
 	 *
@@ -137,7 +138,7 @@ public: // functions
 	 **/
 	void create(size_t max_events = 16);
 
-	/// closes a previously create()'d poll file descriptor again
+	/// Closes a previously create()'d poll file descriptor again
 	/**
 	 * Any monitoring that was setup previously will be dropped. A future
 	 * call to create() can reestablish the Poller functionality.
@@ -149,7 +150,7 @@ public: // functions
 	 **/
 	void close();
 
-	/// controls the auto-restart behaviour on EINTR due to signals
+	/// Controls the auto-restart behaviour on EINTR due to signals
 	/**
 	 * If during wait() an EINTR system call result is encountered, then
 	 * the implementation will transparently restart the system call if
@@ -160,10 +161,10 @@ public: // functions
 		m_restart_on_intr = restart;
 	}
 
-	/// returns whether currently a valid poll file descriptor exists
+	/// Returns whether currently a valid poll file descriptor exists
 	bool isValid() const { return m_poll_fd.valid(); }
 
-	/// start monitoring the given file descriptor using the given settings
+	/// Start monitoring the given file descriptor using the given settings
 	/**
 	 * If currently no valid poll FD exists then this will throw an
 	 * ApiError exception.
@@ -173,7 +174,7 @@ public: // functions
 	 **/
 	void addFD(const FileDescriptor &fd, const MonitorMask &mask);
 
-	/// modify monitoring settings for an already monitored descriptor
+	/// Modify monitoring settings for an already monitored descriptor
 	/**
 	 * If currently no valid poll FD exists then this will throw an
 	 * ApiError exception.
@@ -192,6 +193,9 @@ public: // functions
 	 * \param[in] timeout An optional timeout to apply after which the
 	 * call will return even if no events are ready. An empty vector is
 	 * returned in the timeout case.
+	 *
+	 * \return The range of events that occured, or an empty vector if the
+	 * timeout occured.
 	 **/
 	std::vector<PollEvent> wait(const std::optional<std::chrono::milliseconds> &timeout = {});
 

@@ -4,37 +4,47 @@
 // stdlib
 #include <iosfwd>
 #include <sstream>
+#include <string_view>
 
 // cosmos
 #include "cosmos/io/colors.hxx"
 
 namespace cosmos {
 
+/// Abstract interface for a basic logging facility
 /**
- * \brief
- * 	Abstract interface for a basic logging facility
- * \details
- * 	Applications can use this interface to log data to arbitrary places.
- * 	You need to derive from this interface and decide what places these
- * 	are.
+ * Applications can use this interface to log data to arbitrary places. You
+ * need to derive from this interface and decide what places these are.
  *
- * 	The base class writes data to std::ostream instances. So an
- * 	implementation of this class needs to provide some instance of
- * 	std::ostream for writing to.
+ * The base class writes data to std::ostream instances. So an implementation
+ * of this class needs to provide some instance of std::ostream for writing
+ * to.
  *
- * 	This base class additionally provides means to write colored text and
- * 	detect whether an ostream is connected to a terminal.
+ * The logging supports four different categories for debug, info, warning and
+ * error messages.
+ *
+ * This base class additionally provides means to write ANSI colored text if
+ * an ostream is associated with a terminal. Each category gets its own ANSI
+ * color. Each category can be directed to an individual output stream and be
+ * enabled/disabled individually.
+ *
+ * By default all categories are enabled except debug.
  **/
 class COSMOS_API ILogger {
 public: // functions
 
 	virtual ~ILogger() {};
 
+	/// Log an error message
 	std::ostream& error() { return getStream(m_err); }
+	/// Log a warning message
 	std::ostream& warn() { return getStream(m_warn); }
+	/// Log an info message
 	std::ostream& info() { return getStream(m_info); }
+	/// Log a debug message
 	std::ostream& debug() { return getStream(m_debug); }
 
+	/// Enable/disable different log channels
 	void setChannels(const bool error, const bool warning, const bool info, const bool debug) {
 		m_err.enabled = error;
 		m_warn.enabled = warning;
@@ -44,14 +54,15 @@ public: // functions
 
 protected: // types
 
+	/// Internal state for each channel's stream
 	struct StreamState {
-		StreamState(const char *p, const term::ColorSpec &c) :
+		StreamState(const std::string_view &p, const term::ColorSpec &c) :
 			prefix(p), color(c) {}
 
 		std::ostream *stream = nullptr;
 		bool enabled = false;
 		bool is_tty = false;
-		const char *prefix = "";
+		const std::string_view prefix;
 		const term::ColorSpec color;
 	};
 
@@ -84,7 +95,7 @@ protected: // functions
 		return m_null;
 	}
 
-	//! Returns whether the given ostream is associated with a terminal or not
+	/// Returns whether the given ostream is associated with a terminal or not
 	static bool isTTY(const std::ostream &o);
 
 	void setStreams(
@@ -98,7 +109,7 @@ protected: // functions
 
 protected: // data
 
-	//! a noop stream object to write to if a channel is disabled
+	/// A noop stream object to write to if a channel is disabled
 	std::stringstream m_null;
 
 	StreamState m_err;

@@ -7,8 +7,15 @@
 
 namespace cosmos {
 
+/**
+ * @file
+ *
+ * This header contains low level OS interface types shared between multiple
+ * libcosmos classes.
+ **/
+
 /*
- * these are not part of the SubProc class, because then we'd get mutual
+ * these are not part of the SubProc class, lest we end up in mutual
  * dependencies between Signal and SubProc headers.
  */
 typedef pid_t ProcessID;

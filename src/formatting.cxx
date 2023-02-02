@@ -37,18 +37,17 @@ static std::string sprintfV(const char *fmt, va_list orig_args) {
 			ret.resize(written);
 			break;
 		}
-			
+
 		// re-try with the correct string size
 		ret.resize(written);
 
 		va_end(varargs);
 	}
-		
+
 	va_end(varargs);
 
 	return ret;
 }
-
 
 std::string sprintf(const char *fmt, ...) {
 	va_list varargs;

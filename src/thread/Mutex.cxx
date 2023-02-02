@@ -16,6 +16,7 @@ constexpr bool DEBUG_MUTEX = true;
 constexpr bool DEBUG_MUTEX = false;
 #endif
 
+/// A single pthread_mutexattr_t for constructing Mutexes
 class MutexAttr : public Initable {
 public:
 	MutexAttr() : Initable(InitPrio::MUTEX_ATTR) {}
