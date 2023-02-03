@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "cosmos/formatting.hxx"
 #include "cosmos/PasswdInfo.hxx"
 #include "cosmos/proc/Process.hxx"
 

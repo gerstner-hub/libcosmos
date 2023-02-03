@@ -18,11 +18,11 @@ ProcessID getParentPid() {
 }
 
 UserID getRealUserID() {
-	return ::getuid();
+	return static_cast<UserID>(::getuid());
 }
 
 UserID getEffectiveUserID() {
-	return ::geteuid();
+	return static_cast<UserID>(::geteuid());
 }
 
 ProcessID createNewSession() {

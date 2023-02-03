@@ -18,6 +18,7 @@ namespace cosmos {
  * these are not part of the SubProc class, lest we end up in mutual
  * dependencies between Signal and SubProc headers.
  */
+
 enum class ProcessID : pid_t {
 	INVALID = -1,
 	/// in a number of system calls zero refers to the calling thread
@@ -26,8 +27,13 @@ enum class ProcessID : pid_t {
 	CHILD = 0
 };
 
-typedef uid_t UserID;
-typedef gid_t GroupID;
+enum class UserID : uid_t {
+	ROOT = 0
+};
+
+enum class GroupID : gid_t {
+	ROOT = 0
+};
 
 typedef ino_t Inode;
 

@@ -96,4 +96,16 @@ std::ostream& operator<<(std::ostream &o, const cosmos::ProcessID &pid) {
 	return o;
 }
 
+std::ostream& operator<<(std::ostream &o, const cosmos::UserID &uid) {
+	// similarly we could use special annotation here
+	o << cosmos::to_integral(uid);
+	return o;
+}
+
+std::ostream& operator<<(std::ostream &o, const cosmos::GroupID &gid) {
+	// similarly we could use special annotation here
+	o << cosmos::to_integral(gid);
+	return o;
+}
+
 #endif // inc. guard

@@ -3,6 +3,7 @@
 #include <cstring>
 
 // cosmos
+#include "cosmos/algs.hxx"
 #include "cosmos/errors/ApiError.hxx"
 #include "cosmos/errors/RuntimeError.hxx"
 #include "cosmos/PasswdInfo.hxx"
@@ -51,7 +52,7 @@ PasswdInfo::PasswdInfo(const std::string_view name) {
 
 PasswdInfo::PasswdInfo(const UserID uid) {
 	auto call = [&](struct passwd **res) -> int {
-		return getpwuid_r(uid, &m_passwd,
+		return getpwuid_r(to_integral(uid), &m_passwd,
 			m_buf.data(), m_buf.size(),
 			res);
 	};
