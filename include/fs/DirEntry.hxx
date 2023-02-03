@@ -22,6 +22,7 @@ namespace cosmos {
  **/
 class COSMOS_API DirEntry {
 	friend class Directory;
+	friend class DirIterator;
 
 public: // types
 
@@ -45,11 +46,15 @@ public: // types
 		UNKNOWN = DT_UNKNOWN
 	};
 
-public: // functions
+protected: // functions
 
+	// only allow the Directory type to create this
 	explicit DirEntry(const struct dirent *entry)
 		: m_entry(entry)
 	{}
+
+
+public: // functions
 
 	auto getRawEntry() const { return m_entry; }
 

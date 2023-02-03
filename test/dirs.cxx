@@ -2,8 +2,9 @@
 #include "cosmos/fs/Directory.hxx"
 
 // C++
-#include <iostream>
 #include <exception>
+#include <iostream>
+#include <map>
 
 // Linux
 #include <sys/types.h>
@@ -14,9 +15,7 @@ public:
 
 	DirsTest() :
 		m_dir_path("/usr/include/linux")
-	{
-
-	}
+	{}
 
 
 	int testBasicLogic() {
@@ -75,10 +74,26 @@ public:
 		auto startpos = dir.tell();
 		std::string first_name;
 
-		std::optional<cosmos::DirEntry> oentry;
+		using EntryType = cosmos::DirEntry::Type;
 
-		while ((oentry = dir.nextEntry())) {
-			auto entry = *oentry;
+		const std::map<EntryType, char> TYPE_MAP = {
+			{EntryType::BLOCK_DEVICE, 'b'},
+			{EntryType::CHAR_DEVICE, 'c'},
+			{EntryType::DIRECTORY, 'd'},
+			{EntryType::FIFO, 'p'},
+			{EntryType::SYMLINK, 'l'},
+			{EntryType::REGULAR, '-'},
+			{EntryType::UNIX_SOCKET, 's'},
+			{EntryType::UNKNOWN, '?'}
+		};
+
+		for (auto entry: dir) {
+			if (auto it = TYPE_MAP.find(entry.type()); it != TYPE_MAP.end()) {
+				std::cout << it->second << " ";
+			} else {
+				std::cerr << "invalid type encountered" << std::endl;
+				return 1;
+			}
 			std::cout << entry.name() << std::endl;
 
 			auto sname = std::string(entry.name());
@@ -109,9 +124,10 @@ public:
 		}
 
 		dir.seek(startpos);
-		oentry = dir.nextEntry();
+		std::optional<cosmos::DirEntry> entry;
+		entry = dir.nextEntry();
 
-		if (first_name != oentry->name()) {
+		if (first_name != entry->name()) {
 			std::cerr << "tell() / seek() failed ?!" << std::endl;
 
 			return 1;

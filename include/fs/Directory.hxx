@@ -163,4 +163,7 @@ protected: // data
 
 } // end ns
 
+// make DirIterator available for range based for loops
+#include "cosmos/fs/DirIterator.hxx"
+
 #endif // inc. guard
