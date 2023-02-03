@@ -120,7 +120,7 @@ class COSMOS_API File {
 public: // types
 
 	// strong boolean type for specifying close-file responsibility
-	using CloseFile = NamedBool<struct close_file_t, true>;
+	using AutoClose = NamedBool<struct close_file_t, true>;
 
 public: // functions
 
@@ -146,8 +146,8 @@ public: // functions
 	}
 
 	/// Wrap the given file descriptor applying the specified auto-close behaviour
-	explicit File(FileDescriptor fd, const CloseFile close_fd) {
-		open(fd, close_fd);
+	explicit File(FileDescriptor fd, const AutoClose auto_close) {
+		open(fd, auto_close);
 	}
 
 	virtual ~File();
@@ -170,14 +170,14 @@ public: // functions
 	 * The caller is responsible for invalidating \c fd, if desired, and
 	 * that the file descriptor is not used in conflicting ways.
 	 *
-	 * The parameter \c close_fd determines whether the File object will
+	 * The parameter \c auto_close determines whether the File object will
 	 * take ownership of the file descriptor, or not. If so then the file
-	 * descriptor is closed on OS level if deemed necessary by the File
-	 * object.
+	 * descriptor is closed on OS level if deemed necessary by the
+	 * implementation.
 	 **/
-	void open(FileDescriptor fd, const CloseFile close_fd) {
+	void open(FileDescriptor fd, const AutoClose auto_close) {
 		m_fd = fd;
-		m_close_fd = close_fd;
+		m_auto_close = auto_close;
 	}
 
 	/// Close the current file object
@@ -191,13 +191,13 @@ public: // functions
 		if (!isOpen())
 			return;
 
-		if (m_close_fd) {
+		if (m_auto_close) {
 			m_fd.close();
 		} else {
 			m_fd.reset();
 		}
 
-		m_close_fd = CloseFile(true);
+		m_auto_close = AutoClose(true);
 	}
 
 	/// Returns whether currently a FileDescriptor is opened
@@ -208,7 +208,7 @@ public: // functions
 
 protected: // data
 
-	CloseFile m_close_fd;
+	AutoClose m_auto_close;
 	FileDescriptor m_fd;
 };
 

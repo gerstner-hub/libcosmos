@@ -52,8 +52,8 @@ public: // functions
 	StreamFile(const std::string_view &path, const OpenMode &mode, const OpenFlags &flags) :
 		File(path, mode, flags) {}
 
-	explicit StreamFile(FileDescriptor fd, const CloseFile close_fd) :
-		File(fd, close_fd) {}
+	explicit StreamFile(FileDescriptor fd, const AutoClose auto_close) :
+		File(fd, auto_close) {}
 
 	/// Read up to \p length bytes from the file into \p buf
 	/**

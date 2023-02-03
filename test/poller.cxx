@@ -49,7 +49,7 @@ bool testBasicPoll() {
 		return false;
 	}
 
-	cosmos::StreamFile pipe_write(pp.getWriteEnd(), cosmos::StreamFile::CloseFile(false));
+	cosmos::StreamFile pipe_write(pp.getWriteEnd(), cosmos::StreamFile::AutoClose(false));
 
 	pipe_write.write("test", 4);
 
