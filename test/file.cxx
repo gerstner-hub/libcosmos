@@ -6,8 +6,7 @@
 #include "cosmos/fs/File.hxx"
 #include "cosmos/fs/StreamFile.hxx"
 
-int main()
-{
+int main() {
 	int res = 0;
 	cosmos::File f;
 

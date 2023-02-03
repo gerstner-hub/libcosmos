@@ -7,8 +7,7 @@
 // C++
 #include <iostream>
 
-int main()
-{
+int main() {
 	cosmos::Init init;
 
 	try {

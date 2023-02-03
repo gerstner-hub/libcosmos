@@ -23,8 +23,7 @@
 // POSIX
 #include <signal.h>
 
-class RedirectOutputTestBase
-{
+class RedirectOutputTestBase {
 public:
 	RedirectOutputTestBase() :
 		m_cat_path("/bin/cat")
@@ -194,8 +193,7 @@ protected:
 	const std::string m_nonexisting_file;
 };
 
-class PipeInTest
-{
+class PipeInTest {
 public:
 	explicit PipeInTest() :
 		m_head_path("/usr/bin/head"),
@@ -309,8 +307,7 @@ protected:
 	const size_t m_expected_lines = 5;
 };
 
-class TimeoutTest
-{
+class TimeoutTest {
 public:
 	explicit TimeoutTest() :
 		m_sleep_bin("/usr/bin/sleep")
@@ -363,8 +360,7 @@ protected:
  *
  * Therefore test this situation.
  */
-class MixedWaitInvocationTest
-{
+class MixedWaitInvocationTest {
 public:
 	explicit MixedWaitInvocationTest() :
 		m_sleep_bin("/usr/bin/sleep")
@@ -540,8 +536,7 @@ void runTest() {
 	}
 }
 
-int main()
-{
+int main() {
 	try {
 		cosmos::Init init;
 		/*

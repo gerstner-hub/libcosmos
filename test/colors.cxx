@@ -3,8 +3,7 @@
 
 #include "cosmos/io/colors.hxx"
 
-int main()
-{
+int main() {
 	using namespace cosmos::term;
 
 	std::cout << Inversed("\ninversed text");

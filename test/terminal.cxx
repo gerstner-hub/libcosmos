@@ -3,8 +3,7 @@
 #include "cosmos/fs/File.hxx"
 #include "cosmos/io/Terminal.hxx"
 
-int main()
-{
+int main() {
 	int res = 0;
 	cosmos::Terminal sin(cosmos::stdin);
 

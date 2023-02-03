@@ -9,8 +9,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-class DirsTest
-{
+class DirsTest {
 public:
 
 	DirsTest() :
@@ -142,8 +141,7 @@ protected:
 	const std::string m_dir_path;
 };
 
-int main()
-{
+int main() {
 	try {
 		DirsTest test;
 		return test.run();
