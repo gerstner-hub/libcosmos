@@ -8,9 +8,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-namespace cosmos {
+namespace cosmos::fs {
 
-bool FileSystem::existsFile(const std::string_view &path) {
+bool existsFile(const std::string_view &path) {
 	struct stat s;
 	if (lstat(path.data(), &s) == 0)
 		return true;
