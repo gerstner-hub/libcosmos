@@ -209,7 +209,7 @@ void SubProc::postFork() {
 
 		// this allows our parent to wait for us such that is knows
 		// we're a tracee now
-		Signal::raiseSignal (Signal(SIGSTOP));
+		signal::raise(Signal(SIGSTOP));
 	}
 }
 
@@ -221,7 +221,7 @@ void SubProc::redirectFD(FileDescriptor orig, FileDescriptor redirect) {
 }
 
 void SubProc::kill(const Signal &s) {
-	Signal::sendSignal(m_child_fd, s);
+	signal::send(m_child_fd, s);
 }
 
 // seems also not part of userspace headers yet

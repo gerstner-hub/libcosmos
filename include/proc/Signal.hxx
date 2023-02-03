@@ -46,36 +46,40 @@ public: // functions
 	/// Returns a human readable label for the currently stored signal number
 	std::string name() const;
 
-	/// Sends a signal to the caller itself
-	/**
-	 * The given signal will be delivered to the calling process or
-	 * thread itself.
-	 *
-	 * \exception Throws an ApiError on error.
-	 **/
-	static void raiseSignal(const Signal &s);
-
-	/// Sends a signal to another process based on process ID
-	/**
-	 * \exception Throws an ApiError on error.
-	 **/
-	static void sendSignal(const ProcessID &proc, const Signal &s);
-
-	/// Sends a signal to another process based on a pidfd
-	/**
-	 * \param[in] pidfd needs to refer to a valid pidfd type file
-	 * descriptor. The process represented by it will bet sent the
-	 * specified signal \p s.
-	 *
-	 * \exception Throws an ApiError on error.
-	 **/
-	static void sendSignal(const FileDescriptor &pidfd, const Signal &s);
-
 protected: // data
 
 	/// The raw signal number
 	Type m_sig = 0;
 };
+
+namespace signal {
+
+/// Sends a signal to the caller itself
+/**
+ * The given signal will be delivered to the calling process or
+ * thread itself.
+ *
+ * \exception Throws an ApiError on error.
+ **/
+COSMOS_API void raise(const Signal &s);
+
+/// Sends a signal to another process based on process ID
+/**
+ * \exception Throws an ApiError on error.
+ **/
+COSMOS_API void send(const ProcessID &proc, const Signal &s);
+
+/// Sends a signal to another process based on a pidfd
+/**
+ * \param[in] pidfd needs to refer to a valid pidfd type file
+ * descriptor. The process represented by it will bet sent the
+ * specified signal \p s.
+ *
+ * \exception Throws an ApiError on error.
+ **/
+COSMOS_API void send(const FileDescriptor &pidfd, const Signal &s);
+
+} // end ns
 
 } // end ns
 

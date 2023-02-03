@@ -46,7 +46,7 @@ int main() {
 
 	cosmos::SignalFD::SigInfo info;
 
-	cosmos::Signal::raiseSignal(sigint);
+	cosmos::signal::raise(sigint);
 	sfd.readEvent(info);
 
 	assert( info.getSignal() == sigint );
