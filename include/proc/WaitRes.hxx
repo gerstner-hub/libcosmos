@@ -40,7 +40,7 @@ public: // functions
 	 * If the process didn't stop then this returns a zero signal.
 	 **/
 	Signal stopSignal() const {
-		return stopped() ? Signal(static_cast<SignalNr>(si_status)) : signal::NONE;
+		return stopped() ? Signal(SignalNr{si_status}) : signal::NONE;
 	}
 
 	/// Returns the signal that caused the child to terminate
@@ -48,7 +48,7 @@ public: // functions
 	 * If the process wasn't signaled then this returns a zero signal.
 	 **/
 	Signal termSignal() const {
-		return signaled() ? Signal(static_cast<SignalNr>(si_status)) : signal::NONE;
+		return signaled() ? Signal(SignalNr{si_status}) : signal::NONE;
 	}
 
 	/// Returns true if the child stopped due to syscall tracing

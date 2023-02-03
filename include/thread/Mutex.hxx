@@ -49,7 +49,7 @@ public: // functions
 		const auto lock_res = ::pthread_mutex_lock(&m_pmutex);
 
 		if (lock_res) {
-			cosmos_throw (ApiError(Errno(lock_res)));
+			cosmos_throw (ApiError(Errno{lock_res}));
 		}
 	}
 
@@ -57,7 +57,7 @@ public: // functions
 		const int unlock_res = ::pthread_mutex_unlock(&m_pmutex);
 
 		if (unlock_res) {
-			cosmos_throw (ApiError(Errno(unlock_res)));
+			cosmos_throw (ApiError(Errno{unlock_res}));
 		}
 	}
 

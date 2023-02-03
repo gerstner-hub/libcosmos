@@ -108,7 +108,7 @@ void SubProc::run(const StringVector &sv) {
 	clone_args.exit_signal = SIGCHLD;
 	clone_args.flags = CLONE_CLEAR_SIGHAND | CLONE_PIDFD;
 
-	switch ((m_pid = static_cast<ProcessID>(clone3(clone_args)))) {
+	switch ((m_pid = ProcessID{clone3(clone_args)})) {
 	default: // parent process with child pid
 		// as documented, to prevent future inheritance of undefined
 		// file descriptor state

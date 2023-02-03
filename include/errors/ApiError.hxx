@@ -98,7 +98,7 @@ enum class Errno : int { // errnos are distinct positive `int` values says `man 
 };
 
 /// wrapper that returns the Errno strongly typed representation of the current \c errno
-inline Errno getErrno() { return Errno(errno); }
+inline Errno getErrno() { return Errno{errno}; }
 
 /// Specialized exception type used for when system APIs fail
 /**

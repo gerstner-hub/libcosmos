@@ -20,11 +20,11 @@ bool handleGetPW(std::function< int(struct passwd **)> getpw, std::vector<char> 
 
 	while (true) {
 		const auto err = getpw(&res);
-		switch(Errno(err)) {
+		switch(Errno{err}) {
 			case Errno::NO_ERROR:
 				return res != nullptr;
 			case Errno::RANGE: buf.resize(buf.size() << 1); break;
-			default: cosmos_throw(ApiError(Errno(err))); break;
+			default: cosmos_throw(ApiError(Errno{err})); break;
 		}
 
 		if (buf.size() > 65535) {

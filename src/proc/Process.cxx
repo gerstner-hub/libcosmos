@@ -10,31 +10,31 @@
 namespace cosmos::proc {
 
 ProcessID getOwnPid() {
-	return static_cast<ProcessID>(::getpid());
+	return ProcessID{::getpid()};
 }
 
 ProcessID getParentPid() {
-	return static_cast<ProcessID>(::getppid());
+	return ProcessID{::getppid()};
 }
 
 UserID getRealUserID() {
-	return static_cast<UserID>(::getuid());
+	return UserID{::getuid()};
 }
 
 UserID getEffectiveUserID() {
-	return static_cast<UserID>(::geteuid());
+	return UserID{::geteuid()};
 }
 
 GroupID getRealGroupID() {
-	return static_cast<GroupID>(::getgid());
+	return GroupID{::getgid()};
 }
 
 GroupID getEffectiveGroupID() {
-	return static_cast<GroupID>(::getegid());
+	return GroupID{::getegid()};
 }
 
 ProcessID createNewSession() {
-	auto res = static_cast<ProcessID>(::setsid());
+	auto res = ProcessID{::setsid()};
 
 	if (res == ProcessID::INVALID) {
 		cosmos_throw (ApiError());

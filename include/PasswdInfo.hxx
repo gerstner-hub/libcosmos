@@ -42,10 +42,10 @@ public: // functions
 	/// Returns the optional encrypted password
 	const std::string_view getPasswd() const { return getSV(m_passwd.pw_passwd); }
 
-	UserID getUID() const { return static_cast<UserID>(m_passwd.pw_uid); }
+	UserID getUID() const { return UserID{m_passwd.pw_uid}; }
 
 	/// The user's main group ID
-	GroupID getGID() const { return static_cast<GroupID>(m_passwd.pw_gid); }
+	GroupID getGID() const { return GroupID{m_passwd.pw_gid}; }
 
 	/// Returns the comment field which is used for different things like a full user name
 	const std::string_view getGecos() const { return getSV(m_passwd.pw_gecos); }

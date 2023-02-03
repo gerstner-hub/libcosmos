@@ -35,7 +35,7 @@ protected:
 			return;
 
 		auto res = ::pthread_mutexattr_init(&m_attr);
-		if (auto err = Errno(res); err != Errno::NO_ERROR) {
+		if (auto err = Errno{res}; err != Errno::NO_ERROR) {
 			cosmos_throw (ApiError(err));
 		}
 
@@ -43,7 +43,7 @@ protected:
 			&m_attr, PTHREAD_MUTEX_ERRORCHECK
 		);
 
-		if (auto err = Errno(res); err != Errno::NO_ERROR) {
+		if (auto err = Errno{res}; err != Errno::NO_ERROR) {
 			cosmos_throw (ApiError(err));
 		}
 	}
@@ -65,7 +65,7 @@ MutexAttr g_attr;
 
 Mutex::Mutex() {
 	auto res = ::pthread_mutex_init(&m_pmutex, g_attr.getAttr());
-	if (auto err = Errno(res); err != Errno::NO_ERROR) {
+	if (auto err = Errno{res}; err != Errno::NO_ERROR) {
 		cosmos_throw (ApiError(err));
 	}
 }

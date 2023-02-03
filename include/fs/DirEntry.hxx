@@ -51,7 +51,7 @@ public: // functions
 	 * The inode is an opaque unique ID for the file system object on the
 	 * file system it resides on.
 	 **/
-	Inode inode() const { return static_cast<Inode>(m_entry->d_ino); }
+	Inode inode() const { return Inode{m_entry->d_ino}; }
 
 	/// Returns the position of this entry in its associated Directory object
 	/**
@@ -96,7 +96,7 @@ public: // functions
 	 * will need to perform an explicit fstatat() or similar call to
 	 * obtain the required information.
 	 **/
-	auto type() const { return static_cast<Type>(m_entry->d_type); }
+	auto type() const { return Type{m_entry->d_type}; }
 
 	const char* name() const { return m_entry->d_name; }
 

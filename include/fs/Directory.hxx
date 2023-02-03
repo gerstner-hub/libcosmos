@@ -131,7 +131,7 @@ public: // functions
 			cosmos_throw (ApiError());
 		}
 
-		return static_cast<DirPos>(ret);
+		return DirPos{ret};
 	}
 
 	/// Adjust the directory iterator to the given position
