@@ -35,6 +35,14 @@ class COSMOS_API Condition {
 	Condition(const Condition&) = delete;
 	Condition& operator=(const Condition&) = delete;
 
+public: // types
+
+	/// strong type to express waitTimed() results
+	enum class WaitTimedRes {
+		TIMED_OUT,
+		SIGNALED
+	};
+
 public: // functions
 
 	/// Create a condition coupled with the given \c lock
@@ -78,16 +86,15 @@ public: // functions
 	 * Upon return the Mutex will again be owned by the caller, regardless
 	 * of whether the condition was signaled or a timeout occured.
 	 *
-	 * \return Whether a timeout occured. If not then a signal was
-	 * received.
+	 * \return Whether a timeout or a signal occured.
 	 **/
-	bool waitTimed(const TimeSpec &ts) const {
+	WaitTimedRes waitTimed(const TimeSpec &ts) const {
 		auto res = ::pthread_cond_timedwait(&m_pcond, &(m_lock.m_pmutex), &ts);
 
 		switch(res) {
-		default: cosmos_throw (ApiError(res)); return false;
-		case 0: return true;
-		case ETIMEDOUT: return false;
+		default: cosmos_throw (ApiError(res)); return WaitTimedRes::TIMED_OUT; /* just to silence compiler warning */
+		case 0: return WaitTimedRes::SIGNALED;
+		case ETIMEDOUT: return WaitTimedRes::TIMED_OUT;
 		}
 	}
 

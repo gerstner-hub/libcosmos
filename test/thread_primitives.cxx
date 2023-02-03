@@ -31,9 +31,9 @@ int main()
 		auto endtime = starttime + cosmos::TimeSpec(5);
 
 		condmux.lock();
-		auto signaled = condmux.waitTimed(endtime);
+		auto wait_res = condmux.waitTimed(endtime);
 
-		if (signaled) {
+		if (wait_res != cosmos::Condition::WaitTimedRes::TIMED_OUT) {
 			std::cerr << "got signaled?!" << std::endl;
 			return 1;
 		}
