@@ -1,16 +1,10 @@
 // cosmos
-#include "cosmos/io/ILogger.hxx"
+#include "cosmos/io/StdLogger.hxx"
 
 #include <iostream>
 
-struct StandardLogger : cosmos::ILogger {
-	StandardLogger() {
-		setStreams(std::cout, std::cout, std::cout, std::cerr);
-	}
-};
-
 int main() {
-	auto logger = StandardLogger();
+	auto logger = cosmos::StdLogger();
 
 	logger.setChannels(true, true, true, true);
 
