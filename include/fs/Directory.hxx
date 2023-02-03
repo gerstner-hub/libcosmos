@@ -33,14 +33,6 @@ namespace cosmos {
 class COSMOS_API Directory {
 public: // types
 
-	/// strong type for representing directory stream positions
-	/**
-	 * This type is opaque and should never be interpreted by clients of
-	 * this class. It is only obtained from tell() and passed back into
-	 * seek().
-	 **/
-	enum class DirPos : long {};
-
 public: // functions
 
 	/// Creates an object no associated to a directory
@@ -122,7 +114,7 @@ public: // functions
 	 * should be made about it. It can merely be used to seek() at a later
 	 * point in time.
 	 **/
-	DirPos tell() const {
+	DirEntry::DirPos tell() const {
 		requireOpenStream("tell");
 
 		auto ret = telldir(m_stream);
@@ -131,14 +123,14 @@ public: // functions
 			cosmos_throw (ApiError());
 		}
 
-		return DirPos{ret};
+		return DirEntry::DirPos{ret};
 	}
 
 	/// Adjust the directory iterator to the given position
 	/**
 	 * \c pos needs to be previously obtained from tell().
 	 **/
-	void seek(const DirPos pos) {
+	void seek(const DirEntry::DirPos pos) {
 		requireOpenStream("seek");
 
 		seekdir(m_stream, to_integral(pos));

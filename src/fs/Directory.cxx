@@ -74,8 +74,7 @@ FileDescriptor Directory::fd() const {
 	return ret;
 }
 
-DirEntry Directory::nextEntry()
-{
+DirEntry Directory::nextEntry() {
 	requireOpenStream(__FUNCTION__);
 
 	/*

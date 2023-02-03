@@ -25,6 +25,14 @@ class COSMOS_API DirEntry {
 
 public: // types
 
+	/// strong type for representing directory stream positions
+	/**
+	 * This type is opaque and should never be interpreted by clients of
+	 * this class. It is only obtained from tell() and passed back into
+	 * seek().
+	 **/
+	enum class DirPos : long {};
+
 	/// Strong enum type expressing the dir entry file type
 	enum class Type : unsigned char {
 		BLOCK_DEVICE = DT_BLK,
@@ -59,7 +67,7 @@ public: // functions
 	 * Directory::seek() at a later time to return to the original
 	 * position.
 	 **/
-	off_t dirPos() const { return m_entry->d_off; }
+	DirPos dirPos() const { return DirPos{m_entry->d_off}; }
 
 	/// Returns the length of the directory entry name
 	/**
