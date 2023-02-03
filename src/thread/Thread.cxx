@@ -12,13 +12,11 @@ namespace cosmos {
 
 static std::atomic<size_t> g_num_threads = 0;
 
-Thread::Thread(IThreadEntry &entry, const char *name) :
+Thread::Thread(IThreadEntry &entry, std::optional<const std::string_view> name) :
 	m_state(READY),
 	m_request(PAUSE),
 	m_entry(entry),
-	// we could also use a counter to make unique anonymous
-	// threads
-	m_name(name ? name : "thread<" + std::to_string(g_num_threads) + ">")
+	m_name(name ? *name : "thread<" + std::to_string(g_num_threads) + ">")
 {
 	const auto error = ::pthread_create(
 		&m_pthread,

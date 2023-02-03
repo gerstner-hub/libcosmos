@@ -4,6 +4,9 @@
 // POSIX
 #include <pthread.h>
 
+// C++
+#include <string_view>
+
 // cosmos
 #include "cosmos/errors/ApiError.hxx"
 #include "cosmos/thread/Condition.hxx"
@@ -94,7 +97,7 @@ public: // functions
 	 * 	easily identify threads. If this is not specified then an
 	 * 	automatically generated name will be used.
 	 **/
-	explicit Thread(IThreadEntry &entry, const char *name = nullptr);
+	explicit Thread(IThreadEntry &entry, std::optional<const std::string_view> name = {});
 
 	virtual ~Thread();
 
