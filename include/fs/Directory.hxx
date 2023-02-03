@@ -10,6 +10,7 @@
 #include <dirent.h>
 
 // cosmos
+#include "cosmos/algs.hxx"
 #include "cosmos/errors/ApiError.hxx"
 #include "cosmos/errors/UsageError.hxx"
 #include "cosmos/fs/DirEntry.hxx"
@@ -32,7 +33,13 @@ namespace cosmos {
 class COSMOS_API Directory {
 public: // types
 
-	typedef long DirPos;
+	/// strong type for representing directory stream positions
+	/**
+	 * This type is opaque and should never be interpreted by clients of
+	 * this class. It is only obtained from tell() and passed back into
+	 * seek().
+	 **/
+	enum class DirPos : long {};
 
 public: // functions
 
@@ -124,7 +131,7 @@ public: // functions
 			cosmos_throw (ApiError());
 		}
 
-		return ret;
+		return static_cast<DirPos>(ret);
 	}
 
 	/// Adjust the directory iterator to the given position
@@ -134,7 +141,7 @@ public: // functions
 	void seek(const DirPos &pos) {
 		requireOpenStream("seek");
 
-		seekdir(m_stream, pos);
+		seekdir(m_stream, to_integral(pos));
 	}
 
 	/// Returns the next entry in the associated directory
