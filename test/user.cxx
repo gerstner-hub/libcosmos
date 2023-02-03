@@ -5,7 +5,7 @@
 
 
 int main() {
-	const auto our_uid = cosmos::g_process.getRealUserID();
+	const auto our_uid = cosmos::proc::getRealUserID();
 
 	cosmos::PasswdInfo pi(our_uid);
 

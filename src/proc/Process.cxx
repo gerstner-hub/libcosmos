@@ -7,50 +7,25 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-namespace cosmos {
+namespace cosmos::proc {
 
-ProcessID Process::cachePid() const {
-	m_own_pid = ::getpid();
-	return m_own_pid;
+ProcessID getOwnPid() {
+	return ::getpid();
 }
 
-ProcessID Process::cachePPid() const {
-	m_parent_pid = ::getppid();
-	return m_parent_pid;
+ProcessID getParentPid() {
+	return ::getppid();
 }
 
-UserID Process::getRealUserID() const {
+UserID getRealUserID() {
 	return ::getuid();
 }
 
-UserID Process::getEffectiveUserID() const {
+UserID getEffectiveUserID() {
 	return ::geteuid();
 }
 
-namespace {
-	void setSignalMask(int op, const sigset_t *set, sigset_t *old) {
-		auto res = ::pthread_sigmask(op, set, old);
-
-		if (res == 0)
-			return;
-
-		cosmos_throw (ApiError());
-	}
-}
-
-void Process::blockSignals(const SigSet &s, std::optional<SigSet*> old) {
-	setSignalMask(SIG_BLOCK, s.raw(), old ? old.value()->raw() : nullptr);
-}
-
-void Process::unblockSignals(const SigSet &s, std::optional<SigSet*> old) {
-	setSignalMask(SIG_UNBLOCK, s.raw(), old ? old.value()->raw() : nullptr);
-}
-
-void Process::setSigMask(const SigSet &s, std::optional<SigSet*> old) {
-	setSignalMask(SIG_SETMASK, s.raw(), old ? old.value()->raw() : nullptr);
-}
-
-ProcessID Process::createNewSession() {
+ProcessID createNewSession() {
 	auto res = ::setsid();
 
 	if (res == INVALID_PID) {
@@ -60,12 +35,6 @@ ProcessID Process::createNewSession() {
 	return res;
 }
 
-SigSet Process::getSigMask() {
-	SigSet ret;
-	setSignalMask(SIG_SETMASK, nullptr, ret.raw());
-	return ret;
-}
-
-Process g_process;
+PidInfo cached_pids;
 
 } // end ns

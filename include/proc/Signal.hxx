@@ -3,6 +3,7 @@
 
 // stdlib
 #include <iosfwd>
+#include <optional>
 #include <string>
 
 // Linux
@@ -20,6 +21,7 @@
 namespace cosmos {
 
 class FileDescriptor;
+class SigSet;
 
 /// Represents a POSIX signal number and offers signal related APIs
 class COSMOS_API Signal {
@@ -78,6 +80,33 @@ COSMOS_API void send(const ProcessID &proc, const Signal &s);
  * \exception Throws an ApiError on error.
  **/
 COSMOS_API void send(const FileDescriptor &pidfd, const Signal &s);
+
+/// Blocks the given set of signals in the current process's signal mask
+/**
+ * Blocked signals won't be delivered asynchronously to the process
+ * i.e. no asynchronous signal handler will be invoked, also the
+ * default action will not be executed. This allows to collect the
+ * information synchronously e.g. by using a SignalFD.
+ *
+ * If \c old is provided then the previous signal mask is returned
+ * into this SigSet object.
+ **/
+COSMOS_API void block(const SigSet &s, std::optional<SigSet *> old = {});
+
+/// Unblocks the given set of signals in the current process's signal mask
+COSMOS_API void unblock(const SigSet &s, std::optional<SigSet *> old = {});
+
+/// Assigns exactly the given signal mask to the current process
+COSMOS_API void setSigMask(const SigSet &s, std::optional<SigSet *> old = {});
+
+/// Restores the default signal handling behaviour for the given signal
+inline void restore(const Signal &sig) {
+	::signal(sig.raw(), SIG_DFL);
+}
+
+/// Returns the currently active signal mask for the calling thread
+COSMOS_API SigSet getSigMask();
+
 
 } // end ns
 

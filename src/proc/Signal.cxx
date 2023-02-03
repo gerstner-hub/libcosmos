@@ -5,6 +5,7 @@
 #include "cosmos/errors/ApiError.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/proc/Signal.hxx"
+#include "cosmos/proc/SigSet.hxx"
 
 // Linux
 #include <signal.h>
@@ -12,6 +13,18 @@
 #include <sys/syscall.h>
 
 namespace cosmos {
+
+namespace {
+
+	void setSignalMask(int op, const sigset_t *set, sigset_t *old) {
+		auto res = ::pthread_sigmask(op, set, old);
+
+		if (res == 0)
+			return;
+
+		cosmos_throw (ApiError());
+	}
+}
 
 std::string Signal::name() const {
 	return strsignal(m_sig);
@@ -40,6 +53,24 @@ void send(const FileDescriptor &pidfd, const Signal &s) {
 	if (syscall(SYS_pidfd_send_signal, pidfd.raw(), s.raw(), nullptr, 0) != 0) {
 		cosmos_throw (ApiError());
 	}
+}
+
+void block(const SigSet &s, std::optional<SigSet*> old) {
+	setSignalMask(SIG_BLOCK, s.raw(), old ? old.value()->raw() : nullptr);
+}
+
+void unblock(const SigSet &s, std::optional<SigSet*> old) {
+	setSignalMask(SIG_UNBLOCK, s.raw(), old ? old.value()->raw() : nullptr);
+}
+
+void setSigMask(const SigSet &s, std::optional<SigSet*> old) {
+	setSignalMask(SIG_SETMASK, s.raw(), old ? old.value()->raw() : nullptr);
+}
+
+SigSet getSigMask() {
+	SigSet ret;
+	setSignalMask(SIG_SETMASK, nullptr, ret.raw());
+	return ret;
 }
 
 } // end ns

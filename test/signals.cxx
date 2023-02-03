@@ -24,20 +24,20 @@ int main() {
 
 	full.fill();
 	cosmos::SigSet old;
-	cosmos::g_process.blockSignals(full, &old);
+	cosmos::signal::block(full, &old);
 
 	std::cout << "SIGINT was " << (old.isSet(cosmos::Signal(SIGINT)) ? "blocked" : "not blocked") << std::endl;
-	cosmos::g_process.unblockSignals(full, &old);
+	cosmos::signal::unblock(full, &old);
 	std::cout << "SIGINT was " << (old.isSet(cosmos::Signal(SIGINT)) ? "blocked" : "not blocked") << std::endl;
 
 	const auto sigint = cosmos::Signal(SIGINT);
 
 	some.clear();
 	some.set(sigint);
-	cosmos::g_process.setSigMask(some, &old);
+	cosmos::signal::setSigMask(some, &old);
 
 	assert( !old.isSet(sigint) );
-	some = cosmos::g_process.getSigMask();
+	some = cosmos::signal::getSigMask();
 	assert( some.isSet(sigint) );
 
 	cosmos::SignalFD sfd(sigint);
