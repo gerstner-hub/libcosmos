@@ -98,7 +98,7 @@ void Thread::join() {
 	}
 }
 
-void Thread::stateEntered(const State &s) {
+void Thread::stateEntered(const State s) {
 #ifndef NDEBUG
 	if (!callerIsThread()) {
 		cosmos_throw (UsageError("Foreign thread modified state"));
@@ -115,7 +115,7 @@ void Thread::stateEntered(const State &s) {
 	m_state_condition.broadcast();
 }
 
-void Thread::waitForState(const Thread::State &s) const {
+void Thread::waitForState(const Thread::State s) const {
 	MutexGuard g(m_state_condition);
 
 	while (m_state != s) {
@@ -123,7 +123,7 @@ void Thread::waitForState(const Thread::State &s) const {
 	}
 }
 
-Thread::Request Thread::waitForRequest(const Thread::Request &old) const {
+Thread::Request Thread::waitForRequest(const Thread::Request old) const {
 	MutexGuard g(m_state_condition);
 
 	// wait for some state change away from READY before we actually run

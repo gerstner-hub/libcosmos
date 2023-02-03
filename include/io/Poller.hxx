@@ -172,21 +172,21 @@ public: // functions
 	 * Adding the same file descriptor twice also causes an error. Use
 	 * modFD() to modify monitoring settings for FDs already monitored.
 	 **/
-	void addFD(const FileDescriptor &fd, const MonitorMask &mask);
+	void addFD(const FileDescriptor fd, const MonitorMask mask);
 
 	/// Modify monitoring settings for an already monitored descriptor
 	/**
 	 * If currently no valid poll FD exists then this will throw an
 	 * ApiError exception.
 	 **/
-	void modFD(const FileDescriptor &fd, const MonitorMask &mask);
+	void modFD(const FileDescriptor fd, const MonitorMask mask);
 
 	/// Remove a file descriptor from the set of monitored files
 	/**
 	 * If the given file descriptor is not currently monitored then this
 	 * will throw an ApiError.
 	 **/
-	void delFD(const FileDescriptor &fd);
+	void delFD(const FileDescriptor fd);
 
 	/// Wait for one of the monitored events to be ready
 	/**
@@ -197,7 +197,7 @@ public: // functions
 	 * \return The range of events that occured, or an empty vector if the
 	 * timeout occured.
 	 **/
-	std::vector<PollEvent> wait(const std::optional<std::chrono::milliseconds> &timeout = {});
+	std::vector<PollEvent> wait(const std::optional<std::chrono::milliseconds> timeout = {});
 
 protected: // data
 

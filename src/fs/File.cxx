@@ -18,7 +18,7 @@ File::~File() {
 	}
 }
 
-void File::open(const std::string_view &path, const OpenMode &mode, const OpenFlags &flags, const std::optional<FileMode> &fmode) {
+void File::open(const std::string_view path, const OpenMode mode, const OpenFlags flags, const std::optional<FileMode> fmode) {
 	int raw_flags = flags.get() | static_cast<int>(mode);
 
 	if (flags.anyOf({OpenSettings::CREATE, OpenSettings::TMPFILE}) && !fmode) {

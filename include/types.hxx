@@ -37,7 +37,7 @@ typedef std::vector<const char*> CStringVector;
  *
  *     using MySetting = NamedBool<struct my_setting_t, true>;
  *
- *     void myfunc(const MySetting &setting = MySetting());
+ *     void myfunc(const MySetting setting = MySetting());
  *
  *     // will be called with a true default value
  *     myfunc();

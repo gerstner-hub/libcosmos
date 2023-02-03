@@ -10,7 +10,7 @@
 
 namespace cosmos {
 
-ApiError::ApiError(const std::optional<std::string_view> &prefix) :
+ApiError::ApiError(const std::optional<std::string_view> prefix) :
 	ApiError(errno)
 {
 	if (prefix) {

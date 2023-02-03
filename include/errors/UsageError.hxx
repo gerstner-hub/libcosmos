@@ -16,7 +16,7 @@ class COSMOS_API UsageError :
 {
 public: // functions
 
-	explicit UsageError(const std::string_view &msg) :
+	explicit UsageError(const std::string_view msg) :
 			CosmosError("UsageError") {
 		m_msg = msg;
 	}

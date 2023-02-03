@@ -26,7 +26,7 @@ public: // functions
 	/// Creates an empty signal set
 	SigSet() {}
 	/// Creates a fully set signal set
-	explicit SigSet(const fill_t &) { fill(); }
+	explicit SigSet(const fill_t ) { fill(); }
 	/// Creates a signal set with the given list of signals set
 	explicit SigSet(const std::initializer_list<Signal> &siglist) {
 		for (auto &sig: siglist) {
@@ -40,11 +40,11 @@ public: // functions
 	void fill() { ::sigfillset(&m_set); }
 
 	/// Returns whether the given signal is set
-	bool isSet(const Signal &s) const { return ::sigismember(&m_set, s.raw()); }
+	bool isSet(const Signal s) const { return ::sigismember(&m_set, s.raw()); }
 	/// Sets the given signal in the set
-	void set(const Signal &s) { ::sigaddset(&m_set, s.raw()); }
+	void set(const Signal s) { ::sigaddset(&m_set, s.raw()); }
 	/// Removes the given signal from the set
-	void del(const Signal &s) { ::sigdelset(&m_set, s.raw()); }
+	void del(const Signal s) { ::sigdelset(&m_set, s.raw()); }
 
 	/// Returns a pointer to the raw sigset_t data structure for use in API calls
 	sigset_t* raw() { return &m_set; }

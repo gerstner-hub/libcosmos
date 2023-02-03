@@ -16,7 +16,7 @@ class COSMOS_API InternalError :
 {
 public: // functions
 
-	explicit InternalError(const std::string_view &msg) :
+	explicit InternalError(const std::string_view msg) :
 			CosmosError("InternalError") {
 		m_msg = msg;
 	}

@@ -32,19 +32,19 @@ std::string Signal::name() const {
 
 namespace signal {
 
-void raise(const Signal &s) {
+void raise(const Signal s) {
 	if (::raise(s.raw())) {
 		cosmos_throw (ApiError());
 	}
 }
 
-void send(const ProcessID &proc, const Signal &s) {
+void send(const ProcessID proc, const Signal s) {
 	if (::kill(proc, s.raw())) {
 		cosmos_throw (ApiError());
 	}
 }
 
-void send(const FileDescriptor &pidfd, const Signal &s) {
+void send(const FileDescriptor pidfd, const Signal s) {
 	// there's no glibc wrapper for this yet
 	//
 	// the third siginfo_t argument allows more precise control of the
@@ -76,7 +76,7 @@ SigSet getSigMask() {
 } // end ns
 } // end ns
 
-std::ostream& operator<<(std::ostream &o, const cosmos::Signal &sig) {
+std::ostream& operator<<(std::ostream &o, const cosmos::Signal sig) {
 	o << sig.name() << " (" << sig.raw() << ")";
 
 	return o;

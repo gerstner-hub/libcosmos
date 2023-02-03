@@ -88,7 +88,7 @@ public: // functions
 	 *
 	 * \return Whether a timeout or a signal occured.
 	 **/
-	WaitTimedRes waitTimed(const TimeSpec &ts) const {
+	WaitTimedRes waitTimed(const TimeSpec ts) const {
 		auto res = ::pthread_cond_timedwait(&m_pcond, &(m_lock.m_pmutex), &ts);
 
 		switch(res) {

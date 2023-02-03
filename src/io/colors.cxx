@@ -39,7 +39,7 @@ size_t getANSIColorCode(const ColorSpec &color) {
 	return code + static_cast<size_t>(color.getColor());
 }
 
-TermControl getOffControl(const TermControl &ctrl) {
+TermControl getOffControl(const TermControl ctrl) {
 	switch(ctrl)
 	{
 	case TermControl::UNDERLINE_ON: return TermControl::UNDERLINE_OFF;
@@ -75,7 +75,7 @@ std::ostream& operator<<(std::ostream &o, const cosmos::term::ColorSpec &fc) {
 	return o << cosmos::term::buildANSICommand(code);
 }
 
-std::ostream& operator<<(std::ostream &o, const cosmos::term::TermControl &p) {
+std::ostream& operator<<(std::ostream &o, const cosmos::term::TermControl p) {
 	return o << cosmos::term::buildANSICommand(static_cast<size_t>(p));
 }
 

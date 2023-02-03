@@ -32,7 +32,7 @@ namespace fs {
  * different than "ENOENT" is returned by the operating system then an
  * exception is thrown.
  **/
-COSMOS_API bool existsFile(const std::string_view &path);
+COSMOS_API bool existsFile(const std::string_view path);
 
 } // end ns
 } // end ns

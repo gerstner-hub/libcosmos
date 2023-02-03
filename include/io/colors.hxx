@@ -65,7 +65,7 @@ enum class ColorIntensity {
 class ColorSpec {
 public: // functions
 
-	ColorSpec(const TermColor &color, const ColorKind &kind, const ColorIntensity &intensity) :
+	ColorSpec(const TermColor color, const ColorKind kind, const ColorIntensity intensity) :
 		m_color(color), m_kind(kind), m_intensity(intensity) {}
 
 	TermColor getColor() const { return m_color; }
@@ -82,13 +82,13 @@ protected: // data
 
 /// Simple type to represent an ANSI foreground color in bright or normal intensity.
 struct FrontColor : public ColorSpec {
-	explicit FrontColor(const TermColor &c) : ColorSpec(c, ColorKind::FRONT, ColorIntensity::NORMAL) {}
+	explicit FrontColor(const TermColor c) : ColorSpec(c, ColorKind::FRONT, ColorIntensity::NORMAL) {}
 	FrontColor& setBright() { m_intensity = ColorIntensity::BRIGHT; return *this; }
 };
 
 /// Simple type to represent an ANSI background color in bright or normal intensity.
 struct BackColor : public ColorSpec {
-	explicit BackColor(const TermColor &c) : ColorSpec(c, ColorKind::BACK, ColorIntensity::NORMAL) {}
+	explicit BackColor(const TermColor c) : ColorSpec(c, ColorKind::BACK, ColorIntensity::NORMAL) {}
 	BackColor& setBright() { m_intensity = ColorIntensity::BRIGHT; return *this; }
 };
 
@@ -109,7 +109,7 @@ enum class TermControl : size_t {
 /**
  * This can throw an exception on unexpected input.
  **/
-TermControl COSMOS_API getOffControl(const TermControl &ctrl);
+TermControl COSMOS_API getOffControl(const TermControl ctrl);
 /// Returns the actual ANSI escape code number for the given color specification.
 size_t COSMOS_API getANSIColorCode(const ColorSpec &color);
 
@@ -179,17 +179,17 @@ typedef TextEffectT<TermControl::INVERSE_ON> Inversed;
 
 /// Base class for easy colored text application on ostreams.
 struct ColoredText : public FeatureBase {
-	explicit ColoredText(const std::string_view &text, const TermColor &c, const ColorKind &kind, const ColorIntensity &intensity) :
+	explicit ColoredText(const std::string_view &text, const TermColor c, const ColorKind kind, const ColorIntensity intensity) :
 		FeatureBase(text, getANSIColorCode(ColorSpec(c, kind, intensity)), static_cast<size_t>(getOffCode(kind)))
 	{}
 
-	explicit ColoredText(const FeatureBase &next, const TermColor &c, const ColorKind &kind, const ColorIntensity &intensity) :
+	explicit ColoredText(const FeatureBase &next, const TermColor c, const ColorKind kind, const ColorIntensity intensity) :
 		FeatureBase(next, getANSIColorCode(ColorSpec(c, kind, intensity)), static_cast<size_t>(getOffCode(kind)))
 	{}
 
 protected: // functions
 
-	TermControl getOffCode(const ColorKind &kind) const {
+	TermControl getOffCode(const ColorKind kind) const {
 		return kind == ColorKind::FRONT ? TermControl::DEFAULT_FG_COLOR : TermControl::DEFAULT_BG_COLOR;
 	}
 };
@@ -263,7 +263,7 @@ typedef TextOnColorT<TermColor::WHITE, ColorIntensity::BRIGHT> OnBrightWhite;
 } // end ns
 
 COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::term::ColorSpec &fc);
-COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::term::TermControl &p);
+COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::term::TermControl p);
 COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::term::FeatureBase &fb);
 
 #endif // inc. guard

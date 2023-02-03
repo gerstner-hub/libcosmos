@@ -58,7 +58,7 @@ void StreamFile::writeAll(const void *buf, size_t length) {
 	}
 }
 
-off_t StreamFile::seek(const SeekType &type, off_t off) {
+off_t StreamFile::seek(const SeekType type, off_t off) {
 	const auto res = ::lseek(m_fd.raw(), off, static_cast<int>(type));
 
 	if (res == static_cast<off_t>(-1)) {

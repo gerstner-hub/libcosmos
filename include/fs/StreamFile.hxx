@@ -46,10 +46,10 @@ public: // functions
 
 	StreamFile() {}
 
-	StreamFile(const std::string_view &path, const OpenMode &mode) :
+	StreamFile(const std::string_view path, const OpenMode mode) :
 		File(path, mode, OpenFlags({OpenSettings::CLOEXEC})) {}
 
-	StreamFile(const std::string_view &path, const OpenMode &mode, const OpenFlags &flags) :
+	StreamFile(const std::string_view path, const OpenMode mode, const OpenFlags flags) :
 		File(path, mode, flags) {}
 
 	explicit StreamFile(FileDescriptor fd, const AutoClose auto_close) :
@@ -106,7 +106,7 @@ public: // functions
 	void writeAll(const void *buf, size_t length);
 
 	/// Seek to the given offset based on the given offset \p type
-	off_t seek(const SeekType &type, off_t off);
+	off_t seek(const SeekType type, off_t off);
 
 	/// Seek to the given offset relative to the start of the file
 	off_t seekFromStart(off_t off) { return seek(SeekType::SET, off); }

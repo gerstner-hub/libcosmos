@@ -58,7 +58,7 @@ public:
 	/// Returns the terminal dimension in character width x height
 	TermDimension getSize() const;
 	/// Sets the terminal dimension according to the given values
-	void setSize(const TermDimension &dim);
+	void setSize(const TermDimension dim);
 
 	/// Sends a stream of zero bits for a certain duration
 	/**

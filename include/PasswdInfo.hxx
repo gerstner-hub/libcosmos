@@ -29,11 +29,11 @@ public: // functions
 	 * If simply no matching entry exists then *no* exception is thrown
 	 * but isValid() return false and all members are empty.
 	 **/
-	explicit PasswdInfo(const std::string_view &name);
+	explicit PasswdInfo(const std::string_view name);
 
 	/// Obtains PasswdInfo for the given numerical user id \c uid
 	/**
-	 * \see PasswdInfo(const std::string_view&)
+	 * \see PasswdInfo(const std::string_view)
 	 **/
 	explicit PasswdInfo(const UserID uid);
 

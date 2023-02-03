@@ -23,7 +23,7 @@ void FileDescriptor::close() {
 	cosmos_throw (ApiError("failed to close file descriptor"));
 }
 
-void FileDescriptor::duplicate(const FileDescriptor &new_fd, const CloseOnExec cloexec) const {
+void FileDescriptor::duplicate(const FileDescriptor new_fd, const CloseOnExec cloexec) const {
 	auto res = ::dup3(m_fd, new_fd.raw(), cloexec ? O_CLOEXEC : 0);
 
 	if (res == -1) {

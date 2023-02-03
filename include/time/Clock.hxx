@@ -72,7 +72,7 @@ public: // types
 public: // functions
 
 	/// Construct and optionally set an initial mark()
-	explicit StopWatch(const InitialMark &do_mark = InitialMark()) {
+	explicit StopWatch(const InitialMark do_mark = InitialMark()) {
 		if (do_mark)
 			mark();
 	}
@@ -92,7 +92,7 @@ public: // functions
 	}
 
 	/// Returns the currently set mark (undefined if mark() was never called!)
-	const TimeSpec& currentMark() const {
+	TimeSpec currentMark() const {
 		return m_mark;
 	}
 

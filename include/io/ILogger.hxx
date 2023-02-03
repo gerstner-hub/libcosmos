@@ -56,7 +56,7 @@ protected: // types
 
 	/// Internal state for each channel's stream
 	struct StreamState {
-		StreamState(const std::string_view &p, const term::ColorSpec &c) :
+		StreamState(const std::string_view p, const term::ColorSpec &c) :
 			prefix(p), color(c) {}
 
 		std::ostream *stream = nullptr;

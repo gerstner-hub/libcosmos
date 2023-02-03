@@ -32,7 +32,7 @@ public: // functions
 	BitMask() {}
 
 	/// Sets all bits zo one
-	explicit BitMask(const All &) {
+	explicit BitMask(const All) {
 		setAll();
 	}
 
@@ -44,12 +44,12 @@ public: // functions
 	}
 
 	/// Sets exactly the given bit to one
-	explicit BitMask(const ENUM &bit) :
+	explicit BitMask(const ENUM bit) :
 		m_flags(static_cast<EnumBaseType>(bit))
 	{}
 
 	/// Sets exactly the given primitive type bitmask
-	explicit BitMask(const EnumBaseType &value) :
+	explicit BitMask(const EnumBaseType value) :
 		m_flags(value)
 	{}
 
@@ -60,7 +60,7 @@ public: // functions
 	explicit operator std::string() const { return to_string(); }
 
 	/// Returns a boolean value for the given bit position
-	bool operator[] (const ENUM &flag) const { return test(flag); }
+	bool operator[] (const ENUM flag) const { return test(flag); }
 
 	std::string to_string() const {
 		std::string ret;
@@ -81,7 +81,7 @@ public: // functions
 	}
 
 	/// Assigns the given value to the given bit position
-	BitMask& set(const ENUM &bit, bool val = true) {
+	BitMask& set(const ENUM bit, bool val = true) {
 		const auto bitval = static_cast<EnumBaseType>(bit);
 		m_flags = (val ? (m_flags|bitval) : (m_flags&~bitval));
 		return *this;
@@ -101,7 +101,7 @@ public: // functions
 	}
 
 	/// Zeroes the given bit position
-	BitMask& reset(const ENUM &bit) {
+	BitMask& reset(const ENUM bit) {
 		reset({bit});
 		return *this;
 	}
@@ -126,7 +126,7 @@ public: // functions
 	}
 
 	/// Sets all bits to zero except the given flag
-	BitMask& limit(const ENUM &flag) {
+	BitMask& limit(const ENUM flag) {
 		return limit({flag});
 	}
 
@@ -137,7 +137,7 @@ public: // functions
 	}
 
 	/// Flips the given bit position
-	BitMask& flip(const ENUM &bit) {
+	BitMask& flip(const ENUM bit) {
 		m_flags ^= static_cast<EnumBaseType>(bit);
 		return *this;
 	}
@@ -161,12 +161,12 @@ public: // functions
 	}
 
 	/// Returns whether the given bit position is set
-	bool test(const ENUM &bit) const {
+	bool test(const ENUM bit) const {
 		return (m_flags & static_cast<EnumBaseType>(bit)) != 0;
 	}
 
 	/// Returns whether this is the only bit set
-	bool only(const ENUM &bit) const {
+	bool only(const ENUM bit) const {
 		return m_flags == static_cast<EnumBaseType>(bit);
 	}
 
@@ -209,7 +209,7 @@ public: // functions
 	}
 
 	/// Checks whether the given bit is set
-	bool operator&(const ENUM &bit) const {
+	bool operator&(const ENUM bit) const {
 		return test(bit);
 	}
 

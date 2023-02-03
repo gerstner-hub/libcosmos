@@ -21,7 +21,7 @@ void Directory::close() {
 	}
 }
 
-void Directory::open(const std::string_view &path, const FollowSymlinks follow_links) {
+void Directory::open(const std::string_view path, const FollowSymlinks follow_links) {
 	close();
 
 	/*
@@ -52,7 +52,7 @@ void Directory::open(const std::string_view &path, const FollowSymlinks follow_l
 	}
 }
 
-void Directory::open(const FileDescriptor &fd) {
+void Directory::open(const FileDescriptor fd) {
 	close();
 
 	m_stream = fdopendir(fd.raw());

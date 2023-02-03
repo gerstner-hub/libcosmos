@@ -40,10 +40,10 @@ class COSMOS_API CosmosError :
 {
 public: // functions
 
-	explicit CosmosError(const std::string_view &error_class) :
+	explicit CosmosError(const std::string_view error_class) :
 		m_error_class(error_class) {}
 
-	CosmosError(const std::string_view &error_class, const std::string_view &fixed_text) :
+	CosmosError(const std::string_view error_class, const std::string_view fixed_text) :
 			CosmosError(error_class) {
 		m_msg = fixed_text;
 	}

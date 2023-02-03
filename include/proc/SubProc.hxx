@@ -76,7 +76,7 @@ public: // functions
 	 * Currently the actual executable path and argv0 will always be the
 	 * same.
 	 **/
-	void setExe(const std::string_view &exe) {
+	void setExe(const std::string_view exe) {
 		if (!m_argv.empty())
 			m_argv[0] = exe;
 		else
@@ -136,17 +136,17 @@ public: // functions
 	 * \return The exit status if the child exited. Nothing if the timeout
 	 * occured.
 	 **/
-	std::optional<WaitRes> waitTimed(const std::chrono::milliseconds &max);
+	std::optional<WaitRes> waitTimed(const std::chrono::milliseconds max);
 
 	/// Send the specified signal to the child process
-	void kill(const Signal &signal);
+	void kill(const Signal signal);
 
 	/// Set an explicit working directory the child process
 	/**
 	 * This only affects yet to be started child processes. If empty then
 	 * the parent process's CWD is inherited to the child.
 	 **/
-	void setCWD(const std::string_view &cwd) { m_cwd = cwd; }
+	void setCWD(const std::string_view cwd) { m_cwd = cwd; }
 
 	/// Returns the currently set CWD for sub process execution
 	const auto& cwd() const { return m_cwd; }
@@ -180,7 +180,7 @@ public: // functions
 	 * somewhat breaks encapsulation, so take care not to misuse this file
 	 * descriptor in a way that could break the SubProc class logic.
 	 **/
-	const FileDescriptor& pidFD() const { return m_child_fd; }
+	FileDescriptor pidFD() const { return m_child_fd; }
 
 	/// Redirect the child's stderr to the given file descriptor
 	/**
@@ -278,6 +278,7 @@ protected: // data
 
 } // end ns
 
-cosmos::SubProc& operator<<(cosmos::SubProc &proc, const std::string_view &arg);
+// TODO: implement passing in parameters via <<
+cosmos::SubProc& operator<<(cosmos::SubProc &proc, const std::string_view arg);
 
 #endif // inc. guard

@@ -35,7 +35,7 @@ public: // functions
 
 	SchedulerSettings() {}
 
-	explicit SchedulerSettings(const SchedulerPolicy &policy) :
+	explicit SchedulerSettings(const SchedulerPolicy policy) :
 		m_policy(policy)
 	{}
 
@@ -125,7 +125,7 @@ class COSMOS_API RealtimeSchedulerSettings :
 {
 public: // functions
 
-	explicit RealtimeSchedulerSettings(const SchedulerPolicy &policy) :
+	explicit RealtimeSchedulerSettings(const SchedulerPolicy policy) :
 		SchedulerSettings(policy)
 	{}
 

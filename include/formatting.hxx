@@ -26,7 +26,7 @@ namespace cosmos {
  **/
 template <typename NUM>
 struct hexnum {
-	explicit hexnum(const NUM &num, size_t width) : m_num(num), m_width(width) {}
+	explicit hexnum(const NUM num, size_t width) : m_num(num), m_width(width) {}
 
 	/// If we should prefix '0x' to the number (default yes)
 	const hexnum& showBase(bool yes_no) { m_show_base = yes_no; return *this; }

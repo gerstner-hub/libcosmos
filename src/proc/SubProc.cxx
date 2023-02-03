@@ -220,7 +220,7 @@ void SubProc::redirectFD(FileDescriptor orig, FileDescriptor redirect) {
 	redirect.duplicate(orig, CloseOnExec(false));
 }
 
-void SubProc::kill(const Signal &s) {
+void SubProc::kill(const Signal s) {
 	signal::send(m_child_fd, s);
 }
 
@@ -247,7 +247,7 @@ WaitRes SubProc::wait() {
 	return wr;
 }
 
-std::optional<WaitRes> SubProc::waitTimed(const std::chrono::milliseconds &max) {
+std::optional<WaitRes> SubProc::waitTimed(const std::chrono::milliseconds max) {
 
 	Poller poller(8);
 	poller.addFD(m_child_fd, Poller::MonitorMask(Poller::MonitorSetting::INPUT));

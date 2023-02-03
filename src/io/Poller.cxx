@@ -51,21 +51,21 @@ namespace {
 	}
 }
 
-void Poller::addFD(const FileDescriptor &fd, const MonitorMask &mask) {
+void Poller::addFD(const FileDescriptor fd, const MonitorMask mask) {
 	control(m_poll_fd.raw(), fd.raw(), EPOLL_CTL_ADD, mask.get());
 }
 
-void Poller::modFD(const FileDescriptor &fd, const MonitorMask &mask) {
+void Poller::modFD(const FileDescriptor fd, const MonitorMask mask) {
 	control(m_poll_fd.raw(), fd.raw(), EPOLL_CTL_MOD, mask.get());
 }
 
-void Poller::delFD(const FileDescriptor &fd) {
+void Poller::delFD(const FileDescriptor fd) {
 	if (epoll_ctl(m_poll_fd.raw(), EPOLL_CTL_DEL, fd.raw(), nullptr) < 0) {
 		cosmos_throw (ApiError("Failed to del FD in epoll set"));
 	}
 }
 
-std::vector<Poller::PollEvent> Poller::wait(const std::optional<std::chrono::milliseconds> &timeout) {
+std::vector<Poller::PollEvent> Poller::wait(const std::optional<std::chrono::milliseconds> timeout) {
 	// NOTE: there exists epoll_pwait2 taking a timespec with nanosecond
 	// granularity, but glibc doesn't wrap that yet. If necessary we could
 	// invoke it using syscall() to get the finer granularity.

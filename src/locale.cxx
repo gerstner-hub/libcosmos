@@ -18,7 +18,7 @@ std::string get(Category category) {
 	return locale;
 }
 
-void set(Category category, const std::string_view &val) {
+void set(Category category, const std::string_view val) {
 	if (::setlocale(getCat(category), val.data()) == nullptr) {
 		cosmos_throw (ApiError("setlocale"));
 	}

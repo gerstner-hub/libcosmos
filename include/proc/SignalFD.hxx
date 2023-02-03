@@ -62,7 +62,7 @@ public: // functions
 	}
 
 	/// Creates a signal FD listening on exactly the given signal
-	explicit SignalFD(const Signal &s) {
+	explicit SignalFD(const Signal s) {
 		create(SigSet({s}));
 	}
 

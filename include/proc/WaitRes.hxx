@@ -62,7 +62,7 @@ public: // functions
 	 * These events only occur if the corresponding TraceOpts have been
 	 * set on the tracee
 	 **/
-	bool checkEvent(const TraceEvent &event) {
+	bool checkEvent(const TraceEvent event) {
 		if (!stopped())
 			return false;
 

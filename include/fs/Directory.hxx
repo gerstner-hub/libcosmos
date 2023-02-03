@@ -50,12 +50,12 @@ public: // functions
 	/**
 	 * \see open(FileDescriptor fd)
 	 **/
-	explicit Directory(const FileDescriptor &fd) {
+	explicit Directory(const FileDescriptor fd) {
 		open(fd);
 	}
 
 	/// Create a Directory object operating on the directory at the given path location
-	explicit Directory(const std::string_view &path) {
+	explicit Directory(const std::string_view path) {
 		open(path);
 	}
 
@@ -95,14 +95,14 @@ public: // functions
 	 * If the object is already associated with another directory then
 	 * this previous association will be implicitly close()'d.
 	 **/
-	void open(const FileDescriptor &fd);
+	void open(const FileDescriptor fd);
 
 	/// Associate with the directory at the given file system path locaton
 	/**
 	 * If the object is already associated with another directory then this
 	 * previous associaton will be implicitly close()'d.
 	 **/
-	void open(const std::string_view &path, const FollowSymlinks follow_links = FollowSymlinks(false));
+	void open(const std::string_view path, const FollowSymlinks follow_links = FollowSymlinks(false));
 
 	/// Indicates whether currently a directory is associated with this object
 	auto isOpen() const { return m_stream != nullptr; }
@@ -138,7 +138,7 @@ public: // functions
 	/**
 	 * \c pos needs to be previously obtained from tell().
 	 **/
-	void seek(const DirPos &pos) {
+	void seek(const DirPos pos) {
 		requireOpenStream("seek");
 
 		seekdir(m_stream, to_integral(pos));
@@ -159,7 +159,7 @@ public: // functions
 
 protected: // functions
 
-	void requireOpenStream(const std::string_view &context) const {
+	void requireOpenStream(const std::string_view context) const {
 		if (!isOpen()) {
 			cosmos_throw (UsageError(std::string(context) + " on unassociated Directory instance"));
 		}

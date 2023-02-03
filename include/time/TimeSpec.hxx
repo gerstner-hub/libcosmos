@@ -19,7 +19,7 @@ public:
 		this->tv_nsec = nano_seconds;
 	}
 
-	explicit TimeSpec(const std::chrono::milliseconds &ms) {
+	explicit TimeSpec(const std::chrono::milliseconds ms) {
 		setAsMilliseconds(ms);
 	}
 
@@ -50,7 +50,7 @@ public:
 		return *this;
 	}
 
-	TimeSpec& setAsMilliseconds(const std::chrono::milliseconds &ms) {
+	TimeSpec& setAsMilliseconds(const std::chrono::milliseconds ms) {
 		this->tv_sec = ms.count() / 1000;
 		this->tv_nsec = (ms.count() % 1000) * 1000 * 1000;
 		return *this;

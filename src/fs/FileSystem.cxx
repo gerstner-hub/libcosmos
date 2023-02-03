@@ -10,7 +10,7 @@
 
 namespace cosmos::fs {
 
-bool existsFile(const std::string_view &path) {
+bool existsFile(const std::string_view path) {
 	struct stat s;
 	if (lstat(path.data(), &s) == 0)
 		return true;

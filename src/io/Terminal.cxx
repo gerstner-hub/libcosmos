@@ -36,7 +36,7 @@ TermDimension Terminal::getSize() const {
 	return ws;
 }
 
-void Terminal::setSize(const TermDimension &dim) {
+void Terminal::setSize(const TermDimension dim) {
 	int rc = ::ioctl(m_fd.raw(), TIOCSWINSZ, &dim);
 	if (rc != 0) {
 		cosmos_throw (ApiError("ioctl(SWINSZ)"));

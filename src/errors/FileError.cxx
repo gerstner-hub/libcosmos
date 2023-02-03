@@ -2,7 +2,7 @@
 
 namespace cosmos {
 
-FileError::FileError(const std::string_view &path) :
+FileError::FileError(const std::string_view path) :
 		m_path(path) {
 	setErrorClass("FileError");
 }

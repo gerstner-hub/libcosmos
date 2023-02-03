@@ -137,7 +137,7 @@ public: // functions
 	 * Take care not to wait for state conditions that will never be
 	 * reached, otherwise this call will block forever.
 	 **/
-	void waitForState(const State &s) const;
+	void waitForState(const State s) const;
 
 	/// Returns an opaque thread ID object for the thread represented by this object
 	ID getID() const { return ID(m_pthread); }
@@ -162,7 +162,7 @@ protected: // functions
 	 * The requested thread state will be change to \p r and the condition
 	 * will be signaled to wake up a possibly waiting thread.
 	 **/
-	void issueRequest(const Request &r) {
+	void issueRequest(const Request r) {
 		{
 			MutexGuard g(m_state_condition);
 			m_request = r;
@@ -172,7 +172,7 @@ protected: // functions
 	}
 
 	/// To be called by the associated thread to anounce state changes
-	void stateEntered(const State &s);
+	void stateEntered(const State s);
 
 	/// Returns whether the caller is the associated thread
 	bool callerIsThread() const {
@@ -180,7 +180,7 @@ protected: // functions
 	}
 
 	/// Waits until a new request is issued, returns the new request state
-	Request waitForRequest(const Request &old) const;
+	Request waitForRequest(const Request old) const;
 
 	/// The C level entry function for the thread
 	/**

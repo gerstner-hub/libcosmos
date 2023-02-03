@@ -37,7 +37,7 @@ bool handleGetPW(std::function< int(struct passwd **)> getpw, std::vector<char> 
 
 } // end anon ns
 
-PasswdInfo::PasswdInfo(const std::string_view &name) {
+PasswdInfo::PasswdInfo(const std::string_view name) {
 	auto call = [&](struct passwd **res) -> int {
 		return getpwnam_r(name.data(), &m_passwd,
 			m_buf.data(), m_buf.size(),

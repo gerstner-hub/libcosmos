@@ -16,7 +16,7 @@ class COSMOS_API RuntimeError :
 {
 public: // functions
 
-	explicit RuntimeError(const std::string_view &msg) :
+	explicit RuntimeError(const std::string_view msg) :
 			CosmosError("RuntimeError") {
 		m_msg = msg;
 	}

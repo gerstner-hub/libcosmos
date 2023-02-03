@@ -127,7 +127,7 @@ public: // functions
 	File() {}
 
 	/// Open a file without special flags (close-on-exec will be set)
-	File(const std::string_view &path, const OpenMode &mode) :
+	File(const std::string_view path, const OpenMode mode) :
 		File(path, mode, OpenFlags({OpenSettings::CLOEXEC})) {}
 
 	/// Open a file using specific OpenFlags
@@ -136,12 +136,12 @@ public: // functions
 	 * also the FileMode in that case. An exception will the thrown if
 	 * this condition is violated.
 	 **/
-	File(const std::string_view &path, const OpenMode &mode, const OpenFlags &flags) {
+	File(const std::string_view path, const OpenMode mode, const OpenFlags flags) {
 		open(path, mode, flags);
 	}
 
 	/// Open a file, potentially creating it and assigning the given \p fmode
-	File(const std::string_view &path, const OpenMode &mode, const OpenFlags &flags, const FileMode &fmode) {
+	File(const std::string_view path, const OpenMode mode, const OpenFlags flags, const FileMode fmode) {
 		open(path, mode, flags, fmode);
 	}
 
@@ -152,8 +152,8 @@ public: // functions
 
 	virtual ~File();
 
-	/// \see File(const std::string_view &, const OpenMode &)
-	void open(const std::string_view &path, const OpenMode &mode) {
+	/// \see File(const std::string_view , const OpenMode )
+	void open(const std::string_view path, const OpenMode mode) {
 		return open(path, mode, OpenFlags({OpenSettings::CLOEXEC}));
 	}
 
@@ -162,8 +162,8 @@ public: // functions
 	 * If in \p flags the #CREATE bit is set then you \b must specify also
 	 * \p fmode, otherwise an exception is thrown.
 	 **/
-	void open(const std::string_view &path, const OpenMode &mode,
-			const OpenFlags &flags, const std::optional<FileMode> &fmode = {});
+	void open(const std::string_view path, const OpenMode mode,
+			const OpenFlags flags, const std::optional<FileMode> fmode = {});
 
 	/// Takes the already open file descriptor fd and operates on it
 	/**
@@ -204,7 +204,7 @@ public: // functions
 	bool isOpen() const { return m_fd.valid(); }
 
 	/// Allow befriended classes to get the FD with const semantics.
-	const FileDescriptor& getFD() const { return m_fd; }
+	const FileDescriptor getFD() const { return m_fd; }
 
 protected: // data
 

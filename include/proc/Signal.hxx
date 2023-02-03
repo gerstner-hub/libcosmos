@@ -33,7 +33,7 @@ public: // types
 public: // functions
 
 	/// Creates a Signal object for the given primitive signal number
-	constexpr explicit Signal(const Type &sig) : m_sig(sig) {}
+	constexpr explicit Signal(const Type sig) : m_sig(sig) {}
 
 	Signal(const Signal &o) { *this = o; }
 
@@ -43,7 +43,7 @@ public: // functions
 	bool operator!=(const Signal &o) const { return !(*this == o); }
 
 	/// Returns the primitive signal number stored in this object
-	const Type& raw() const { return m_sig; }
+	Type raw() const { return m_sig; }
 
 	/// Returns a human readable label for the currently stored signal number
 	std::string name() const;
@@ -63,13 +63,13 @@ namespace signal {
  *
  * \exception Throws an ApiError on error.
  **/
-COSMOS_API void raise(const Signal &s);
+COSMOS_API void raise(const Signal s);
 
 /// Sends a signal to another process based on process ID
 /**
  * \exception Throws an ApiError on error.
  **/
-COSMOS_API void send(const ProcessID &proc, const Signal &s);
+COSMOS_API void send(const ProcessID proc, const Signal s);
 
 /// Sends a signal to another process based on a pidfd
 /**
@@ -79,7 +79,7 @@ COSMOS_API void send(const ProcessID &proc, const Signal &s);
  *
  * \exception Throws an ApiError on error.
  **/
-COSMOS_API void send(const FileDescriptor &pidfd, const Signal &s);
+COSMOS_API void send(const FileDescriptor pidfd, const Signal s);
 
 /// Blocks the given set of signals in the current process's signal mask
 /**
@@ -100,7 +100,7 @@ COSMOS_API void unblock(const SigSet &s, std::optional<SigSet *> old = {});
 COSMOS_API void setSigMask(const SigSet &s, std::optional<SigSet *> old = {});
 
 /// Restores the default signal handling behaviour for the given signal
-inline void restore(const Signal &sig) {
+inline void restore(const Signal sig) {
 	::signal(sig.raw(), SIG_DFL);
 }
 
@@ -113,6 +113,6 @@ COSMOS_API SigSet getSigMask();
 } // end ns
 
 /// Print a friendly name of the signal to the given output stream
-COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::Signal &sig);
+COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::Signal sig);
 
 #endif // inc. guard
