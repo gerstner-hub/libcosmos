@@ -5,6 +5,7 @@
 #include <signal.h>
 
 // cosmos
+#include "cosmos/algs.hxx"
 #include "cosmos/proc/Signal.hxx"
 
 namespace cosmos {
@@ -40,11 +41,11 @@ public: // functions
 	void fill() { ::sigfillset(&m_set); }
 
 	/// Returns whether the given signal is set
-	bool isSet(const Signal s) const { return ::sigismember(&m_set, s.raw()); }
+	bool isSet(const Signal s) const { return ::sigismember(&m_set, to_integral(s.raw())); }
 	/// Sets the given signal in the set
-	void set(const Signal s) { ::sigaddset(&m_set, s.raw()); }
+	void set(const Signal s) { ::sigaddset(&m_set, to_integral(s.raw())); }
 	/// Removes the given signal from the set
-	void del(const Signal s) { ::sigdelset(&m_set, s.raw()); }
+	void del(const Signal s) { ::sigdelset(&m_set, to_integral(s.raw())); }
 
 	/// Returns a pointer to the raw sigset_t data structure for use in API calls
 	sigset_t* raw() { return &m_set; }

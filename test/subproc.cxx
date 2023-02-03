@@ -228,7 +228,7 @@ public:
 			performPipeIO();
 		}
 		catch (...) {
-			m_proc.kill(cosmos::Signal(SIGTERM));
+			m_proc.kill(cosmos::Signal(cosmos::signal::TERMINATE));
 			m_proc.wait();
 			throw;
 		}
@@ -417,7 +417,7 @@ public:
 		catch (const std::exception &ex) {
 			std::cerr << "Failed: " << ex.what() << std::endl;
 
-			const auto sig = cosmos::Signal(SIGKILL);
+			const auto sig = cosmos::signal::KILL;
 
 			for (auto *proc: { &m_short_proc, &m_long_proc }) {
 				if (!proc->running())

@@ -2,8 +2,8 @@
 #include <ostream>
 
 // cosmos
-#include "cosmos/algs.hxx"
 #include "cosmos/errors/ApiError.hxx"
+#include "cosmos/formatting.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/proc/Signal.hxx"
 #include "cosmos/proc/SigSet.hxx"
@@ -28,19 +28,19 @@ namespace {
 }
 
 std::string Signal::name() const {
-	return strsignal(m_sig);
+	return strsignal(to_integral(m_sig));
 }
 
 namespace signal {
 
 void raise(const Signal s) {
-	if (::raise(s.raw())) {
+	if (::raise(to_integral(s.raw()))) {
 		cosmos_throw (ApiError());
 	}
 }
 
 void send(const ProcessID proc, const Signal s) {
-	if (::kill(to_integral(proc), s.raw())) {
+	if (::kill(to_integral(proc), to_integral(s.raw()))) {
 		cosmos_throw (ApiError());
 	}
 }

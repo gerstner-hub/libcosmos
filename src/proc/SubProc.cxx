@@ -210,7 +210,7 @@ void SubProc::postFork() {
 
 		// this allows our parent to wait for us such that is knows
 		// we're a tracee now
-		signal::raise(Signal(SIGSTOP));
+		signal::raise(Signal(signal::STOP));
 	}
 }
 

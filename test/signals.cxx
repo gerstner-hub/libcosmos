@@ -7,13 +7,14 @@
 #include "cosmos/proc/SigSet.hxx"
 #include "cosmos/proc/Process.hxx"
 
+using namespace cosmos;
+
 int main() {
 	cosmos::SigSet empty;
 	cosmos::SigSet full(cosmos::SigSet::filled);
 	cosmos::SigSet some;
 
-	for (auto sigraw: {SIGINT, SIGTERM, SIGIO, SIGKILL, SIGBUS}) {
-		auto sig = cosmos::Signal(sigraw);
+	for (auto sig: {signal::INTERRUPT, signal::TERMINATE, signal::KILL, signal::IO_EVENT, signal::BUS}) {
 		assert( !empty.isSet(sig) );
 		assert( full.isSet(sig) );
 		some.set(sig);
@@ -26,11 +27,11 @@ int main() {
 	cosmos::SigSet old;
 	cosmos::signal::block(full, &old);
 
-	std::cout << "SIGINT was " << (old.isSet(cosmos::Signal(SIGINT)) ? "blocked" : "not blocked") << std::endl;
+	std::cout << "SIGINT was " << (old.isSet(signal::INTERRUPT) ? "blocked" : "not blocked") << std::endl;
 	cosmos::signal::unblock(full, &old);
-	std::cout << "SIGINT was " << (old.isSet(cosmos::Signal(SIGINT)) ? "blocked" : "not blocked") << std::endl;
+	std::cout << "SIGINT was " << (old.isSet(signal::INTERRUPT) ? "blocked" : "not blocked") << std::endl;
 
-	const auto sigint = cosmos::Signal(SIGINT);
+	const auto sigint = signal::INTERRUPT;
 
 	some.clear();
 	some.set(sigint);

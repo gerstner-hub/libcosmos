@@ -89,22 +89,28 @@ std::ostream& operator<<(std::ostream &o, const cosmos::hexnum<NUM> &hn) {
 	return o;
 }
 
-std::ostream& operator<<(std::ostream &o, const cosmos::ProcessID &pid) {
+inline std::ostream& operator<<(std::ostream &o, const cosmos::ProcessID &pid) {
 	// we could also think about using a consistent annotation of process
 	// ids in the output like @1234 or <pid: 1234> something like that.
 	o << cosmos::to_integral(pid);
 	return o;
 }
 
-std::ostream& operator<<(std::ostream &o, const cosmos::UserID &uid) {
+inline std::ostream& operator<<(std::ostream &o, const cosmos::UserID &uid) {
 	// similarly we could use special annotation here
 	o << cosmos::to_integral(uid);
 	return o;
 }
 
-std::ostream& operator<<(std::ostream &o, const cosmos::GroupID &gid) {
+inline std::ostream& operator<<(std::ostream &o, const cosmos::GroupID &gid) {
 	// similarly we could use special annotation here
 	o << cosmos::to_integral(gid);
+	return o;
+}
+
+inline std::ostream& operator<<(std::ostream &o, const cosmos::SignalNr &sig) {
+	// similarly we could use special annotation here
+	o << cosmos::to_integral(sig);
 	return o;
 }
 
