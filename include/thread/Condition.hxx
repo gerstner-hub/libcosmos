@@ -18,9 +18,9 @@ namespace cosmos {
  * operations. Refer to the POSIX man pages for more information.
  *
  * A condition allows to efficiently wait for a certain program condition to
- * be reached. A thread typically evaluates some program state, owning a Lock,
+ * be reached. A thread typically evaluates some program state, owning a Mutex,
  * and if there is no work to be done it invokes wait() on the Condition which
- * atomically unlocks the lock and waits for another thread to signal the
+ * atomically unlocks the Mutex and waits for another thread to signal the
  * condition.
  *
  * There are some caveats to be considered:
@@ -39,7 +39,7 @@ public: // functions
 
 	/// Create a condition coupled with the given \c lock
 	/**
-	 * The given lock will be associated with the Condition for the
+	 * The given Mutex will be associated with the Condition for the
 	 * complete lifetime of the object. You need to make sure that \c lock
 	 * is never destroyed before the associated Condition object is
 	 * destroyed.
@@ -54,8 +54,10 @@ public: // functions
 
 	/// Wait for the Condition to be signaled
 	/**
-	 * The associated lock must already be locked at entry, otherwise
+	 * The associated Mutex must already be locked at entry, otherwise
 	 * undefined behaviour is the result.
+	 *
+	 * Upon return the Mutex will again be owned by the caller.
 	 **/
 	void wait() const {
 		auto res = ::pthread_cond_wait(&m_pcond, &(m_lock.m_pmutex));
@@ -73,7 +75,11 @@ public: // functions
 	 * The timeout operation is based on the clock defined in
 	 * Condition::Clock.
 	 *
-	 * \return \c true If a signal was received, \c false if a timeout occured
+	 * Upon return the Mutex will again be owned by the caller, regardless
+	 * of whether the condition was signaled or a timeout occured.
+	 *
+	 * \return Whether a timeout occured. If not then a signal was
+	 * received.
 	 **/
 	bool waitTimed(const TimeSpec &ts) const {
 		auto res = ::pthread_cond_timedwait(&m_pcond, &(m_lock.m_pmutex), &ts);
@@ -85,6 +91,15 @@ public: // functions
 		}
 	}
 
+	/// Signal and unblock one waiting thread
+	/**
+	 * This call will unblock at most one thread waiting for a signal on
+	 * the condition. If multiple threads are waiting for a signal then
+	 * the rest of the thread will not be woken up.
+	 *
+	 * This call will not block the caller. If not thread is currently
+	 * waiting for a signal then nothing happens.
+	 **/
 	void signal() {
 		auto res = ::pthread_cond_signal(&m_pcond);
 
@@ -93,6 +108,14 @@ public: // functions
 		}
 	}
 
+	/// Signal and unblock all waiting threads
+	/**
+	 * All threads currently waiting for a signal on the condition will be
+	 * woken up. Keep in mind that each thread will contend for acquiring
+	 * the mutex at wakeup and thus a certain serialization will take
+	 * place until all threads evaluated the new program state and release
+	 * the mutex again.
+	 **/
 	void broadcast() {
 		auto res = ::pthread_cond_broadcast(&m_pcond);
 
