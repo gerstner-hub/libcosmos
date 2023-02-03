@@ -14,6 +14,7 @@
 #include <unistd.h>
 
 // cosmos
+#include "cosmos/algs.hxx"
 #include "cosmos/errors/ApiError.hxx"
 #include "cosmos/errors/InternalError.hxx"
 #include "cosmos/errors/UsageError.hxx"
@@ -74,7 +75,7 @@ SubProc::SubProc()
 
 SubProc::~SubProc() {
 	if (m_child_fd.valid()) {
-		std::cerr << "child process still running: " << m_pid << "\n";
+		std::cerr << "child process still running: " << to_integral(m_pid) << "\n";
 		std::abort();
 	}
 }
@@ -107,19 +108,19 @@ void SubProc::run(const StringVector &sv) {
 	clone_args.exit_signal = SIGCHLD;
 	clone_args.flags = CLONE_CLEAR_SIGHAND | CLONE_PIDFD;
 
-	switch ((m_pid = clone3(clone_args))) {
+	switch ((m_pid = static_cast<ProcessID>(clone3(clone_args)))) {
 	default: // parent process with child pid
 		// as documented, to prevent future inheritance of undefined
 		// file descriptor state
 		resetStdFiles();
 		m_child_fd.setFD(pfd);
 		return;
-	case -1: // an error occured
+	case ProcessID::INVALID: // an error occured
 		// see above, same for error case
 		resetStdFiles();
 		cosmos_throw (ApiError());
 		return;
-	case 0: // the child process
+	case ProcessID::CHILD: // the child process
 		// let's do something!
 		break;
 	}
@@ -169,7 +170,7 @@ void SubProc::postFork() {
 	}
 	if (m_sched_settings) {
 		try {
-			m_sched_settings->apply(0);
+			m_sched_settings->apply(ProcessID::SELF);
 		}
 		catch(const std::exception &ex) {
 			// treat this as non-critical, the process can still
@@ -233,7 +234,7 @@ void SubProc::kill(const Signal s) {
 WaitRes SubProc::wait() {
 	WaitRes wr;
 
-	m_pid = INVALID_PID;
+	m_pid = ProcessID::INVALID;
 
 	if (waitid((idtype_t)P_PIDFD, m_child_fd.raw(), &wr, WEXITED) != 0) {
 		try {
@@ -261,7 +262,7 @@ std::optional<WaitRes> SubProc::waitTimed(const std::chrono::milliseconds max) {
 } // end ns
 
 std::ostream& operator<<(std::ostream &o, const cosmos::SubProc &proc) {
-	o << "Subprocess PID " << proc.m_pid << "\n";
+	o << "Subprocess PID " << cosmos::to_integral(proc.m_pid) << "\n";
 	o << "Arguments: " << proc.args() << "\n";
 	if (!proc.cwd().empty())
 		o << "CWD: " << proc.cwd() << "\n";

@@ -9,12 +9,15 @@
 #include <type_traits>
 
 // cosmos
+#include "cosmos/algs.hxx"
 #include "cosmos/compiler.hxx"
+#include "cosmos/ostypes.hxx"
 
 /**
  * @file
  *
- * C stdio and C++ iostream related helper types and functions.
+ * C stdio and C++ iostream related helper types and functions. Also some
+ * output operators for cosmos primitive types.
  **/
 
 namespace cosmos {
@@ -83,6 +86,13 @@ std::ostream& operator<<(std::ostream &o, const cosmos::hexnum<NUM> &hn) {
 
 	o.flags(orig_flags);
 	o.fill(orig_fill);
+	return o;
+}
+
+std::ostream& operator<<(std::ostream &o, const cosmos::ProcessID &pid) {
+	// we could also think about using a consistent annotation of process
+	// ids in the output like @1234 or <pid: 1234> something like that.
+	o << cosmos::to_integral(pid);
 	return o;
 }
 

@@ -10,11 +10,11 @@
 namespace cosmos::proc {
 
 ProcessID getOwnPid() {
-	return ::getpid();
+	return static_cast<ProcessID>(::getpid());
 }
 
 ProcessID getParentPid() {
-	return ::getppid();
+	return static_cast<ProcessID>(::getppid());
 }
 
 UserID getRealUserID() {
@@ -26,9 +26,9 @@ UserID getEffectiveUserID() {
 }
 
 ProcessID createNewSession() {
-	auto res = ::setsid();
+	auto res = static_cast<ProcessID>(::setsid());
 
-	if (res == INVALID_PID) {
+	if (res == ProcessID::INVALID) {
 		cosmos_throw (ApiError());
 	}
 

@@ -170,7 +170,7 @@ public: // functions
 	void setTrace(const bool trace) { m_trace = trace; }
 	bool getTrace() const { return m_trace; }
 
-	/// Returns the PID of the currently running child process or INVALID_PID
+	/// Returns the PID of the currently running child process or ProcessID::INVALID
 	ProcessID pid() const { return m_pid; }
 
 	/// Returns a pidfd refering to the currently running child
@@ -250,7 +250,7 @@ protected: // functions
 protected: // data
 
 	/// The pid of the child process, if any
-	ProcessID m_pid = INVALID_PID;
+	ProcessID m_pid = ProcessID::INVALID;
 	/// Executable plus arguments to use
 	StringVector m_argv;
 	/// Path to an explicit working directory, if any

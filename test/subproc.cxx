@@ -5,6 +5,7 @@
 #include "cosmos/errors/CosmosError.hxx"
 #include "cosmos/errors/InternalError.hxx"
 #include "cosmos/errors/ApiError.hxx"
+#include "cosmos/formatting.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/types.hxx"
 #include "cosmos/Init.hxx"

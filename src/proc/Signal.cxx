@@ -2,6 +2,7 @@
 #include <ostream>
 
 // cosmos
+#include "cosmos/algs.hxx"
 #include "cosmos/errors/ApiError.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/proc/Signal.hxx"
@@ -39,7 +40,7 @@ void raise(const Signal s) {
 }
 
 void send(const ProcessID proc, const Signal s) {
-	if (::kill(proc, s.raw())) {
+	if (::kill(to_integral(proc), s.raw())) {
 		cosmos_throw (ApiError());
 	}
 }
