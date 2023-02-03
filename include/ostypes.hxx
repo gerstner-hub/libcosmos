@@ -35,7 +35,8 @@ enum class GroupID : gid_t {
 	ROOT = 0
 };
 
-typedef ino_t Inode;
+enum class Inode : ino_t {
+};
 
 } // end ns
 

@@ -48,10 +48,10 @@ public: // functions
 
 	/// Returns the inode of the directory entry
 	/**
-	 * The inode is a unique ID for the file system object on the file
-	 * system it resides on.
+	 * The inode is an opaque unique ID for the file system object on the
+	 * file system it resides on.
 	 **/
-	Inode inode() const { return m_entry->d_ino; }
+	Inode inode() const { return static_cast<Inode>(m_entry->d_ino); }
 
 	/// Returns the position of this entry in its associated Directory object
 	/**
