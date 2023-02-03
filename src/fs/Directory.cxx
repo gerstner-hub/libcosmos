@@ -21,7 +21,7 @@ void Directory::close() {
 	}
 }
 
-void Directory::open(const std::string_view &path, const bool follow_links) {
+void Directory::open(const std::string_view &path, const FollowSymlinks follow_links) {
 	close();
 
 	/*

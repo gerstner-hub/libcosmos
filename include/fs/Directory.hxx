@@ -14,6 +14,7 @@
 #include "cosmos/errors/UsageError.hxx"
 #include "cosmos/fs/DirEntry.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
+#include "cosmos/fs/FileSystem.hxx"
 
 namespace cosmos {
 
@@ -94,7 +95,7 @@ public: // functions
 	 * If the object is already associated with another directory then this
 	 * previous associaton will be implicitly close()'d.
 	 **/
-	void open(const std::string_view &path, const bool follow_links = false);
+	void open(const std::string_view &path, const FollowSymlinks follow_links = FollowSymlinks(false));
 
 	/// Indicates whether currently a directory is associated with this object
 	auto isOpen() const { return m_stream != nullptr; }

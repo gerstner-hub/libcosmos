@@ -4,7 +4,13 @@
 // C++ stdlib
 #include <string_view>
 
+// cosmos
+#include "cosmos/types.hxx"
+
 namespace cosmos {
+
+/// Strong boolean type to enable following of symlinks in the file system
+using FollowSymlinks = NamedBool<struct follow_links_t, false>;
 
 /// Access to various file system information
 class COSMOS_API FileSystem
