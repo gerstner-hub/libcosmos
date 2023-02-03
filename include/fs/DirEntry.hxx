@@ -40,6 +40,7 @@ public: // types
 		DIRECTORY = DT_DIR,
 		FIFO = DT_FIFO,
 		SYMLINK = DT_LNK,
+		REGULAR = DT_REG,
 		UNIX_SOCKET = DT_SOCK,
 		UNKNOWN = DT_UNKNOWN
 	};
