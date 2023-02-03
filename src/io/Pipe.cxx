@@ -16,8 +16,8 @@ Pipe::Pipe() {
 		cosmos_throw (ApiError());
 	}
 
-	m_read_end.setFD(ends[0]);
-	m_write_end.setFD(ends[1]);
+	m_read_end.setFD(FileNum{ends[0]});
+	m_write_end.setFD(FileNum{ends[1]});
 }
 
 } // end ns

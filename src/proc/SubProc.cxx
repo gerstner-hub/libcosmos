@@ -104,6 +104,7 @@ void SubProc::run(const StringVector &sv) {
 	// out until Valgrind gets supports for clone3().
 	int pfd = 0;
 	struct clone_args clone_args{};
+	// this takes the pointer to the pfd, as a 64 but unsigned integer
 	clone_args.pidfd = reinterpret_cast<uint64_t>(&pfd);
 	clone_args.exit_signal = SIGCHLD;
 	clone_args.flags = CLONE_CLEAR_SIGHAND | CLONE_PIDFD;
@@ -113,7 +114,7 @@ void SubProc::run(const StringVector &sv) {
 		// as documented, to prevent future inheritance of undefined
 		// file descriptor state
 		resetStdFiles();
-		m_child_fd.setFD(pfd);
+		m_child_fd.setFD(FileNum{pfd});
 		return;
 	case ProcessID::INVALID: // an error occured
 		// see above, same for error case
@@ -236,7 +237,7 @@ WaitRes SubProc::wait() {
 
 	m_pid = ProcessID::INVALID;
 
-	if (waitid((idtype_t)P_PIDFD, m_child_fd.raw(), &wr, WEXITED) != 0) {
+	if (waitid((idtype_t)P_PIDFD, to_integral(m_child_fd.raw()), &wr, WEXITED) != 0) {
 		try {
 			m_child_fd.close();
 		} catch(...) {}

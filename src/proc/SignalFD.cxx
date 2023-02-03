@@ -2,6 +2,7 @@
 #include <unistd.h>
 
 // cosmos
+#include "cosmos/algs.hxx"
 #include "cosmos/errors/ApiError.hxx"
 #include "cosmos/errors/UsageError.hxx"
 #include "cosmos/errors/RuntimeError.hxx"
@@ -27,7 +28,7 @@ void SignalFD::create(const SigSet &mask) {
 		cosmos_throw (ApiError("failed to create signal fd"));
 	}
 
-	m_fd.setFD(fd);
+	m_fd.setFD(FileNum{fd});
 }
 
 void SignalFD::adjustMask(const SigSet &mask) {
@@ -38,14 +39,14 @@ void SignalFD::adjustMask(const SigSet &mask) {
 	// NOTE: it's unclear from the man page whether flags are used when
 	// modifying an existing signal fd. Let's pass on zero, hoping that no
 	// flags will be taken away again through this.
-	auto fd = ::signalfd(m_fd.raw(), mask.raw(), 0);
+	auto fd = ::signalfd(to_integral(m_fd.raw()), mask.raw(), 0);
 	if (fd == -1) {
 		cosmos_throw (ApiError("failed to modify signal fd"));
 	}
 }
 
 void SignalFD::readEvent(SigInfo &info) {
-	auto res = ::read(m_fd.raw(), &info, sizeof(info));
+	auto res = ::read(to_integral(m_fd.raw()), &info, sizeof(info));
 
 	if (res < 0) {
 		cosmos_throw (ApiError("failed reading from signal fd"));

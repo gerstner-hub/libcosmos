@@ -2,6 +2,7 @@
 #define COSMOS_FILEDESCRIPTOR_HXX
 
 // libcosmos
+#include "cosmos/ostypes.hxx"
 #include "cosmos/types.hxx"
 
 namespace cosmos {
@@ -21,21 +22,12 @@ using CloseOnExec = NamedBool<struct cloexec_t, true>;
  * descriptor during destruction. This has to be done explicitly instead.
  **/
 class COSMOS_API FileDescriptor {
-public: // types
-
-	/// Primitive file descriptor.
-	typedef int fd_t;
-
-public: // constants
-
-	static constexpr fd_t INVALID_FD = -1;
-
 public: // functions
 
-	explicit FileDescriptor(fd_t fd = INVALID_FD) : m_fd(fd) {}
+	explicit FileDescriptor(FileNum fd = FileNum::INVALID) : m_fd(fd) {}
 
 	/// Returns whether currently a valid file descriptor number is assigned.
-	bool valid() const { return m_fd != INVALID_FD; }
+	bool valid() const { return m_fd != FileNum::INVALID; }
 	bool invalid() const { return !valid(); }
 
 	/// Assigns a new primitive file descriptor to the object
@@ -43,15 +35,16 @@ public: // functions
 	 * A potentially already contained file descriptor will *not* be
 	 * closed, the caller is responsible for preventing leaks.
 	 **/
-	void setFD(fd_t fd) { m_fd = fd; }
+	void setFD(FileNum fd) { m_fd = fd; }
 
 	/// Invalidates the stored file descriptor.
 	/**
-	 * This operation simply resets the stored file descriptor to the
-	 * INVALID_FD. No system call will be performed and if the file is not
-	 * closed by other means a file descriptor leak will be the result.
+	 * This operation simply resets the stored file descriptor to
+	 * FileNum::INVALID. No system call will be performed and if the file
+	 * is not closed by other means a file descriptor leak will be the
+	 * result.
 	 **/
-	void reset() { m_fd = INVALID_FD; }
+	void reset() { m_fd = FileNum::INVALID; }
 
 	/// Explicitly close the contained FD.
 	/**
@@ -82,7 +75,7 @@ public: // functions
 	void duplicate(const FileDescriptor new_fd, const CloseOnExec cloexec = CloseOnExec(true)) const;
 
 	/// Returns the primitive file descriptor contained in the object
-	fd_t raw() const { return m_fd; }
+	FileNum raw() const { return m_fd; }
 
 	bool operator==(const FileDescriptor &other) const {
 		return m_fd == other.m_fd;
@@ -94,7 +87,7 @@ public: // functions
 
 protected: // data
 
-	fd_t m_fd = INVALID_FD;
+	FileNum m_fd = FileNum::INVALID;
 };
 
 /// Representation of the stdout file descriptor

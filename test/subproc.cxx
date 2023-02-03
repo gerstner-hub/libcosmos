@@ -41,7 +41,7 @@ public:
 		m_tmp_file_path = "/tmp/subproc_test.XXXXXX";
 		auto fd = mkostemp(&m_tmp_file_path[0], O_CLOEXEC);
 
-		cosmos::FileDescriptor ret(fd);
+		cosmos::FileDescriptor ret(cosmos::FileNum{fd});
 
 		if (ret.invalid()) {
 			cosmos_throw (cosmos::ApiError());

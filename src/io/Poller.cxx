@@ -3,6 +3,7 @@
 #include <iostream>
 
 // cosmos
+#include "cosmos/algs.hxx"
 #include "cosmos/errors/ApiError.hxx"
 #include "cosmos/io/Poller.hxx"
 #include "cosmos/time/TimeSpec.hxx"
@@ -17,6 +18,10 @@ Poller::~Poller() {
 	}
 }
 
+int Poller::rawPollFD() const {
+	return to_integral(m_poll_fd.raw());
+}
+
 void Poller::create(size_t max_events) {
 	if (isValid())
 		return;
@@ -27,7 +32,7 @@ void Poller::create(size_t max_events) {
 		cosmos_throw (ApiError("Failed to create epoll FD"));
 	}
 
-	m_poll_fd.setFD(pfd);
+	m_poll_fd.setFD(FileNum{pfd});
 	m_events.resize(max_events);
 }
 
@@ -52,15 +57,15 @@ namespace {
 }
 
 void Poller::addFD(const FileDescriptor fd, const MonitorMask mask) {
-	control(m_poll_fd.raw(), fd.raw(), EPOLL_CTL_ADD, mask.get());
+	control(rawPollFD(), to_integral(fd.raw()), EPOLL_CTL_ADD, mask.get());
 }
 
 void Poller::modFD(const FileDescriptor fd, const MonitorMask mask) {
-	control(m_poll_fd.raw(), fd.raw(), EPOLL_CTL_MOD, mask.get());
+	control(rawPollFD(), to_integral(fd.raw()), EPOLL_CTL_MOD, mask.get());
 }
 
 void Poller::delFD(const FileDescriptor fd) {
-	if (epoll_ctl(m_poll_fd.raw(), EPOLL_CTL_DEL, fd.raw(), nullptr) < 0) {
+	if (epoll_ctl(rawPollFD(), EPOLL_CTL_DEL, to_integral(fd.raw()), nullptr) < 0) {
 		cosmos_throw (ApiError("Failed to del FD in epoll set"));
 	}
 }
@@ -72,7 +77,7 @@ std::vector<Poller::PollEvent> Poller::wait(const std::optional<std::chrono::mil
 
 	while (true) {
 		const auto num_events = epoll_wait(
-			m_poll_fd.raw(), m_events.data(), m_events.size(), timeout ? timeout->count() : -1);
+			rawPollFD(), m_events.data(), m_events.size(), timeout ? timeout->count() : -1);
 
 		if (num_events < 0) {
 			if (m_restart_on_intr && getErrno() == Errno::INTERRUPTED)

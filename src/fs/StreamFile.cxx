@@ -1,4 +1,5 @@
 // cosmos
+#include "cosmos/algs.hxx"
 #include "cosmos/errors/ApiError.hxx"
 #include "cosmos/errors/RuntimeError.hxx"
 #include "cosmos/fs/StreamFile.hxx"
@@ -7,7 +8,7 @@ namespace cosmos {
 
 size_t StreamFile::read(void *buf, size_t length) {
 	while (true) {
-		auto res = ::read(m_fd.raw(), buf, length);
+		auto res = ::read(to_integral(m_fd.raw()), buf, length);
 
 		if (res < 0) {
 			// transparent restart
@@ -35,7 +36,7 @@ void StreamFile::readAll(void *buf, size_t length) {
 
 size_t StreamFile::write(const void *buf, size_t length) {
 	while (true) {
-		auto res = ::write(m_fd.raw(), buf, length);
+		auto res = ::write(to_integral(m_fd.raw()), buf, length);
 
 		if (res < 0) {
 			// transparent restart
@@ -59,7 +60,7 @@ void StreamFile::writeAll(const void *buf, size_t length) {
 }
 
 off_t StreamFile::seek(const SeekType type, off_t off) {
-	const auto res = ::lseek(m_fd.raw(), off, static_cast<int>(type));
+	const auto res = ::lseek(to_integral(m_fd.raw()), off, to_integral(type));
 
 	if (res == static_cast<off_t>(-1)) {
 		cosmos_throw (ApiError("seeking in file"));

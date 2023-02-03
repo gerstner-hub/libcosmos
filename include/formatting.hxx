@@ -114,4 +114,10 @@ inline std::ostream& operator<<(std::ostream &o, const cosmos::SignalNr &sig) {
 	return o;
 }
 
+inline std::ostream& operator<<(std::ostream &o, const cosmos::FileNum &fd) {
+	// similarly we could use special annotation here
+	o << cosmos::to_integral(fd);
+	return o;
+}
+
 #endif // inc. guard

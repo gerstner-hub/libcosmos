@@ -5,6 +5,7 @@
 #include "cosmos/errors/FileError.hxx"
 #include "cosmos/errors/InternalError.hxx"
 #include "cosmos/errors/UsageError.hxx"
+#include "cosmos/formatting.hxx"
 #include "cosmos/fs/File.hxx"
 
 namespace cosmos {
@@ -27,7 +28,7 @@ void File::open(const std::string_view path, const OpenMode mode, const OpenFlag
 
 	auto fd = ::open(path.data(), raw_flags, fmode ? fmode.value().raw() : 0);
 
-	m_fd.setFD(fd);
+	m_fd.setFD(FileNum{fd});
 
 	if (!isOpen()) {
 		cosmos_throw (FileError(path));

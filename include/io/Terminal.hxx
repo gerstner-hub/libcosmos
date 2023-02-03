@@ -82,6 +82,10 @@ public:
 	 **/
 	void makeControllingTerminal(bool force = false);
 
+protected: // functions
+
+	int rawFD() const;
+
 protected: // data
 
 	FileDescriptor m_fd;

@@ -34,7 +34,7 @@ void Directory::open(const std::string_view path, const FollowSymlinks follow_li
 		O_RDONLY | O_CLOEXEC | O_DIRECTORY | (follow_links ? O_NOFOLLOW : 0)
 	);
 
-	FileDescriptor fd(res);
+	FileDescriptor fd(FileNum{res});
 
 	if (fd.invalid()) {
 		cosmos_throw (ApiError());
@@ -55,7 +55,7 @@ void Directory::open(const std::string_view path, const FollowSymlinks follow_li
 void Directory::open(const FileDescriptor fd) {
 	close();
 
-	m_stream = fdopendir(fd.raw());
+	m_stream = fdopendir(to_integral(fd.raw()));
 
 	if (!m_stream) {
 		cosmos_throw (ApiError());
@@ -65,7 +65,7 @@ void Directory::open(const FileDescriptor fd) {
 FileDescriptor Directory::fd() const {
 	requireOpenStream(__FUNCTION__);
 	auto fd = dirfd(m_stream);
-	FileDescriptor ret(fd);
+	FileDescriptor ret(FileNum{fd});
 
 	if (ret.invalid()) {
 		cosmos_throw (ApiError());

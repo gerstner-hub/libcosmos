@@ -7,13 +7,18 @@
 #include <unistd.h>
 
 // cosmos
+#include "cosmos/algs.hxx"
 #include "cosmos/errors/ApiError.hxx"
 #include "cosmos/io/Terminal.hxx"
 
 namespace cosmos {
 
+int Terminal::rawFD() const {
+	return to_integral(m_fd.raw());
+}
+
 bool Terminal::isTTY() const {
-	if (::isatty(m_fd.raw()) == 1) {
+	if (::isatty(rawFD()) == 1) {
 		return true;
 	}
 
@@ -27,7 +32,7 @@ bool Terminal::isTTY() const {
 
 TermDimension Terminal::getSize() const {
 	TermDimension ws;
-	int rc = ::ioctl(m_fd.raw(), TIOCGWINSZ, &ws);
+	int rc = ::ioctl(rawFD(), TIOCGWINSZ, &ws);
 	if (rc != 0) {
 		cosmos_throw (ApiError("ioctl(GWINSZ)"));
 	}
@@ -36,20 +41,20 @@ TermDimension Terminal::getSize() const {
 }
 
 void Terminal::setSize(const TermDimension dim) {
-	int rc = ::ioctl(m_fd.raw(), TIOCSWINSZ, &dim);
+	int rc = ::ioctl(rawFD(), TIOCSWINSZ, &dim);
 	if (rc != 0) {
 		cosmos_throw (ApiError("ioctl(SWINSZ)"));
 	}
 }
 
 void Terminal::sendBreak(int duration) {
-	if (::tcsendbreak(m_fd.raw(), duration) != 0) {
+	if (::tcsendbreak(rawFD(), duration) != 0) {
 		cosmos_throw (ApiError("tcsendbreak"));
 	}
 }
 
 void Terminal::makeControllingTerminal(bool force) {
-	int rc = ::ioctl(m_fd.raw(), TIOCSCTTY, force ? 1 : 0);
+	int rc = ::ioctl(rawFD(), TIOCSCTTY, force ? 1 : 0);
 	if (rc != 0) {
 		cosmos_throw (ApiError("ioctl(TIOCSCTTY)"));
 	}
@@ -67,7 +72,10 @@ std::pair<FileDescriptor, FileDescriptor> openPTY() {
 		cosmos_throw (ApiError("openpty failed"));
 	}
 
-	return {cosmos::FileDescriptor(master), cosmos::FileDescriptor(slave)};
+	return {
+		cosmos::FileDescriptor(FileNum{master}),
+		cosmos::FileDescriptor(FileNum{slave})
+	};
 }
 
 } // end ns

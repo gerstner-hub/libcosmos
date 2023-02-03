@@ -102,7 +102,7 @@ public: // types
 	public:
 
 		/// The file descriptor this event refers to
-		FileDescriptor fd() const { return FileDescriptor((this->data).fd); }
+		FileDescriptor fd() const { return FileDescriptor(FileNum{(this->data).fd}); }
 
 		auto getEvents() const { return EventMask(static_cast<Event>(this->events)); }
 	};
@@ -198,6 +198,10 @@ public: // functions
 	 * timeout occured.
 	 **/
 	std::vector<PollEvent> wait(const std::optional<std::chrono::milliseconds> timeout = {});
+
+protected: // functions
+
+	int rawPollFD() const;
 
 protected: // data
 

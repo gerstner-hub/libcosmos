@@ -80,6 +80,14 @@ enum class SignalNr : int {
 
 };
 
+/// Primitive file descriptor
+enum class FileNum : int {
+	INVALID = -1,
+	STDIN = STDIN_FILENO,
+	STDOUT = STDOUT_FILENO,
+	STDERR = STDERR_FILENO
+};
+
 } // end ns
 
 #endif // inc. agurd

@@ -29,9 +29,9 @@ bool ILogger::isTTY(const std::ostream &o) {
 	FileDescriptor fd_to_check;
 
 	if (&o == &std::cout) {
-		fd_to_check.setFD(STDOUT_FILENO);
+		fd_to_check.setFD(FileNum::STDOUT);
 	} else if (&o == &std::cerr) {
-		fd_to_check.setFD(STDERR_FILENO);
+		fd_to_check.setFD(FileNum::STDERR);
 	} else {
 		return false;
 	}

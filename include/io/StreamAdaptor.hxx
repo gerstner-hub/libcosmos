@@ -2,6 +2,7 @@
 #define COSMOS_STREAMADAPTOR_HXX
 
 // Cosmos
+#include "cosmos/algs.hxx"
 #include "cosmos/compiler.hxx"
 #include "cosmos/types.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
@@ -49,12 +50,12 @@ public: // functions
 		m_buffer.close();
 	}
 
-	FileDescriptor fileDesc() { return FileDescriptor(m_buffer.fd()); }
+	FileDescriptor fileDesc() { return FileDescriptor(FileNum{m_buffer.fd()}); }
 
 protected: // functions
 
 	StreamAdaptor(FileDescriptor fd, std::ios_base::openmode mode) :
-		m_buffer(fd.raw(), mode)
+		m_buffer(to_integral(fd.raw()), mode)
 	{
 		if (fd.invalid()) {
 			cosmos_throw (UsageError("Attempt to construct StreamAdaptor for invalid FD"));
