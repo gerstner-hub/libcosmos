@@ -74,7 +74,7 @@ FileDescriptor Directory::fd() const {
 	return ret;
 }
 
-DirEntry Directory::nextEntry() {
+std::optional<DirEntry> Directory::nextEntry() {
 	requireOpenStream(__FUNCTION__);
 
 	/*
@@ -86,18 +86,18 @@ DirEntry Directory::nextEntry() {
 	 */
 
 	// needed to differentiate between end-of-stream and error condition
-	errno = 0;
-	auto entry = readdir(m_stream);
+	resetErrno();
+	const auto entry = readdir(m_stream);
 
 	if (entry) {
 		return DirEntry(entry);
 	}
 
-	if (errno != 0) {
-		cosmos_throw( ApiError() );
+	if (isErrnoSet()) {
+		cosmos_throw(ApiError());
 	}
 
-	return DirEntry(nullptr);
+	return {};
 }
 
 } // end ns

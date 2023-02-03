@@ -75,9 +75,10 @@ public:
 		auto startpos = dir.tell();
 		std::string first_name;
 
-		cosmos::DirEntry entry;
+		std::optional<cosmos::DirEntry> oentry;
 
-		while ((entry = dir.nextEntry()).isValid()) {
+		while ((oentry = dir.nextEntry())) {
+			auto entry = *oentry;
 			std::cout << entry.name() << std::endl;
 
 			auto sname = std::string(entry.name());
@@ -91,8 +92,7 @@ public:
 					std::cerr << sname << " != isDotEntry()?!" << std::endl;
 					return 1;
 				}
-			}
-			else {
+			} else {
 				if (entry.isDotEntry() != false) {
 					std::cerr << sname << " == isDotEntry()?!" << std::endl;
 					return 1;
@@ -102,13 +102,16 @@ public:
 			if (sname.size() != entry.nameLength()) {
 				std::cerr << "len(" << sname << ") == " << entry.nameLength() << "?!" << std::endl;
 				return 1;
+			} else if (sname.size() != entry.view().size()) {
+				std::cerr << "length of view() and name() don't match" << std::endl;
+				return 1;
 			}
 		}
 
 		dir.seek(startpos);
-		entry = dir.nextEntry();
+		oentry = dir.nextEntry();
 
-		if (first_name != entry.name()) {
+		if (first_name != oentry->name()) {
 			std::cerr << "tell() / seek() failed ?!" << std::endl;
 
 			return 1;

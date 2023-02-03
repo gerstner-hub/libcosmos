@@ -4,6 +4,7 @@
 // stdlib
 #include <exception>
 #include <iostream>
+#include <optional>
 #include <string_view>
 
 // Linux
@@ -31,8 +32,6 @@ namespace cosmos {
  * filtered by applications.
  **/
 class COSMOS_API Directory {
-public: // types
-
 public: // functions
 
 	/// Creates an object no associated to a directory
@@ -144,10 +143,10 @@ public: // functions
 	 * nextEntry() will invalidate previously returned DirEntry instances
 	 * returned from the same Directory instance.
 	 *
-	 * When the end of the directory has been reached then an invalid
-	 * DirEntry object is returned.
+	 * When the end of the directory has been reached then \c nullopt is
+	 * returned.
 	 **/
-	DirEntry nextEntry();
+	std::optional<DirEntry> nextEntry();
 
 protected: // functions
 

@@ -46,13 +46,11 @@ public: // types
 
 public: // functions
 
-	explicit DirEntry(struct dirent *entry = nullptr)
+	explicit DirEntry(const struct dirent *entry)
 		: m_entry(entry)
 	{}
 
-	const auto getRawEntry() const { return m_entry; }
-
-	auto isValid() const { return m_entry != nullptr; }
+	auto getRawEntry() const { return m_entry; }
 
 	/// Returns the inode of the directory entry
 	/**
@@ -125,7 +123,7 @@ public: // functions
 
 protected: // data
 
-	struct dirent *m_entry = nullptr;
+	const struct dirent *m_entry;
 };
 
 } // end ns
