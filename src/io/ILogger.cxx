@@ -14,10 +14,10 @@ namespace cosmos {
 using namespace cosmos::term;
 
 ILogger::ILogger() :
-	m_err("Error: ", FrontColor(TermColor::RED)),
-	m_warn("Warning: ", FrontColor(TermColor::YELLOW)),
-	m_info("Info: ", FrontColor(TermColor::WHITE)),
-	m_debug("Debug: ", FrontColor(TermColor::CYAN))
+	m_err(  "Error:   ", FrontColor(TermColor::RED)),
+	m_warn( "Warning: ", FrontColor(TermColor::YELLOW)),
+	m_info( "Info:    ", FrontColor(TermColor::WHITE)),
+	m_debug("Debug:   ", FrontColor(TermColor::CYAN))
 {}
 
 bool ILogger::isTTY(const std::ostream &o) {
