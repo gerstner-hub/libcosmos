@@ -33,6 +33,15 @@ COSMOS_API UserID getRealUserID();
  **/
 COSMOS_API UserID getEffectiveUserID();
 
+/// Returns the real group ID the current process is running as
+COSMOS_API GroupID getRealGroupID();
+
+/// Returns the effective group ID the current process is running as
+/**
+ * \see getEffectiveUserID()
+ **/
+COSMOS_API GroupID getEffectiveGroupID();
+
 /// Creates a new session with the current process as leader
 /**
  * The session will also receive a new process group of which the

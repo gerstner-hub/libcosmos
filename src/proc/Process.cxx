@@ -25,6 +25,14 @@ UserID getEffectiveUserID() {
 	return static_cast<UserID>(::geteuid());
 }
 
+GroupID getRealGroupID() {
+	return static_cast<GroupID>(::getgid());
+}
+
+GroupID getEffectiveGroupID() {
+	return static_cast<GroupID>(::getegid());
+}
+
 ProcessID createNewSession() {
 	auto res = static_cast<ProcessID>(::setsid());
 
