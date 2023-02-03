@@ -17,9 +17,8 @@ bool Terminal::isTTY() const {
 		return true;
 	}
 
-	switch (errno)
-	{
-	case ENOTTY: break;
+	switch (getErrno()) {
+	case Errno::NOT_A_TTY: break;
 	default: cosmos_throw (ApiError("isTTY:"));
 	}
 

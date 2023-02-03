@@ -14,7 +14,7 @@ bool existsFile(const std::string_view path) {
 	struct stat s;
 	if (lstat(path.data(), &s) == 0)
 		return true;
-	else if (errno != ENOENT)
+	else if (getErrno() != Errno::NO_ENTRY)
 		cosmos_throw (ApiError());
 
 	return false;

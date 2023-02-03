@@ -70,8 +70,8 @@ public: // functions
 	void wait() const {
 		auto res = ::pthread_cond_wait(&m_pcond, &(m_lock.m_pmutex));
 
-		if (res != 0) {
-			cosmos_throw (ApiError(res));
+		if (auto err = Errno(res); err != Errno::NO_ERROR) {
+			cosmos_throw (ApiError(Errno(err)));
 		}
 	}
 
@@ -92,7 +92,7 @@ public: // functions
 		auto res = ::pthread_cond_timedwait(&m_pcond, &(m_lock.m_pmutex), &ts);
 
 		switch(res) {
-		default: cosmos_throw (ApiError(res)); return WaitTimedRes::TIMED_OUT; /* just to silence compiler warning */
+		default: cosmos_throw (ApiError(Errno(res))); return WaitTimedRes::TIMED_OUT; /* just to silence compiler warning */
 		case 0: return WaitTimedRes::SIGNALED;
 		case ETIMEDOUT: return WaitTimedRes::TIMED_OUT;
 		}
@@ -110,8 +110,8 @@ public: // functions
 	void signal() {
 		auto res = ::pthread_cond_signal(&m_pcond);
 
-		if (res != 0) {
-			cosmos_throw (ApiError(res));
+		if (auto err = Errno(res); err != Errno::NO_ERROR) {
+			cosmos_throw (ApiError(err));
 		}
 	}
 
@@ -126,8 +126,8 @@ public: // functions
 	void broadcast() {
 		auto res = ::pthread_cond_broadcast(&m_pcond);
 
-		if (res != 0) {
-			cosmos_throw (ApiError(res));
+		if (auto err = Errno(res); err != Errno::NO_ERROR) {
+			cosmos_throw (ApiError(err));
 		}
 	}
 

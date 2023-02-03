@@ -12,8 +12,8 @@ Condition::Condition(Mutex &lock) :
 
 	res = pthread_condattr_init(&attr);
 
-	if (res != 0) {
-		cosmos_throw (ApiError(res));
+	if (auto err = Errno(res); err != Errno::NO_ERROR) {
+		cosmos_throw (ApiError(err));
 	}
 
 	try {
@@ -24,14 +24,14 @@ Condition::Condition(Mutex &lock) :
 		 */
 		res = pthread_condattr_setclock(&attr, Condition::Clock::rawType());
 
-		if (res != 0) {
-			cosmos_throw (ApiError(res));
+		if (auto err = Errno(res); err != Errno::NO_ERROR) {
+			cosmos_throw (ApiError(err));
 		}
 
 		res = ::pthread_cond_init(&m_pcond, &attr);
 
-		if (res != 0) {
-			cosmos_throw (ApiError(res));
+		if (auto err = Errno(res); err != Errno::NO_ERROR) {
+			cosmos_throw (ApiError(err));
 		}
 	}
 	catch(...) {
