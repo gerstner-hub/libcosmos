@@ -17,22 +17,22 @@ namespace cosmos {
  * initializers to avoid issues with static initialization order in
  * executables / libraries.
  *
- * Multiple initializations can be performed but finishLibcosmos() needs to be
+ * Multiple initializations can be performed but finish() needs to be
  * called the same number of times for cleanup to occur.
  **/
-void COSMOS_API initLibCosmos();
+void COSMOS_API init();
 
-/// Undo initialization of initLibCosmos()
-void COSMOS_API finishLibCosmos();
+/// Undo initialization of init()
+void COSMOS_API finish();
 
 /// Convenience initialization object
 /**
  * During the lifetime of this object the cosmos library remains initialized.
  **/
-struct COSMOS_API Init {
-	Init() { initLibCosmos(); }
+struct Init {
+	Init() { init(); }
 
-	~Init() { finishLibCosmos(); }
+	~Init() { finish(); }
 };
 
 } // end ns

@@ -12,34 +12,52 @@
 
 namespace cosmos {
 
-static std::atomic<std::size_t> g_init_counter;
 // maintain a map with a priority value as key and the Initable as a value.
 // the priority value allows to give a defined intialization order.
 // lower priority value means earlier initialization.
 typedef std::map<InitPrio, Initable*> InitableMap;
-static InitableMap *g_init_map = nullptr;
 
-void freeInitMap() {
-	delete g_init_map;
-	g_init_map = nullptr;
-}
+struct InitData {
 
-void Initable::registerInitable(const InitPrio prio) {
-	if (!g_init_map) {
+	void add(const InitPrio prio, Initable *init_if);
+	void init();
+	void finish();
+protected:
+	InitableMap initables;
+};
+
+namespace {
+	std::atomic<std::size_t> init_counter;
+	InitData *init_data = nullptr;
+
+	void freeInitData() {
+		delete init_data;
+		init_data = nullptr;
+	}
+
+	void createInitData() {
+		if (init_data)
+			return;
+
 		/*
 		 * this gives us a problem with static initialization order.
 		 * we need to keep the map on the heap to make sure the object
-		 * is valid at this point in time.
+		 * is valid at this point in time (because this function could
+		 * be invoked in static initialization context).
 		 *
-		 * this on the other hand gives us trouble with freeing the
-		 * heap memory. an atexit() handler will at least silence
-		 * memory leaks reported by valgrind.
+		 * This on the other hand gives us trouble with freeing the
+		 * heap memory, since we want to allow re-initialization. An
+		 * atexit() handler will at least silence memory leaks
+		 * reported by valgrind.
 		 */
-		g_init_map = new InitableMap;
-		atexit(freeInitMap);
+		init_data = new InitData;
+		atexit(freeInitData);
 	}
+} // end anon ns
 
-	auto ret = g_init_map->insert(std::make_pair(prio, this));
+void InitData::add(const InitPrio prio, Initable *init_if) {
+
+	auto ret = initables.insert(std::make_pair(prio, init_if));
 
 	if (ret.second != true) {
 		std::cerr << "Conflicting priority of Initables!" << std::endl;
@@ -47,35 +65,49 @@ void Initable::registerInitable(const InitPrio prio) {
 	}
 }
 
-void initLibCosmos() {
-	if (g_init_counter++ != 0)
-		return;
-
-	if (!g_init_map)
-		return;
-
-	// okay we need to perform initialization
-	for (auto &pair: *g_init_map) {
-		auto initable = pair.second;
+void InitData::init() {
+	for (auto &[prio, initable]: initables) {
 		initable->libInit();
 		initable->m_lib_initialized = true;
 	}
 }
 
-void finishLibCosmos() {
-
-	if (--g_init_counter != 0)
-		return;
-
-	if (!g_init_map)
-		return;
-
-	// okay we need to perform cleanup - in reverse order
-	for (auto it = g_init_map->rbegin(); it != g_init_map->rend(); it++) {
+void InitData::finish() {
+	// perform cleanup - in reverse order
+	for (auto it = initables.rbegin(); it != initables.rend(); it++) {
 		auto initable = it->second;
 		initable->libExit();
 		initable->m_lib_initialized = false;
 	}
+}
+
+void Initable::registerInitable(const InitPrio prio) {
+	createInitData();
+
+	init_data->add(prio, this);
+}
+
+void init() {
+	if (init_counter++ != 0)
+		return;
+
+	if (!init_data)
+		// no initables have been registered
+		return;
+
+	// okay we need to perform initialization
+	init_data->init();
+}
+
+void finish() {
+	if (--init_counter != 0)
+		return;
+
+	if (!init_data)
+		// no initables around
+		return;
+
+	init_data->finish();
 }
 
 } // end ns

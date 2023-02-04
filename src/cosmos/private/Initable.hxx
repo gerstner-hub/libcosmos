@@ -21,12 +21,11 @@ enum class InitPrio : std::size_t {
  * from this base class and instantiate a globally statically initialized
  * object from it.
  *
- * It will automatically register at the libraries' init system and the init
+ * It will automatically register at the library's init system and the init
  * system will call libInit() and libExit() at the appropriate times.
  **/
 class Initable {
-	friend void initLibCosmos();
-	friend void finishLibCosmos();
+	friend class InitData;
 
 protected: // functions
 
