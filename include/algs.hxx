@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <type_traits>
 #include <vector>
+#include <variant>
 
 namespace cosmos {
 
@@ -57,6 +58,16 @@ T1& append(T1 &v1, const T2 &v2) {
 template<typename ENUM>
 constexpr auto to_integral(const ENUM e) -> typename std::underlying_type<ENUM>::type {
    return static_cast<typename std::underlying_type<ENUM>::type>(e);
+}
+
+template <typename VARIANT>
+bool is_empty_variant(const VARIANT &var) {
+	return std::holds_alternative<std::monostate>(var);
+}
+
+template <typename VARIANT>
+bool variant_holds_value(const VARIANT &var) {
+	return !is_empty_variant(var);
 }
 
 } // end ns
