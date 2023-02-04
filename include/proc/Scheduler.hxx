@@ -4,6 +4,9 @@
 // Linux
 #include <sched.h>
 
+// C++
+#include <variant>
+
 // Cosmos
 #include "cosmos/ostypes.hxx"
 
@@ -182,6 +185,12 @@ public: // functions
 		RealtimeSchedulerSettings(SchedulerPolicy::ROUND_ROBIN)
 	{}
 };
+
+/// A variant that can hold any of the specialized SchedulerSettings types
+typedef std::variant<
+		OtherSchedulerSettings,
+		FifoSchedulerSettings,
+		RoundRobinSchedulerSettings> SchedulerSettingsVariant;
 
 } // end ns
 
