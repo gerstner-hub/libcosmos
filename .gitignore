@@ -4,3 +4,4 @@ build
 *.swp
 *.swo
 __pycache__
+doc/todo
