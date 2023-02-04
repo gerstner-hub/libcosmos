@@ -34,6 +34,12 @@ namespace fs {
  **/
 COSMOS_API bool existsFile(const std::string_view path);
 
+/// change the calling process's current working directory to \c path
+/**
+ * On error an ApiError exception is thrown.
+ **/
+COSMOS_API void changeDir(const std::string_view path);
+
 } // end ns
 } // end ns
 
