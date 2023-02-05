@@ -24,6 +24,22 @@
 #include <sstream>
 #include <string>
 
+using ExitStatus = cosmos::ExitStatus;
+
+class TestBase {
+protected:
+	constexpr TestBase(const std::string_view title) :
+		m_title(title)
+	{}
+
+public:
+
+	std::string_view getTitle() const { return m_title; }
+
+protected:
+	const std::string_view m_title;
+};
+
 class RedirectOutputTestBase {
 public:
 	RedirectOutputTestBase() :
@@ -61,10 +77,12 @@ protected:
 
 // test whether redirecting stdout works
 class RedirectStdoutTest :
-	public RedirectOutputTestBase
+	public RedirectOutputTestBase,
+	public TestBase
 {
 public:
 	RedirectStdoutTest() :
+		TestBase{"redirecting stdout"},
 		m_cat_file("/etc/fstab")
 	{}
 
@@ -134,10 +152,12 @@ protected:
 
 // test whether redirecting stderr works
 class RedirectStderrTest :
-	public RedirectOutputTestBase
+	public RedirectOutputTestBase,
+	public TestBase
 {
 public:
 	RedirectStderrTest() :
+		TestBase{"redirecting stderr"},
 		m_nonexisting_file("/non/existing/file")
 	{}
 
@@ -157,7 +177,7 @@ public:
 		m_proc = std::move(cloner.run());
 		auto res = m_proc.wait();
 
-		if (! res.exited() || res.exitStatus() != cosmos::ExitStatus(1)) {
+		if (! res.exited() || res.exitStatus() != ExitStatus(1)) {
 			std::cerr << res << std::endl;
 			cosmos_throw (cosmos::InternalError("Child process with redirected stderr ended in unexpected state"));
 		}
@@ -197,9 +217,10 @@ protected:
 };
 
 // tests a more complex child process setup using Pipe I/O
-class PipeInTest {
+class PipeInTest : public TestBase {
 public:
 	explicit PipeInTest() :
+		TestBase{"pipe I/O"},
 		m_head_path("/usr/bin/head"),
 		m_test_file("/etc/services")
 	{}
@@ -312,12 +333,12 @@ protected:
 };
 
 // tests the waitTimed() functionality
-class TimeoutTest {
+class TimeoutTest : public TestBase {
 public:
 	explicit TimeoutTest() :
+		TestBase{"wait with timeout"},
 		m_sleep_bin("/usr/bin/sleep")
-	{
-	}
+	{}
 
 	void run() {
 		// let the child sleep some seconds
@@ -334,7 +355,7 @@ public:
 				num_timeouts++;
 				continue;
 			}
-			else if (res->exited() && res->exitStatus() == cosmos::ExitStatus::SUCCESS) {
+			else if (res->exited() && res->exitStatus() == ExitStatus::SUCCESS) {
 				// correctly exited
 				break;
 			}
@@ -365,13 +386,12 @@ protected:
  *
  * Therefor test this situation.
  */
-class MixedWaitInvocationTest {
+class MixedWaitInvocationTest : public TestBase {
 public:
 	explicit MixedWaitInvocationTest() :
+		TestBase{"parallel wait invocation"},
 		m_sleep_bin("/usr/bin/sleep")
-	{
-
-	}
+	{}
 
 	void collectResults() {
 		/*
@@ -440,11 +460,11 @@ protected:
 };
 
 // tests whether the setPostForkCB() works
-class PostForkTest {
+class PostForkTest : public TestBase {
 public:
-	PostForkTest() {
-
-	}
+	PostForkTest() :
+		TestBase{"post fork callback"}
+	{}
 
 	void postFork(const cosmos::ChildCloner &cloner) {
 		if (&cloner != &m_cloner) {
@@ -475,12 +495,16 @@ public:
 protected:
 	cosmos::ChildCloner m_cloner;
 	cosmos::SubProc m_true_proc;
-	static constexpr cosmos::ExitStatus REPLACE_EXIT = cosmos::ExitStatus(40);
+	static constexpr ExitStatus REPLACE_EXIT = ExitStatus(40);
 };
 
 // tests whether overriding child environment works
-class EnvironmentTest {
+class EnvironmentTest : public TestBase {
 public:
+
+	EnvironmentTest() :
+		TestBase{"environment override"}
+	{}
 
 	void run() {
 		cosmos::ChildCloner cloner{{"/usr/bin/env"}};
@@ -535,8 +559,12 @@ protected:
 
 // tests whether the operator<< to add executable and command line arguments
 // works as expected
-class ArgOperatorTest {
+class ArgOperatorTest : public TestBase {
 public:
+
+	ArgOperatorTest() :
+		TestBase{"arg operator<<"}
+	{}
 
 	void run() {
 		cosmos::ChildCloner cloner;
@@ -566,15 +594,19 @@ public:
 		proc.wait();
 
 		if (!found_root) {
-			std::cerr << "couldn't find root: eintry in /etc/passwd" << std::endl;
-			cosmos::proc::exit(cosmos::ExitStatus(1));
+			cosmos_throw( cosmos::InternalError("couldn't find root: eintry in /etc/passwd") );
 		}
 	}
 };
 
 // tests whether scheduler settings actually apply
-class SchedulerTest {
+class SchedulerTest : public TestBase {
 public:
+
+	SchedulerTest() :
+		TestBase{"scheduler priority setting"}
+	{}
+
 	void run() {
 		// we test the "OtherSchedulerSettings" i.e. raising the nice
 		// value (i.e. lowering nice priority). This is the only
@@ -601,14 +633,22 @@ public:
 
 		std::string stat_line;
 		std::getline(stat_io, stat_line);
-		verifyNiceValue(stat_line);
+
+		try {
+			verifyNiceValue(stat_line);
+		} catch (...) {
+			stat_pipe.closeReadEnd();
+			proc.kill(cosmos::signal::TERMINATE);
+			proc.wait();
+			throw;
+		}
 
 		stat_pipe.closeReadEnd();
 
 		auto res = proc.wait();
 		if (!res.exitedSuccessfully()) {
 			std::cerr << "cat /proc/self/stat failed" << std::endl;
-			cosmos::proc::exit(cosmos::ExitStatus(1));
+			cosmos::proc::exit(ExitStatus(1));
 		}
 	}
 
@@ -644,16 +684,16 @@ public:
 			break;
 		}
 
-		cosmos::proc::exit(cosmos::ExitStatus(1));
+		cosmos_throw( cosmos::InternalError("Failed to verify nice prio of child") );
 	}
 };
 
 template <class T>
-void runTest(const std::string_view title) {
+void runTest() {
 	T test;
 	try {
 		std::cout << "\n\n=================\n";
-		std::cout <<     "running sub-test: " << title << "\n";
+		std::cout <<     "running sub-test: " << test.getTitle() << "\n";
 		std::cout <<     "=================\n" << std::endl;
 		test.run();
 		std::cout << "\n\n";
@@ -669,15 +709,15 @@ int main() {
 		 * test redirection of each std. file descriptor
 		 */
 
-		runTest<RedirectStdoutTest>("Redirecting stdout");
-		runTest<RedirectStderrTest>("Redirecting stderr");
-		runTest<PipeInTest>("Pipe input");
-		runTest<TimeoutTest>("wait with timeout");
-		runTest<MixedWaitInvocationTest>("parallel wait invocation");
-		runTest<PostForkTest>("post fork callback");
-		runTest<EnvironmentTest>("environment override");
-		runTest<ArgOperatorTest>("arg operator<<");
-		runTest<SchedulerTest>("scheduler priority setting");
+		runTest<RedirectStdoutTest>();
+		runTest<RedirectStderrTest>();
+		runTest<PipeInTest>();
+		runTest<TimeoutTest>();
+		runTest<MixedWaitInvocationTest>();
+		runTest<PostForkTest>();
+		runTest<EnvironmentTest>();
+		runTest<ArgOperatorTest>();
+		runTest<SchedulerTest>();
 
 		return 0;
 	}
