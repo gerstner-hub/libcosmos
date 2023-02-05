@@ -97,6 +97,10 @@ public:
 	bool canOthersWrite() const { return (m_mode & S_IWOTH) != 0; }
 	bool canOthersExec()  const { return (m_mode & S_IXOTH) != 0; }
 
+	bool canAnyExec() const {
+		return canOwnerExec() || canGroupExec() || canOthersExec();
+	}
+
 	/// Returns the file permissions bits only (file type stripped off)
 	mode_t getPermBits() const { return m_mode & (~S_IFMT); }
 
