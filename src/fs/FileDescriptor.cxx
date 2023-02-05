@@ -32,6 +32,24 @@ void FileDescriptor::duplicate(const FileDescriptor new_fd, const CloseOnExec cl
 	}
 }
 
+FileDescriptor::StatusFlags FileDescriptor::getStatusFlags() const {
+	const auto flags = fcntl(to_integral(m_fd), F_GETFD);
+
+	if (flags == -1) {
+		cosmos_throw (ApiError("failed to get F_GETFD status flags"));
+	}
+	
+	return StatusFlags{flags};
+}
+
+void FileDescriptor::setStatusFlags(const StatusFlags flags) {
+	auto res = fcntl(to_integral(m_fd), F_SETFD, flags.get());
+
+	if (res != 0) {
+		cosmos_throw (ApiError("failed to set F_SETFD status flags"));
+	}
+}
+
 FileDescriptor stdout(FileNum::STDOUT);
 FileDescriptor stderr(FileNum::STDERR);
 FileDescriptor stdin(FileNum::STDIN);

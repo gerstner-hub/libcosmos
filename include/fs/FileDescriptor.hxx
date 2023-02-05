@@ -1,7 +1,11 @@
 #ifndef COSMOS_FILEDESCRIPTOR_HXX
 #define COSMOS_FILEDESCRIPTOR_HXX
 
+// Linux
+#include <fcntl.h>
+
 // libcosmos
+#include "cosmos/BitMask.hxx"
 #include "cosmos/ostypes.hxx"
 #include "cosmos/types.hxx"
 
@@ -22,6 +26,16 @@ using CloseOnExec = NamedBool<struct cloexec_t, true>;
  * descriptor during destruction. This has to be done explicitly instead.
  **/
 class COSMOS_API FileDescriptor {
+public: // types
+
+	/// Configurable per file-descriptors flags
+	enum class Flags : int {
+		CLOEXEC = FD_CLOEXEC
+	};
+
+	/// Collection of OpenSettings used for opening files
+	typedef BitMask<Flags> StatusFlags;
+
 public: // functions
 
 	explicit FileDescriptor(FileNum fd = FileNum::INVALID) : m_fd(fd) {}
@@ -73,6 +87,17 @@ public: // functions
 	 * will have the close-on-exec flag set.
 	 **/
 	void duplicate(const FileDescriptor new_fd, const CloseOnExec cloexec = CloseOnExec(true)) const;
+
+	/// retrieves the current file descriptor status flags
+	StatusFlags getStatusFlags() const;
+
+	/// changes the current file descriptor status flags
+	void setStatusFlags(const StatusFlags flags);
+
+	/// convenience wrapper around setStatusFlags to change CLOEXEC setting
+	void setCloseOnExec(bool on_off) {
+		setStatusFlags(on_off ? StatusFlags{Flags::CLOEXEC} : StatusFlags{0});
+	}
 
 	/// Returns the primitive file descriptor contained in the object
 	FileNum raw() const { return m_fd; }
