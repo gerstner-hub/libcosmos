@@ -10,6 +10,10 @@
 // cosmos
 #include "cosmos/algs.hxx"
 #include "cosmos/errors/ApiError.hxx"
+#include "cosmos/errors/InternalError.hxx"
+#include "cosmos/errors/UsageError.hxx"
+#include "cosmos/fs/Directory.hxx"
+#include "cosmos/fs/DirIterator.hxx"
 #include "cosmos/fs/File.hxx"
 #include "cosmos/fs/FileSystem.hxx"
 #include "cosmos/proc/Process.hxx"
@@ -24,6 +28,12 @@ bool existsFile(const std::string_view path) {
 		cosmos_throw (ApiError());
 
 	return false;
+}
+
+void unlinkFile(const std::string_view path) {
+	if (::unlink(path.data()) != 0) {
+		cosmos_throw (ApiError());
+	}
 }
 
 void changeDir(const std::string_view path) {
@@ -111,6 +121,82 @@ std::optional<std::string> which(const std::string_view exec_base) noexcept {
 	}
 
 	return {};
+}
+
+void makeDir(const std::string_view path, const FileMode mode) {
+	if (::mkdir(path.data(), mode.raw()) != 0) {
+		cosmos_throw (ApiError());
+	}
+}
+
+void removeDir(const std::string_view path) {
+	if (::rmdir(path.data()) != 0) {
+		cosmos_throw (ApiError());
+	}
+}
+
+Errno makeAllDirs(const std::string_view path, const FileMode mode) {
+	size_t sep_pos = 0;
+	std::string prefix;
+	Errno ret{Errno::EXISTS};
+
+	if (path.empty()) {
+		cosmos_throw (UsageError("empty string passed in"));
+	}
+
+	while (sep_pos != path.npos) {
+		sep_pos = path.find('/', sep_pos + 1);
+		prefix = path.substr(0, sep_pos);
+
+		if (prefix.back() == '/') {
+			// root directory "/" or a trailing or duplicate slash
+			continue;
+		} else if (prefix == ".") {
+			// leading "." component, no sense in trying to create it
+			continue;
+		}
+
+		if (::mkdir(prefix.data(), mode.raw()) != 0) {
+			if (getErrno() == Errno::EXISTS) {
+				continue;
+			}
+
+			cosmos_throw (ApiError());
+		}
+
+		// at least one directory was created
+		ret = Errno::NO_ERROR;
+	}
+
+	return ret;
+}
+
+void removeTree(const std::string_view path) {
+	// TODO implement this more efficiently using ulinkat() & friends
+	Directory dir(path);
+
+	using Type = DirEntry::Type;
+
+	for (const auto entry: dir) {
+
+		if (entry.isDotEntry())
+			continue;
+
+		switch(entry.type()) {
+		case Type::UNKNOWN: // TODO fetch FileInfo separately
+			cosmos_throw (InternalError("not implemented"));
+			break;
+		case Type::DIRECTORY:
+			// get down recursively 
+			removeTree(std::string{path} + "/" + entry.name());
+			break;
+		default:
+			unlinkFile(std::string{path} + "/" + entry.name());
+			break;
+		}
+	};
+
+	removeDir(path);
 }
 
 } // end ns
