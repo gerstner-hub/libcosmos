@@ -1,4 +1,5 @@
 // Cosmos
+#include "cosmos/proc/ChildCloner.hxx"
 #include "cosmos/proc/SubProc.hxx"
 #include "cosmos/io/StreamAdaptor.hxx"
 #include "cosmos/io/Pipe.hxx"
@@ -7,6 +8,7 @@
 #include "cosmos/errors/ApiError.hxx"
 #include "cosmos/formatting.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
+#include "cosmos/string.hxx"
 #include "cosmos/types.hxx"
 #include "cosmos/Init.hxx"
 
@@ -78,9 +80,9 @@ public:
 		 * and check afterwards that the file contains the right
 		 * stuff.
 		 */
-		m_proc.setStdout(file.fileDesc());
-		m_proc.setArgs({m_cat_path, m_cat_file});
-		m_proc.run();
+		cosmos::ChildCloner cloner{{m_cat_path, m_cat_file}};
+		cloner.setStdOut(file.fileDesc());
+		m_proc = std::move(cloner.run());
 		auto res = m_proc.wait();
 
 		if (! res.exitedSuccessfully()) {
@@ -150,9 +152,9 @@ public:
 		 * and check afterwards that an error message is
 		 * contained in the stderr file.
 		 */
-		m_proc.setStderr(file.fileDesc());
-		m_proc.setArgs({m_cat_path, m_nonexisting_file});
-		m_proc.run();
+		cosmos::ChildCloner cloner{{m_cat_path, m_nonexisting_file}};
+		cloner.setStdErr(file.fileDesc());
+		m_proc = std::move(cloner.run());
 		auto res = m_proc.wait();
 
 		if (! res.exited() || res.exitStatus() != 1) {
@@ -212,10 +214,10 @@ public:
 		 * and we check whether the expected number of lines can be
 		 * read from the pipe
 		 */
-		m_proc.setArgs({m_head_path, "-n", ss.str()});
-		m_proc.setStdout(m_pipe_from_head.getWriteEnd());
-		m_proc.setStdin(m_pipe_to_head.getReadEnd());
-		m_proc.run();
+		cosmos::ChildCloner cloner{{m_head_path, "-n", ss.str()}};
+		cloner.setStdOut(m_pipe_from_head.getWriteEnd());
+		cloner.setStdIn(m_pipe_to_head.getReadEnd());
+		m_proc = std::move(cloner.run());
 
 		// we need to close the write-end to successfully receive an
 		// EOF indication on the read end when the sub process
@@ -317,8 +319,8 @@ public:
 
 	void run() {
 		// let the child sleep some seconds
-		m_proc.setArgs({m_sleep_bin, "5"});
-		m_proc.run();
+		cosmos::ChildCloner cloner{{m_sleep_bin, "5"}};
+		m_proc = std::move(cloner.run());
 
 		size_t num_timeouts = 0;
 
@@ -402,14 +404,14 @@ public:
 	}
 
 	void run() {
-		m_short_proc.setArgs({m_sleep_bin, "5"});
-		m_long_proc.setArgs({m_sleep_bin, "10"});
+		cosmos::ChildCloner cloner;
+		cloner.setArgs({m_sleep_bin, "5"});
+		m_short_proc = cloner.run();
+		std::cout << "started " << cloner.getArgs() << " with PID " << m_short_proc.pid() << "\n";
 
-		m_short_proc.run();
-		m_long_proc.run();
-
-		std::cout << "started " << m_short_proc.args() << " with PID " << m_short_proc.pid() << std::endl;
-		std::cout << "started " << m_long_proc.args() << " with PID " << m_long_proc.pid() << std::endl;
+		cloner.setArgs({m_sleep_bin, "10"});
+		m_long_proc = cloner.run();
+		std::cout << "started " << cloner.getArgs() << " with PID " << m_long_proc.pid() << std::endl;
 
 		try {
 			collectResults();
@@ -441,24 +443,24 @@ public:
 
 	}
 
-	void postFork(const cosmos::SubProc &proc) {
-		if (&proc != &m_true_proc) {
+	void postFork(const cosmos::ChildCloner &cloner) {
+		if (&cloner != &m_cloner) {
 			std::cerr << "proc != m_true_proc ?!" << std::endl;
-			std::cerr << (void*)&proc << " != " << (void*)&m_true_proc << std::endl;
+			std::cerr << (void*)&cloner << " != " << (void*)&m_cloner << std::endl;
 			_exit(2);
 		}
 
 		// let's exit with this status instead of actually executing
 		// true, this will signal us that that the postFork() actually
-		// run.
+		// did run.
 		_exit(REPLACE_EXIT);
 	}
 
 	void run() {
-		m_true_proc.setExe("/usr/bin/true");
-		cosmos::SubProc::Callback cb = std::bind( &PostForkTest::postFork, this, std::placeholders::_1 );
-		m_true_proc.setPostForkCB(cb);
-		m_true_proc.run();
+		m_cloner.setExe("/usr/bin/true");
+		cosmos::ChildCloner::Callback cb = std::bind( &PostForkTest::postFork, this, std::placeholders::_1 );
+		m_cloner.setPostForkCB(cb);
+		m_true_proc = m_cloner.run();
 		auto res = m_true_proc.wait();
 		if (!res.exited() || res.exitStatus() != REPLACE_EXIT) {
 			cosmos_throw (cosmos::InternalError("post fork child didn't act as expected"));
@@ -468,6 +470,7 @@ public:
 	}
 
 protected:
+	cosmos::ChildCloner m_cloner;
 	cosmos::SubProc m_true_proc;
 	static constexpr int REPLACE_EXIT = 40;
 };
@@ -476,10 +479,10 @@ class EnvironmentTest {
 public:
 
 	void run() {
+		cosmos::ChildCloner cloner{{"/usr/bin/env"}};
 		// run the env tool to inspect via pipe redirection whether
 		// the child process has got the expected environment
-		m_env_proc.setStdout(m_pipe_from_env.getWriteEnd());
-		m_env_proc.setExe("/usr/bin/env");
+		cloner.setStdOut(m_pipe_from_env.getWriteEnd());
 		cosmos::StringVector env({"this=that", "misc=other"});
 		std::set<std::string> env_set;
 
@@ -487,8 +490,8 @@ public:
 			env_set.insert(e);
 		}
 
-		m_env_proc.setEnv(env);
-		m_env_proc.run();
+		cloner.setEnv(env);
+		m_env_proc = cloner.run();
 
 		m_pipe_from_env.closeWriteEnd();
 
@@ -526,6 +529,43 @@ protected:
 	cosmos::SubProc m_env_proc;
 };
 
+class ArgOperatorTest {
+public:
+
+	void run() {
+		cosmos::ChildCloner cloner;
+		cosmos::Pipe pipe_from_cat;
+
+		cloner << "/bin/cat" << "/etc/passwd";
+		cloner.setStdOut(pipe_from_cat.getWriteEnd());
+
+		auto proc = cloner.run();
+
+		pipe_from_cat.closeWriteEnd();
+		cosmos::InputStreamAdaptor from_cat(pipe_from_cat);
+
+		std::string passwd_line;
+		bool found_root = false;
+
+		while (true) {
+			std::getline(from_cat, passwd_line);
+			if (cosmos::isPrefix(passwd_line, "root:")) {
+				std::cout << "found root: entry in /etc/passwd";
+				found_root = true;
+				break;
+			}
+		}
+
+		pipe_from_cat.closeReadEnd();
+		proc.wait();
+
+		if (!found_root) {
+			std::cerr << "couldn't find root: eintry in /etc/passwd" << std::endl;
+			exit(1);
+		}
+	}
+};
+
 template <class T>
 void runTest() {
 	T test;
@@ -551,6 +591,7 @@ int main() {
 		runTest<MixedWaitInvocationTest>();
 		runTest<PostForkTest>();
 		runTest<EnvironmentTest>();
+		runTest<ArgOperatorTest>();
 
 		return 0;
 	}
