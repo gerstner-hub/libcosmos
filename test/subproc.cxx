@@ -1,6 +1,7 @@
 // Cosmos
 #include "cosmos/proc/ChildCloner.hxx"
 #include "cosmos/proc/SubProc.hxx"
+#include "cosmos/proc/Process.hxx"
 #include "cosmos/io/StreamAdaptor.hxx"
 #include "cosmos/io/Pipe.hxx"
 #include "cosmos/errors/CosmosError.hxx"
@@ -12,19 +13,15 @@
 #include "cosmos/types.hxx"
 #include "cosmos/Init.hxx"
 
+// POSIX
+#include <fcntl.h>
+
 // C++
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <set>
 #include <sstream>
 #include <string>
-
-// C
-#include <stdlib.h>
-#include <fcntl.h>
-
-// POSIX
-#include <signal.h>
 
 class RedirectOutputTestBase {
 public:
@@ -157,7 +154,7 @@ public:
 		m_proc = std::move(cloner.run());
 		auto res = m_proc.wait();
 
-		if (! res.exited() || res.exitStatus() != 1) {
+		if (! res.exited() || res.exitStatus() != cosmos::ExitStatus(1)) {
 			std::cerr << res << std::endl;
 			cosmos_throw (cosmos::InternalError("Child process with redirected stderr ended in unexpected state"));
 		}
@@ -332,7 +329,7 @@ public:
 				num_timeouts++;
 				continue;
 			}
-			else if (res->exited() && res->exitStatus() == 0) {
+			else if (res->exited() && res->exitStatus() == cosmos::ExitStatus::SUCCESS) {
 				// correctly exited
 				break;
 			}
@@ -453,7 +450,7 @@ public:
 		// let's exit with this status instead of actually executing
 		// true, this will signal us that that the postFork() actually
 		// did run.
-		_exit(REPLACE_EXIT);
+		cosmos::proc::exit(REPLACE_EXIT);
 	}
 
 	void run() {
@@ -472,7 +469,7 @@ public:
 protected:
 	cosmos::ChildCloner m_cloner;
 	cosmos::SubProc m_true_proc;
-	static constexpr int REPLACE_EXIT = 40;
+	static constexpr cosmos::ExitStatus REPLACE_EXIT = cosmos::ExitStatus(40);
 };
 
 class EnvironmentTest {

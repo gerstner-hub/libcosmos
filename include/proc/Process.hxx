@@ -7,6 +7,7 @@
 // cosmos
 #include "cosmos/ostypes.hxx"
 #include "cosmos/proc/Signal.hxx"
+#include "cosmos/proc/WaitRes.hxx"
 
 /**
  * @file
@@ -54,6 +55,14 @@ COSMOS_API GroupID getEffectiveGroupID();
  * The new session will not yet have a controlling terminal.
  **/
 COSMOS_API ProcessID createNewSession();
+
+/// immediately terminate the calling process
+/**
+ * This terminates the calling process, using \c status as the process's exit
+ * code. "immediately" refers to the fact that no userspace cleanup actions
+ * like running libc `atexit()` handlers will take place.
+ **/
+COSMOS_API [[ noreturn ]] void exit(ExitStatus status);
 
 /// helper type for caching PID an PPID information
 struct PidInfo {

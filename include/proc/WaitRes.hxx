@@ -14,8 +14,21 @@
 
 namespace cosmos {
 
+/// represents an exit status code from a child process
+/**
+ * The valid range of exit statuses is 0 .. 255 (the 8 lower bits of the
+ * si_status field in WaitRes).
+ **/
+enum class ExitStatus : int {
+	INVALID = -1,
+	SUCCESS = 0
+};
+
 /// Represents the result from a waitid() call
-class COSMOS_API WaitRes : siginfo_t {
+/**
+ * An instance of this type is returned from SubProc::wait().
+ **/
+class WaitRes : siginfo_t {
 	friend class SubProc;
 public: // functions
 
@@ -33,7 +46,7 @@ public: // functions
 	 * The returned value is only valid in case exited() returns \c true.
 	 * Otherwise -1 is returned.
 	 **/
-	int exitStatus() const { return exited() ? si_status : -1; }
+	ExitStatus exitStatus() const { return exited() ? ExitStatus{si_status} : ExitStatus::INVALID; }
 
 	/// Returns the signal that caused the child to stop
 	/**
@@ -55,7 +68,7 @@ public: // functions
 	/**
 	 * \note This only works if the TRACESYSGOOD option was set
 	 **/
-	bool syscallTrace() const { return si_code == CLD_TRAPPED; }
+	bool trapped() const { return si_code == CLD_TRAPPED; }
 
 	/// Checks whether the given trace event occured
 	/**
@@ -71,13 +84,16 @@ public: // functions
 
 	/// Returns whether the child exited and had an exit status of 0
 	bool exitedSuccessfully() const {
-		return exited() && exitStatus() == 0;
+		return exited() && exitStatus() == ExitStatus::SUCCESS;
 	}
 
 	void reset() { si_status = 0; }
 };
 
 } // end ns
+
+/// Outputs the strongly typed ExitStatus as an integer
+COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::ExitStatus status);
 
 /// Outputs a human readable summary of the WaitRes
 COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::WaitRes &res);

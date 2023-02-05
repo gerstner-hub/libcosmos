@@ -1,11 +1,12 @@
-// Cosmos
-#include "cosmos/proc/Process.hxx"
-#include "cosmos/proc/SigSet.hxx"
-#include "cosmos/errors/ApiError.hxx"
-
 // Linux
 #include <sys/types.h>
 #include <unistd.h>
+
+// Cosmos
+#include "cosmos/algs.hxx"
+#include "cosmos/errors/ApiError.hxx"
+#include "cosmos/proc/Process.hxx"
+#include "cosmos/proc/SigSet.hxx"
 
 namespace cosmos::proc {
 
@@ -41,6 +42,10 @@ ProcessID createNewSession() {
 	}
 
 	return res;
+}
+
+void exit(ExitStatus status) {
+	_exit(to_integral(status));
 }
 
 PidInfo cached_pids;
