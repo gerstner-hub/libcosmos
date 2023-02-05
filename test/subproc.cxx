@@ -1,22 +1,23 @@
 // Cosmos
-#include "cosmos/proc/ChildCloner.hxx"
-#include "cosmos/proc/SubProc.hxx"
-#include "cosmos/proc/Process.hxx"
-#include "cosmos/io/StreamAdaptor.hxx"
-#include "cosmos/io/Pipe.hxx"
+#include "cosmos/errors/ApiError.hxx"
 #include "cosmos/errors/CosmosError.hxx"
 #include "cosmos/errors/InternalError.hxx"
-#include "cosmos/errors/ApiError.hxx"
 #include "cosmos/formatting.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
+#include "cosmos/Init.hxx"
+#include "cosmos/io/Pipe.hxx"
+#include "cosmos/io/StreamAdaptor.hxx"
+#include "cosmos/proc/ChildCloner.hxx"
+#include "cosmos/proc/Process.hxx"
+#include "cosmos/proc/SubProc.hxx"
 #include "cosmos/string.hxx"
 #include "cosmos/types.hxx"
-#include "cosmos/Init.hxx"
 
 // POSIX
 #include <fcntl.h>
 
 // C++
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <set>
@@ -58,6 +59,7 @@ protected:
 	cosmos::SubProc m_proc;
 };
 
+// test whether redirecting stdout works
 class RedirectStdoutTest :
 	public RedirectOutputTestBase
 {
@@ -130,6 +132,7 @@ protected:
 	const std::string m_cat_file;
 };
 
+// test whether redirecting stderr works
 class RedirectStderrTest :
 	public RedirectOutputTestBase
 {
@@ -193,6 +196,7 @@ protected:
 	const std::string m_nonexisting_file;
 };
 
+// tests a more complex child process setup using Pipe I/O
 class PipeInTest {
 public:
 	explicit PipeInTest() :
@@ -307,6 +311,7 @@ protected:
 	const size_t m_expected_lines = 5;
 };
 
+// tests the waitTimed() functionality
 class TimeoutTest {
 public:
 	explicit TimeoutTest() :
@@ -358,7 +363,7 @@ protected:
  * child process is waited for in the meantime and the implementation discards
  * its result.
  *
- * Therefore test this situation.
+ * Therefor test this situation.
  */
 class MixedWaitInvocationTest {
 public:
@@ -434,6 +439,7 @@ protected:
 	const std::string m_sleep_bin;
 };
 
+// tests whether the setPostForkCB() works
 class PostForkTest {
 public:
 	PostForkTest() {
@@ -472,6 +478,7 @@ protected:
 	static constexpr cosmos::ExitStatus REPLACE_EXIT = cosmos::ExitStatus(40);
 };
 
+// tests whether overriding child environment works
 class EnvironmentTest {
 public:
 
@@ -526,6 +533,8 @@ protected:
 	cosmos::SubProc m_env_proc;
 };
 
+// tests whether the operator<< to add executable and command line arguments
+// works as expected
 class ArgOperatorTest {
 public:
 
@@ -558,15 +567,94 @@ public:
 
 		if (!found_root) {
 			std::cerr << "couldn't find root: eintry in /etc/passwd" << std::endl;
-			exit(1);
+			cosmos::proc::exit(cosmos::ExitStatus(1));
 		}
 	}
 };
 
+// tests whether scheduler settings actually apply
+class SchedulerTest {
+public:
+	void run() {
+		// we test the "OtherSchedulerSettings" i.e. raising the nice
+		// value (i.e. lowering nice priority). This is the only
+		// scheduler change we can perform without special
+		// permissions.
+		//
+		// The nice value of the process can be found in
+		// /proc/<pid>/stat so use cat on this and parse the output
+		// via a Pipe
+		cosmos::ChildCloner cloner{{"/bin/cat", "/proc/self/stat"}};
+
+		cosmos::Pipe stat_pipe;
+		cloner.setStdOut(stat_pipe.getWriteEnd());
+
+		cosmos::OtherSchedulerSettings sched_settings;
+		sched_settings.setNiceValue(sched_settings.maxNiceValue());
+		cloner.setSchedulerSettings(sched_settings);
+
+		auto proc = cloner.run();
+
+		stat_pipe.closeWriteEnd();
+
+		cosmos::InputStreamAdaptor stat_io(stat_pipe);
+
+		std::string stat_line;
+		std::getline(stat_io, stat_line);
+		verifyNiceValue(stat_line);
+
+		stat_pipe.closeReadEnd();
+
+		auto res = proc.wait();
+		if (!res.exitedSuccessfully()) {
+			std::cerr << "cat /proc/self/stat failed" << std::endl;
+			cosmos::proc::exit(cosmos::ExitStatus(1));
+		}
+	}
+
+	void verifyNiceValue(const std::string stat_line) {
+
+		std::cout << "stat_line: " << stat_line << std::endl;
+		std::istringstream ss;
+		ss.str(stat_line);
+
+		// NOTE: parsing this way would be unsafe for untrusted
+		// processes if they contain whitespace in their executable
+		// name
+		std::string field;
+
+		for(size_t nr = 1; !ss.eof(); nr++) {
+			std::getline(ss, field, ' ');
+
+			if (nr != 19)
+				continue;
+			
+			char *end;
+			auto prio = std::strtoul(field.c_str(), &end, 10);
+			if (static_cast<size_t>(end - field.data()) != field.size()) {
+				std::cerr << "couldn't parse /proc/self/stat" << std::endl;
+			} else if (prio != cosmos::OtherSchedulerSettings::maxNiceValue()) {
+				std::cerr << "encountered nice prio " << prio << " doesn't match max nice prio " << cosmos::OtherSchedulerSettings::maxNiceValue() << std::endl;
+			} else {
+				std::cout << "child process has correct maximum nice value" << std::endl;
+				// found correct prio
+				return;
+			}
+
+			break;
+		}
+
+		cosmos::proc::exit(cosmos::ExitStatus(1));
+	}
+};
+
 template <class T>
-void runTest() {
+void runTest(const std::string_view title) {
 	T test;
 	try {
+		std::cout << "\n\n=================\n";
+		std::cout <<     "running sub-test: " << title << "\n";
+		std::cout <<     "=================\n" << std::endl;
 		test.run();
 		std::cout << "\n\n";
 	} catch (const std::exception &ex) {
@@ -581,14 +669,15 @@ int main() {
 		 * test redirection of each std. file descriptor
 		 */
 
-		runTest<RedirectStdoutTest>();
-		runTest<RedirectStderrTest>();
-		runTest<PipeInTest>();
-		runTest<TimeoutTest>();
-		runTest<MixedWaitInvocationTest>();
-		runTest<PostForkTest>();
-		runTest<EnvironmentTest>();
-		runTest<ArgOperatorTest>();
+		runTest<RedirectStdoutTest>("Redirecting stdout");
+		runTest<RedirectStderrTest>("Redirecting stderr");
+		runTest<PipeInTest>("Pipe input");
+		runTest<TimeoutTest>("wait with timeout");
+		runTest<MixedWaitInvocationTest>("parallel wait invocation");
+		runTest<PostForkTest>("post fork callback");
+		runTest<EnvironmentTest>("environment override");
+		runTest<ArgOperatorTest>("arg operator<<");
+		runTest<SchedulerTest>("scheduler priority setting");
 
 		return 0;
 	}
