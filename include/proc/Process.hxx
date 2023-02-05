@@ -4,10 +4,15 @@
 // Linux
 #include <signal.h>
 
+// C++
+#include <optional>
+#include <string_view>
+
 // cosmos
 #include "cosmos/ostypes.hxx"
 #include "cosmos/proc/Signal.hxx"
 #include "cosmos/proc/WaitRes.hxx"
+#include "cosmos/types.hxx"
 
 /**
  * @file
@@ -56,13 +61,47 @@ COSMOS_API GroupID getEffectiveGroupID();
  **/
 COSMOS_API ProcessID createNewSession();
 
-/// immediately terminate the calling process
+/// Immediately terminate the calling process
 /**
  * This terminates the calling process, using \c status as the process's exit
  * code. "immediately" refers to the fact that no userspace cleanup actions
  * like running libc `atexit()` handlers will take place.
  **/
 COSMOS_API [[ noreturn ]] void exit(ExitStatus status);
+
+/// Returns the value for the environment variable named \c name
+/**
+ * This inspects the calling process's environment variables for a variable
+ * named \c name and returns its value. If no such variable is found then
+ * nothing is returned.
+ **/
+COSMOS_API std::optional<std::string_view> getEnvVar(const std::string_view name);
+
+/// helper type to specify overwrite behaviour in setEnvVar()
+using OverwriteEnv = NamedBool<struct overwrite_env_t, true>;
+
+/// Insert or replace an environment variable
+/**
+ * This inserts a new name/value pair into the calling process's environment.
+ * If a variable of the given name already exists then the outcome depends on
+ * the \c overwrite setting: If true then an existing value will be replaced,
+ * otherwise the existing value remains untouched.
+ *
+ * This call can fail with an exception (e.g. if the \c name contains invalid
+ * characters).
+ **/
+COSMOS_API void setEnvVar(const std::string_view name, const std::string_view val, const OverwriteEnv overwrite);
+
+/// Remove the given environment variable
+/**
+ * This removes the environment variable named \c name from the calling
+ * process's environment. If no such variable exists then nothing happens and
+ * the function succeeds.
+ *
+ * This call can fail with an exception (e.g. if the \c name contains invalid
+ * characters).
+ **/
+COSMOS_API void clearEnvVar(const std::string_view name);
 
 /// helper type for caching PID an PPID information
 struct PidInfo {
