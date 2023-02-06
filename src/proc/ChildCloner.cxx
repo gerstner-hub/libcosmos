@@ -161,7 +161,6 @@ void ChildCloner::postFork() {
 		m_post_fork_cb(*this);
 	}
 
-
 	if (m_sched_settings) {
 		try {
 			std::visit([](auto &&sched_settings) {
@@ -183,6 +182,10 @@ void ChildCloner::postFork() {
 	redirectFD(cosmos::stdout, m_stdout);
 	redirectFD(cosmos::stderr, m_stderr);
 	redirectFD(cosmos::stdin, m_stdin);
+
+	for (auto fd: m_inherit_fds) {
+		fd.setCloseOnExec(false);
+	}
 }
 
 void ChildCloner::redirectFD(FileDescriptor orig, FileDescriptor redirect) {

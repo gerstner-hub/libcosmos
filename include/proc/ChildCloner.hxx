@@ -8,6 +8,7 @@
 #include <string_view>
 
 // cosmos
+#include "cosmos/errors/UsageError.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/proc/Scheduler.hxx"
 #include "cosmos/proc/SubProc.hxx"
@@ -160,6 +161,37 @@ public: // functions
 	/// \c see setStderr()
 	void setStdIn(FileDescriptor fd) { m_stdin = fd; }
 
+	/// adds a file descriptor to inherit to the child process
+	/**
+	 * Beyond the stdin, stdout and stderr file descriptor additional
+	 * descriptors can be inherited into the child process context. The \c
+	 * fd should have the O_CLOEXEC flag set. The implementation will
+	 * adjust this flag appropriately to allow the \c fd to be inherited
+	 * across execution of the new child process image.
+	 *
+	 * The file descriptor number of \c fd will not be change in the child
+	 * process. Therefore it must not be number 0, 1 or 2 (stdin, stdout,
+	 * stderr), since these are already covered by the setStdErr(),
+	 * setStdOut() and setStdIn() functions.
+	 *
+	 * The ownership of \c fd remains with the caller. The caller must
+	 * ensure that the file descriptor stays valid until \c run() is
+	 * invoked. Otherwise the child process execution / descriptor
+	 * inheritance will fail. The implementation will not alter the \c fd
+	 * in the current process's context.
+	 *
+	 * The child process must be instructed which FD to use and for which
+	 * purpose. Some programs support command line arguments or evaluate
+	 * environment variables to get this knowledge. Some programs may also
+	 * be hardcoded to use certain file descriptor numbers.
+	 **/
+	void addInheritFD(FileDescriptor fd) {
+		if (fd.raw() <= FileNum::STDERR) {
+			cosmos_throw(UsageError{"added stdio or invalid FD as extra inherit FD"});
+		};
+		m_inherit_fds.push_back(fd);
+	}
+
 	/// Restore the default inheritance behaviour for stdin/stderr/stdout
 	/**
 	 * Any previously set file descriptor overrides will be reset and the
@@ -263,6 +295,8 @@ protected: // data
 	FileDescriptor m_stderr;
 	/// File descriptor to use as child's stdin
 	FileDescriptor m_stdin;
+	/// additional file descriptors to inherit to the child process
+	std::vector<FileDescriptor> m_inherit_fds;
 
 	Callback m_post_fork_cb = nullptr;
 

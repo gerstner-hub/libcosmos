@@ -23,8 +23,11 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <vector>
 
 using ExitStatus = cosmos::ExitStatus;
+
+std::string_view argv0;
 
 class TestBase {
 protected:
@@ -78,8 +81,7 @@ protected:
 // test whether redirecting stdout works
 class RedirectStdoutTest :
 	public RedirectOutputTestBase,
-	public TestBase
-{
+	public TestBase {
 public:
 	RedirectStdoutTest() :
 		TestBase{"redirecting stdout"},
@@ -153,8 +155,7 @@ protected:
 // test whether redirecting stderr works
 class RedirectStderrTest :
 	public RedirectOutputTestBase,
-	public TestBase
-{
+	public TestBase {
 public:
 	RedirectStderrTest() :
 		TestBase{"redirecting stderr"},
@@ -688,6 +689,66 @@ public:
 	}
 };
 
+class RedirectExtraTest :
+	public TestBase {
+public:
+	RedirectExtraTest() :
+		TestBase{"test inheritance of non-std file descriptor"}
+	{}
+
+	void run() {
+		auto sep = argv0.rfind('/');
+		std::string coproc_path{argv0.substr(0, sep+1)};
+		coproc_path += "coproc";
+		cosmos::ChildCloner cloner{{coproc_path}};
+
+		cosmos::Pipe pipe;
+		cosmos::proc::setEnvVar(
+				"COPROC_PIPE_WRITE_FD",
+				std::to_string(cosmos::to_integral(pipe.getWriteEnd().raw())),
+				cosmos::proc::OverwriteEnv{true});
+		cloner.addInheritFD(pipe.getWriteEnd());
+
+		auto coproc = cloner.run();
+
+		cosmos::proc::clearEnvVar("COPROC_PIPE_WRITE_FD");
+		pipe.closeWriteEnd();
+
+		cosmos::InputStreamAdaptor file{pipe.getReadEnd()};
+
+		const std::vector<std::string> expected{"Hello", "from", "PID"};
+
+		for (auto &word: expected) {
+			std::string part;
+			file >> part;
+			if (part != word) {
+				std::cerr << "Expected " << word << " but got " << part << "\n";
+				cosmos_throw( cosmos::InternalError("unexpected word") );
+			}
+		}
+
+		// and finally the child process PID
+		std::string num;
+		file >> num;
+
+		cosmos::ProcessID peer_pid{std::stoi(num, nullptr)};
+
+		pipe.closeReadEnd();
+		auto res = coproc.wait();
+
+		if (peer_pid != coproc.pid()) {
+			std::cerr << "PID reported on pipe doesn't match actual child pid!\n";
+			cosmos_throw( cosmos::InternalError("PID mismatch") );
+		} else {
+			std::cout << "child process " << peer_pid << " reported correct PID over pipe\n";
+		}
+
+		if (!res.exitedSuccessfully()) {
+			cosmos_throw( cosmos::InternalError("coproc exited != 0") );
+		}
+	}
+};
+
 template <class T>
 void runTest() {
 	T test;
@@ -702,9 +763,10 @@ void runTest() {
 	}
 }
 
-int main() {
+int main(int, const char **argv) {
 	try {
 		cosmos::Init init;
+		argv0 = argv[0];
 		/*
 		 * test redirection of each std. file descriptor
 		 */
@@ -718,6 +780,7 @@ int main() {
 		runTest<EnvironmentTest>();
 		runTest<ArgOperatorTest>();
 		runTest<SchedulerTest>();
+		runTest<RedirectExtraTest>();
 
 		return 0;
 	}

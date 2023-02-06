@@ -11,10 +11,14 @@ def sequencify(arg):
     # return a tuple by default
     return (arg,)
 
-def gatherSources(self, suffixes, path='.'):
+def gatherSources(self, suffixes, path='.', recursive=True):
     """Recursively walks through the given path (by default the current
     SConscript directory) and returns relative paths to
-    matching sources that end in one of the given suffixes."""
+    matching sources that end in one of the given suffixes.
+
+    If @param recursive is False then only the directory found in @param path
+    itself is considered.
+    """
     import bisect
 
     srcdir = self.Dir('.').srcnode().abspath
@@ -33,6 +37,9 @@ def gatherSources(self, suffixes, path='.'):
 
             # maintain a sorted list of sources for determinism
             bisect.insort(sources, relpath)
+
+        if not recursive:
+            break
 
     return sources
 
