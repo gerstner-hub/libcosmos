@@ -6,57 +6,196 @@
 
 // cosmos
 #include "cosmos/types.hxx"
+#include "cosmos/BitMask.hxx"
 
 namespace cosmos {
 
 /// Strong boolean type to enable following of symlinks in the file system
 using FollowSymlinks = NamedBool<struct follow_links_t, false>;
 
-/// Represents a file type and mode
+/// Combined file type and mode bits of a file (as found in st_mode struct stat)
 /**
- * This is wrapper around the primitive mode_t describing file types and
- * classical UNIX file permissions and mode bits.
+ * In struct stat the st_mode field contains the file type value in the upper
+ * four bits and the file mode bitmask in the lower bits.
+ *
+ * This type should be treated mostly opaque. Operate on the two parts
+ * independently by using FileType and FileMode.
+ **/
+enum class ModeT : mode_t {
+	NONE      = 0,
+	TYPE_MASK = S_IFMT, /// masks all type bits
+	MODE_MASK = ~static_cast<mode_t>(S_IFMT) /// masks all mode bits
+};
+
+/// support bit masking operations on ModeT for extracing type and mode parts
+inline ModeT operator&(const ModeT a, const ModeT b) {
+	auto ret = static_cast<mode_t>(a) & static_cast<mode_t>(b);
+	return static_cast<ModeT>(ret);
+}
+
+/// File type portion as found in a ModeT
+/**
+ * Note that these are *not* bitmask values. Only one of the types can ever be
+ * set, no bitmask operations can be performed with this type.
+ *
+ * These are the upper 4 bits of the st_mode field in struct stat. You can
+ * extract it using FileType.
+ **/
+enum class FileT : mode_t {
+	NONE      = 0,
+	SOCKET    = S_IFSOCK,
+	LINK      = S_IFLNK, /// symbolic link
+	REGULAR   = S_IFREG,
+	BLOCKDEV  = S_IFBLK,
+	DIRECTORY = S_IFDIR,
+	CHARDEV   = S_IFCHR,
+	FIFO      = S_IFIFO /// (named) pipe
+};
+
+/// Bitmask values for file mode bits
+/**
+ * These are the lower (07777) bits of the st_mode field in struct stat.
+ *
+ * These make up the classical UNIX user/group/other permission bits plus the
+ * three special bits for set-uid, set-gid and sticky bit.
+ **/
+enum class FileModeFlags : mode_t {
+	SETUID      = S_ISUID, // set user-id bit
+	SETGID      = S_ISGID, // set group-id bit
+	STICKY      = S_ISVTX, // only has a meaning for directory, typically set on /tmp
+	OWNER_READ  = S_IRUSR,
+	OWNER_WRITE = S_IWUSR,
+	OWNER_EXEC  = S_IXUSR,
+	OWNER_ALL   = S_IRWXU,
+	GROUP_READ  = S_IRGRP,
+	GROUP_WRITE = S_IWGRP,
+	GROUP_EXEC  = S_IXGRP,
+	GROUP_ALL   = S_IRWXG,
+	OTHER_READ  = S_IROTH,
+	OTHER_WRITE = S_IWOTH,
+	OTHER_EXEC  = S_IXOTH,
+	OTHER_ALL   = S_IRWXO
+};
+
+/// BitMask of FileModeFlags (represents the mode bit portion of ModeT)
+typedef BitMask<FileModeFlags> FileModeBits;
+
+/// Convenience wrapper around FileT
+/**
+ * \note You won't need to set the FileType in any API call, you only need to
+ * check the FileType reported back from e.g. a stat() system call.
+ **/
+class FileType {
+public:
+	explicit FileType(const FileT raw) : m_raw(raw) {}
+
+	/// Same as getFileT but returns a FileType wrapper instance for it
+	explicit FileType(const ModeT raw) {
+		m_raw = static_cast<FileT>(raw & ModeT::TYPE_MASK);
+	}
+
+	bool isRegular()   const { return m_raw == FileT::REGULAR;  }
+	bool isDirectory() const { return m_raw == FileT::DIRECTORY; }
+	bool isCharDev()   const { return m_raw == FileT::CHARDEV; }
+	bool isBlockDev()  const { return m_raw == FileT::BLOCKDEV; }
+	bool isFIFO()      const { return m_raw == FileT::FIFO; }
+	bool isLink()      const { return m_raw == FileT::LINK; }
+	bool isSocket()    const { return m_raw == FileT::SOCKET; }
+
+	auto raw() { return m_raw; }
+
+	bool operator==(const FileType &other) const {
+		return m_raw == other.m_raw;
+	}
+
+	bool operator!=(const FileType &other) const {
+		return !(*this == other);
+	}
+
+protected: // data
+
+	FileT m_raw;
+};
+
+/// Represents the mode bits porition of a ModeT
+/**
+ * This is wrapper around the primitive ModeT describing the classical UNIX
+ * file permissions and mode bits.
  **/
 class FileMode {
 public:
-	/// Constructs a FileMode from a fully specified numerical value
-	explicit FileMode(mode_t mode = 0) : m_mode(mode) {}
+	/// Constructs a FileMode from the given bitmask object
+	explicit FileMode(const FileModeBits mask) :
+		m_mode(mask)
+	{}
 
-	bool isRegular()  const { return S_ISREG(m_mode);  }
-	bool isDir()      const { return S_ISDIR(m_mode);  }
-	bool isCharDev()  const { return S_ISCHR(m_mode);  }
-	bool isBlockDev() const { return S_ISBLK(m_mode);  }
-	bool isFIFO()     const { return S_ISFIFO(m_mode); }
-	bool isLink()     const { return S_ISLNK(m_mode);  }
-	bool isSocket()   const { return S_ISSOCK(m_mode); }
+	/// Constructs a FileMode from the given raw input
+	/**
+	 * - can be used to specify a literal: FileMode{ModeT{0751}}
+	 * - or to pass in a mode_t received from a system call (struct stat)
+	 *
+	 * This constructor is concsiously not `explicit` to allow simpler use
+	 * of octal literals.
+	 **/
+	FileMode(const ModeT raw = ModeT::NONE) :
+		m_mode(static_cast<FileModeFlags>(raw & ModeT::MODE_MASK))
+	{}
 
-	bool hasSetUID() const { return (m_mode & S_ISUID) != 0; }
-	bool hasSetGID() const { return (m_mode & S_ISGID) != 0; }
-	bool hasSticky() const { return (m_mode & S_ISVTX) != 0; }
+	bool isSetUID() const { return m_mode[FileModeFlags::SETUID]; }
+	bool isSetGID() const { return m_mode[FileModeFlags::SETGID]; }
+	bool isSticky() const { return m_mode[FileModeFlags::STICKY]; }
 
-	bool canOwnerRead()  const { return (m_mode & S_IRUSR) != 0; }
-	bool canOwnerWrite() const { return (m_mode & S_IWUSR) != 0; }
-	bool canOwnerExec()  const { return (m_mode & S_IXUSR) != 0; }
+	bool canOwnerRead()  const { return m_mode[FileModeFlags::OWNER_READ]; }
+	bool canOwnerWrite() const { return m_mode[FileModeFlags::OWNER_WRITE]; }
+	bool canOwnerExec()  const { return m_mode[FileModeFlags::OWNER_EXEC]; }
 
-	bool canGroupRead()  const { return (m_mode & S_IRGRP) != 0; }
-	bool canGroupWrite() const { return (m_mode & S_IWGRP) != 0; }
-	bool canGroupExec()  const { return (m_mode & S_IXGRP) != 0; }
+	bool canGroupRead()  const { return m_mode[FileModeFlags::GROUP_READ]; }
+	bool canGroupWrite() const { return m_mode[FileModeFlags::GROUP_WRITE]; }
+	bool canGroupExec()  const { return m_mode[FileModeFlags::GROUP_EXEC]; }
 
-	bool canOthersRead()  const { return (m_mode & S_IROTH) != 0; }
-	bool canOthersWrite() const { return (m_mode & S_IWOTH) != 0; }
-	bool canOthersExec()  const { return (m_mode & S_IXOTH) != 0; }
+	bool canOthersRead()  const { return m_mode[FileModeFlags::OTHER_READ]; }
+	bool canOthersWrite() const { return m_mode[FileModeFlags::OTHER_WRITE]; }
+	bool canOthersExec()  const { return m_mode[FileModeFlags::OTHER_EXEC]; }
 
-	bool canAnyExec() const {
-		return canOwnerExec() || canGroupExec() || canOthersExec();
+	bool canAnyRead() const {
+		return m_mode.anyOf({
+				FileModeFlags::OWNER_READ,
+				FileModeFlags::GROUP_READ,
+				FileModeFlags::OTHER_READ});
 	}
 
-	/// Returns the file permissions bits only (file type stripped off)
-	mode_t getPermBits() const { return m_mode & (~S_IFMT); }
+	bool canAnyWrite() const {
+		return m_mode.anyOf({
+				FileModeFlags::OWNER_WRITE,
+				FileModeFlags::GROUP_WRITE,
+				FileModeFlags::OTHER_WRITE});
+	}
 
-	mode_t raw() const { return m_mode; }
+	bool canAnyExec() const {
+		return m_mode.anyOf({
+				FileModeFlags::OWNER_EXEC,
+				FileModeFlags::GROUP_EXEC,
+				FileModeFlags::OTHER_EXEC});
+	}
+
+	/// Returns the complete bitmask object
+	FileModeBits& getMask() { return m_mode; }
+	const FileModeBits& getMask() const { return m_mode; }
+
+	ModeT raw() const { return ModeT{m_mode.get()}; }
+
+	bool operator==(const FileMode &other) const {
+		return m_mode == other.m_mode;
+	}
+
+	bool operator!=(const FileMode &other) const {
+		return !(*this == other);
+	}
+
 protected: // data
-	/// Plain file mode value
-	mode_t m_mode;
+
+	/// bitmask for mode bits
+	FileModeBits m_mode;
 };
 
 } // end ns

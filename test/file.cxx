@@ -56,7 +56,7 @@ int main() {
 
 	{
 		cosmos::StreamFile sf;
-		sf.open("/tmp", cosmos::OpenMode::READ_WRITE, cosmos::OpenFlags({cosmos::OpenSettings::TMPFILE}), cosmos::FileMode(0700));
+		sf.open("/tmp", cosmos::OpenMode::READ_WRITE, cosmos::OpenFlags({cosmos::OpenSettings::TMPFILE}), cosmos::ModeT{0700});
 		sf.writeAll(hosts.data(), hosts.size());
 		sf.seekFromStart(0);
 		std::string hosts2;

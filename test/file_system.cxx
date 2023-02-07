@@ -28,7 +28,7 @@ bool testCreateDir() {
 
 	std::cout << "Attempting to create " << testdir << std::endl;
 
-	cosmos::fs::makeDir(testdir, cosmos::FileMode(0750));
+	cosmos::fs::makeDir(testdir, cosmos::ModeT{0750});
 
 	if (!cosmos::fs::existsFile(testdir)) {
 		std::cerr << "created directory does not exist?!" << std::endl;
@@ -49,7 +49,7 @@ bool testCreateDir() {
 
 bool testCreateAllDirs() {
 
-	const cosmos::FileMode dirmode{0750};
+	const cosmos::FileMode dirmode{cosmos::ModeT{0750}};
 	auto testdir = getTestDirPath();
 
 	auto deepdir = testdir / "deeper" / "path";

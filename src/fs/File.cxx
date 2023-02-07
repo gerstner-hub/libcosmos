@@ -2,6 +2,7 @@
 #include <iostream>
 
 // cosmos
+#include "cosmos/algs.hxx"
 #include "cosmos/errors/FileError.hxx"
 #include "cosmos/errors/InternalError.hxx"
 #include "cosmos/errors/UsageError.hxx"
@@ -26,7 +27,7 @@ void File::open(const std::string_view path, const OpenMode mode, const OpenFlag
 		cosmos_throw (UsageError("the given open flags required an fmode argument"));
 	}
 
-	auto fd = ::open(path.data(), raw_flags, fmode ? fmode.value().raw() : 0);
+	auto fd = ::open(path.data(), raw_flags, fmode ? to_integral(fmode.value().raw()) : 0);
 
 	m_fd.setFD(FileNum{fd});
 

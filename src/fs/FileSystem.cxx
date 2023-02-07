@@ -80,9 +80,9 @@ std::optional<std::string> which(const std::string_view exec_base) noexcept {
 				return false;
 			}
 
-			FileMode mode(buf.st_mode);
+			ModeT raw{buf.st_mode};
 
-			if (!mode.isRegular() || !mode.canAnyExec())
+			if (!FileType{raw}.isRegular() || !FileMode{raw}.canAnyExec())
 				return false;
 
 			return true;
@@ -124,7 +124,7 @@ std::optional<std::string> which(const std::string_view exec_base) noexcept {
 }
 
 void makeDir(const std::string_view path, const FileMode mode) {
-	if (::mkdir(path.data(), mode.raw()) != 0) {
+	if (::mkdir(path.data(), to_integral(mode.raw())) != 0) {
 		cosmos_throw (ApiError());
 	}
 }
@@ -156,7 +156,7 @@ Errno makeAllDirs(const std::string_view path, const FileMode mode) {
 			continue;
 		}
 
-		if (::mkdir(prefix.data(), mode.raw()) != 0) {
+		if (::mkdir(prefix.data(), to_integral(mode.raw())) != 0) {
 			if (getErrno() == Errno::EXISTS) {
 				continue;
 			}
