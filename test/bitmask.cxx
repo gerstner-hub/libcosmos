@@ -10,7 +10,8 @@ enum class MyEnum : int {
 	VAL2 = 0x2,
 	VAL3 = 0x4,
 	VAL4 = 0x8,
-	VAL5 = 0x10
+	VAL5 = 0x10,
+	MASK45 = 0x18
 };
 
 typedef cosmos::BitMask<MyEnum> MyBitMask;
@@ -46,6 +47,22 @@ int main() {
 		std::string expected(27, '0');
 		expected += "00110";
 		assert (bitmask.to_string() == expected);
+	}
+
+	{
+		MyBitMask bitmask;
+		bitmask.set(MyEnum::VAL4);
+		// should report true event if only one of the bits is set
+		assert (bitmask[MyEnum::MASK45] == true);
+		bitmask.set(MyEnum::VAL5);
+		// when both are set it should still be true
+		assert (bitmask[MyEnum::MASK45] == true);
+		bitmask.set(MyEnum::VAL4, false);
+		assert (bitmask[MyEnum::MASK45] == true);
+		bitmask.set(MyEnum::VAL5, false);
+		assert (bitmask[MyEnum::MASK45] == false);
+		bitmask.set(MyEnum::VAL1);
+		assert (bitmask[MyEnum::MASK45] == false);
 	}
 
 	{

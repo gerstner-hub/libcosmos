@@ -15,6 +15,10 @@ namespace cosmos {
  * bitset with named bits based on a strongly typed enum class.
  *
  * The interface is kept similar to that of std::bitset.
+ *
+ * The constants defined for the given ENUM type should denote single bit
+ * positions only. If a constant consists of multiple bits then the behaviour
+ * of the implementation could be surprising (\see test()).
  **/
 template <typename ENUM>
 class BitMask {
@@ -59,7 +63,7 @@ public: // functions
 	/// Return a string representation of the bit mask
 	explicit operator std::string() const { return to_string(); }
 
-	/// Returns a boolean value for the given bit position
+	/// Returns a boolean value for the given bit position, \see test()
 	bool operator[] (const ENUM flag) const { return test(flag); }
 
 	std::string to_string() const {
@@ -161,6 +165,11 @@ public: // functions
 	}
 
 	/// Returns whether the given bit position is set
+	/**
+	 * \note This expects that each ENUM constant denotes a single bit. If
+	 * you have values denoting multiple bits at once then this test
+	 * returns whether *any* of the related bits are set.
+	 **/
 	bool test(const ENUM bit) const {
 		return (m_flags & static_cast<EnumBaseType>(bit)) != 0;
 	}
@@ -208,7 +217,7 @@ public: // functions
 		return !(*this == other);
 	}
 
-	/// Checks whether the given bit is set
+	/// Checks whether the given bit is set, \see test()
 	bool operator&(const ENUM bit) const {
 		return test(bit);
 	}
