@@ -36,7 +36,12 @@ enum class GroupID : gid_t {
 	ROOT = 0
 };
 
+/// A unique file number for a file on a block device
 enum class Inode : ino_t {
+};
+
+/// A device file identification type (consists of major:minor parts)
+enum class DeviceID : dev_t {
 };
 
 /// a primitive signal nr specification
