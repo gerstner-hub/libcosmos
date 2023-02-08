@@ -15,6 +15,7 @@
 #include "cosmos/fs/Directory.hxx"
 #include "cosmos/fs/DirIterator.hxx"
 #include "cosmos/fs/File.hxx"
+#include "cosmos/fs/FileStatus.hxx"
 #include "cosmos/fs/FileSystem.hxx"
 #include "cosmos/proc/Process.hxx"
 
@@ -182,16 +183,24 @@ void removeTree(const std::string_view path) {
 		if (entry.isDotEntry())
 			continue;
 
+		const auto subpath = std::string{path} + "/" + entry.name();
+
 		switch(entry.type()) {
-		case Type::UNKNOWN: // TODO fetch FileInfo separately
-			cosmos_throw (InternalError("not implemented"));
-			break;
+		case Type::UNKNOWN: {
+			FileStatus fs{subpath};
+			if (fs.getType().isDirectory())
+				goto dircase;
+			else
+				goto filecase;
+		}
 		case Type::DIRECTORY:
+		dircase:
 			// get down recursively 
-			removeTree(std::string{path} + "/" + entry.name());
+			removeTree(subpath);
 			break;
 		default:
-			unlinkFile(std::string{path} + "/" + entry.name());
+		filecase:
+			unlinkFile(subpath);
 			break;
 		}
 	};
