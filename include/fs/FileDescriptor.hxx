@@ -99,6 +99,45 @@ public: // functions
 		setStatusFlags(on_off ? StatusFlags{Flags::CLOEXEC} : StatusFlags{0});
 	}
 
+	/// Flush oustanding writes to disk
+	/**
+	 * Kernel buffering may cause written data to stay in memory until it
+	 * is deemed necessary to actually write to disk. Use this function to
+	 * make sure that any writes that happened on the file descriptor will
+	 * actually be transferred to the underyling disk device. This covers
+	 * not only the actual file data but also the metdata (inode data).
+	 *
+	 * This operation ensures that the data is on disk even if the system
+	 * is hard reset, crashes or loses power. The call blocks until the
+	 * underlying device reports that the transfer has completed.
+	 *
+	 * Even after that it is not yet ensured that the directory containing
+	 * the file has actually the directory entry written to disk. To
+	 * ensure this as well perform sync() also on a file descriptor for
+	 * the directory containing the file.
+	 *
+	 * This call can cause an ApiError to be thrown e.g. if:
+	 *
+	 * - the file descriptor is invalid (Errno::BAD_FD)
+	 * - a device level I/O error occured (Errno::IO_ERROR)
+	 * - space is exhausted on the file system (Errno::NO_SPACE)
+	 * - the file descriptor does not support syncing, because it is a
+	 *   special file that does not support it (Errno::INVALID_ARG)
+	 *
+	 * \param[in] restart Determines whether the implementation will
+	 * automatically restart the system call if EINTR is encountered.
+	 **/
+	void sync(const RestartOnIntr restart = RestartOnIntr{true});
+
+	/// Flush outstanding writes to disk except metadata
+	/**
+	 * This is an optimization of sync() that only writes out the actual
+	 * file data, but not the metadata. This can make sense if e.g. the
+	 * file size did not change but the data changed (e.g. for fixed size
+	 * database files etc.).
+	 **/
+	void dataSync(const RestartOnIntr restart = RestartOnIntr{true});
+
 	/// Returns the primitive file descriptor contained in the object
 	FileNum raw() const { return m_fd; }
 

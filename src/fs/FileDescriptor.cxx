@@ -50,6 +50,38 @@ void FileDescriptor::setStatusFlags(const StatusFlags flags) {
 	}
 }
 
+namespace {
+
+template <typename SyncFunc>
+void syncHelper(FileDescriptor &fd, SyncFunc sync_func, const RestartOnIntr restart) {
+	while (true) {
+		if (sync_func(to_integral(fd.raw())) == 0) {
+			return;
+		}
+		else {
+			switch(getErrno()) {
+				default: break;
+				case Errno::INTERRUPTED: {
+					if (restart)
+						continue;
+				}
+			}
+
+			cosmos_throw (ApiError("failed to sync"));
+		}
+	}
+}
+
+} // end anon ns
+
+void FileDescriptor::sync(const RestartOnIntr restart) {
+	syncHelper(*this, fsync, restart);
+}
+
+void FileDescriptor::dataSync(const RestartOnIntr restart) {
+	syncHelper(*this, fdatasync, restart);
+}
+
 FileDescriptor stdout(FileNum::STDOUT);
 FileDescriptor stderr(FileNum::STDERR);
 FileDescriptor stdin(FileNum::STDIN);

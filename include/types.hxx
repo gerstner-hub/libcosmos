@@ -58,6 +58,13 @@ protected:
 	bool m_val = def;
 };
 
+/// Controls automatic EINTR retry behaviour
+/**
+ * This type is used in some system call wrappers to control the automatic
+ * restart logic on EINTR error returns.
+ **/
+using RestartOnIntr = NamedBool<struct restart_on_intr_t, true>;
+
 /// Helper class to guard arbitrary resources
 /**
  * For non-heap resources (for which stdlib smart pointers should be used)

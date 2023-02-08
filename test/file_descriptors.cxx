@@ -1,8 +1,9 @@
 #include <iostream>
 
 #include "cosmos/fs/FileDescriptor.hxx"
+#include "cosmos/fs/StreamFile.hxx"
 
-int main() {
+int main(int, const char **argv) {
 	using Flags = cosmos::FileDescriptor::Flags;
 
 	cosmos::FileDescriptor fd{cosmos::FileNum::STDIN};
@@ -36,6 +37,12 @@ int main() {
 		std::cerr << "setStatusFlags() didn't work?!" << std::endl;
 		return 1;
 	}
+
+	cosmos::StreamFile sf{argv[0], cosmos::OpenMode::READ_ONLY};
+	auto sf_fd = sf.getFD();
+	// syncing a read-only FD is allowed in Linux
+	sf_fd.sync();
+	sf_fd.dataSync();
 
 	return 0;
 }
