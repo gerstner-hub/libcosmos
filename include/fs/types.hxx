@@ -33,25 +33,6 @@ inline ModeT operator&(const ModeT a, const ModeT b) {
 	return static_cast<ModeT>(ret);
 }
 
-/// File type portion as found in a ModeT
-/**
- * Note that these are *not* bitmask values. Only one of the types can ever be
- * set, no bitmask operations can be performed with this type.
- *
- * These are the upper 4 bits of the st_mode field in struct stat. You can
- * extract it using FileType.
- **/
-enum class FileT : mode_t {
-	NONE      = 0,
-	SOCKET    = S_IFSOCK,
-	LINK      = S_IFLNK, /// symbolic link
-	REGULAR   = S_IFREG,
-	BLOCKDEV  = S_IFBLK,
-	DIRECTORY = S_IFDIR,
-	CHARDEV   = S_IFCHR,
-	FIFO      = S_IFIFO /// (named) pipe
-};
-
 /// Bitmask values for file mode bits
 /**
  * These are the lower (07777) bits of the st_mode field in struct stat.
@@ -86,6 +67,33 @@ typedef BitMask<FileModeFlags> FileModeBits;
  * check the FileType reported back from e.g. a stat() system call.
  **/
 class FileType {
+public: // types
+
+	/// File type portion as found in a ModeT
+	/**
+	 * Note that these are *not* bitmask values. Only one of the types can ever be
+	 * set, no bitmask operations can be performed with this type.
+	 *
+	 * These are the upper 4 bits of the st_mode field in struct stat. You can
+	 * extract it using FileType.
+	 *
+	 * TODO: This is now no class enum and thus no strong type. Using a
+	 * strong type would be awkward, because we'd have something like
+	 * OtherType::SOCKET, or FileType::Type::SOCKET. Once we reach C++20
+	 * we can use `using enum OtherType` within the FileType class which
+	 * will solve the problem.
+	 **/
+	enum FileT : mode_t {
+		NONE      = 0,
+		SOCKET    = S_IFSOCK,
+		LINK      = S_IFLNK, /// symbolic link
+		REGULAR   = S_IFREG,
+		BLOCKDEV  = S_IFBLK,
+		DIRECTORY = S_IFDIR,
+		CHARDEV   = S_IFCHR,
+		FIFO      = S_IFIFO /// (named) pipe
+	};
+
 public:
 	explicit FileType(const FileT raw) : m_raw(raw) {}
 
@@ -94,13 +102,13 @@ public:
 		m_raw = static_cast<FileT>(raw & ModeT::TYPE_MASK);
 	}
 
-	bool isRegular()   const { return m_raw == FileT::REGULAR;  }
-	bool isDirectory() const { return m_raw == FileT::DIRECTORY; }
-	bool isCharDev()   const { return m_raw == FileT::CHARDEV; }
-	bool isBlockDev()  const { return m_raw == FileT::BLOCKDEV; }
-	bool isFIFO()      const { return m_raw == FileT::FIFO; }
-	bool isLink()      const { return m_raw == FileT::LINK; }
-	bool isSocket()    const { return m_raw == FileT::SOCKET; }
+	bool isRegular()   const { return m_raw == REGULAR;  }
+	bool isDirectory() const { return m_raw == DIRECTORY; }
+	bool isCharDev()   const { return m_raw == CHARDEV; }
+	bool isBlockDev()  const { return m_raw == BLOCKDEV; }
+	bool isFIFO()      const { return m_raw == FIFO; }
+	bool isLink()      const { return m_raw == LINK; }
+	bool isSocket()    const { return m_raw == SOCKET; }
 
 	auto raw() { return m_raw; }
 

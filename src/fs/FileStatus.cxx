@@ -27,8 +27,8 @@ void FileStatus::updateFrom(const std::string_view path, const FollowSymlinks fo
 DeviceID FileStatus::getRepresentedDevice() const {
 
 	switch (getType().raw()) {
-		case FileT::BLOCKDEV:
-		case FileT::CHARDEV:
+		case FileType::BLOCKDEV:
+		case FileType::CHARDEV:
 			return DeviceID{m_st.st_rdev};
 		default:
 			throwBadType("attempted to get st_rdev but this is no dev!");

@@ -134,9 +134,9 @@ public: // functions
 	 **/
 	off_t getSize() const {
 		switch (getType().raw()) {
-			case FileT::REGULAR:
-			case FileT::LINK:
-			case FileT::DIRECTORY:
+			case FileType::REGULAR:
+			case FileType::LINK:
+			case FileType::DIRECTORY:
 				return m_st.st_size;
 			default:
 				throwBadType("invalid type for st_size");
