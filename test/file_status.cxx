@@ -229,6 +229,9 @@ public:
 
 		std::string_view data("some data");
 
+		// make sure the timestamp can change
+		sleep(1);
+
 		m_second_file.write(data.data(), data.size());
 
 		status.updateFrom(m_second_file.getFD());
