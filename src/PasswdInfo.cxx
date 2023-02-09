@@ -65,6 +65,7 @@ PasswdInfo::PasswdInfo(const UserID uid) {
 void PasswdInfo::invalidate() {
 	m_buf.clear();
 	std::memset(&m_passwd, 0, sizeof(m_passwd));
+	m_valid = false;
 }
 
 } // end ns
