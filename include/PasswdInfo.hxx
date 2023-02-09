@@ -4,12 +4,9 @@
 // Linux
 #include <pwd.h>
 
-// C++
-#include <string_view>
-#include <vector>
-
 // cosmos
 #include "cosmos/ostypes.hxx"
+#include "cosmos/InfoBase.hxx"
 
 namespace cosmos {
 
@@ -18,7 +15,8 @@ namespace cosmos {
  * This type obtains and stores data for an individual user account ID as
  * found in the /etc/passwd database.
  **/
-class COSMOS_API PasswdInfo {
+class COSMOS_API PasswdInfo :
+	public InfoBase<struct passwd> {
 public: // functions
 
 	/// Obtains PasswdInfo for the given username \c name
@@ -37,51 +35,24 @@ public: // functions
 	 **/
 	explicit PasswdInfo(const UserID uid);
 
-	const std::string_view getName() const { return getSV(m_passwd.pw_name); }
+	const std::string_view getName() const { return getSV(m_info.pw_name); }
 
 	/// Returns the optional encrypted password
-	const std::string_view getPasswd() const { return getSV(m_passwd.pw_passwd); }
+	const std::string_view getPasswd() const { return getSV(m_info.pw_passwd); }
 
-	UserID getUID() const { return UserID{m_passwd.pw_uid}; }
+	UserID getUID() const { return UserID{m_info.pw_uid}; }
 
 	/// The user's main group ID
-	GroupID getGID() const { return GroupID{m_passwd.pw_gid}; }
+	GroupID getGID() const { return GroupID{m_info.pw_gid}; }
 
 	/// Returns the comment field which is used for different things like a full user name
-	const std::string_view getGecos() const { return getSV(m_passwd.pw_gecos); }
+	const std::string_view getGecos() const { return getSV(m_info.pw_gecos); }
 
 	/// Path to the user's home directory
-	const std::string_view getHomeDir() const { return getSV(m_passwd.pw_dir); }
+	const std::string_view getHomeDir() const { return getSV(m_info.pw_dir); }
 
 	/// Optional command interpreter for the user
-	const std::string_view getShell() const { return getSV(m_passwd.pw_shell); }
-
-	const struct passwd* getRaw() const { return &m_passwd; }
-	struct passwd* getRaw() { return &m_passwd; }
-
-	/// Returns whether data is present in the object
-	/**
-	 * if no corresponding entry was found during construction time then
-	 * this returns \c false.
-	 **/
-	bool isValid() const { return m_valid; }
-
-	/// Zero out all data
-	void invalidate();
-
-protected: // functions
-
-	const std::string_view getSV(const char *ptr) const {
-		// string_view can't take nullptr, thus use this
-		return ptr ? std::string_view{ptr} : std::string_view{};
-	}
-
-protected: // data
-
-	bool m_valid = false;
-	struct passwd m_passwd;
-	/// Extra space for storing the strings of struct passwd
-	std::vector<char> m_buf;
+	const std::string_view getShell() const { return getSV(m_info.pw_shell); }
 };
 
 } // end ns
