@@ -73,17 +73,17 @@ std::optional<std::string> which(const std::string_view exec_base) noexcept {
 	auto checkExecutable = [](const std::string_view path) -> bool {
 		try {
 			File f(path, OpenMode::READ_ONLY);
+			FileStatus status;
 
-			// TODO: replace by a file info type
-			struct stat buf;
-			auto num = f.getFD().raw();
-			if (::fstat(to_integral(num), &buf) != 0) {
+			try {
+				status.updateFrom(f.getFD());
+			} catch (const CosmosError &) {
 				return false;
 			}
 
-			ModeT raw{buf.st_mode};
-
-			if (!FileType{raw}.isRegular() || !FileMode{raw}.canAnyExec())
+			if (!status.getType().isRegular())
+				return false;
+			else if (!status.getMode().canAnyExec())
 				return false;
 
 			return true;
