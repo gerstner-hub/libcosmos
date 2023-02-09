@@ -73,7 +73,7 @@ protected: // functions
 
 	const std::string_view getSV(const char *ptr) const {
 		// string_view can't take nullptr, thus use this
-		return ptr ? std::string_view(ptr) : std::string_view{};
+		return ptr ? std::string_view{ptr} : std::string_view{};
 	}
 
 protected: // data
