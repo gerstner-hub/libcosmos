@@ -23,7 +23,7 @@ class COSMOS_API FileError :
 {
 public: // functions
 
-	explicit FileError(const std::string_view path);
+	explicit FileError(const std::string_view path, const std::string_view operation);
 
 	COSMOS_ERROR_IMPL;
 
@@ -34,6 +34,7 @@ protected: // functions
 protected: // data
 
 	std::string m_path;
+	std::string m_operation;
 };
 
 } // end ns

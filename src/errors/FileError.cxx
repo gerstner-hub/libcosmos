@@ -2,13 +2,13 @@
 
 namespace cosmos {
 
-FileError::FileError(const std::string_view path) :
-		m_path(path) {
+FileError::FileError(const std::string_view path, const std::string_view operation) :
+		m_path(path), m_operation(operation) {
 	setErrorClass("FileError");
 }
 
 void FileError::generateMsg() const {
-	m_msg += m_path + ": ";
+	m_msg += m_path + ": " + m_operation + ": ";
 	ApiError::generateMsg();
 }
 

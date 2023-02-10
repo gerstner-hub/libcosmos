@@ -32,7 +32,7 @@ void File::open(const std::string_view path, const OpenMode mode, const OpenFlag
 	m_fd.setFD(FileNum{fd});
 
 	if (!isOpen()) {
-		cosmos_throw (FileError(path));
+		cosmos_throw (FileError(path, "open"));
 	}
 }
 
