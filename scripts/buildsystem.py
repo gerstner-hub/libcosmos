@@ -1,5 +1,6 @@
 from SCons.Script import *
 import os
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -122,16 +123,31 @@ def initSCons(project, rtti=True):
     # some basic cross compilation support using GCC
     prefix = os.environ.get("SCONS_CROSS_PREFIX", None)
 
-    env_options = {}
+    env_options = {
+            "ENV": {
+                # this is needed to get color output support in programs that
+                # SCons calls
+                "TERM": os.environ["TERM"],
+                "PATH": os.environ["PATH"],
+                "HOME": os.environ["HOME"]
+            }
+    }
 
     if prefix:
-        env_options = {
+        env_options.update({
             "CC"    : f"{prefix}-gcc",
             "CXX"   : f"{prefix}-g++",
             "LD"    : f"{prefix}-g++",
             "AR"    : f"{prefix}-ar",
             "STRIP" : f"{prefix}-strip",
-        }
+        })
+    # use colorgcc wrapper if available
+    elif shutil.which("colorgcc"):
+        # TODO: how can we find out where exactly the symlinks are located
+        # independently of the distribution?
+        env_options.update({
+            "CXX"   : "/usr/lib/colorgcc/bin/g++"
+        })
 
     env = Environment(**env_options)
     # this entry can be used to add global entries visible by all other cloned
