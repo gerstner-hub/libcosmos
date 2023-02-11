@@ -2,6 +2,7 @@
 #define COSMOS_FILE_TYPES_HXX
 
 // Linux
+#include <fcntl.h>
 #include <sys/stat.h>
 
 // C++
@@ -9,14 +10,61 @@
 #include <string>
 
 // cosmos
+#include "cosmos/BitMask.hxx"
 #include "cosmos/dso_export.h"
 #include "cosmos/types.hxx"
-#include "cosmos/BitMask.hxx"
 
 namespace cosmos {
 
 /// Strong boolean type to enable following of symlinks in the file system
 using FollowSymlinks = NamedBool<struct follow_links_t, false>;
+
+/// Strong enum type wrapper for the basic open() mode flag
+enum class OpenMode : int {
+	READ_ONLY = O_RDONLY,
+	WRITE_ONLY = O_WRONLY,
+	READ_WRITE = O_RDWR
+};
+
+/// Strong enum type wrapper for file descriptor settings on top of the basic OpenMode
+enum class OpenSettings : int {
+	/// Writes will always happen at the end of the file
+	APPEND = O_APPEND,
+	/// Enable signal driven I/O for certain file types
+	ASYNC = O_ASYNC,
+	/// Close file descriptor during execve() system call
+	CLOEXEC = O_CLOEXEC,
+	/// Create the file if it doesn't exist (file mode required as well)
+	CREATE = O_CREAT,
+	/// Bypass Kernel side caching
+	DIRECT = O_DIRECT,
+	/// Require the path to refer to a directory
+	DIRECTORY = O_DIRECTORY,
+	/// Use synchronous write operation, after write() returns everything should be written to disk
+	DSYNC = O_DSYNC,
+	/// Use this in conjunction with CREATE to make sure the file gets newly created
+	EXCLUSIVE = O_EXCL,
+	/// Don't update the access time of the file if certain preconditions are fulfilled
+	NOATIME = O_NOATIME,
+	/// If the file refers to a terminal, don't make it the controlling terminal of the calling process
+	NO_CONTROLLING_TTY = O_NOCTTY,
+	/// Don't follow symlinks in the final path component
+	NOFOLLOW = O_NOFOLLOW,
+	/// Attempt to open the file in non-blocking mode causing I/O operations not to block
+	NONBLOCK = O_NONBLOCK,
+	/// Open only the file location, not the actual file object the resulting file descriptor can mostly only be used for
+	/// Navigating the file system using *at system calls
+	PATH = O_PATH,
+	/// Similar to DSYNC, see man page
+	SYNC = O_SYNC,
+	/// Attempt to create an unnamed temporary file, path needs to specify the directory where to create it
+	TMPFILE = O_TMPFILE,
+	/// If write access was requested and is allowed then an already existing file object is truncated to zero size
+	TRUNCATE = O_TRUNC
+};
+
+/// Collection of OpenSettings used for opening files
+typedef BitMask<OpenSettings> OpenFlags;
 
 /// Combined file type and mode bits of a file (as found in st_mode struct stat)
 /**
