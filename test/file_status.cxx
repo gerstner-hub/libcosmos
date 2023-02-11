@@ -1,7 +1,8 @@
 // C++
-#include <iostream>
 #include <cstdlib>
 #include <climits>
+#include <iostream>
+#include <sstream>
 
 // cosmos
 #include "cosmos/formatting.hxx"
@@ -35,6 +36,7 @@ public:
 		checkSize();
 		checkDevInode();
 		checkTimes();
+		checkFormatting();
 		return m_res;
 	}
 
@@ -243,6 +245,41 @@ public:
 		}
 	}
 
+	void checkFormatting() {
+
+		std::stringstream ss;
+
+		auto check = [this, &ss](const std::string &oct, const std::string &sym) {
+			auto s = ss.str();
+			if (s.find(oct) != s.npos && s.find(sym) != s.npos) {
+				good(s + std::string{" contains "} + oct + std::string{" and "} + sym);
+			} else {
+				bad(ss.str()  + " does not match expected oct/symbolic output");
+			}
+			ss.str("");
+		};
+
+		cosmos::FileMode fm{cosmos::ModeT{04740}};
+		ss << fm;
+		check("0o4740", "rwsr-----");
+
+		fm = cosmos::FileMode{cosmos::ModeT{0700}};
+		ss << fm;
+		check("0o0700", "rwx------");
+
+		fm = cosmos::FileMode{cosmos::ModeT{0070}};
+		ss << fm;
+		check("0o0070", "---rwx---");
+
+		fm = cosmos::FileMode{cosmos::ModeT{0007}};
+		ss << fm;
+		check("0o0007", "------rwx");
+
+		cosmos::FileStatus parent{"."};
+		ss << parent.getType() << parent.getMode();
+		check("d", "x");
+	}
+
 	std::optional<std::string> findSocket() const {
 		auto systemd_sock = "/run/systemd/notify";
 
@@ -267,7 +304,7 @@ public:
 	}
 
 	void good(const std::string_view msg) {
-		std::cout << "> " << msg << std::endl;
+		std::cout << "+ " << msg << std::endl;
 	}
 
 	void bad(const std::string_view msg) {

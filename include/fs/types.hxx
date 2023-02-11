@@ -4,7 +4,12 @@
 // Linux
 #include <sys/stat.h>
 
+// C++
+#include <iosfwd>
+#include <string>
+
 // cosmos
+#include "cosmos/dso_export.h"
 #include "cosmos/types.hxx"
 #include "cosmos/BitMask.hxx"
 
@@ -66,7 +71,7 @@ typedef BitMask<FileModeFlags> FileModeBits;
  * \note You won't need to set the FileType in any API call, you only need to
  * check the FileType reported back from e.g. a stat() system call.
  **/
-class FileType {
+class COSMOS_API FileType {
 public: // types
 
 	/// File type portion as found in a ModeT
@@ -110,7 +115,14 @@ public:
 	bool isLink()      const { return m_raw == LINK; }
 	bool isSocket()    const { return m_raw == SOCKET; }
 
-	auto raw() { return m_raw; }
+	auto raw() const { return m_raw; }
+
+	/// returns a symbolic character representing the type
+	/**
+	 * This returns a symbolic character like 'd' for directory as known
+	 * from the ls utility and other tools.
+	 **/
+	char symbolic() const;
 
 	bool operator==(const FileType &other) const {
 		return m_raw == other.m_raw;
@@ -130,7 +142,7 @@ protected: // data
  * This is wrapper around the primitive ModeT describing the classical UNIX
  * file permissions and mode bits.
  **/
-class FileMode {
+class COSMOS_API FileMode {
 public:
 	/// Constructs a FileMode from the given bitmask object
 	explicit FileMode(const FileModeBits mask) :
@@ -190,6 +202,14 @@ public:
 	FileModeBits& getMask() { return m_mode; }
 	const FileModeBits& getMask() const { return m_mode; }
 
+	/// Returns a symbolic string representation of the mode
+	/**
+	 * This returns a string like "r-x---r-x" as known from the `ls`
+	 * utility and similar tools. The type is not part of this. You can
+	 * use FileType::symbolic() to also get the type character in front.
+	 **/
+	std::string symbolic() const;
+
 	ModeT raw() const { return ModeT{m_mode.get()}; }
 
 	bool operator==(const FileMode &other) const {
@@ -207,5 +227,10 @@ protected: // data
 };
 
 } // end ns
+
+/// Outputs a friendly version of the FileMode information onto the stream
+COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::FileMode mode);
+/// Outputs a symbolic type character onto the stream
+COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::FileType type);
 
 #endif // inc. guard

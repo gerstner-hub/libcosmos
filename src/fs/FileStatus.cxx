@@ -2,6 +2,7 @@
 #include "cosmos/algs.hxx"
 #include "cosmos/errors/ApiError.hxx"
 #include "cosmos/errors/UsageError.hxx"
+#include "cosmos/formatting.hxx"
 #include "cosmos/fs/FileStatus.hxx"
 
 namespace cosmos {
@@ -36,4 +37,64 @@ DeviceID FileStatus::getRepresentedDevice() const {
 	}
 }
 
+std::string FileMode::symbolic() const {
+	std::string ret;
+
+	if (canOwnerRead()) ret.push_back('r');
+	else ret.push_back('-');
+
+	if (canOwnerWrite()) ret.push_back('w');
+	else ret.push_back('-');
+
+	if (isSetUID()) ret.push_back('s');
+	else if (canOwnerExec()) ret.push_back('x');
+	else ret.push_back('-');
+
+	if (canGroupRead()) ret.push_back('r');
+	else ret.push_back('-');
+
+	if (canGroupWrite()) ret.push_back('w');
+	else ret.push_back('-');
+
+	if (isSetGID()) ret.push_back('s');
+	else if (canGroupExec()) ret.push_back('x');
+	else ret.push_back('-');
+
+	if (canOthersRead()) ret.push_back('r');
+	else ret.push_back('-');
+
+	if (canOthersWrite()) ret.push_back('w');
+	else ret.push_back('-');
+
+	if (isSticky()) ret.push_back('t');
+	else if(canOthersExec()) ret.push_back('x');
+	else ret.push_back('-');
+
+	return ret;
+}
+
+char FileType::symbolic() const {
+	switch(raw()) {
+		default: return '?';
+		case NONE: return '-';
+		case SOCKET: return 's';
+		case LINK: return 'l';
+		case REGULAR: return '-';
+		case BLOCKDEV: return 'b';
+		case DIRECTORY: return 'd';
+		case CHARDEV: return 'c';
+		case FIFO: return 'p';
+	}
+}
+
 } // end ns
+
+std::ostream& operator<<(std::ostream &o, const cosmos::FileMode mode) {
+	o << mode.symbolic() << " (" << cosmos::octnum(cosmos::to_integral(mode.raw()), 4) << ")";
+	return o;
+}
+
+std::ostream& operator<<(std::ostream &o, const cosmos::FileType type) {
+	o << type.symbolic();
+	return o;
+}
