@@ -2,9 +2,12 @@
 #include <filesystem>
 #include <fstream>
 
+#include "cosmos/errors/FileError.hxx"
 #include "cosmos/errors/RuntimeError.hxx"
 #include "cosmos/formatting.hxx"
 #include "cosmos/fs/FileSystem.hxx"
+#include "cosmos/fs/FileStatus.hxx"
+#include "cosmos/fs/StreamFile.hxx"
 #include "cosmos/proc/ChildCloner.hxx"
 #include "cosmos/proc/Process.hxx"
 #include "cosmos/PasswdInfo.hxx"
@@ -117,6 +120,204 @@ bool testUnlink() {
 	return true;
 }
 
+bool testChmod() {
+	// TODO: use a temporary directory for this to avoid cluttering arbitrary dirs
+	const std::string_view modfile_base{"modfile"};
+	cosmos::StreamFile modfile{
+		modfile_base,
+		cosmos::OpenMode{cosmos::OpenMode::WRITE_ONLY},
+		cosmos::OpenFlags{cosmos::OpenSettings::CREATE},
+		cosmos::FileMode{cosmos::ModeT{0600}}
+	};
+
+	cosmos::fs::changeMode(modfile_base, cosmos::FileMode{cosmos::ModeT{0651}});
+
+	cosmos::FileStatus stat{modfile.getFD()};
+
+	if (stat.getMode().raw() != cosmos::ModeT{0651}) {
+		std::cerr << "New mode of modfile incorrect: " << stat.getMode() << "\n";
+		return false;
+	}
+
+	std::cout << "changemode(path, ...): New mode of modfile is correct" << std::endl;
+
+	cosmos::fs::changeMode(modfile.getFD(), cosmos::FileMode{cosmos::ModeT{0711}});
+
+	stat.updateFrom(modfile.getFD());
+
+	if (stat.getMode().raw() != cosmos::ModeT{0711}) {
+		std::cerr << "New mode of modfile incorrect: " << stat.getMode() << "\n";
+		return false;
+	}
+
+	std::cout << "changemode(fd, ...): New mode of modfile is correct" << std::endl;
+
+	modfile.close();
+
+	cosmos::fs::unlinkFile(modfile_base);
+
+	return true;
+}
+
+bool testChowner() {
+	// TODO: use a temporary directory
+	const std::string_view ownfile_base{"ownfile"};
+	cosmos::StreamFile ownfile{
+		ownfile_base,
+		cosmos::OpenMode{cosmos::OpenMode::WRITE_ONLY},
+		cosmos::OpenFlags{cosmos::OpenSettings::CREATE},
+		cosmos::FileMode{cosmos::ModeT{0600}}
+	};
+
+	const auto our_uid = cosmos::proc::getRealUserID();
+
+	// typically we'll run with non-root privileges so we won't be able to
+	// change owner or group ... so be prepared for that
+	auto tolerateEx = [](const cosmos::FileError &ex) {
+		if (ex.errnum() != cosmos::Errno::ACCESS && ex.errnum() != cosmos::Errno::PERMISSION) {
+			return false;
+		}
+
+		return true;
+	};
+
+	try {
+		cosmos::fs::changeOwner(ownfile_base, cosmos::UserID{1234});
+
+		cosmos::FileStatus status{ownfile_base};
+		if (status.getOwnerUID() != cosmos::UserID{1234}) {
+			std::cerr << "changeOwner(path, ...) didn't do the right thing" << std::endl;
+			return false;
+		}
+	} catch (const cosmos::FileError &ex) {
+		std::cerr << "changeOwner(path, ...) failed: " << ex.what() << std::endl;
+
+		if (!tolerateEx(ex))
+			return false;
+	}
+
+	try {
+		cosmos::fs::changeOwner(ownfile_base, "root");
+
+		cosmos::FileStatus status{ownfile_base};
+		if (status.getOwnerUID() != cosmos::UserID::ROOT) {
+			std::cerr << "changeOwner(path, ...) didn't do the right thing" << std::endl;
+			return false;
+		}
+	} catch (const cosmos::FileError &ex) {
+		std::cerr << "changeOwner(path, string) failed: " << ex.what() << std::endl;
+
+		if (!tolerateEx(ex))
+			return false;
+	}
+
+	try {
+		cosmos::fs::changeGroup(ownfile_base, cosmos::GroupID{1234});
+
+		cosmos::FileStatus status{ownfile_base};
+		if (status.getOwnerGID() != cosmos::GroupID{1234}) {
+			std::cerr << "changeGroup(path, ...) didn't do the right thing" << std::endl;
+			return false;
+		}
+	} catch (const cosmos::FileError &ex) {
+		std::cerr << "changeGroup(path, ...) failed: " << ex.what() << std::endl;
+
+		if (!tolerateEx(ex))
+			return false;
+	}
+
+	try {
+		cosmos::fs::changeOwner(ownfile.getFD(), cosmos::UserID{1234});
+
+		cosmos::FileStatus status{ownfile_base};
+		if (status.getOwnerUID() != cosmos::UserID{1234}) {
+			std::cerr << "changeUser(fd, ...) didn't do the right thing" << std::endl;
+			return false;
+		}
+	} catch (const cosmos::FileError &ex) {
+		std::cerr << "changeUser(fd, ...) failed: " << ex.what() << std::endl;
+
+		if (!tolerateEx(ex))
+			return false;
+	}
+
+	try {
+		cosmos::fs::changeGroup(ownfile.getFD(), cosmos::GroupID{1234});
+
+		cosmos::FileStatus status{ownfile_base};
+		if (status.getOwnerGID() != cosmos::GroupID{1234}) {
+			std::cerr << "changeGroup(fd, ...) didn't do the right thing" << std::endl;
+			return false;
+		}
+	} catch (const cosmos::FileError &ex) {
+		std::cerr << "changeGroup(fd, ...) failed: " << ex.what() << std::endl;
+
+		if (!tolerateEx(ex))
+			return false;
+	}
+
+	// changing ownership to ourselves should always work
+	cosmos::fs::linkChangeOwner(ownfile_base, our_uid);
+
+	cosmos::FileStatus status{ownfile_base};
+
+	if (status.getOwnerUID() != our_uid) {
+		std::cerr << "lchown() to self failed?!" << std::endl;
+		return false;
+	}
+
+	ownfile.close();
+
+	cosmos::fs::unlinkFile(ownfile_base);
+
+	return true;
+}
+
+int testSymlink() {
+	// TODO use temporary directory
+	const std::string_view linktarget_base{"targetfile"};
+	cosmos::StreamFile targetfile{
+		linktarget_base,
+		cosmos::OpenMode{cosmos::OpenMode::WRITE_ONLY},
+		cosmos::OpenFlags{cosmos::OpenSettings::CREATE},
+		cosmos::FileMode{cosmos::ModeT{0600}}
+	};
+
+	targetfile.writeAll(std::string_view{"some data"});
+
+	const std::string_view symlink_base{"alink"};
+	cosmos::fs::makeSymlink(linktarget_base, symlink_base);
+
+	auto link_content = cosmos::fs::readSymlink(symlink_base);
+
+	if (link_content == linktarget_base)  {
+		std::cout << "symlink content correct\n";
+	} else {
+		std::cerr << "link content doesn't match: " << link_content << " != " << linktarget_base << std::endl;
+		return false;
+	}
+
+	cosmos::StreamFile linkfile{
+		symlink_base,
+		cosmos::OpenMode{cosmos::OpenMode::READ_ONLY}
+	};
+
+	cosmos::FileStatus target_status{targetfile.getFD()};
+	cosmos::FileStatus link_status{linkfile.getFD()};
+
+	if (target_status.isSameFile(link_status)) {
+		std::cout << "symlink points to the expected file" << std::endl;
+	} else {
+		std::cerr << "symlink points to some other file?!\n";
+		return false;
+	}
+
+	cosmos::fs::unlinkFile(linktarget_base);
+	cosmos::fs::unlinkFile(symlink_base);
+
+	return true;
+}
+
 int main(const int, const char **argv) {
 
 	if (!cosmos::fs::existsFile(argv[0])) {
@@ -166,6 +367,15 @@ int main(const int, const char **argv) {
 		return 1;
 
 	if (!testCreateAllDirs())
+		return 1;
+
+	if (!testChmod())
+		return 1;
+
+	if (!testChowner())
+		return 1;
+
+	if (!testSymlink())
 		return 1;
 
 	return 0;

@@ -1,22 +1,28 @@
 // Linux
 #include <errno.h>
+#include <limits.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
 // C++
 #include <sstream>
+#include <string>
 
 // cosmos
 #include "cosmos/algs.hxx"
 #include "cosmos/errors/ApiError.hxx"
+#include "cosmos/errors/FileError.hxx"
 #include "cosmos/errors/InternalError.hxx"
 #include "cosmos/errors/UsageError.hxx"
+#include "cosmos/errors/RuntimeError.hxx"
 #include "cosmos/fs/Directory.hxx"
 #include "cosmos/fs/DirIterator.hxx"
 #include "cosmos/fs/File.hxx"
 #include "cosmos/fs/FileStatus.hxx"
 #include "cosmos/fs/FileSystem.hxx"
+#include "cosmos/GroupInfo.hxx"
+#include "cosmos/PasswdInfo.hxx"
 #include "cosmos/proc/Process.hxx"
 
 namespace cosmos::fs {
@@ -206,6 +212,122 @@ void removeTree(const std::string_view path) {
 	};
 
 	removeDir(path);
+}
+
+void changeMode(const std::string_view path, const FileMode mode) {
+	if (::chmod(path.data(), to_integral(mode.raw())) != 0) {
+		cosmos_throw (FileError(path, "chmod()"));
+	}
+}
+
+void changeMode(const FileDescriptor fd, const FileMode mode) {
+	if (::fchmod(to_integral(fd.raw()), to_integral(mode.raw())) != 0) {
+		cosmos_throw (FileError("(fd)", "fchmod()"));
+	}
+}
+
+void changeOwner(const std::string_view path, const UserID uid, const GroupID gid) {
+	if (::chown(path.data(), to_integral(uid), to_integral(gid)) != 0) {
+		cosmos_throw (FileError(path, "chown()"));
+	}
+}
+
+void changeOwner(const FileDescriptor fd, const UserID uid, const GroupID gid) {
+	if (::fchown(to_integral(fd.raw()), to_integral(uid), to_integral(gid)) != 0) {
+		cosmos_throw (FileError("(fd)", "fchown()"));
+	}
+}
+
+namespace {
+
+UserID resolveUser(const std::string_view user) {
+	if (user.empty()) {
+		return UserID::INVALID;
+	}
+
+	PasswdInfo info{user};
+	if (!info.isValid()) {
+		cosmos_throw (RuntimeError{std::string{user} + " does not exist"});
+	}
+
+	return info.getUID();
+}
+
+GroupID resolveGroup(const std::string_view group) {
+	if (group.empty()) {
+		return GroupID::INVALID;
+	}
+
+	GroupInfo info{group};
+	if (!info.isValid()) {
+		cosmos_throw (RuntimeError{std::string{group} + "does not exist"});
+	}
+
+	return info.getGID();
+}
+
+} // end anon ns
+
+void changeOwner(const std::string_view path, const std::string_view user,
+		const std::string_view group) {
+
+	const UserID uid = resolveUser(user);
+	const GroupID gid = resolveGroup(group);
+	changeOwner(path, uid, gid);
+}
+
+void changeOwner(const FileDescriptor fd, const std::string_view user,
+		const std::string_view group) {
+	const UserID uid = resolveUser(user);
+	const GroupID gid = resolveGroup(group);
+	changeOwner(fd, uid, gid);
+}
+
+void linkChangeOwner(const std::string_view path, const UserID uid, const GroupID gid) {
+	if (::lchown(path.data(), to_integral(uid), to_integral(gid)) != 0) {
+		cosmos_throw (FileError(path, "lchown()"));
+	}
+}
+
+void linkChangeOwner(const std::string_view path, const std::string_view user,
+		const std::string_view group) {
+	const UserID uid = resolveUser(user);
+	const GroupID gid = resolveGroup(group);
+	linkChangeOwner(path, uid, gid);
+}
+
+void makeSymlink(const std::string_view target, const std::string_view path) {
+	if (::symlink(target.data(), path.data()) != 0) {
+		cosmos_throw (FileError(path, "symlink()"));
+	}
+}
+
+std::string readSymlink(const std::string_view path) {
+	std::string ret;
+	ret.resize(128);
+
+	while (true) {
+		auto res = ::readlink(path.data(), &ret.front(), ret.size());
+
+		if (res < 0) {
+			cosmos_throw (FileError(path, "readlink()"));
+		}
+
+		// NOTE: this returns the size excluding a null terminator,
+		// also doesn't write a null terminator
+		auto len = static_cast<size_t>(res);
+
+		if (len < ret.size()) {
+			ret.resize(len);
+			return ret;
+		} else {
+			// man page says: if len equals size then truncation
+			// may have occured. Thus use one byte extra to avoid
+			// ambiguity.
+			ret.resize(len+1);
+			continue;
+		}
+	}
 }
 
 } // end ns

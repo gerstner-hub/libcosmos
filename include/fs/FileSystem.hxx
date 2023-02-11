@@ -9,6 +9,7 @@
 // cosmos
 #include "cosmos/dso_export.h"
 #include "cosmos/errors/ApiError.hxx"
+#include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/fs/types.hxx"
 
 namespace cosmos::fs {
@@ -128,6 +129,168 @@ COSMOS_API Errno makeAllDirs(const std::string_view path, const FileMode mode);
  * conditions that leads to undefined behaviour.
  **/
 COSMOS_API void removeTree(const std::string_view path);
+
+/// Changes the FileMode of the given path
+/**
+ * Attempts to change the FileMode associated with the file object found at
+ * the given path. Symlinks will be followed.
+ *
+ * To change the mode of symlinks use linkChangeOwner(). To avoid symlinks
+ * use File::open() with OpenSettings::NOFOLLOW. Obtain a FileStatus() for the
+ * open FileDescriptor and then use changeMode(FileDescriptor, FileMode)
+ * if the file isn't a symlink.
+ *
+ * \note On Linux there is no way to change the mode symlinks.
+ *
+ * Various errors can occur which will cause a FileError to be thrown. The
+ * most common errors are:
+ *
+ * - file does not exist (Errno::NO_ENTRY)
+ * - no permission to change the mode (Errno::PERMISSION)
+ * - read only file system (Errno::READ_ONLY_FS)
+ **/
+COSMOS_API void changeMode(const std::string_view path, const FileMode mode);
+
+/// Changes the FileMode of the given open file descriptor
+/**
+ * This behaves the same as changeMode(std::string_view, FileMode) with the
+ * exception that the file associated with the given file descriptor will be
+ * affected instead of a to-be-opened path.
+ *
+ * Additional common errors that can occur:
+ *
+ * - bad file descriptor (Errno::BAD_FD)
+ **/
+COSMOS_API void changeMode(const FileDescriptor fd, const FileMode mode);
+
+/// Change numerical owner and/or group ID of a file path
+/**
+ * Attempts to change the owner and/or the group of the file object found at
+ * \c path. If \c path refers to a symbolic link then the target of the link
+ * is affected. UserID::INVALID and GroupID::INVALID will cause the respective
+ * item *not* to be touched.
+ *
+ * Various errors can occur which will cause a FileError to be thrown. The
+ * most common errors are:
+ *
+ * - file does not exist (Errno::NO_ENTRY)
+ * - no permission to change the owner (Errno::PERMISSION)
+ * - read only file system (Errno::READ_ONLY_FS)
+ **/
+COSMOS_API void changeOwner(const std::string_view path, const UserID uid, const GroupID gid = GroupID::INVALID);
+
+/// Change numerical owner and/or group ID of the given open file descriptor
+/**
+ * This behaves the same as changeOwner(std::string_view, UserID, GroupID)
+ * with the exception that the file associated with the given file descriptor
+ * will be affected instead of a to-be-opened path.
+ *
+ * Additional common errors that can occur:
+ *
+ * - bad file descriptor (Errno::BAD_FD)
+ **/
+COSMOS_API void changeOwner(const FileDescriptor fd, const UserID uid, const GroupID gid = GroupID::INVALID);
+
+/// Change owner and/or group of the given path by user name and/or group name
+/**
+ * This is a convenience function on top of changeOwner(std::string_view,
+ * UserID, GroupID). It looks up the numerical UserID of \c user and the
+ * numerical GroupID of \c group.
+ *
+ * To skip changing the owner of user or group simply pass an empty
+ * string_view as respective parameter.
+ *
+ * Additional errors that can occur are the ones described in PasswdInfo(),
+ * GroupInfo() and RuntimeError() in case the username or group do not
+ * exist.
+ **/
+COSMOS_API void changeOwner(const std::string_view path, const std::string_view user,
+		const std::string_view group = {});
+
+/// Change owner and/or group of the given file descriptor by user name and/or group name
+/**
+ * This is a convenience function on top of changeOwner(FileDescriptor,
+ * UserID, GroupID). The description of changeOwner(std::string_view,
+ * std::string_view, std::string_view) applies here as well.
+ **/
+COSMOS_API void changeOwner(const FileDescriptor fd, const std::string_view user,
+		const std::string_view group = {});
+
+/// Convenience wrapper of changeOwner() to change only the group of a file
+inline void changeGroup(const FileDescriptor fd, const GroupID id) {
+	changeOwner(fd, UserID::INVALID, id);
+}
+
+/// Convenience wrapper of changeOwnner() to change only the group of a file
+inline void changeGroup(const FileDescriptor fd, const std::string_view group) {
+	changeOwner(fd, {}, group);
+}
+
+/// Convenience wrapper of changeOwnner() to change only the group of a file
+inline void changeGroup(const std::string_view path, const GroupID id) {
+	changeOwner(path, UserID::INVALID, id);
+}
+
+/// Convenience wrapper of changeOwnner() to change only the group of a file
+inline void changeGroup(const std::string_view path, const std::string_view group) {
+	changeOwner(path, {}, group);
+}
+
+/// Changes owner and/or group of the given path while not following symlinks
+/**
+ * This behaves the same as changeOwner(const std::string_view, const UserID,
+ * const GroupID) with the exception that if the final path component refers
+ * to a symbolic link that the ownership of the link is changed, not that of
+ * the target.
+ *
+ * If \c path is not a symlink then it's owner will still be changed and no
+ * error is thrown.
+ **/
+COSMOS_API void linkChangeOwner(const std::string_view path, const UserID uid,
+		const GroupID gid = GroupID::INVALID);
+
+/// Changes owner and/or group of the given path while not following symlinks
+/**
+ * \see linkChangeOwner(const std::string_view, const UserID, const GroupID)
+ **/
+COSMOS_API void linkChangeOwner(const std::string_view path, const std::string_view user,
+		const std::string_view group = {});
+
+/// Creates a symbolic link at \c path pointing to \c target
+/**
+ * A symbolic link is simply a pointer to another file system location as
+ * provided in \c target. Leading ".." components in \c target will refer to
+ * the parent directories of \c path.
+ *
+ * The permission bits (FileMode) of a symlink are ignored by Linux. The
+ * user and group ownership are ignored when dereferencing a symlink, except
+ * for when the protected_symlinks feature is enabled (see proc(5); the
+ * feature is enabled on most Linux systems these days). The ownership is also
+ * relevant for renaming or removing a symlink.
+ *
+ * If an error occurs then a FileError is thrown. Common errors are:
+ *
+ * - access denied to \c path. Either search access in the initial components
+ *   or write access to the final directory component (Errno::ACCESS).
+ * - the file system does not allow the creation of symbolic links
+ *   (Errno::PERMISSION).
+ * - Earlier parts of \c path do not exist or \c target is empty
+ *   (Errno::NO_ENTRY).
+ * - \c path already exists (Errno::EXISTS).
+ **/
+COSMOS_API void makeSymlink(const std::string_view target, const std::string_view path);
+
+/// Returns the target (content) of the symbolic at \c path.
+/**
+ * This returns the target path of the symlink present at the given \c path.
+ *
+ * If an error occurs then a FileError is thrown. Common errors are:
+ *
+ * - access denied (Errno::ACCESS)
+ * - invalid argument if \c path is not a symlink (Errno::INVALID_ARG)
+ * - no entry if \c path does not exist (Errno::NO_ENTRY)
+ **/
+COSMOS_API std::string readSymlink(const std::string_view path);
 
 } // end ns
 
