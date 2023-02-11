@@ -8,8 +8,10 @@ void check(int &res, std::stringstream &ss, const std::string &cmp) {
 	std::string s = ss.str();
 	ss.str("");
 
-	if (s == cmp)
+	if (s == cmp) {
+		std::cout << s << " == " << cmp << "\n";
 		return;
+	}
 
 	std::cerr << s << " != " << cmp << std::endl;
 	res = 1;
@@ -31,10 +33,25 @@ int testHexnum() {
 	return res;
 }
 
+int testOctnum() {
+	int res = 0;
+	std::stringstream ss;
+
+	ss << cosmos::octnum(10, 4);
+	check(res, ss, "0o0012");
+
+	ss << cosmos::octnum(13, 3).showBase(false);
+	check(res, ss, "015");
+
+	return res;
+}
+
 void check(int &res, const std::string &val, const std::string &cmp)
 {
-	if (val == cmp)
+	if (val == cmp) {
+		std::cout << val << " == " << cmp << "\n";
 		return;
+	}
 
 	std::cerr << val << " != " << cmp << std::endl;
 	res = 1;
@@ -53,7 +70,8 @@ int testSprintf() {
 int main() {
 	int res = testHexnum();
 
-	res = testSprintf() && res;
+	res = testOctnum() || res;
+	res = testSprintf() || res;
 
 	return res;
 }

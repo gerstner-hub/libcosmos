@@ -3,8 +3,10 @@
 
 // stdlib
 #include <iomanip>
+#include <functional>
 #include <ostream>
 #include <string>
+#include <string_view>
 #include <sstream>
 #include <type_traits>
 
@@ -22,36 +24,74 @@
 
 namespace cosmos {
 
-/// Helper to output a primitive integer as hexadecimal
-/**
- * the stream state will be maintained i.e. after the output operation
- * finished the previous/default stream state will be applied
- **/
+/// base class for hexnum and octnum format output helpers
 template <typename NUM>
-struct hexnum {
-	explicit hexnum(const NUM num, size_t width) : m_num(num), m_width(width) {}
+struct fmtnum_base {
+protected: // types
 
-	/// If we should prefix '0x' to the number (default yes)
-	const hexnum& showBase(bool yes_no) { m_show_base = yes_no; return *this; }
+	/// this function is supposed to apply the desired number base to the stream
+	using SetBaseFN = std::function<void(std::ostream&)>;
+
+protected: // functions
+
+	fmtnum_base(const NUM num, size_t width, SetBaseFN fn, std::string_view base_prefix) :
+		m_num(num), m_width(width), m_setbase_fn(fn), m_base_prefix(base_prefix) {}
+
+public: // functions
+
+	/// If we should show a prefix identifier the number's base (e.g. 0x for hex, default: yes)
+	const fmtnum_base& showBase(bool yes_no) { m_show_base = yes_no; return *this; }
 
 	size_t getWidth() const { return m_width; }
 	bool showBase() const { return m_show_base; }
 	auto getNum() const { return m_num; }
+	const std::string_view getBasePrefix() const { return m_base_prefix; }
+	SetBaseFN getSetBaseFN() const { return m_setbase_fn; }
 
 	explicit operator std::string() const {
 		std::stringstream ss;
 		ss << *this;
 		return ss.str();
 	}
+
 protected: // data
 
 	NUM m_num;
 	size_t m_width = 0;
+	SetBaseFN m_setbase_fn;
+	std::string_view m_base_prefix;
 	bool m_show_base = true;
 };
 
-/// This is a C++ variant of the libc sprintf() function
-COSMOS_API std::string sprintf(const char *fmt, ...) COSMOS_FORMAT_PRINTF(1, 2);
+/// Helper to output a primitive integer as hexadecimal in the style of 0x1234
+/**
+ * the stream state will be maintained i.e. after the output operation is
+ * finished the previous/default stream state will be applied
+ *
+ * Leading zeroes will be added to reach the desired field width.
+ *
+ * The given field width will only count towards the actual digits the number
+ * consists of. A possible base prefix is not counted towards the field width.
+ * I.e. if showBase() is set to \c true then hexnum(0x10, 4) will be printed
+ * as: "0x0010".
+ **/
+template <typename NUM>
+struct hexnum : public fmtnum_base<NUM> {
+	hexnum(const NUM num, size_t width) :
+		fmtnum_base<NUM>{num, width, [](std::ostream &o){ o << std::hex; }, "0x"}
+	{}
+};
+
+/// Helper to output a primitive integer as octal in the style of 0o123
+/**
+ * \see hexnum
+ **/
+template <typename NUM>
+struct octnum : public fmtnum_base<NUM> {
+	octnum(const NUM num, size_t width) :
+		fmtnum_base<NUM>{num, width, [](std::ostream &o){ o << std::oct; }, "0o"}
+	{}
+};
 
 /// This helper makes sure that any integer is turned into a printable integer
 /**
@@ -66,28 +106,10 @@ auto to_printable_integer(T num) -> decltype(+num) {
 	return +num;
 }
 
+/// This is a C++ variant of the libc sprintf() function
+COSMOS_API std::string sprintf(const char *fmt, ...) COSMOS_FORMAT_PRINTF(1, 2);
+
 } // end ns cosmos
-
-template <typename NUM>
-std::ostream& operator<<(std::ostream &o, const cosmos::hexnum<NUM> &hn) {
-	const auto orig_flags = o.flags();
-	const auto orig_fill = o.fill();
-
-	static_assert(std::is_integral_v<NUM>, "template type needs to be an integral integer type");
-
-	// don't handle this with std::showbase, it's behaving badly e.g. the
-	// "0x" prefix counts towards the field with, also, the fill character
-	// will be prepended to the "0x" prefix resulting in things like
-	// "0000x64".
-	if (hn.showBase())
-		o << "0x";
-	o << std::setw(hn.getWidth()) << std::hex << std::setfill('0')
-		<< cosmos::to_printable_integer(hn.getNum());
-
-	o.flags(orig_flags);
-	o.fill(orig_fill);
-	return o;
-}
 
 inline std::ostream& operator<<(std::ostream &o, const cosmos::ProcessID &pid) {
 	// we could also think about using a consistent annotation of process
@@ -119,5 +141,10 @@ inline std::ostream& operator<<(std::ostream &o, const cosmos::FileNum &fd) {
 	o << cosmos::to_integral(fd);
 	return o;
 }
+
+// this is implemented outlined with explicit template instantiations for the
+// currently necessary primitive types
+template <typename NUM>
+std::ostream& operator<<(std::ostream& o, const cosmos::fmtnum_base<NUM> &fmtnum);
 
 #endif // inc. guard

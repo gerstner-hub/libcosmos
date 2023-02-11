@@ -58,3 +58,31 @@ std::string sprintf(const char *fmt, ...) {
 }
 
 } // end ns
+
+template <typename NUM>
+std::ostream& operator<<(std::ostream& o, const cosmos::fmtnum_base<NUM> &fmtnum) {
+	const auto orig_flags = o.flags();
+	const auto orig_fill = o.fill();
+
+	static_assert(std::is_integral_v<NUM>, "template type needs to be an integral integer type");
+
+	// don't handle this with std::showbase, it's behaving badly e.g. the
+	// "0x" prefix counts towards the field with, also, the fill character
+	// will be prepended to the "0x" prefix resulting in things like
+	// "0000x64".
+	if (fmtnum.showBase())
+		o << fmtnum.getBasePrefix();
+	o << std::setw(fmtnum.getWidth());
+	fmtnum.getSetBaseFN()(o);
+	o << std::setfill('0') << cosmos::to_printable_integer(fmtnum.getNum());
+
+	o.flags(orig_flags);
+	o.fill(orig_fill);
+	return o;
+}
+
+/* explicit instantiations of the templated operator<< */
+
+template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::fmtnum_base<unsigned int>&);
+template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::fmtnum_base<int>&);
+template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::fmtnum_base<size_t>&);
