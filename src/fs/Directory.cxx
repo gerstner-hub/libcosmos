@@ -62,10 +62,10 @@ void Directory::open(const FileDescriptor fd) {
 	}
 }
 
-FileDescriptor Directory::fd() const {
+DirFD Directory::fd() const {
 	requireOpenStream(__FUNCTION__);
 	auto fd = dirfd(m_stream);
-	FileDescriptor ret(FileNum{fd});
+	DirFD ret(FileNum{fd});
 
 	if (ret.invalid()) {
 		cosmos_throw (ApiError());

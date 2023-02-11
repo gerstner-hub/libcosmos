@@ -1,14 +1,12 @@
 // Cosmos
+#include "cosmos/errors/ApiError.hxx"
+#include "cosmos/fs/FileStatus.hxx"
 #include "cosmos/fs/Directory.hxx"
 
 // C++
 #include <exception>
 #include <iostream>
 #include <map>
-
-// Linux
-#include <sys/types.h>
-#include <sys/stat.h>
 
 class DirsTest {
 public:
@@ -70,6 +68,14 @@ public:
 		}
 
 		auto fd = dir.fd();
+
+		{
+			cosmos::FileStatus status{fd};
+			if (!status.getType().isDirectory()) {
+				std::cerr << "Directory FD refers to non-dir?!" << std::endl;
+				return 1;
+			}
+		}
 
 		auto startpos = dir.tell();
 		std::string first_name;
@@ -134,11 +140,16 @@ public:
 		}
 
 		dir.close();
-		struct stat s;
 
-		if (::fstat(cosmos::to_integral(fd.raw()), &s) != -1 || errno != EBADF) {
-			std::cerr << "fd() still valid after close() ?!" << std::endl;
+		try {
+			cosmos::FileStatus status{fd};
+			std::cerr << "dirfd still valid after close?" << std::endl;
 			return 1;
+		} catch (const cosmos::ApiError &ex) {
+			if (ex.errnum() != cosmos::Errno::BAD_FD) {
+				std::cerr << "fstat() reports errno != EBADF?!" << std::endl;
+				return 1;
+			}
 		}
 
 		return 0;

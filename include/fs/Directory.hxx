@@ -15,6 +15,7 @@
 #include "cosmos/errors/ApiError.hxx"
 #include "cosmos/errors/UsageError.hxx"
 #include "cosmos/fs/DirEntry.hxx"
+#include "cosmos/fs/DirFD.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/fs/FileSystem.hxx"
 
@@ -105,7 +106,7 @@ public: // functions
 	 * result in undefined behaviour. The file descriptor will become
 	 * invalid after close() is invoked.
 	 **/
-	FileDescriptor fd() const;
+	DirFD fd() const;
 
 	/// Returns the current position in the directory iteration
 	/**
