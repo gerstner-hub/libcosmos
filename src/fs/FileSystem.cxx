@@ -32,20 +32,20 @@ bool existsFile(const std::string_view path) {
 	if (::lstat(path.data(), &s) == 0)
 		return true;
 	else if (getErrno() != Errno::NO_ENTRY)
-		cosmos_throw (ApiError());
+		cosmos_throw (FileError(path, "lstat()"));
 
 	return false;
 }
 
 void unlinkFile(const std::string_view path) {
 	if (::unlink(path.data()) != 0) {
-		cosmos_throw (ApiError());
+		cosmos_throw (FileError(path, "unlink()"));
 	}
 }
 
 void changeDir(const std::string_view path) {
 	if (::chdir(path.data()) != 0) {
-		cosmos_throw (ApiError());
+		cosmos_throw (FileError(path, "chdir()"));
 	}
 }
 
@@ -61,7 +61,7 @@ std::string getWorkingDir() {
 					ret.resize(ret.size() * 2);
 					continue;
 				}
-				default: cosmos_throw (ApiError());
+				default: cosmos_throw (ApiError("getcwd()"));
 			}
 		}
 
@@ -132,13 +132,13 @@ std::optional<std::string> which(const std::string_view exec_base) noexcept {
 
 void makeDir(const std::string_view path, const FileMode mode) {
 	if (::mkdir(path.data(), to_integral(mode.raw())) != 0) {
-		cosmos_throw (ApiError());
+		cosmos_throw (FileError(path, "mkdir()"));
 	}
 }
 
 void removeDir(const std::string_view path) {
 	if (::rmdir(path.data()) != 0) {
-		cosmos_throw (ApiError());
+		cosmos_throw (FileError(path, "rmdir()"));
 	}
 }
 
@@ -168,7 +168,7 @@ Errno makeAllDirs(const std::string_view path, const FileMode mode) {
 				continue;
 			}
 
-			cosmos_throw (ApiError());
+			cosmos_throw (FileError(prefix, "mkdir()"));
 		}
 
 		// at least one directory was created

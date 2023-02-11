@@ -8,7 +8,6 @@
 
 // cosmos
 #include "cosmos/dso_export.h"
-#include "cosmos/errors/ApiError.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/fs/types.hxx"
 
@@ -51,7 +50,7 @@ COSMOS_API void unlinkFile(const std::string_view path);
 
 /// Change the calling process's current working directory to \c path
 /**
- * On error an ApiError exception is thrown.
+ * On error a FileError exception is thrown.
  **/
 COSMOS_API void changeDir(const std::string_view path);
 
@@ -80,7 +79,7 @@ COSMOS_API std::optional<std::string> which(const std::string_view exec_base) no
 /// Creates a directory at the given location
 /**
  * This attempts to create a single new directory at the given \c path. The
- * parent directory must already exist, otherwise an ApiError is thrown.
+ * parent directory must already exist, otherwise a FileError is thrown.
  *
  * The given \c mode determines the permissions of the newly created
  * directory. The permissions are modified by the process's umask
@@ -91,7 +90,7 @@ COSMOS_API void makeDir(const std::string_view path, const FileMode mode);
 /// Removes an empty directory at the given location
 /**
  * The directory must exist and must be empty for the call to succeed. On
- * error an ApiError is thrown.
+ * error a FileError is thrown.
  **/
 COSMOS_API void removeDir(const std::string_view path);
 
@@ -102,7 +101,7 @@ COSMOS_API void removeDir(const std::string_view path);
  * receive the given \c mode.
  *
  * If any of the path components cannot be created (or accessed) then an
- * ApiError is thrown. This could mean that some of the paths have been
+ * FileError is thrown. This could mean that some of the paths have been
  * created in the error case, but not the full path.
  *
  * TODO: this does not currently normalize the input path which can lead to
@@ -123,7 +122,7 @@ COSMOS_API Errno makeAllDirs(const std::string_view path, const FileMode mode);
  * exception is thrown.
  *
  * If an error occurs while removing any of the descendant path elements then
- * an ApiError is thrown and the state of the directory tree is undefined.
+ * a FileError is thrown and the state of the directory tree is undefined.
  * Note that using this function with concurrently file system access from
  * within the calling or another process in the system can cause race
  * conditions that leads to undefined behaviour.
