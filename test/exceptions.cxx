@@ -25,6 +25,13 @@ void test_func() {
 	cosmos_throw(DerivedError());
 }
 
+struct TestClass {
+	void throwSomething(int num) {
+		(void)num;
+		cosmos_throw(DerivedError());
+	}
+};
+
 int main() {
 	cosmos::Init init;
 	errno = ENOENT;
@@ -53,6 +60,13 @@ int main() {
 		test_func();
 	} catch(const DerivedError &e) {
 		std::cerr << "Testing DerivedError: " << e.what() << std::endl;
+	}
+
+	try {
+		TestClass tc;
+		tc.throwSomething(10);
+	} catch(const DerivedError &e) {
+		std::cerr << "Testing DerivedError from class context: " << e.what() << std::endl;
 	}
 
 	return 0;

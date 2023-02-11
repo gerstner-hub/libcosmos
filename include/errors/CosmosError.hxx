@@ -6,16 +6,8 @@
 #include <string>
 #include <string_view>
 
-/// Throws the given Exception type after information from the calling context has been added
-#define cosmos_throw(e) (e.setInfo(__FILE__, __LINE__, __FUNCTION__).raise())
-/// Use this in each type derived from CosmosError to apply mandatory overrides
-/**
- * since this is a virtual function, the `noreturn` attribute is not enough to
- * silence "no return in function returning non-void" functions. I didn't find
- * a way around that yet, meaning that somethings unnecessary returns have to
- * be added to silence these warnings.
- **/
-#define COSMOS_ERROR_IMPL [[ noreturn ]] void raise() override { throw *this; }
+// libcosmos
+#include "cosmos/errors/macros.hxx"
 
 namespace cosmos {
 
