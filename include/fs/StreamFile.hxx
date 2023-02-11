@@ -4,6 +4,9 @@
 // Linux
 #include <unistd.h>
 
+// C++
+#include <string_view>
+
 // cosmos
 #include "cosmos/fs/File.hxx"
 
@@ -85,6 +88,11 @@ public: // functions
 	 **/
 	size_t write(const void *buf, size_t length);
 
+	/// string_view wrapper around write(const void*, size_t)
+	size_t write(const std::string_view data) {
+		return write(data.data(), data.size());
+	}
+
 	/// Read *all* \p length bytes from the underlying file
 	/**
 	 * This behaves just like read() with the exception that on short
@@ -107,6 +115,11 @@ public: // functions
 	 * been transferred.
 	 **/
 	void writeAll(const void *buf, size_t length);
+
+	/// string_view wrapper around writeAll(const void*, size_t)
+	void writeAll(const std::string_view data) {
+		return writeAll(data.data(), data.size());
+	}
 
 	/// Seek to the given offset based on the given offset \p type
 	off_t seek(const SeekType type, off_t off);
