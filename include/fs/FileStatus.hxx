@@ -206,11 +206,22 @@ public: // functions
 		return *reinterpret_cast<const TimeSpec*>(&m_st.st_atim);
 	}
 
+	/// Returns whether the two FileStatus objects refer to the same file
+	/**
+	 * This condition is true if both the inodes and the block device IDs
+	 * for both FileStatus objects match. Note that files can be identical
+	 * even if the file names aren't (hard links).
+	 **/
+	bool isSameFile(const FileStatus &other) const {
+		return this->getInode() == other.getInode() &&
+			this->getDevice() == other.getDevice();
+	}
+
 	/// compares the two objects on raw data level
 	/**
 	 * All file status fields need to be equal for this to match. To
 	 * compare file objects on a logical level (i.e. if they refer to the
-	 * same file system object) use getDevice() and getInode().
+	 * same file system object) use isSameFile().
 	 **/
 	bool operator==(const FileStatus &other) {
 		return std::memcmp(&m_st, &other.m_st, sizeof(m_st)) == 0;
