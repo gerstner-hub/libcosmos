@@ -6,6 +6,9 @@
 #include <string_view>
 #include <variant>
 
+// cosmos
+#include "cosmos/algs.hxx"
+
 /**
  * @file
  *
@@ -106,13 +109,17 @@ enum class TermControl : size_t {
 	DEFAULT_BG_COLOR = 49 /// Set default bg color
 };
 
+/// A generic ANSI code e.g. for color indices
+enum class ANSICode : size_t {
+};
+
 /// Returns the matching _OFF value for an _ON value of the TermControl enum.
 /**
  * This can throw an exception on unexpected input.
  **/
 TermControl COSMOS_API getOffControl(const TermControl ctrl);
 /// Returns the actual ANSI escape code number for the given color specification.
-size_t COSMOS_API getANSIColorCode(const ColorSpec &color);
+ANSICode COSMOS_API getANSIColorCode(const ColorSpec &color);
 
 /// Base class to build nested ANSI feature objects.
 /**
@@ -129,36 +136,44 @@ size_t COSMOS_API getANSIColorCode(const ColorSpec &color);
  **/
 class FeatureBase {
 public:
-	size_t getOnCode() const { return m_on_code; }
-	size_t getOffCode() const { return m_off_code; }
+	ANSICode getOnCode() const { return m_on_code; }
+	ANSICode getOffCode() const { return m_off_code; }
 	bool hasText() const { return std::holds_alternative<const std::string_view*>(m_info); }
 	const std::string_view& getText() const { return *std::get<const std::string_view*>(m_info); }
 	bool hasNextFeature() const { return std::holds_alternative<const FeatureBase*>(m_info); }
 	const FeatureBase& getNextFeature() const { return *std::get<const FeatureBase*>(m_info); }
 protected:
-	FeatureBase(const std::string_view &text, const size_t on_code, const size_t off_code) :
+	FeatureBase(const std::string_view &text, const ANSICode on_code, const ANSICode off_code) :
 		m_info(&text), m_on_code(on_code), m_off_code(off_code)
 	{}
 
-	FeatureBase(const FeatureBase &next, const size_t on_code, const size_t off_code) :
+	FeatureBase(const FeatureBase &next, const ANSICode on_code, const ANSICode off_code) :
 		m_info(&next), m_on_code(on_code), m_off_code(off_code)
 	{}
 protected:
 	// either a terminal string or a pointer to the next feature to apply
 	std::variant<const std::string_view*, const FeatureBase*> m_info;
-	const size_t m_on_code;
-	const size_t m_off_code;
+	const ANSICode m_on_code;
+	const ANSICode m_off_code;
 };
 
 /// Base class for easy feature TermControl application on ostreams
 class TextEffect : public FeatureBase {
 protected:
 	TextEffect(const TermControl feature, const std::string_view &text) :
-		FeatureBase{text, static_cast<size_t>(feature), static_cast<size_t>(getOffControl(feature))}
+		FeatureBase{
+			text,
+			ANSICode{to_integral(feature)},
+			ANSICode{to_integral(getOffControl(feature))}
+		}
 	{}
 
 	TextEffect(const TermControl feature, const FeatureBase &next) :
-		FeatureBase{next, static_cast<size_t>(feature), static_cast<size_t>(getOffControl(feature))}
+		FeatureBase{
+			next,
+			ANSICode{to_integral(feature)},
+			ANSICode{to_integral(getOffControl(feature))}
+		}
 	{}
 };
 
@@ -181,17 +196,26 @@ typedef TextEffectT<TermControl::INVERSE_ON> Inversed;
 /// Base class for easy colored text application on ostreams.
 struct ColoredText : public FeatureBase {
 	explicit ColoredText(const std::string_view &text, const TermColor c, const ColorKind kind, const ColorIntensity intensity) :
-		FeatureBase{text, getANSIColorCode(ColorSpec{c, kind, intensity}), static_cast<size_t>(getOffCode(kind))}
+		FeatureBase{
+			text,
+			getANSIColorCode(ColorSpec{c, kind, intensity}),
+			getOffCode(kind)
+		}
 	{}
 
 	explicit ColoredText(const FeatureBase &next, const TermColor c, const ColorKind kind, const ColorIntensity intensity) :
-		FeatureBase{next, getANSIColorCode(ColorSpec{c, kind, intensity}), static_cast<size_t>(getOffCode(kind))}
+		FeatureBase{
+			next,
+			getANSIColorCode(ColorSpec{c, kind, intensity}),
+			getOffCode(kind)
+		}
 	{}
 
 protected: // functions
 
-	TermControl getOffCode(const ColorKind kind) const {
-		return kind == ColorKind::FRONT ? TermControl::DEFAULT_FG_COLOR : TermControl::DEFAULT_BG_COLOR;
+	ANSICode getOffCode(const ColorKind kind) const {
+		auto ret = kind == ColorKind::FRONT ? TermControl::DEFAULT_FG_COLOR : TermControl::DEFAULT_BG_COLOR;
+		return ANSICode{to_integral(ret)};
 	}
 };
 

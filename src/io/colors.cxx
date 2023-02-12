@@ -9,7 +9,7 @@
 
 namespace cosmos::term {
 
-static std::string buildANSICommand(const std::vector<size_t> &cmd_list) {
+static std::string buildANSICommand(const std::vector<ANSICode> &cmd_list) {
 	// the ASCII escape character for ANSI control sequences
 	constexpr char ANSI_ESC_START = '\033';
 	// ANSI escape finish character
@@ -18,7 +18,7 @@ static std::string buildANSICommand(const std::vector<size_t> &cmd_list) {
 	std::string ret(1, ANSI_ESC_START);
 	ret += '[';
 	for (const auto &cmd: cmd_list) {
-		ret += std::to_string(cmd);
+		ret += std::to_string(to_integral(cmd));
 		ret += ";";
 	}
 	// remove superfluous separator again
@@ -27,16 +27,16 @@ static std::string buildANSICommand(const std::vector<size_t> &cmd_list) {
 	return ret;
 }
 
-static std::string buildANSICommand(size_t code) {
-	return buildANSICommand(std::vector<size_t>({code}));
+static std::string buildANSICommand(const ANSICode code) {
+	return buildANSICommand(std::vector<ANSICode>({code}));
 }
 
-size_t getANSIColorCode(const ColorSpec &color) {
+ANSICode getANSIColorCode(const ColorSpec &color) {
 	size_t code = color.isFrontColor() ? 30 : 40;
 	if (color.isBright())
 		code += 60;
 
-	return code + static_cast<size_t>(color.getColor());
+	return ANSICode{code + to_integral(color.getColor())};
 }
 
 TermControl getOffControl(const TermControl ctrl) {
@@ -69,13 +69,13 @@ static std::vector<const FeatureBase*> getFeatures(const FeatureBase &first) {
 
 
 std::ostream& operator<<(std::ostream &o, const cosmos::term::ColorSpec &fc) {
-	const size_t code = getANSIColorCode(fc);
+	const auto code = getANSIColorCode(fc);
 
 	return o << cosmos::term::buildANSICommand(code);
 }
 
 std::ostream& operator<<(std::ostream &o, const cosmos::term::TermControl p) {
-	return o << cosmos::term::buildANSICommand(static_cast<size_t>(p));
+	return o << cosmos::term::buildANSICommand(cosmos::term::ANSICode{cosmos::to_integral(p)});
 }
 
 std::ostream& operator<<(std::ostream &o, const cosmos::term::FeatureBase &fb) {
@@ -87,7 +87,7 @@ std::ostream& operator<<(std::ostream &o, const cosmos::term::FeatureBase &fb) {
 	}
 
 	// complex case with nested features
-	std::vector<size_t> on_codes, off_codes;
+	std::vector<cosmos::term::ANSICode> on_codes, off_codes;
 	const auto features = getFeatures(fb);
 	for (const auto feature: features) {
 		on_codes.push_back(feature->getOnCode());
