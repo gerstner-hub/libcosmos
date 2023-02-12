@@ -5,6 +5,7 @@
 #include <sys/ioctl.h>
 
 // C++
+#include <chrono>
 #include <utility>
 
 // Cosmos
@@ -62,12 +63,12 @@ public:
 
 	/// Sends a stream of zero bits for a certain duration
 	/**
-	 * If duration is zero then the stream will last between 0.25 and 0.50
-	 * seconds. If non-zero then the stream will last for an
+	 * If \c ms is zero then the stream will last between 0.25 and 0.50
+	 * seconds. If it is non-zero then the stream will last for an
 	 * implementation defined time (on Linux the given duration in
 	 * milliseconds).
 	 **/
-	void sendBreak(int duration);
+	void sendBreak(const std::chrono::milliseconds ms);
 
 	/// Attempt to make the terminal the controlling terminal of the current process
 	/**

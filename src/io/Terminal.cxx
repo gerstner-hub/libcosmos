@@ -47,8 +47,8 @@ void Terminal::setSize(const TermDimension dim) {
 	}
 }
 
-void Terminal::sendBreak(int duration) {
-	if (::tcsendbreak(rawFD(), duration) != 0) {
+void Terminal::sendBreak(const std::chrono::milliseconds ms) {
+	if (::tcsendbreak(rawFD(), static_cast<int>(ms.count())) != 0) {
 		cosmos_throw (ApiError("tcsendbreak"));
 	}
 }
