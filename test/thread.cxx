@@ -5,7 +5,7 @@
 
 
 // cosmos
-#include "cosmos/Init.hxx"
+#include "cosmos/cosmos.hxx"
 #include "cosmos/thread/Thread.hxx"
 
 class ThreadUser :

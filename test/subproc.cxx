@@ -1,10 +1,10 @@
 // Cosmos
+#include "cosmos/cosmos.hxx"
 #include "cosmos/errors/ApiError.hxx"
 #include "cosmos/errors/CosmosError.hxx"
 #include "cosmos/errors/InternalError.hxx"
 #include "cosmos/formatting.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
-#include "cosmos/Init.hxx"
 #include "cosmos/io/Pipe.hxx"
 #include "cosmos/io/StreamAdaptor.hxx"
 #include "cosmos/proc/ChildCloner.hxx"

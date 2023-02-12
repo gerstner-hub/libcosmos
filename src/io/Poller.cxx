@@ -6,6 +6,7 @@
 #include "cosmos/algs.hxx"
 #include "cosmos/errors/ApiError.hxx"
 #include "cosmos/io/Poller.hxx"
+#include "cosmos/private/cosmos.hxx"
 #include "cosmos/time/TimeSpec.hxx"
 
 namespace cosmos {
@@ -80,7 +81,7 @@ std::vector<Poller::PollEvent> Poller::wait(const std::optional<std::chrono::mil
 			rawPollFD(), m_events.data(), m_events.size(), timeout ? timeout->count() : -1);
 
 		if (num_events < 0) {
-			if (m_restart_on_intr && getErrno() == Errno::INTERRUPTED)
+			if (auto_restart_syscalls && getErrno() == Errno::INTERRUPTED)
 				// transparent restart
 				continue;
 			cosmos_throw (ApiError("Failed to epoll_wait()"));

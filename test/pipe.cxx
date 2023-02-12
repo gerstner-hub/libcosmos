@@ -6,7 +6,7 @@
 #include "cosmos/io/Pipe.hxx"
 #include "cosmos/io/StreamAdaptor.hxx"
 #include "cosmos/proc/SubProc.hxx"
-#include "cosmos/Init.hxx"
+#include "cosmos/cosmos.hxx"
 
 int main() {
 	cosmos::Init init;

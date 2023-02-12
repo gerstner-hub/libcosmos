@@ -7,7 +7,8 @@
 #include <map>
 
 // Cosmos
-#include "cosmos/Init.hxx"
+#include "cosmos/cosmos.hxx"
+#include "cosmos/private/cosmos.hxx"
 #include "cosmos/private/Initable.hxx"
 
 namespace cosmos {
@@ -108,6 +109,12 @@ void finish() {
 		return;
 
 	init_data->finish();
+}
+
+RestartOnIntr auto_restart_syscalls{true};
+
+void setRestartSyscallOnInterrupt(const bool auto_restart) {
+	auto_restart_syscalls = RestartOnIntr{auto_restart};
 }
 
 } // end ns

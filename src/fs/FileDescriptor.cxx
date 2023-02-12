@@ -9,6 +9,7 @@
 #include "cosmos/algs.hxx"
 #include "cosmos/errors/ApiError.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
+#include "cosmos/private/cosmos.hxx"
 
 namespace cosmos {
 
@@ -53,7 +54,7 @@ void FileDescriptor::setStatusFlags(const StatusFlags flags) {
 namespace {
 
 template <typename SyncFunc>
-void syncHelper(FileDescriptor &fd, SyncFunc sync_func, const RestartOnIntr restart) {
+void syncHelper(FileDescriptor &fd, SyncFunc sync_func) {
 	while (true) {
 		if (sync_func(to_integral(fd.raw())) == 0) {
 			return;
@@ -62,7 +63,7 @@ void syncHelper(FileDescriptor &fd, SyncFunc sync_func, const RestartOnIntr rest
 			switch(getErrno()) {
 				default: break;
 				case Errno::INTERRUPTED: {
-					if (restart)
+					if (auto_restart_syscalls)
 						continue;
 				}
 			}
@@ -74,12 +75,12 @@ void syncHelper(FileDescriptor &fd, SyncFunc sync_func, const RestartOnIntr rest
 
 } // end anon ns
 
-void FileDescriptor::sync(const RestartOnIntr restart) {
-	syncHelper(*this, fsync, restart);
+void FileDescriptor::sync() {
+	syncHelper(*this, fsync);
 }
 
-void FileDescriptor::dataSync(const RestartOnIntr restart) {
-	syncHelper(*this, fdatasync, restart);
+void FileDescriptor::dataSync() {
+	syncHelper(*this, fdatasync);
 }
 
 FileDescriptor stdout(FileNum::STDOUT);

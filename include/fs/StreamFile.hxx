@@ -131,22 +131,6 @@ public: // functions
 	off_t seekFromCurrent(off_t off) { return seek(SeekType::CUR, off); }
 	/// Seek to the given offset relative to the end of the file
 	off_t seekFromEnd(off_t off) { return seek(SeekType::END, off); }
-
-	/// Controls the auto-restart behaviour on EINTR due to signals
-	/**
-	 * If during read or write operations an EINTR system call result is
-	 * encountered, then the implementation will transparently restart the
-	 * system call if this boolean flag is set (the default). Otherwise
-	 * the error is returned to the caller by means of an ApiError
-	 * exception.
-	 **/
-	void setRestartOnIntr(const bool restart) {
-		m_restart_on_intr = restart;
-	}
-
-protected: // data
-
-	bool m_restart_on_intr = true;
 };
 
 }

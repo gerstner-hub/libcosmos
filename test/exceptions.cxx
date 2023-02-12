@@ -8,7 +8,7 @@
 #include "cosmos/errors/UsageError.hxx"
 #include "cosmos/errors/RuntimeError.hxx"
 #include "cosmos/fs/File.hxx"
-#include "cosmos/Init.hxx"
+#include "cosmos/cosmos.hxx"
 
 void testFileError() {
 	cosmos::File f;

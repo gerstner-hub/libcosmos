@@ -3,6 +3,7 @@
 #include "cosmos/errors/ApiError.hxx"
 #include "cosmos/errors/RuntimeError.hxx"
 #include "cosmos/fs/StreamFile.hxx"
+#include "cosmos/private/cosmos.hxx"
 
 namespace cosmos {
 
@@ -12,7 +13,7 @@ size_t StreamFile::read(void *buf, size_t length) {
 
 		if (res < 0) {
 			// transparent restart
-			if (m_restart_on_intr && getErrno() == Errno::INTERRUPTED)
+			if (auto_restart_syscalls && getErrno() == Errno::INTERRUPTED)
 				continue;
 			cosmos_throw (ApiError("reading from file"));
 		}
@@ -40,7 +41,7 @@ size_t StreamFile::write(const void *buf, size_t length) {
 
 		if (res < 0) {
 			// transparent restart
-			if (m_restart_on_intr && getErrno() == Errno::INTERRUPTED)
+			if (auto_restart_syscalls && getErrno() == Errno::INTERRUPTED)
 				continue;
 			cosmos_throw (ApiError("writing to file"));
 		}

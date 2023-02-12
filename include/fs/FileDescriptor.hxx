@@ -123,11 +123,8 @@ public: // functions
 	 * - space is exhausted on the file system (Errno::NO_SPACE)
 	 * - the file descriptor does not support syncing, because it is a
 	 *   special file that does not support it (Errno::INVALID_ARG)
-	 *
-	 * \param[in] restart Determines whether the implementation will
-	 * automatically restart the system call if EINTR is encountered.
 	 **/
-	void sync(const RestartOnIntr restart = RestartOnIntr{true});
+	void sync();
 
 	/// Flush outstanding writes to disk except metadata
 	/**
@@ -136,7 +133,7 @@ public: // functions
 	 * file size did not change but the data changed (e.g. for fixed size
 	 * database files etc.).
 	 **/
-	void dataSync(const RestartOnIntr restart = RestartOnIntr{true});
+	void dataSync();
 
 	/// Returns the primitive file descriptor contained in the object
 	FileNum raw() const { return m_fd; }

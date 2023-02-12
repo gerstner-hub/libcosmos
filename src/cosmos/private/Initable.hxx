@@ -2,7 +2,7 @@
 #define COSMOS_PRIV_INIT_HXX
 
 // cosmos
-#include "cosmos/Init.hxx"
+#include "cosmos/cosmos.hxx"
 
 namespace cosmos {
 

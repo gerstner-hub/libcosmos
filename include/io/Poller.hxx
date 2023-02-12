@@ -150,17 +150,6 @@ public: // functions
 	 **/
 	void close();
 
-	/// Controls the auto-restart behaviour on EINTR due to signals
-	/**
-	 * If during wait() an EINTR system call result is encountered, then
-	 * the implementation will transparently restart the system call if
-	 * this boolean flag is set (the default). Otherwise the error is
-	 * returned to the caller by means of an ApiError exception.
-	 **/
-	void setRestartOnIntr(const bool restart) {
-		m_restart_on_intr = restart;
-	}
-
 	/// Returns whether currently a valid poll file descriptor exists
 	bool isValid() const { return m_poll_fd.valid(); }
 
@@ -207,7 +196,6 @@ protected: // data
 
 	FileDescriptor m_poll_fd;
 	std::vector<PollEvent> m_events;
-	bool m_restart_on_intr = true;
 };
 
 } // end ns
