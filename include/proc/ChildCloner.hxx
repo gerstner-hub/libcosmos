@@ -1,7 +1,7 @@
 #ifndef COSMOS_CHILDCLONER_HXX
 #define COSMOS_CHILDCLONER_HXX
 
-// stdlib
+// C++
 #include <functional>
 #include <iosfwd>
 #include <optional>
@@ -105,7 +105,7 @@ public: // functions
 	void setArgsFromView(const StringViewVector &svv) {
 		m_argv.clear();
 		for (const auto s: svv)
-			m_argv.push_back(std::string(s));
+			m_argv.push_back(std::string{s});
 		setExeFromArgv0();
 	}
 
@@ -315,7 +315,7 @@ inline cosmos::ChildCloner& operator<<(cosmos::ChildCloner &cloner, const std::s
 	if (!cloner.hasExe()) {
 		cloner.setExe(arg);
 	} else {
-		cloner.getArgs().push_back(std::string(arg));
+		cloner.getArgs().push_back(std::string{arg});
 	}
 
 	return cloner;

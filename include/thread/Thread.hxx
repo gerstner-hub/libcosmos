@@ -67,7 +67,7 @@ public: // types
 		friend class Thread;
 	protected: // functions
 
-		explicit ID(pthread_t id) : m_id(id) {}
+		explicit ID(pthread_t id) : m_id{id} {}
 
 	public: // functions
 
@@ -164,7 +164,7 @@ protected: // functions
 	 **/
 	void issueRequest(const Request r) {
 		{
-			MutexGuard g(m_state_condition);
+			MutexGuard g{m_state_condition};
 			m_request = r;
 		}
 

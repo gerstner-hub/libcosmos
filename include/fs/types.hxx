@@ -148,12 +148,12 @@ public: // types
 	};
 
 public:
-	explicit FileType(const FileT raw) : m_raw(raw) {}
+	explicit FileType(const FileT raw) : m_raw{raw} {}
 
 	/// Same as getFileT but returns a FileType wrapper instance for it
-	explicit FileType(const ModeT raw) {
-		m_raw = static_cast<FileT>(raw & ModeT::TYPE_MASK);
-	}
+	explicit FileType(const ModeT raw) :
+		m_raw{static_cast<FileT>(raw & ModeT::TYPE_MASK)}
+	{}
 
 	bool isRegular()   const { return m_raw == REGULAR;  }
 	bool isDirectory() const { return m_raw == DIRECTORY; }
@@ -194,7 +194,7 @@ class COSMOS_API FileMode {
 public:
 	/// Constructs a FileMode from the given bitmask object
 	explicit FileMode(const FileModeBits mask) :
-		m_mode(mask)
+		m_mode{mask}
 	{}
 
 	/// Constructs a FileMode from the given raw input
@@ -206,7 +206,7 @@ public:
 	 * of octal literals.
 	 **/
 	FileMode(const ModeT raw = ModeT::NONE) :
-		m_mode(static_cast<FileModeFlags>(raw & ModeT::MODE_MASK))
+		m_mode{static_cast<FileModeFlags>(raw & ModeT::MODE_MASK)}
 	{}
 
 	bool isSetUID() const { return m_mode[FileModeFlags::SETUID]; }

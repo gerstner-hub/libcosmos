@@ -1,9 +1,8 @@
 #ifndef COSMOS_DIRECTORY_HXX
 #define COSMOS_DIRECTORY_HXX
 
-// stdlib
+// C++
 #include <exception>
-#include <iostream>
 #include <optional>
 #include <string_view>
 
@@ -51,17 +50,8 @@ public: // functions
 		open(path);
 	}
 
-	~Directory() {
-		try {
-			close();
-		}
-		catch (const std::exception &ex) {
-			// ignore otherwise
-			std::cerr << __FUNCTION__
-				<< ": failed to close Directory stream: "
-				<< ex.what() << "\n";
-		}
-	}
+	/// Closes the underlying directory object, if currently open
+	~Directory();
 
 	/// Close the currently associated directory
 	/**
@@ -94,7 +84,7 @@ public: // functions
 	 * If the object is already associated with another directory then this
 	 * previous associaton will be implicitly close()'d.
 	 **/
-	void open(const std::string_view path, const FollowSymlinks follow_links = FollowSymlinks(false));
+	void open(const std::string_view path, const FollowSymlinks follow_links = FollowSymlinks{false});
 
 	/// Indicates whether currently a directory is associated with this object
 	auto isOpen() const { return m_stream != nullptr; }
@@ -117,7 +107,7 @@ public: // functions
 	DirEntry::DirPos tell() const {
 		requireOpenStream("tell");
 
-		auto ret = telldir(m_stream);
+		auto ret = ::telldir(m_stream);
 
 		if (ret == -1) {
 			cosmos_throw (ApiError());
@@ -133,7 +123,7 @@ public: // functions
 	void seek(const DirEntry::DirPos pos) {
 		requireOpenStream("seek");
 
-		seekdir(m_stream, to_integral(pos));
+		::seekdir(m_stream, to_integral(pos));
 	}
 
 	/// Returns the next entry in the associated directory

@@ -2,8 +2,10 @@
 #define COSMOS_CONDITION_HXX
 
 // Linux
-#include <assert.h>
 #include <pthread.h>
+
+// C++
+#include <cassert>
 
 // cosmos
 #include "cosmos/errors/ApiError.hxx"
@@ -147,13 +149,12 @@ protected: // data
 
 /// An aggregate of a Mutex and a Condition coupled together for typical Condition usage
 class ConditionMutex :
-	public Mutex,
-	public Condition
-{
+		public Mutex,
+		public Condition {
 public: // functions
 
 	ConditionMutex() :
-		Condition(static_cast<Mutex&>(*this))
+		Condition{static_cast<Mutex&>(*this)}
 	{}
 };
 

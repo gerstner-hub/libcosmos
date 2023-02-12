@@ -1,7 +1,7 @@
 #ifndef COSMOS_ERRORS_MACROS_HXX
 #define COSMOS_ERRORS_MACROS_HXX
 
-// libcosmos
+// cosmos
 #include "cosmos/compiler.hxx"
 
 /**

@@ -1,11 +1,11 @@
 #ifndef COSMOS_MUTEX_HXX
 #define COSMOS_MUTEX_HXX
 
-// stdlib
-#include <cassert>
-
 // POSIX
 #include <pthread.h>
+
+// C++
+#include <cassert>
 
 // cosmos
 #include "cosmos/errors/ApiError.hxx"
@@ -71,7 +71,8 @@ protected: // data
 };
 
 /// A mutex guard object that locks a Mutex for the lifetime of the guard object
-struct MutexGuard : public ResourceGuard<const Mutex&> {
+struct MutexGuard :
+		public ResourceGuard<const Mutex&> {
 
 	explicit MutexGuard(const Mutex &m) :
 		ResourceGuard(m, [](const Mutex &_m) { _m.unlock(); })
@@ -81,7 +82,8 @@ struct MutexGuard : public ResourceGuard<const Mutex&> {
 };
 
 /// A reversed mutex guard object that unlocks a Mutex for the lifetime of the guard object
-struct MutexReverseGuard : public ResourceGuard<const Mutex&> {
+struct MutexReverseGuard :
+		public ResourceGuard<const Mutex&> {
 
 	explicit MutexReverseGuard(const Mutex &m) :
 		ResourceGuard(m, [](const Mutex &_m) { _m.lock(); })

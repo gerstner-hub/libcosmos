@@ -1,12 +1,26 @@
-// Cosmos
-#include "cosmos/fs/Directory.hxx"
-
 // Linux
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
+// C++
+#include <iostream>
+
+// Cosmos
+#include "cosmos/fs/Directory.hxx"
+
 namespace cosmos {
+
+Directory::~Directory() {
+	try {
+		close();
+	} catch (const std::exception &ex) {
+		// ignore otherwise
+		std::cerr << __FUNCTION__
+			<< ": failed to close Directory stream: "
+			<< ex.what() << "\n";
+	}
+}
 
 void Directory::close() {
 	if (!m_stream) {
@@ -34,7 +48,7 @@ void Directory::open(const std::string_view path, const FollowSymlinks follow_li
 		O_RDONLY | O_CLOEXEC | O_DIRECTORY | (follow_links ? O_NOFOLLOW : 0)
 	);
 
-	FileDescriptor fd(FileNum{res});
+	FileDescriptor fd{FileNum{res}};
 
 	if (fd.invalid()) {
 		cosmos_throw (ApiError());
@@ -42,8 +56,7 @@ void Directory::open(const std::string_view path, const FollowSymlinks follow_li
 
 	try {
 		open(fd);
-	}
-	catch (...) {
+	} catch (...) {
 		// intentionally ignore error conditions here
 		try {
 			fd.close();
@@ -65,7 +78,7 @@ void Directory::open(const FileDescriptor fd) {
 DirFD Directory::fd() const {
 	requireOpenStream(__FUNCTION__);
 	auto fd = dirfd(m_stream);
-	DirFD ret(FileNum{fd});
+	DirFD ret{FileNum{fd}};
 
 	if (ret.invalid()) {
 		cosmos_throw (ApiError());
@@ -90,7 +103,7 @@ std::optional<DirEntry> Directory::nextEntry() {
 	const auto entry = readdir(m_stream);
 
 	if (entry) {
-		return DirEntry(entry);
+		return DirEntry{entry};
 	}
 
 	if (isErrnoSet()) {

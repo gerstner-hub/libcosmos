@@ -4,7 +4,7 @@
 #include "cosmos/private/Scheduler.hxx"
 #include "cosmos/proc/Scheduler.hxx"
 
-// C++ stdlib
+// C++
 #include <cstring>
 
 // Linux

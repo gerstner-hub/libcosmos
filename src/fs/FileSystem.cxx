@@ -14,8 +14,8 @@
 #include "cosmos/errors/ApiError.hxx"
 #include "cosmos/errors/FileError.hxx"
 #include "cosmos/errors/InternalError.hxx"
-#include "cosmos/errors/UsageError.hxx"
 #include "cosmos/errors/RuntimeError.hxx"
+#include "cosmos/errors/UsageError.hxx"
 #include "cosmos/fs/Directory.hxx"
 #include "cosmos/fs/DirIterator.hxx"
 #include "cosmos/fs/File.hxx"
@@ -78,7 +78,7 @@ std::optional<std::string> which(const std::string_view exec_base) noexcept {
 
 	auto checkExecutable = [](const std::string_view path) -> bool {
 		try {
-			File f(path, OpenMode::READ_ONLY);
+			File f{path, OpenMode::READ_ONLY};
 			FileStatus status;
 
 			try {
@@ -116,11 +116,11 @@ std::optional<std::string> which(const std::string_view exec_base) noexcept {
 
 	// TODO: replace this with some string split helper
 	std::istringstream ss;
-	ss.str(std::string(*pathvar));
+	ss.str(std::string{*pathvar});
 	std::string dir;
 
 	while (!std::getline(ss, dir, ':').eof()) {
-		auto path = dir + "/" + std::string(exec_base);
+		auto path = dir + "/" + std::string{exec_base};
 
 		if (checkExecutable(path)) {
 			return {path};
@@ -180,7 +180,7 @@ Errno makeAllDirs(const std::string_view path, const FileMode mode) {
 
 void removeTree(const std::string_view path) {
 	// TODO implement this more efficiently using ulinkat() & friends
-	Directory dir(path);
+	Directory dir{path};
 
 	using Type = DirEntry::Type;
 

@@ -1,4 +1,4 @@
-// stdlib
+// C++
 #include <ostream>
 
 // cosmos

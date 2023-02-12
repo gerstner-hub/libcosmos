@@ -107,8 +107,8 @@ COSMOS_API void clearEnvVar(const std::string_view name);
 struct PidInfo {
 
 	PidInfo() :
-		own_pid(getOwnPid()),
-		parent_pid(getParentPid())
+		own_pid{getOwnPid()},
+		parent_pid{getParentPid()}
 	{}
 
 	const ProcessID own_pid;

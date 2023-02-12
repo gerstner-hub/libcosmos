@@ -12,12 +12,11 @@ namespace cosmos {
  * logical preconditions and continuing is impossible.
  **/
 class COSMOS_API UsageError :
-	public CosmosError
-{
+	public CosmosError {
 public: // functions
 
 	explicit UsageError(const std::string_view msg) :
-			CosmosError("UsageError") {
+			CosmosError{"UsageError"} {
 		m_msg = msg;
 	}
 

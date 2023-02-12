@@ -1,7 +1,7 @@
 #ifndef COSMOS_POLLER_HXX
 #define COSMOS_POLLER_HXX
 
-// stdlib
+// C++
 #include <chrono>
 #include <optional>
 #include <vector>
@@ -102,9 +102,9 @@ public: // types
 	public:
 
 		/// The file descriptor this event refers to
-		FileDescriptor fd() const { return FileDescriptor(FileNum{(this->data).fd}); }
+		FileDescriptor fd() const { return FileDescriptor{FileNum{(this->data).fd}}; }
 
-		auto getEvents() const { return EventMask(static_cast<Event>(this->events)); }
+		auto getEvents() const { return EventMask{static_cast<Event>(this->events)}; }
 	};
 
 public: // functions

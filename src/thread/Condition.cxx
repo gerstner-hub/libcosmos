@@ -4,8 +4,7 @@
 namespace cosmos {
 
 Condition::Condition(Mutex &lock) :
-	m_lock(lock)
-{
+		m_lock{lock} {
 	int res = -1;
 
 	pthread_condattr_t attr;
@@ -33,8 +32,7 @@ Condition::Condition(Mutex &lock) :
 		if (auto err = Errno{res}; err != Errno::NO_ERROR) {
 			cosmos_throw (ApiError(err));
 		}
-	}
-	catch(...) {
+	} catch(...) {
 		(void)pthread_condattr_destroy(&attr);
 		throw;
 	}

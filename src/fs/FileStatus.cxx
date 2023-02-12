@@ -8,7 +8,7 @@
 namespace cosmos {
 
 void FileStatus::throwBadType(const std::string_view context) const {
-	cosmos_throw (UsageError(context) );
+	cosmos_throw (UsageError(context));
 }
 
 void FileStatus::updateFrom(const FileDescriptor fd) {
@@ -26,7 +26,6 @@ void FileStatus::updateFrom(const std::string_view path, const FollowSymlinks fo
 }
 
 DeviceID FileStatus::getRepresentedDevice() const {
-
 	switch (getType().raw()) {
 		case FileType::BLOCKDEV:
 		case FileType::CHARDEV:
@@ -75,22 +74,22 @@ std::string FileMode::symbolic() const {
 
 char FileType::symbolic() const {
 	switch(raw()) {
-		default: return '?';
-		case NONE: return '-';
-		case SOCKET: return 's';
-		case LINK: return 'l';
-		case REGULAR: return '-';
-		case BLOCKDEV: return 'b';
+		default:        return '?';
+		case NONE:      return '-';
+		case SOCKET:    return 's';
+		case LINK:      return 'l';
+		case REGULAR:   return '-';
+		case BLOCKDEV:  return 'b';
 		case DIRECTORY: return 'd';
-		case CHARDEV: return 'c';
-		case FIFO: return 'p';
+		case CHARDEV:   return 'c';
+		case FIFO:      return 'p';
 	}
 }
 
 } // end ns
 
 std::ostream& operator<<(std::ostream &o, const cosmos::FileMode mode) {
-	o << mode.symbolic() << " (" << cosmos::octnum(cosmos::to_integral(mode.raw()), 4) << ")";
+	o << mode.symbolic() << " (" << cosmos::octnum{cosmos::to_integral(mode.raw()), 4} << ")";
 	return o;
 }
 

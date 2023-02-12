@@ -72,7 +72,7 @@ public: // types
 public: // functions
 
 	/// Construct and optionally set an initial mark()
-	explicit StopWatch(const InitialMark do_mark = InitialMark()) {
+	explicit StopWatch(const InitialMark do_mark = InitialMark{}) {
 		if (do_mark)
 			mark();
 	}

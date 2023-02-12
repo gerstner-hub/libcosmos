@@ -1,4 +1,4 @@
-// stdlib
+// C++
 #include <iostream>
 
 // cosmos
@@ -24,7 +24,7 @@ void File::open(const std::string_view path, const OpenMode mode, const OpenFlag
 	int raw_flags = flags.get() | static_cast<int>(mode);
 
 	if (flags.anyOf({OpenSettings::CREATE, OpenSettings::TMPFILE}) && !fmode) {
-		cosmos_throw (UsageError("the given open flags required an fmode argument"));
+		cosmos_throw (UsageError("the given open flags require an fmode argument"));
 	}
 
 	auto fd = ::open(path.data(), raw_flags, fmode ? to_integral(fmode.value().raw()) : 0);

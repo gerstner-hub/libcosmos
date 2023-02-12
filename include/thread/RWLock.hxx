@@ -1,11 +1,11 @@
 #ifndef COSMOS_RWLOCK_HXX
 #define COSMOS_RWLOCK_HXX
 
-// stdlib
-#include <cassert>
-
 // POSIX
 #include <pthread.h>
+
+// C++
+#include <cassert>
 
 // cosmos
 #include "cosmos/errors/ApiError.hxx"
@@ -46,16 +46,14 @@ public: // functions
 		}
 	}
 
-	void writelock() const
-	{
+	void writelock() const {
 		if (::pthread_rwlock_wrlock(&m_prwlock) != 0) {
 			cosmos_throw (ApiError("Error write-locking rwlock"));
 		}
 	}
 
 	/// Unlock a previously obtained read or write lock
-	void unlock() const
-	{
+	void unlock() const {
 		if (::pthread_rwlock_unlock(&m_prwlock) != 0) {
 			cosmos_throw (ApiError("Error unlocking rw-lock"));
 		}
@@ -68,21 +66,21 @@ protected: // data
 };
 
 /// A lock-guard object that locks an RWLock for reading until it is destroyed
-struct ReadLockGuard : public ResourceGuard<const RWLock&> {
+struct ReadLockGuard :
+		public ResourceGuard<const RWLock&> {
 
 	explicit ReadLockGuard(const RWLock &rwl) :
-		ResourceGuard(rwl, [](const RWLock &_rwl) { _rwl.unlock(); })
-	{
+			ResourceGuard{rwl, [](const RWLock &_rwl) { _rwl.unlock(); }} {
 		rwl.readlock();
 	}
 };
 
 /// A lock-guard object that locks an RWLock for writing until it is destroyed
-struct WriteLockGuard : public ResourceGuard<const RWLock&> {
+struct WriteLockGuard :
+		public ResourceGuard<const RWLock&> {
 
 	explicit WriteLockGuard(const RWLock &rwl) :
-		ResourceGuard(rwl, [](const RWLock &_rwl) { _rwl.unlock(); })
-	{
+		ResourceGuard{rwl, [](const RWLock &_rwl) { _rwl.unlock(); }} {
 		rwl.writelock();
 	}
 };

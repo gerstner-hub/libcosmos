@@ -1,7 +1,7 @@
 #ifndef COSMOS_SUBPROC_HXX
 #define COSMOS_SUBPROC_HXX
 
-// stdlib
+// C++
 #include <chrono>
 #include <optional>
 
@@ -102,7 +102,7 @@ protected: // functions
 
 	/// wraps the given process ID and pidfd
 	SubProc(const ProcessID pid, const FileNum pidfd) :
-		m_pid(pid), m_child_fd(pidfd)
+		m_pid{pid}, m_child_fd{pidfd}
 	{}
 
 protected: // data

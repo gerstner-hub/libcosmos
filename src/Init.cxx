@@ -1,10 +1,10 @@
-// stdlib
+// Linux
+#include <unistd.h>
+
+// C++
 #include <atomic>
 #include <iostream>
 #include <map>
-
-// Linux
-#include <unistd.h>
 
 // Cosmos
 #include "cosmos/Init.hxx"
@@ -60,7 +60,7 @@ void InitData::add(const InitPrio prio, Initable *init_if) {
 	auto ret = initables.insert(std::make_pair(prio, init_if));
 
 	if (ret.second != true) {
-		std::cerr << "Conflicting priority of Initables!" << std::endl;
+		std::cerr << "Conflicting priority of Initables!\n";
 		_exit(9);
 	}
 }

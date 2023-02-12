@@ -1,7 +1,7 @@
 #ifndef COSMOS_ENUMBITSET_HXX
 #define COSMOS_ENUMBITSET_HXX
 
-// stdlib
+// C++
 #include <initializer_list>
 #include <string>
 #include <type_traits>
@@ -49,12 +49,12 @@ public: // functions
 
 	/// Sets exactly the given bit to one
 	explicit BitMask(const ENUM bit) :
-		m_flags(static_cast<EnumBaseType>(bit))
+		m_flags{static_cast<EnumBaseType>(bit)}
 	{}
 
 	/// Sets exactly the given primitive type bitmask
 	explicit BitMask(const EnumBaseType value) :
-		m_flags(value)
+		m_flags{value}
 	{}
 
 	/// Returns the raw bitfield integer
@@ -87,7 +87,7 @@ public: // functions
 	/// Assigns the given value to the given bit position
 	BitMask& set(const ENUM bit, bool val = true) {
 		const auto bitval = static_cast<EnumBaseType>(bit);
-		m_flags = (val ? (m_flags|bitval) : (m_flags&~bitval));
+		m_flags = (val ? (m_flags|bitval) : (m_flags & ~bitval));
 		return *this;
 	}
 

@@ -39,7 +39,7 @@ public: // functions
 	SchedulerSettings() {}
 
 	explicit SchedulerSettings(const SchedulerPolicy policy) :
-		m_policy(policy)
+			m_policy{policy}
 	{}
 
 	SchedulerPolicy policy() const { return m_policy; }
@@ -65,12 +65,11 @@ protected: // data
 
 /// "OTHER" Scheduling Policy Settings
 class COSMOS_API OtherSchedulerSettings :
-	public SchedulerSettings
-{
+		public SchedulerSettings {
 public: // functions
 
 	OtherSchedulerSettings() :
-		SchedulerSettings(SchedulerPolicy::OTHER)
+			SchedulerSettings{SchedulerPolicy::OTHER}
 	{}
 
 	// there don't seem to be preprocessor constants around for these
@@ -124,12 +123,11 @@ protected: // data
  * with non-realtime scheduling.
  **/
 class COSMOS_API RealtimeSchedulerSettings :
-	public SchedulerSettings
-{
+		public SchedulerSettings {
 public: // functions
 
 	explicit RealtimeSchedulerSettings(const SchedulerPolicy policy) :
-		SchedulerSettings(policy)
+		SchedulerSettings{policy}
 	{}
 
 	void setPriority(const int priority) {
@@ -159,12 +157,11 @@ protected: // data
  * running thread * becomes blocked.
  **/
 class COSMOS_API FifoSchedulerSettings :
-	public RealtimeSchedulerSettings
-{
+		public RealtimeSchedulerSettings {
 public: // functions
 
 	FifoSchedulerSettings() :
-		RealtimeSchedulerSettings(SchedulerPolicy::FIFO)
+			RealtimeSchedulerSettings{SchedulerPolicy::FIFO}
 	{}
 };
 
@@ -177,12 +174,11 @@ public: // functions
  * time slice elapsed.
  **/
 class COSMOS_API RoundRobinSchedulerSettings :
-	public RealtimeSchedulerSettings
-{
+	public RealtimeSchedulerSettings {
 public: // functions
 
 	RoundRobinSchedulerSettings() :
-		RealtimeSchedulerSettings(SchedulerPolicy::ROUND_ROBIN)
+			RealtimeSchedulerSettings{SchedulerPolicy::ROUND_ROBIN}
 	{}
 };
 

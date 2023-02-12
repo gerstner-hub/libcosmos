@@ -6,17 +6,17 @@ int main() {
 	int ret = 0;
 	const std::string test_string("A test string. Have a nice day!");
 
-	auto lower_string = cosmos::tolower(test_string);
+	auto lower_string = cosmos::toLower(test_string);
 
 	if (lower_string != "a test string. have a nice day!") {
-		std::cerr << "tolower() returned unexpected result '" << lower_string << "'\n";
+		std::cerr << "toLower() returned unexpected result '" << lower_string << "'\n";
 		ret = 1;
 	}
 
-	auto upper_string = cosmos::toupper(test_string);
+	auto upper_string = cosmos::toUpper(test_string);
 
 	if (upper_string != "A TEST STRING. HAVE A NICE DAY!") {
-		std::cerr << "toupper() returned unexpected result '" << upper_string << "'\n";
+		std::cerr << "toUpper() returned unexpected result '" << upper_string << "'\n";
 		ret = 1;
 	}
 

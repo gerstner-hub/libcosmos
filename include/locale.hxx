@@ -34,12 +34,12 @@ enum class Category : int {
 	NUMERIC =  LC_NUMERIC,   /// non-monetary numeric values
 	TIME =     LC_TIME       /// formatting of date and time values
 #ifdef LC_ADDRESS /* the following are GNU extensions */
-	,ADDRESS = LC_ADDRESS,         /// formatting of addresses and geography related items
+	,ADDRESS =       LC_ADDRESS,        /// formatting of addresses and geography related items
 	IDENTIFICATION = LC_IDENTIFICATION, /// metadata about a locale
-	MEASUREMENT = LC_MEASUREMENT, /// measurement settings (e.g. metric vs. US)
-	NAME = LC_NAME,               /// salutations for persons
-	PAPER = LC_PAPER,             /// standard paper size
-	TELEPHONE = LC_TELEPHONE     /// formats for telephone services
+	MEASUREMENT =    LC_MEASUREMENT,    /// measurement settings (e.g. metric vs. US)
+	NAME =           LC_NAME,           /// salutations for persons
+	PAPER =          LC_PAPER,          /// standard paper size
+	TELEPHONE =      LC_TELEPHONE       /// formats for telephone services
 #endif
 };
 

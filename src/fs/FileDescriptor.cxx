@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-// stdlib
+// C++
 #include <string>
 
 // cosmos

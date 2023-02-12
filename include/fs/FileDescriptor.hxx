@@ -4,7 +4,7 @@
 // Linux
 #include <fcntl.h>
 
-// libcosmos
+// cosmos
 #include "cosmos/BitMask.hxx"
 #include "cosmos/ostypes.hxx"
 #include "cosmos/types.hxx"
@@ -38,7 +38,7 @@ public: // types
 
 public: // functions
 
-	explicit FileDescriptor(FileNum fd = FileNum::INVALID) : m_fd(fd) {}
+	explicit FileDescriptor(FileNum fd = FileNum::INVALID) : m_fd{fd} {}
 
 	/// Returns whether currently a valid file descriptor number is assigned.
 	bool valid() const { return m_fd != FileNum::INVALID; }
@@ -86,7 +86,7 @@ public: // functions
 	 * \param[in] cloexec Denotes whether the duplicate file descriptor
 	 * will have the close-on-exec flag set.
 	 **/
-	void duplicate(const FileDescriptor new_fd, const CloseOnExec cloexec = CloseOnExec(true)) const;
+	void duplicate(const FileDescriptor new_fd, const CloseOnExec cloexec = CloseOnExec{true}) const;
 
 	/// retrieves the current file descriptor status flags
 	StatusFlags getStatusFlags() const;

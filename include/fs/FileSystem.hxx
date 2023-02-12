@@ -1,7 +1,7 @@
 #ifndef COSMOS_FILESYSTEM_HXX
 #define COSMOS_FILESYSTEM_HXX
 
-// C++ stdlib
+// C++
 #include <optional>
 #include <string>
 #include <string_view>

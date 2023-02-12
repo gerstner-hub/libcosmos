@@ -1,7 +1,7 @@
 #ifndef COSMOS_FILE_HXX
 #define COSMOS_FILE_HXX
 
-// stdlib
+// C++
 #include <optional>
 
 // cosmos
@@ -35,7 +35,7 @@ public: // functions
 
 	/// Open a file without special flags (close-on-exec will be set)
 	File(const std::string_view path, const OpenMode mode) :
-		File(path, mode, OpenFlags({OpenSettings::CLOEXEC})) {}
+		File{path, mode, OpenFlags{{OpenSettings::CLOEXEC}}} {}
 
 	/// Open a file using specific OpenFlags
 	/**
@@ -61,7 +61,7 @@ public: // functions
 
 	/// \see File(const std::string_view , const OpenMode )
 	void open(const std::string_view path, const OpenMode mode) {
-		return open(path, mode, OpenFlags({OpenSettings::CLOEXEC}));
+		return open(path, mode, OpenFlags{{OpenSettings::CLOEXEC}});
 	}
 
 	/// Open the given path applying the specified mode and flags

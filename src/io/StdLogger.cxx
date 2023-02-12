@@ -1,4 +1,4 @@
-// stdlib
+// C++
 #include <iostream>
 
 // cosmos
@@ -6,13 +6,11 @@
 
 namespace cosmos {
 
-StdLogger::StdLogger()
-{
+StdLogger::StdLogger() {
 	setStreams(std::cout, std::cout, std::cout, std::cerr);
 }
 
-StdLogger::~StdLogger()
-{
+StdLogger::~StdLogger() {
 	// make sure any outstanding data is displayed by now
 	std::cout << std::flush;
 }

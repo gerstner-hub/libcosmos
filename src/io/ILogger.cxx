@@ -1,8 +1,8 @@
-// stdlib
-#include <iostream>
-
 // POSIX
 #include <unistd.h> // STD*_FILENO
+
+// C++
+#include <iostream>
 
 // Cosmos
 #include "cosmos/fs/FileDescriptor.hxx"
@@ -14,10 +14,10 @@ namespace cosmos {
 using namespace cosmos::term;
 
 ILogger::ILogger() :
-	m_err(  "Error:   ", FrontColor(TermColor::RED)),
-	m_warn( "Warning: ", FrontColor(TermColor::YELLOW)),
-	m_info( "Info:    ", FrontColor(TermColor::WHITE)),
-	m_debug("Debug:   ", FrontColor(TermColor::CYAN))
+	m_err{  "Error:   ", FrontColor{TermColor::RED}},
+	m_warn{ "Warning: ", FrontColor{TermColor::YELLOW}},
+	m_info{ "Info:    ", FrontColor{TermColor::WHITE}},
+	m_debug{"Debug:   ", FrontColor{TermColor::CYAN}}
 {}
 
 bool ILogger::isTTY(const std::ostream &o) {
@@ -36,7 +36,7 @@ bool ILogger::isTTY(const std::ostream &o) {
 		return false;
 	}
 
-	return Terminal(fd_to_check).isTTY();
+	return Terminal{fd_to_check}.isTTY();
 }
 
 void ILogger::setStream(std::ostream &s, StreamState &state) {

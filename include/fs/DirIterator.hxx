@@ -15,7 +15,7 @@ class DirIterator {
 public: // functions
 
 	explicit DirIterator(Directory &dir, bool at_end) :
-			m_dir(dir) {
+			m_dir{dir} {
 		if (!at_end)
 			m_entry = dir.nextEntry();
 	}
@@ -50,7 +50,7 @@ inline DirIterator begin(Directory &dir) {
 }
 
 inline DirIterator end(Directory &dir) {
-	return DirIterator(dir, true);
+	return DirIterator{dir, true};
 }
 
 } // end ns

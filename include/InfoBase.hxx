@@ -27,7 +27,6 @@ public: // functions
 	const DB_STRUCT* getRaw() const { return &m_info; }
 	DB_STRUCT* getRaw() { return &m_info; }
 
-
 protected: // functions
 
 	const std::string_view getSV(const char *ptr) const {

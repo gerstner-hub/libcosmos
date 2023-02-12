@@ -84,7 +84,6 @@ enum class SignalNr : int {
 	POLL = IO_EVENT,           /// pollable event, synonym for IO
 	POWER = SIGPWR,            /// power failure
 	BAD_SYS = SIGSYS,          /// bad system call
-
 };
 
 /// Primitive file descriptor

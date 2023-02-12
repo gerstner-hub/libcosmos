@@ -1,10 +1,10 @@
-// stdlib
+// Linux
+#include <errno.h>
+
+// C++
 #include <cstring>
 #include <iostream>
 #include <sstream>
-
-// Linux
-#include <errno.h>
 
 // cosmos
 #include "cosmos/algs.hxx"
@@ -13,8 +13,7 @@
 namespace cosmos {
 
 ApiError::ApiError(const std::optional<std::string_view> prefix) :
-	ApiError(Errno{errno})
-{
+		ApiError{Errno{errno}} {
 	if (prefix) {
 		m_msg = prefix.value();
 		m_msg += ": ";
@@ -22,8 +21,8 @@ ApiError::ApiError(const std::optional<std::string_view> prefix) :
 }
 
 ApiError::ApiError(const Errno err) :
-	CosmosError("ApiError"),
-	m_errno(err)
+		CosmosError{"ApiError"},
+		m_errno{err}
 {}
 
 void ApiError::generateMsg() const {

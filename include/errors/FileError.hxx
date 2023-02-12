@@ -19,11 +19,10 @@ namespace cosmos {
  * these special cases.
  **/
 class COSMOS_API FileError :
-	public ApiError
-{
+	public ApiError {
 public: // functions
 
-	explicit FileError(const std::string_view path, const std::string_view operation);
+	FileError(const std::string_view path, const std::string_view operation);
 
 	COSMOS_ERROR_IMPL;
 

@@ -1,11 +1,11 @@
-// cosmos
-#include "cosmos/formatting.hxx"
-
-// stdlib
-#include <string>
-
 // libc
 #include <stdarg.h>
+
+// C++
+#include <string>
+
+// cosmos
+#include "cosmos/formatting.hxx"
 
 namespace cosmos {
 
@@ -29,9 +29,7 @@ static std::string sprintfV(const char *fmt, va_list orig_args) {
 			// then
 			ret.clear();
 			break;
-		}
-		else if (static_cast<size_t>(written) <= ret.size())
-		{
+		} else if (static_cast<size_t>(written) <= ret.size()) {
 			// the return value is excluding the null terminator
 			// so it's just rigth for resize()
 			ret.resize(written);

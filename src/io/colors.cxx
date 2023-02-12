@@ -1,4 +1,4 @@
-// stdlib
+// C++
 #include <cassert>
 #include <ostream>
 #include <vector>
@@ -40,11 +40,10 @@ size_t getANSIColorCode(const ColorSpec &color) {
 }
 
 TermControl getOffControl(const TermControl ctrl) {
-	switch(ctrl)
-	{
+	switch(ctrl) {
 	case TermControl::UNDERLINE_ON: return TermControl::UNDERLINE_OFF;
-	case TermControl::BLINK_ON: return TermControl::BLINK_OFF;
-	case TermControl::INVERSE_ON: return TermControl::INVERSE_OFF;
+	case TermControl::BLINK_ON:     return TermControl::BLINK_OFF;
+	case TermControl::INVERSE_ON:   return TermControl::INVERSE_OFF;
 	default: cosmos_throw (UsageError("bad value"));
 		 return TermControl::RESET; /* to silence compiler warning */
 	}
@@ -52,8 +51,8 @@ TermControl getOffControl(const TermControl ctrl) {
 
 static std::vector<const FeatureBase*> getFeatures(const FeatureBase &first) {
 	std::vector<const FeatureBase*> ret;
-
 	const FeatureBase *feature = &first;
+
 	while (true) {
 		ret.push_back(feature);
 

@@ -1,15 +1,15 @@
 // Linux
 #include <unistd.h>
 
+// C++
+#include <iostream>
+
 // cosmos
 #include "cosmos/algs.hxx"
 #include "cosmos/errors/ApiError.hxx"
 #include "cosmos/errors/UsageError.hxx"
 #include "cosmos/errors/RuntimeError.hxx"
 #include "cosmos/proc/SignalFD.hxx"
-
-// stdlib
-#include <iostream>
 
 namespace cosmos {
 

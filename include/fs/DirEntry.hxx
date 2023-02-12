@@ -1,7 +1,7 @@
 #ifndef COSMOS_DIRENTRY_HXX
 #define COSMOS_DIRENTRY_HXX
 
-// stdlib
+// C++
 #include <cstring>
 #include <string_view>
 
@@ -51,7 +51,7 @@ protected: // functions
 
 	// only allow the Directory type to create this
 	explicit DirEntry(const struct dirent *entry)
-		: m_entry(entry)
+		: m_entry{entry}
 	{}
 
 

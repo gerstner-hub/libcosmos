@@ -1,7 +1,7 @@
 #ifndef COSMOS_TYPES_HXX
 #define COSMOS_TYPES_HXX
 
-// C++ stdlib
+// C++
 #include <functional>
 #include <map>
 #include <ostream>
@@ -51,7 +51,7 @@ template <typename _, bool def>
 class NamedBool {
 public:
 	explicit NamedBool(bool val=def) :
-		m_val(val) {}
+		m_val{val} {}
 
 	operator bool() const { return m_val; }
 protected:
@@ -83,8 +83,8 @@ public: // functions
 	ResourceGuard& operator=(const ResourceGuard &) = delete;
 
 	ResourceGuard(R r, std::function<CleanFunc> cleaner) :
-		m_res(r),
-		m_cleaner(cleaner)
+		m_res{r},
+		m_cleaner{cleaner}
 	{}
 
 	~ResourceGuard() {

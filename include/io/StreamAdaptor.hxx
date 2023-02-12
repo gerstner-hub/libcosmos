@@ -4,12 +4,12 @@
 // Cosmos
 #include "cosmos/algs.hxx"
 #include "cosmos/compiler.hxx"
-#include "cosmos/types.hxx"
+#include "cosmos/errors/UsageError.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/io/Pipe.hxx"
-#include "cosmos/errors/UsageError.hxx"
+#include "cosmos/types.hxx"
 
-// stdlib
+// C++
 #include <iostream>
 #ifdef COSMOS_GNU_CXXLIB
 #	include <ext/stdio_filebuf.h>
@@ -41,8 +41,7 @@ typedef __gnu_cxx::stdio_filebuf<char> StdioFileBuf;
  **/
 template <typename STREAM_TYPE>
 class StreamAdaptor :
-	public STREAM_TYPE
-{
+	public STREAM_TYPE {
 public: // functions
 
 	/// Close the underlying file descriptor
@@ -50,13 +49,12 @@ public: // functions
 		m_buffer.close();
 	}
 
-	FileDescriptor fileDesc() { return FileDescriptor(FileNum{m_buffer.fd()}); }
+	FileDescriptor fileDesc() { return FileDescriptor{FileNum{m_buffer.fd()}}; }
 
 protected: // functions
 
 	StreamAdaptor(FileDescriptor fd, std::ios_base::openmode mode) :
-		m_buffer(to_integral(fd.raw()), mode)
-	{
+			m_buffer{to_integral(fd.raw()), mode} {
 		if (fd.invalid()) {
 			cosmos_throw (UsageError("Attempt to construct StreamAdaptor for invalid FD"));
 		}
@@ -70,33 +68,31 @@ protected: // data
 
 /// Wraps a file descriptor in a std::istream interface
 class InputStreamAdaptor :
-	public StreamAdaptor<std::istream>
-{
+	public StreamAdaptor<std::istream> {
 public: // functions
 
 	explicit InputStreamAdaptor(FileDescriptor fd) :
-		StreamAdaptor<std::istream>(fd, std::ios_base::in)
+			StreamAdaptor<std::istream>{fd, std::ios_base::in}
 	{}
 
 	/// Wrap the read end of a Pipe object
 	explicit InputStreamAdaptor(Pipe &p) :
-		InputStreamAdaptor(p.takeReadEndOwnership())
+			InputStreamAdaptor{p.takeReadEndOwnership()}
 	{}
 };
 
 /// Wraps a file descriptor in a std::ostream interface
 class OutputStreamAdaptor :
-	public StreamAdaptor<std::ostream>
-{
+	public StreamAdaptor<std::ostream> {
 public: // functions
 
 	explicit OutputStreamAdaptor(FileDescriptor fd) :
-		StreamAdaptor<std::ostream>(fd, std::ios_base::out)
+			StreamAdaptor<std::ostream>{fd, std::ios_base::out}
 	{}
 
 	/// Wrap the write end of a Pipe object
 	explicit OutputStreamAdaptor(Pipe &p) :
-		OutputStreamAdaptor(p.takeWriteEndOwnership())
+			OutputStreamAdaptor{p.takeWriteEndOwnership()}
 	{}
 
 	void close() override {
@@ -107,12 +103,11 @@ public: // functions
 
 /// Wraps a file descriptor in a std::iostream interface
 class InputOutputStreamAdaptor :
-	public StreamAdaptor<std::iostream>
-{
+	public StreamAdaptor<std::iostream> {
 public: // functions
 
 	explicit InputOutputStreamAdaptor(FileDescriptor fd) :
-		StreamAdaptor<std::iostream>(fd, std::ios_base::in | std::ios_base::out)
+		StreamAdaptor<std::iostream>{fd, std::ios_base::in | std::ios_base::out}
 	{}
 
 	void close() override {

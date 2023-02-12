@@ -7,7 +7,7 @@
  * provides compiler or C++ standard library specific features
  **/
 
-// needed for stdlib preprocessor defines to become available
+// needed for C++ stdlib preprocessor defines to become available
 #include <iosfwd>
 
 #if defined(__GLIBCXX__)

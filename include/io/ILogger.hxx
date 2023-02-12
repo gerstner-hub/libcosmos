@@ -1,7 +1,7 @@
 #ifndef COSMOS_ILOGGER_HXX
 #define COSMOS_ILOGGER_HXX
 
-// stdlib
+// C++
 #include <iosfwd>
 #include <sstream>
 #include <string_view>
@@ -57,7 +57,7 @@ protected: // types
 	/// Internal state for each channel's stream
 	struct StreamState {
 		StreamState(const std::string_view p, const term::ColorSpec &c) :
-			prefix(p), color(c) {}
+			prefix{p}, color{c} {}
 
 		std::ostream *stream = nullptr;
 		bool enabled = false;

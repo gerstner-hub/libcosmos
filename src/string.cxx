@@ -1,13 +1,13 @@
 // cosmos
 #include "cosmos/string.hxx"
 
-// C++ stdlib
+// C++
 #include <algorithm>
 #include <cctype>
 
 namespace cosmos {
 
-std::string tolower(const std::string &s) {
+std::string toLower(const std::string_view s) {
 	std::string ret;
 	ret.resize(s.size());
 	// put it all to lower case
@@ -20,7 +20,7 @@ std::string tolower(const std::string &s) {
 	return ret;
 }
 
-std::string toupper(const std::string &s) {
+std::string toUpper(const std::string_view s) {
 	std::string ret;
 	ret.resize(s.size());
 	// put it all to lower case
@@ -35,7 +35,7 @@ std::string toupper(const std::string &s) {
 
 void strip(std::string &s) {
 	while (!s.empty() && std::isspace(s[0]))
-		s.erase( s.begin() );
+		s.erase(s.begin());
 
 	while (!s.empty() && std::isspace(s[s.length()-1]))
 		s.pop_back();

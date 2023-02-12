@@ -16,7 +16,7 @@ namespace cosmos {
  * found in the /etc/passwd database.
  **/
 class COSMOS_API PasswdInfo :
-	public InfoBase<struct passwd> {
+		public InfoBase<struct passwd> {
 public: // functions
 
 	/// Obtains PasswdInfo for the given username \c name

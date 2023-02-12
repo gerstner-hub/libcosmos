@@ -1,7 +1,7 @@
 #ifndef COSMOS_FORMATTING_HXX
 #define COSMOS_FORMATTING_HXX
 
-// stdlib
+// C++
 #include <iomanip>
 #include <functional>
 #include <ostream>
@@ -35,7 +35,7 @@ protected: // types
 protected: // functions
 
 	fmtnum_base(const NUM num, size_t width, SetBaseFN fn, std::string_view base_prefix) :
-		m_num(num), m_width(width), m_setbase_fn(fn), m_base_prefix(base_prefix) {}
+		m_num{num}, m_width{width}, m_setbase_fn{fn}, m_base_prefix{base_prefix} {}
 
 public: // functions
 
@@ -76,7 +76,8 @@ protected: // data
  * as: "0x0010".
  **/
 template <typename NUM>
-struct hexnum : public fmtnum_base<NUM> {
+struct hexnum :
+		public fmtnum_base<NUM> {
 	hexnum(const NUM num, size_t width) :
 		fmtnum_base<NUM>{num, width, [](std::ostream &o){ o << std::hex; }, "0x"}
 	{}
@@ -87,7 +88,8 @@ struct hexnum : public fmtnum_base<NUM> {
  * \see hexnum
  **/
 template <typename NUM>
-struct octnum : public fmtnum_base<NUM> {
+struct octnum :
+		public fmtnum_base<NUM> {
 	octnum(const NUM num, size_t width) :
 		fmtnum_base<NUM>{num, width, [](std::ostream &o){ o << std::oct; }, "0o"}
 	{}

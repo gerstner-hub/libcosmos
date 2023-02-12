@@ -20,7 +20,7 @@ namespace cosmos {
  * found in the /etc/group database.
  **/
 class COSMOS_API GroupInfo :
-	public InfoBase<struct group> {
+		public InfoBase<struct group> {
 public: // functions
 
 	/// Obtains GroupInfo for the given group name \c name
@@ -40,7 +40,6 @@ public: // functions
 
 	/// Returns a vector containing the name of users that are members of this group
 	const StringViewVector getMembers() const;
-
 };
 
 } // end ns

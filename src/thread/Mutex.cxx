@@ -1,10 +1,10 @@
-// stdlib
+// C++
 #include <cassert>
 
-// Cosmos
+// cosmos
 #include "cosmos/errors/UsageError.hxx"
-#include "cosmos/thread/Mutex.hxx"
 #include "cosmos/private/Initable.hxx"
+#include "cosmos/thread/Mutex.hxx"
 
 namespace cosmos {
 
@@ -17,8 +17,9 @@ constexpr bool DEBUG_MUTEX = false;
 #endif
 
 /// A single pthread_mutexattr_t for constructing Mutexes
-class MutexAttr : public Initable {
-public:
+class MutexAttr :
+		public Initable {
+public: // functions
 	MutexAttr() : Initable(InitPrio::MUTEX_ATTR) {}
 
 	pthread_mutexattr_t* getAttr() {
@@ -28,7 +29,7 @@ public:
 		return DEBUG_MUTEX ? &m_attr : nullptr;
 	}
 
-protected:
+protected: // functions
 
 	void libInit() override {
 		if (!DEBUG_MUTEX)
@@ -54,7 +55,7 @@ protected:
 		(void)::pthread_mutexattr_destroy(&m_attr);
 	}
 
-protected:
+protected: // data
 
 	pthread_mutexattr_t m_attr;
 };

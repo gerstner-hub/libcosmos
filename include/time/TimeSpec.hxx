@@ -1,7 +1,7 @@
 #ifndef COSMOS_TIMESPEC_HXX
 #define COSMOS_TIMESPEC_HXX
 
-// stdlib
+// C++
 #include <chrono>
 
 // Linux
@@ -11,8 +11,7 @@ namespace cosmos {
 
 /// A C++ wrapper around the POSIX struct timespec
 class TimeSpec :
-	public timespec
-{
+		public timespec {
 public:
 	explicit TimeSpec(time_t seconds, long nano_seconds = 0) {
 		this->tv_sec = seconds;

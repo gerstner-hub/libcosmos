@@ -1,7 +1,7 @@
 #ifndef COSMOS_DIRFD_HXX
 #define COSMOS_DIRFD_HXX
 
-// libcosmos
+// cosmos
 #include "cosmos/ostypes.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
 
@@ -18,7 +18,7 @@ class DirFD : public FileDescriptor {
 public: // functions
 
 	explicit DirFD(FileNum fd = FileNum::INVALID) :
-		FileDescriptor(fd) {}
+		FileDescriptor{fd} {}
 };
 
 } // end ns

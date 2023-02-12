@@ -1,4 +1,4 @@
-// stdlib
+// C++
 #include <cstdlib>
 #include <iostream>
 
@@ -38,7 +38,7 @@ WaitRes SubProc::wait() {
 
 	m_pid = ProcessID::INVALID;
 
-	if (waitid((idtype_t)P_PIDFD, to_integral(m_child_fd.raw()), &wr, WEXITED) != 0) {
+	if (waitid(static_cast<idtype_t>(P_PIDFD), to_integral(m_child_fd.raw()), &wr, WEXITED) != 0) {
 		try {
 			m_child_fd.close();
 		} catch(...) {}
@@ -51,9 +51,10 @@ WaitRes SubProc::wait() {
 }
 
 std::optional<WaitRes> SubProc::waitTimed(const std::chrono::milliseconds max) {
-
 	Poller poller(8);
-	poller.addFD(m_child_fd, Poller::MonitorMask(Poller::MonitorSetting::INPUT));
+
+	poller.addFD(m_child_fd, Poller::MonitorMask{Poller::MonitorSetting::INPUT});
+
 	if (poller.wait(max).empty()) {
 		return std::nullopt;
 	}

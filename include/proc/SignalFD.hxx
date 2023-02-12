@@ -31,7 +31,7 @@ public: // types
 	/// Data structure returned by readEvent()
 	struct SigInfo : signalfd_siginfo {
 		/// Returns the signal number that occured
-		auto getSignal() const { return Signal(SignalNr{static_cast<int>(ssi_signo)}); }
+		auto getSignal() const { return Signal{SignalNr{static_cast<int>(ssi_signo)}}; }
 
 		/// Returns the PID of the process that sent or caused this signal, if applicable
 		auto getSenderPID() const { return ProcessID{static_cast<pid_t>(ssi_pid)}; }
@@ -58,12 +58,12 @@ public: // functions
 
 	/// Creates a signal FD listening on the given list of signals
 	explicit SignalFD(const std::initializer_list<Signal> &siglist) {
-		create(SigSet(siglist));
+		create(SigSet{siglist});
 	}
 
 	/// Creates a signal FD listening on exactly the given signal
 	explicit SignalFD(const Signal s) {
-		create(SigSet({s}));
+		create(SigSet{{s}});
 	}
 
 	/// Creates a new SignalFD

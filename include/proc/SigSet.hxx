@@ -27,7 +27,7 @@ public: // functions
 	/// Creates an empty signal set
 	SigSet() {}
 	/// Creates a fully set signal set
-	explicit SigSet(const fill_t ) { fill(); }
+	explicit SigSet(const fill_t) { fill(); }
 	/// Creates a signal set with the given list of signals set
 	explicit SigSet(const std::initializer_list<Signal> &siglist) {
 		for (auto &sig: siglist) {

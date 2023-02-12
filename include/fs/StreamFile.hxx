@@ -21,7 +21,8 @@ namespace cosmos {
  * This is the most common access mode for files but also somewhat
  * inefficient. In contrast e.g. memory mapped files can be more efficient.
  **/
-class COSMOS_API StreamFile : public File {
+class COSMOS_API StreamFile :
+		public File {
 public: // types
 
 	/// Different methods for changing the file read/write position
@@ -50,16 +51,16 @@ public: // functions
 	StreamFile() {}
 
 	StreamFile(const std::string_view path, const OpenMode mode) :
-		File(path, mode, OpenFlags({OpenSettings::CLOEXEC})) {}
+		File{path, mode, OpenFlags{{OpenSettings::CLOEXEC}}} {}
 
 	StreamFile(const std::string_view path, const OpenMode mode, const OpenFlags flags) :
-		File(path, mode, flags) {}
+		File{path, mode, flags} {}
 
 	StreamFile(const std::string_view path, const OpenMode mode, const OpenFlags flags, const FileMode fmode) :
-		File(path, mode, flags, fmode) {}
+		File{path, mode, flags, fmode} {}
 
 	StreamFile(FileDescriptor fd, const AutoClose auto_close) :
-		File(fd, auto_close) {}
+		File{fd, auto_close} {}
 
 	/// Read up to \p length bytes from the file into \p buf
 	/**

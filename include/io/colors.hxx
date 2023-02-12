@@ -1,7 +1,7 @@
 #ifndef COSMOS_COLORS_HXX
 #define COSMOS_COLORS_HXX
 
-// stdlib
+// C++
 #include <iosfwd>
 #include <string_view>
 #include <variant>
@@ -75,6 +75,7 @@ public: // functions
 	bool isBackColor() const { return !isFrontColor(); }
 
 protected: // data
+
 	TermColor m_color;
 	ColorKind m_kind = ColorKind::FRONT;
 	ColorIntensity m_intensity = ColorIntensity::NORMAL;
@@ -153,11 +154,11 @@ protected:
 class TextEffect : public FeatureBase {
 protected:
 	TextEffect(const TermControl feature, const std::string_view &text) :
-		FeatureBase(text, static_cast<size_t>(feature), static_cast<size_t>(getOffControl(feature)))
+		FeatureBase{text, static_cast<size_t>(feature), static_cast<size_t>(getOffControl(feature))}
 	{}
 
 	TextEffect(const TermControl feature, const FeatureBase &next) :
-		FeatureBase(next, static_cast<size_t>(feature), static_cast<size_t>(getOffControl(feature)))
+		FeatureBase{next, static_cast<size_t>(feature), static_cast<size_t>(getOffControl(feature))}
 	{}
 };
 
@@ -165,9 +166,9 @@ protected:
 template <TermControl effect>
 struct TextEffectT : public TextEffect {
 	explicit TextEffectT(const std::string_view &text) :
-		TextEffect(effect, text) {}
+		TextEffect{effect, text} {}
 	explicit TextEffectT(const FeatureBase &next) :
-		TextEffect(effect, next) {}
+		TextEffect{effect, next} {}
 };
 
 /// Helper to print underlined text easily onto an ostream.
@@ -180,11 +181,11 @@ typedef TextEffectT<TermControl::INVERSE_ON> Inversed;
 /// Base class for easy colored text application on ostreams.
 struct ColoredText : public FeatureBase {
 	explicit ColoredText(const std::string_view &text, const TermColor c, const ColorKind kind, const ColorIntensity intensity) :
-		FeatureBase(text, getANSIColorCode(ColorSpec(c, kind, intensity)), static_cast<size_t>(getOffCode(kind)))
+		FeatureBase{text, getANSIColorCode(ColorSpec{c, kind, intensity}), static_cast<size_t>(getOffCode(kind))}
 	{}
 
 	explicit ColoredText(const FeatureBase &next, const TermColor c, const ColorKind kind, const ColorIntensity intensity) :
-		FeatureBase(next, getANSIColorCode(ColorSpec(c, kind, intensity)), static_cast<size_t>(getOffCode(kind)))
+		FeatureBase{next, getANSIColorCode(ColorSpec{c, kind, intensity}), static_cast<size_t>(getOffCode(kind))}
 	{}
 
 protected: // functions
@@ -195,17 +196,17 @@ protected: // functions
 };
 
 /// Template for definition of concrete color text helpers.
-template <TermColor color, ColorIntensity intensity=ColorIntensity::NORMAL>
+template <TermColor color, ColorIntensity intensity = ColorIntensity::NORMAL>
 struct ColoredTextT : public ColoredText {
-	explicit ColoredTextT(const std::string_view &text) : ColoredText(text, color, ColorKind::FRONT, intensity) {}
-	explicit ColoredTextT(const FeatureBase &next) : ColoredText(next, color, ColorKind::FRONT, intensity) {}
+	explicit ColoredTextT(const std::string_view &text) : ColoredText{text, color, ColorKind::FRONT, intensity} {}
+	explicit ColoredTextT(const FeatureBase &next) : ColoredText{next, color, ColorKind::FRONT, intensity} {}
 };
 
 /// Template for definition of concrete background color helpers.
-template <TermColor color, ColorIntensity intensity=ColorIntensity::NORMAL>
+template <TermColor color, ColorIntensity intensity = ColorIntensity::NORMAL>
 struct TextOnColorT : public ColoredText {
-	explicit TextOnColorT(const std::string_view &text) : ColoredText(text, color, ColorKind::BACK, intensity) {}
-	explicit TextOnColorT(const FeatureBase &next) : ColoredText(next, color, ColorKind::BACK, intensity) {}
+	explicit TextOnColorT(const std::string_view &text) : ColoredText{text, color, ColorKind::BACK, intensity} {}
+	explicit TextOnColorT(const FeatureBase &next) : ColoredText{next, color, ColorKind::BACK, intensity} {}
 };
 
 /*

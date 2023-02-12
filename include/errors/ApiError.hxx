@@ -4,7 +4,7 @@
 // C
 #include <errno.h>
 
-// stdlib
+// C++
 #include <iosfwd>
 #include <optional>
 #include <string>
@@ -108,8 +108,7 @@ inline bool isErrnoSet() { return getErrno() != Errno::NO_ERROR; }
  * format a human readable error message from it.
  **/
 class COSMOS_API ApiError :
-	public CosmosError
-{
+		public CosmosError {
 public: // functions
 
 	/// Stores the current errno code in the exception
