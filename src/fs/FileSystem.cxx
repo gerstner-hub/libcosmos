@@ -27,6 +27,18 @@
 
 namespace cosmos::fs {
 
+FileMode setUmask(const FileMode mode) {
+	auto raw_mode = to_integral(mode.raw());
+
+	if ((raw_mode & ~0777) != 0) {
+		cosmos_throw (UsageError("invalid bits set in umask"));
+	}
+
+	auto old_mode = ::umask(raw_mode);
+
+	return FileMode{ModeT{old_mode}};
+}
+
 bool existsFile(const std::string_view path) {
 	struct stat s;
 	if (::lstat(path.data(), &s) == 0)

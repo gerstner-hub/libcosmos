@@ -99,6 +99,38 @@ bool testCreateAllDirs() {
 	return true;
 }
 
+bool testUmask() {
+
+	const auto new_mask = cosmos::FileMode{cosmos::ModeT{0227}};
+
+	cosmos::fs::setUmask(new_mask);
+
+	cosmos::File testfile{
+		"umask.test",
+		cosmos::OpenMode{cosmos::OpenMode::WRITE_ONLY},
+		cosmos::OpenFlags{cosmos::OpenSettings::CREATE},
+		cosmos::FileMode{cosmos::ModeT{0777}}
+	};
+
+	cosmos::FileStatus status{testfile.getFD()};
+
+	if (status.getMode().raw() != cosmos::ModeT{0550}) {
+		std::cerr << "umask did not work as expected\n";
+		return false;
+	}
+
+	cosmos::fs::unlinkFile("umask.test");
+
+	const auto old = cosmos::fs::setUmask(cosmos::FileMode{cosmos::ModeT{0022}});
+
+	if (new_mask != old) {
+		std::cerr << "old umask has unexpected value?!\n";
+		return false;
+	}
+
+	return true;
+}
+
 bool testUnlink() {
 	std::ofstream f;
 	f.open("testfile");
@@ -359,6 +391,9 @@ int main(const int, const char **argv) {
 		std::cerr << "failed to run " << *ls_bin << std::endl;
 		return 1;
 	}
+
+	if (!testUmask())
+		return 1;
 
 	if (!testUnlink())
 		return 1;

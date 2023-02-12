@@ -13,6 +13,37 @@
 
 namespace cosmos::fs {
 
+/// Sets the process's file creation mask
+/**
+ * The file creation mask is a process wide attribute that determines an upper
+ * limit of the file permission bits that are set on newly created files and
+ * directories. Most prominently this affects files created via open() and
+ * directories created via mkdir(). Even if more open permissions are
+ * specified in these system calls, the bits will be switched off if they are
+ * also present in the process's umask. The file permission bits are
+ * calculated as (<mode> & ~umask) i.e. bits that are set in the umask will be
+ * set to zero during file creation.
+ *
+ * Since this is a process wide attribute it will affect all threads in the
+ * process and can thus cause race conditions. If necessary you should the the
+ * umask in the main thread of a program early on.
+ *
+ * Only the lower 9 bits of \c mode will be taken into account (i.e.
+ * owner/group/other permissions bits). If any other bits are set then an
+ * UsageError exception is thrown.
+ *
+ * The umask is inherited across fork() and is not changed during execve().
+ *
+ * Other system calls that make use of the umask are the creation of POSIX IPC
+ * objects (message queues, semaphores, shared memory), named pipes, and UNIX
+ * domain sockets. It is *not* used by SYSV IPC objects.
+ *
+ * \return The umask that was previously in effect. To only read the current
+ * process's umask you need to read the proc file system in /proc/<pid>/status
+ * (umask is available there since Linux 4.7).
+ **/
+COSMOS_API FileMode setUmask(const FileMode mode);
+
 /// Returns whether the given file system object exists
 /**
  * The information returned is only a snapshot in time. It is subject
