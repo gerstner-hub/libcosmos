@@ -36,8 +36,8 @@ public: // functions
 	BitMask() {}
 
 	/// Sets all bits zo one
-	explicit BitMask(const All) {
-		setAll();
+	explicit BitMask(const All a) {
+		set(a);
 	}
 
 	/// Sets only the flags found in the given initializer list
@@ -58,7 +58,7 @@ public: // functions
 	{}
 
 	/// Returns the raw bitfield integer
-	EnumBaseType get() const { return m_flags; }
+	EnumBaseType raw() const { return m_flags; }
 
 	/// Return a string representation of the bit mask
 	explicit operator std::string() const { return to_string(); }
@@ -79,7 +79,7 @@ public: // functions
 	}
 
 	/// Sets all bits it the set
-	BitMask& setAll() {
+	BitMask& set(const All) {
 		m_flags = ~EnumBaseType(0);
 		return *this;
 	}

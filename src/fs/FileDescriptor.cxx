@@ -44,7 +44,7 @@ FileDescriptor::StatusFlags FileDescriptor::getStatusFlags() const {
 }
 
 void FileDescriptor::setStatusFlags(const StatusFlags flags) {
-	auto res = fcntl(to_integral(m_fd), F_SETFD, flags.get());
+	auto res = fcntl(to_integral(m_fd), F_SETFD, flags.raw());
 
 	if (res != 0) {
 		cosmos_throw (ApiError("failed to set F_SETFD status flags"));

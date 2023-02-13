@@ -19,18 +19,18 @@ typedef cosmos::BitMask<MyEnum> MyBitMask;
 int main() {
 	{
 		MyBitMask bitmask;
-		assert( bitmask.get() == 0 );
+		assert( bitmask.raw() == 0 );
 	}
 
 	{
 		MyBitMask bitmask(MyEnum::VAL3);
-		assert( bitmask.get() == static_cast<int>(MyEnum::VAL3) );
+		assert( bitmask.raw() == static_cast<int>(MyEnum::VAL3) );
 	}
 
 	{
 		const auto val = static_cast<int>(MyEnum::VAL3) | static_cast<int>(MyEnum::VAL4);
 		MyBitMask bitmask(val);
-		assert (bitmask.get() == val);
+		assert (bitmask.raw() == val);
 	}
 
 	{
@@ -67,15 +67,15 @@ int main() {
 
 	{
 		MyBitMask bitmask;
-		bitmask.setAll();
+		bitmask.set(MyBitMask::all);
 		assert (bitmask.to_string() == std::string(32, '1'));
 
 		bitmask.reset();
-		assert (bitmask.get() == 0);
+		assert (bitmask.raw() == 0);
 
 		bitmask.set( MyEnum::VAL3 );
 		bitmask.set( MyEnum::VAL5 );
-		assert (bitmask.get() == (static_cast<int>(MyEnum::VAL3) | static_cast<int>(MyEnum::VAL5)));
+		assert (bitmask.raw() == (static_cast<int>(MyEnum::VAL3) | static_cast<int>(MyEnum::VAL5)));
 
 		bitmask.reset( MyEnum::VAL3 );
 		assert (bitmask.test(MyEnum::VAL3) == false);

@@ -258,7 +258,7 @@ public:
 	 **/
 	std::string symbolic() const;
 
-	ModeT raw() const { return ModeT{m_mode.get()}; }
+	ModeT raw() const { return ModeT{m_mode.raw()}; }
 
 	bool operator==(const FileMode &other) const {
 		return m_mode == other.m_mode;

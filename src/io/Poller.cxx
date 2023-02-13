@@ -58,11 +58,11 @@ namespace {
 }
 
 void Poller::addFD(const FileDescriptor fd, const MonitorMask mask) {
-	control(rawPollFD(), to_integral(fd.raw()), EPOLL_CTL_ADD, mask.get());
+	control(rawPollFD(), to_integral(fd.raw()), EPOLL_CTL_ADD, mask.raw());
 }
 
 void Poller::modFD(const FileDescriptor fd, const MonitorMask mask) {
-	control(rawPollFD(), to_integral(fd.raw()), EPOLL_CTL_MOD, mask.get());
+	control(rawPollFD(), to_integral(fd.raw()), EPOLL_CTL_MOD, mask.raw());
 }
 
 void Poller::delFD(const FileDescriptor fd) {

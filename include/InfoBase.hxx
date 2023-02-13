@@ -24,8 +24,8 @@ public: // functions
 	void invalidate();
 
 	/// Grants access to the raw underlying datastructure
-	const DB_STRUCT* getRaw() const { return &m_info; }
-	DB_STRUCT* getRaw() { return &m_info; }
+	const DB_STRUCT* raw() const { return &m_info; }
+	DB_STRUCT* raw() { return &m_info; }
 
 protected: // functions
 

@@ -57,7 +57,7 @@ protected: // functions
 
 public: // functions
 
-	auto getRawEntry() const { return m_entry; }
+	auto raw() const { return m_entry; }
 
 	/// Returns the inode of the directory entry
 	/**
