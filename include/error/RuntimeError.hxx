@@ -2,7 +2,7 @@
 #define COSMOS_RUNTIMEERROR_HXX
 
 // cosmos
-#include "cosmos/errors/CosmosError.hxx"
+#include "cosmos/error/CosmosError.hxx"
 
 namespace cosmos {
 

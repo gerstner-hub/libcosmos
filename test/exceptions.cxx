@@ -4,9 +4,9 @@
 #include <string>
 
 // Cosmos
-#include "cosmos/errors/ApiError.hxx"
-#include "cosmos/errors/UsageError.hxx"
-#include "cosmos/errors/RuntimeError.hxx"
+#include "cosmos/error/ApiError.hxx"
+#include "cosmos/error/UsageError.hxx"
+#include "cosmos/error/RuntimeError.hxx"
 #include "cosmos/fs/File.hxx"
 #include "cosmos/cosmos.hxx"
 

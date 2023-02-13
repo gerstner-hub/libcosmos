@@ -2,7 +2,7 @@
 #include <iostream>
 #include <limits.h>
 
-#include "cosmos/errors/CosmosError.hxx"
+#include "cosmos/error/CosmosError.hxx"
 #include "cosmos/fs/File.hxx"
 #include "cosmos/fs/StreamFile.hxx"
 

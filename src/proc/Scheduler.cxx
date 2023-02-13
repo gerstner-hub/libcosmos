@@ -1,6 +1,6 @@
 // Cosmos
-#include "cosmos/errors/ApiError.hxx"
-#include "cosmos/errors/UsageError.hxx"
+#include "cosmos/error/ApiError.hxx"
+#include "cosmos/error/UsageError.hxx"
 #include "cosmos/private/Scheduler.hxx"
 #include "cosmos/proc/Scheduler.hxx"
 

@@ -1,8 +1,8 @@
 // Cosmos
 #include "cosmos/cosmos.hxx"
-#include "cosmos/errors/ApiError.hxx"
-#include "cosmos/errors/CosmosError.hxx"
-#include "cosmos/errors/InternalError.hxx"
+#include "cosmos/error/ApiError.hxx"
+#include "cosmos/error/CosmosError.hxx"
+#include "cosmos/error/InternalError.hxx"
 #include "cosmos/formatting.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/io/Pipe.hxx"

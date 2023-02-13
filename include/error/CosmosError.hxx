@@ -7,7 +7,7 @@
 #include <string_view>
 
 // cosmos
-#include "cosmos/errors/macros.hxx"
+#include "cosmos/error/macros.hxx"
 
 namespace cosmos {
 

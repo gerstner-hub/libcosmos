@@ -5,7 +5,7 @@
 #include <string>
 
 // cosmos
-#include "cosmos/errors/UsageError.hxx"
+#include "cosmos/error/UsageError.hxx"
 #include "cosmos/thread/Thread.hxx"
 
 namespace cosmos {

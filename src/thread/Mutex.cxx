@@ -2,7 +2,7 @@
 #include <cassert>
 
 // cosmos
-#include "cosmos/errors/UsageError.hxx"
+#include "cosmos/error/UsageError.hxx"
 #include "cosmos/private/Initable.hxx"
 #include "cosmos/thread/Mutex.hxx"
 

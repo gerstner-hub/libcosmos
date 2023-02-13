@@ -2,7 +2,7 @@
 #include <ostream>
 
 // cosmos
-#include "cosmos/errors/ApiError.hxx"
+#include "cosmos/error/ApiError.hxx"
 #include "cosmos/formatting.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/proc/Signal.hxx"

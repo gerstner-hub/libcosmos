@@ -2,8 +2,8 @@
 #include <filesystem>
 #include <fstream>
 
-#include "cosmos/errors/FileError.hxx"
-#include "cosmos/errors/RuntimeError.hxx"
+#include "cosmos/error/FileError.hxx"
+#include "cosmos/error/RuntimeError.hxx"
 #include "cosmos/formatting.hxx"
 #include "cosmos/fs/FileSystem.hxx"
 #include "cosmos/fs/FileStatus.hxx"

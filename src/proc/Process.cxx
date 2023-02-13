@@ -7,7 +7,7 @@
 
 // Cosmos
 #include "cosmos/algs.hxx"
-#include "cosmos/errors/ApiError.hxx"
+#include "cosmos/error/ApiError.hxx"
 #include "cosmos/proc/Process.hxx"
 #include "cosmos/proc/SigSet.hxx"
 

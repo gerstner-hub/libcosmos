@@ -5,7 +5,7 @@
 #include <string>
 
 // cosmos
-#include "cosmos/errors/ApiError.hxx"
+#include "cosmos/error/ApiError.hxx"
 
 namespace cosmos {
 

@@ -1,6 +1,6 @@
 // cosmos
 #include "cosmos/algs.hxx"
-#include "cosmos/errors/ApiError.hxx"
+#include "cosmos/error/ApiError.hxx"
 #include "cosmos/locale.hxx"
 
 namespace cosmos::locale {

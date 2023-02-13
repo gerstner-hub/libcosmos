@@ -1,4 +1,4 @@
-#include "cosmos/errors/FileError.hxx"
+#include "cosmos/error/FileError.hxx"
 
 namespace cosmos {
 

@@ -7,9 +7,9 @@
 #include <string>
 
 // cosmos
-#include "cosmos/errors/errno.hxx"
+#include "cosmos/error/CosmosError.hxx"
+#include "cosmos/error/errno.hxx"
 #include "cosmos/ostypes.hxx"
-#include "cosmos/errors/CosmosError.hxx"
 
 namespace cosmos {
 

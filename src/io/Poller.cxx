@@ -4,7 +4,7 @@
 
 // cosmos
 #include "cosmos/algs.hxx"
-#include "cosmos/errors/ApiError.hxx"
+#include "cosmos/error/ApiError.hxx"
 #include "cosmos/io/Poller.hxx"
 #include "cosmos/private/cosmos.hxx"
 #include "cosmos/time/TimeSpec.hxx"

@@ -1,6 +1,6 @@
 // cosmos
 #include "cosmos/algs.hxx"
-#include "cosmos/errors/UsageError.hxx"
+#include "cosmos/error/UsageError.hxx"
 #include "cosmos/GroupInfo.hxx"
 #include "cosmos/private/InfoBase.hxx"
 

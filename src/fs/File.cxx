@@ -3,9 +3,9 @@
 
 // cosmos
 #include "cosmos/algs.hxx"
-#include "cosmos/errors/FileError.hxx"
-#include "cosmos/errors/InternalError.hxx"
-#include "cosmos/errors/UsageError.hxx"
+#include "cosmos/error/FileError.hxx"
+#include "cosmos/error/InternalError.hxx"
+#include "cosmos/error/UsageError.hxx"
 #include "cosmos/formatting.hxx"
 #include "cosmos/fs/File.hxx"
 

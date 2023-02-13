@@ -11,11 +11,11 @@
 
 // cosmos
 #include "cosmos/algs.hxx"
-#include "cosmos/errors/ApiError.hxx"
-#include "cosmos/errors/FileError.hxx"
-#include "cosmos/errors/InternalError.hxx"
-#include "cosmos/errors/RuntimeError.hxx"
-#include "cosmos/errors/UsageError.hxx"
+#include "cosmos/error/ApiError.hxx"
+#include "cosmos/error/FileError.hxx"
+#include "cosmos/error/InternalError.hxx"
+#include "cosmos/error/RuntimeError.hxx"
+#include "cosmos/error/UsageError.hxx"
 #include "cosmos/fs/Directory.hxx"
 #include "cosmos/fs/DirIterator.hxx"
 #include "cosmos/fs/File.hxx"

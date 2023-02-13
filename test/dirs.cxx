@@ -1,5 +1,5 @@
 // Cosmos
-#include "cosmos/errors/ApiError.hxx"
+#include "cosmos/error/ApiError.hxx"
 #include "cosmos/fs/FileStatus.hxx"
 #include "cosmos/fs/Directory.hxx"
 

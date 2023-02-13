@@ -4,7 +4,7 @@
 #include <vector>
 
 // cosmos
-#include "cosmos/errors/UsageError.hxx"
+#include "cosmos/error/UsageError.hxx"
 #include "cosmos/io/colors.hxx"
 
 namespace cosmos::term {

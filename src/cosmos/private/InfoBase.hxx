@@ -5,8 +5,8 @@
 #include <cstring>
 
 // cosmos
-#include "cosmos/errors/ApiError.hxx"
-#include "cosmos/errors/RuntimeError.hxx"
+#include "cosmos/error/ApiError.hxx"
+#include "cosmos/error/RuntimeError.hxx"
 
 namespace cosmos {
 

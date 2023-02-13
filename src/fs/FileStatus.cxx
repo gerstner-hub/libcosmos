@@ -1,7 +1,7 @@
 // cosmos
 #include "cosmos/algs.hxx"
-#include "cosmos/errors/ApiError.hxx"
-#include "cosmos/errors/UsageError.hxx"
+#include "cosmos/error/ApiError.hxx"
+#include "cosmos/error/UsageError.hxx"
 #include "cosmos/formatting.hxx"
 #include "cosmos/fs/FileStatus.hxx"
 

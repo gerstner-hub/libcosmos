@@ -8,7 +8,7 @@
 #include <string_view>
 
 // cosmos
-#include "cosmos/errors/ApiError.hxx"
+#include "cosmos/error/ApiError.hxx"
 #include "cosmos/thread/Condition.hxx"
 #include "cosmos/thread/IThreadEntry.hxx"
 

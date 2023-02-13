@@ -3,7 +3,7 @@
 #include <limits.h>
 
 // Cosmos
-#include "cosmos/errors/ApiError.hxx"
+#include "cosmos/error/ApiError.hxx"
 #include "cosmos/io/Pipe.hxx"
 
 namespace cosmos {

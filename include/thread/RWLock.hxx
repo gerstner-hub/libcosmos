@@ -8,7 +8,7 @@
 #include <cassert>
 
 // cosmos
-#include "cosmos/errors/ApiError.hxx"
+#include "cosmos/error/ApiError.hxx"
 #include "cosmos/types.hxx"
 
 namespace cosmos {
