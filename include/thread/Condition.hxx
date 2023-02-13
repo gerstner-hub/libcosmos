@@ -133,7 +133,7 @@ public: // functions
 		}
 	}
 
-	Mutex& getMutex() { return m_lock; }
+	Mutex& mutex() { return m_lock; }
 
 public: // types
 

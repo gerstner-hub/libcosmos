@@ -24,7 +24,7 @@ int Poller::rawPollFD() const {
 }
 
 void Poller::create(size_t max_events) {
-	if (isValid())
+	if (valid())
 		return;
 
 	auto pfd = epoll_create1(EPOLL_CLOEXEC);
@@ -38,7 +38,7 @@ void Poller::create(size_t max_events) {
 }
 
 void Poller::close() {
-	if (!isValid())
+	if (!valid())
 		return;
 
 	m_poll_fd.close();

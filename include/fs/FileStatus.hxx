@@ -71,52 +71,52 @@ public: // functions
 		m_st.st_mode = 0;
 	}
 
-	bool isValid() const {
+	bool valid() const {
 		return m_st.st_mode != 0;
 	}
 
 	/// Returns the composite ModeT for the file
-	ModeT getModeT() const {
+	ModeT rawMode() const {
 		return ModeT{m_st.st_mode};
 	}
 
 	/// Returns the file mode bitmask containing the permission bits for the file
-	FileMode getMode() const {
-		return FileMode{getModeT()};
+	FileMode mode() const {
+		return FileMode{rawMode()};
 	}
 
 	/// Returns the FileType representation for the file
-	FileType getType() const {
-		return FileType{getModeT()};
+	FileType type() const {
+		return FileType{rawMode()};
 	}
 
 	/// Returns the identifier for the block device this file resides on
-	DeviceID getDevice() const {
+	DeviceID device() const {
 		return DeviceID{m_st.st_dev};
 	}
 
 	/// Returns the unique file inode for the file
 	/**
-	 * The pair of data getDevice() and getInode() allow to uniquely
+	 * The pair of data device() and inode() allow to uniquely
 	 * identifier a file on the system. For example this allows to detect
 	 * hard links to the same file data.
 	 **/
-	Inode getInode() const {
+	Inode inode() const {
 		return Inode{m_st.st_ino};
 	}
 
 	/// Returns the number of hard links for this file
-	nlink_t getNumLinks() const {
+	nlink_t numLinks() const {
 		return m_st.st_nlink;
 	}
 
 	/// Returns the UID of the owner of the file
-	UserID getOwnerUID() const {
+	UserID uid() const {
 		return UserID{m_st.st_uid};
 	}
 
 	/// Returns the GID of the owner of the file
-	GroupID getOwnerGID() const {
+	GroupID gid() const {
 		return GroupID{m_st.st_gid};
 	}
 
@@ -132,8 +132,8 @@ public: // functions
 	 *
 	 * For any other type a UsageError exception is thrown.
 	 **/
-	off_t getSize() const {
-		switch (getType().raw()) {
+	off_t size() const {
+		switch (type().raw()) {
 			case FileType::REGULAR:
 			case FileType::LINK:
 			case FileType::DIRECTORY:
@@ -148,11 +148,11 @@ public: // functions
 	/**
 	 * This is only valid if
 	 *
-	 * 	getType() == FileType::BLOCKDEV || getType() == FileType::CHARDEV
+	 * 	type() == FileType::BLOCKDEV || type() == FileType::CHARDEV
 	 *
 	 * If this condition is not fulfilled then a UsageError is thrown.
 	 **/
-	DeviceID getRepresentedDevice() const;
+	DeviceID representedDevice() const;
 
 	/// Preferred block size for file system I/O
 	/**
@@ -161,16 +161,16 @@ public: // functions
 	 * value can theoretically be different for different files on the
 	 * same file system.
 	 **/
-	blksize_t getIOBlockSize() const {
+	blksize_t blockSize() const {
 		return m_st.st_blksize;
 	}
 
 	/// Returns the number of blocks in 512 byte units allocated to the file
 	/**
-	 * This can be smaller than the result of getSize() / 512 if the file
+	 * This can be smaller than the result of size() / 512 if the file
 	 * has holes in it.
 	 **/
-	blkcnt_t getAllocatedBlocks() const {
+	blkcnt_t allocatedBlocks() const {
 		return m_st.st_blocks;
 	}
 
@@ -178,7 +178,7 @@ public: // functions
 	// had second resolution integers in st_mtime, st_ctime, st_atime.
 
 	/// Returns the time of the last modification of the file content
-	const TimeSpec& getModTime() const {
+	const TimeSpec& modTime() const {
 		// This is a bit dirty, casting the struct timespec to its
 		// wrapper type. Should work as long as we don't change the
 		// object size (is checked in the compilation unit for
@@ -192,7 +192,7 @@ public: // functions
 	 * This timestamp reflects the last change to the inode data i.e. the
 	 * metadata of the file (e.g. ownership, permissions etc.)
 	 **/
-	const TimeSpec& getStatusTime() const {
+	const TimeSpec& statusTime() const {
 		return *reinterpret_cast<const TimeSpec*>(&m_st.st_ctim);
 	}
 
@@ -202,7 +202,7 @@ public: // functions
 	 * circumstances, for example there is mount option `noatime` that
 	 * disables this for performance reasons.
 	 **/
-	const TimeSpec& getAccessTime() const {
+	const TimeSpec& accessTime() const {
 		return *reinterpret_cast<const TimeSpec*>(&m_st.st_atim);
 	}
 
@@ -213,8 +213,8 @@ public: // functions
 	 * even if the file names aren't (hard links).
 	 **/
 	bool isSameFile(const FileStatus &other) const {
-		return this->getInode() == other.getInode() &&
-			this->getDevice() == other.getDevice();
+		return this->inode() == other.inode() &&
+			this->device() == other.device();
 	}
 
 	/// compares the two objects on raw data level

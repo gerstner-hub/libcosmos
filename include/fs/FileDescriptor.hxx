@@ -49,7 +49,7 @@ public: // functions
 	 * A potentially already contained file descriptor will *not* be
 	 * closed, the caller is responsible for preventing leaks.
 	 **/
-	void setFD(FileNum fd) { m_fd = fd; }
+	void setFD(const FileNum fd) { m_fd = fd; }
 
 	/// Invalidates the stored file descriptor.
 	/**

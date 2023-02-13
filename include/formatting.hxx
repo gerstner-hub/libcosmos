@@ -42,11 +42,11 @@ public: // functions
 	/// If we should show a prefix identifier the number's base (e.g. 0x for hex, default: yes)
 	const fmtnum_base& showBase(bool yes_no) { m_show_base = yes_no; return *this; }
 
-	size_t getWidth() const { return m_width; }
+	size_t width() const { return m_width; }
 	bool showBase() const { return m_show_base; }
-	auto getNum() const { return m_num; }
-	const std::string_view getBasePrefix() const { return m_base_prefix; }
-	SetBaseFN getSetBaseFN() const { return m_setbase_fn; }
+	auto num() const { return m_num; }
+	const std::string_view basePrefix() const { return m_base_prefix; }
+	SetBaseFN baseFN() const { return m_setbase_fn; }
 
 	explicit operator std::string() const {
 		std::stringstream ss;

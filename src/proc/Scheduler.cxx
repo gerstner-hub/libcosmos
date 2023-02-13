@@ -29,7 +29,7 @@ void SchedulerSettings::apply(ProcessID pid) const {
 	}
 }
 
-int RealtimeSchedulerSettings::getMinPriority() const {
+int RealtimeSchedulerSettings::minPriority() const {
 	auto ret = sched_get_priority_min(static_cast<int>(m_policy));
 
 	if (ret == -1) {
@@ -39,7 +39,7 @@ int RealtimeSchedulerSettings::getMinPriority() const {
 	return ret;
 }
 
-int RealtimeSchedulerSettings::getMaxPriority() const {
+int RealtimeSchedulerSettings::maxPriority() const {
 	auto ret = sched_get_priority_max(static_cast<int>(m_policy));
 
 	if (ret == -1) {

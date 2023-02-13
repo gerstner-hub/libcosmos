@@ -94,14 +94,14 @@ std::optional<std::string> which(const std::string_view exec_base) noexcept {
 			FileStatus status;
 
 			try {
-				status.updateFrom(f.getFD());
+				status.updateFrom(f.fd());
 			} catch (const CosmosError &) {
 				return false;
 			}
 
-			if (!status.getType().isRegular())
+			if (!status.type().isRegular())
 				return false;
-			else if (!status.getMode().canAnyExec())
+			else if (!status.mode().canAnyExec())
 				return false;
 
 			return true;
@@ -206,7 +206,7 @@ void removeTree(const std::string_view path) {
 		switch(entry.type()) {
 		case Type::UNKNOWN: {
 			FileStatus fs{subpath};
-			if (fs.getType().isDirectory())
+			if (fs.type().isDirectory())
 				goto dircase;
 			else
 				goto filecase;
@@ -258,11 +258,11 @@ UserID resolveUser(const std::string_view user) {
 	}
 
 	PasswdInfo info{user};
-	if (!info.isValid()) {
+	if (!info.valid()) {
 		cosmos_throw (RuntimeError{std::string{user} + " does not exist"});
 	}
 
-	return info.getUID();
+	return info.uid();
 }
 
 GroupID resolveGroup(const std::string_view group) {
@@ -271,11 +271,11 @@ GroupID resolveGroup(const std::string_view group) {
 	}
 
 	GroupInfo info{group};
-	if (!info.isValid()) {
+	if (!info.valid()) {
 		cosmos_throw (RuntimeError{std::string{group} + "does not exist"});
 	}
 
-	return info.getGID();
+	return info.gid();
 }
 
 } // end anon ns

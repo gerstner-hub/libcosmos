@@ -43,7 +43,7 @@ public:
 	void checkValidity() {
 		cosmos::FileStatus status;
 
-		if (status.isValid()) {
+		if (status.valid()) {
 			bad("empty FileStatus is valid?!");
 		} else {
 			good("empty FileStatus is invalid");
@@ -51,14 +51,14 @@ public:
 
 		status.updateFrom(".");
 
-		if (status.isValid()) {
+		if (status.valid()) {
 			good("filled FileStatus is valid");
 		} else {
 			bad("filled FileStatus is invalid");
 		}
 
 		status.reset();
-		if (status.isValid()) {
+		if (status.valid()) {
 			bad("reset FileStatus is valid?!");
 		} else {
 			good("reset FileStatus is invalid");
@@ -69,7 +69,7 @@ public:
 
 		cosmos::FileStatus status1, status2;
 		status1.updateFrom("first");
-		status2.updateFrom(m_first_file.getFD());
+		status2.updateFrom(m_first_file.fd());
 
 		if (status1 == status2) {
 			good("updateFrom(string_view) equals updateFrom(FileDescriptor");
@@ -79,29 +79,29 @@ public:
 	}
 
 	void checkFileTypes() {
-		cosmos::FileStatus status{m_first_file.getFD()};
-		verifyType(status.getType().isRegular(), "regular");
+		cosmos::FileStatus status{m_first_file.fd()};
+		verifyType(status.type().isRegular(), "regular");
 
 		status.updateFrom(m_tmp_dir);
-		verifyType(status.getType().isDirectory(), "directory");
+		verifyType(status.type().isDirectory(), "directory");
 
 		runTool({"ln", "-s", "first", "symlink"});
 
 		status.updateFrom("symlink");
-		verifyType(status.getType().isLink(), "symlink");
+		verifyType(status.type().isLink(), "symlink");
 
 		status.updateFrom("symlink", cosmos::FollowSymlinks{true});
-		verifyType(status.getType().isRegular(), "regular symlink target");
+		verifyType(status.type().isRegular(), "regular symlink target");
 
 		status.updateFrom("/dev/null");
-		verifyType(status.getType().isCharDev(), "chardev");
+		verifyType(status.type().isCharDev(), "chardev");
 
 		status.updateFrom("/dev/loop0");
-		verifyType(status.getType().isBlockDev(), "blockdev");
+		verifyType(status.type().isBlockDev(), "blockdev");
 
 		runTool({"mkfifo", "./fifo"});
 		status.updateFrom("./fifo");
-		verifyType(status.getType().isFIFO(), "fifo");
+		verifyType(status.type().isFIFO(), "fifo");
 
 		auto sockpath = findSocket();
 
@@ -110,14 +110,14 @@ public:
 		} else {
 			good(std::string{"found socket in "} + *sockpath);
 			status.updateFrom(*sockpath);
-			verifyType(status.getType().isSocket(), "socket");
+			verifyType(status.type().isSocket(), "socket");
 		}
 	}
 
 	void checkFileModes() {
-		cosmos::FileStatus status{m_first_file.getFD()};
+		cosmos::FileStatus status{m_first_file.fd()};
 
-		if (status.getMode() == m_mode) {
+		if (status.mode() == m_mode) {
 			good("created file has matching mode");
 		} else {
 			bad("created file has non-matching mode");
@@ -131,7 +131,7 @@ public:
 
 		status.updateFrom(*ls_bin);
 
-		if (status.getMode().canAnyExec()) {
+		if (status.mode().canAnyExec()) {
 			good("ls program is executable");
 		} else {
 			bad("ls program is not executable?");
@@ -141,13 +141,13 @@ public:
 	void checkOwners() {
 		cosmos::FileStatus status{"first"};
 
-		if (status.getOwnerUID() == cosmos::proc::getRealUserID()) {
+		if (status.uid() == cosmos::proc::getRealUserID()) {
 			good("file is owned by us");
 		} else {
 			bad("file is owned by someone else?!");
 		}
 
-		if (status.getOwnerGID() == cosmos::proc::getRealGroupID()) {
+		if (status.gid() == cosmos::proc::getRealGroupID()) {
 			good("file group is ours");
 		} else {
 			bad("file group is something else?!");
@@ -155,13 +155,13 @@ public:
 	}
 
 	void checkSize() {
-		cosmos::FileStatus status1{m_first_file.getFD()};
+		cosmos::FileStatus status1{m_first_file.fd()};
 
-		if (status1.getIOBlockSize() <= 0) {
+		if (status1.blockSize() <= 0) {
 			bad("non-positive I/O block size?");
 		}
 
-		if (status1.getSize() == 0) {
+		if (status1.size() == 0) {
 			good("empty file has 0 bytes size");
 		} else {
 			bad("empty file has non-0 size?!");
@@ -170,28 +170,28 @@ public:
 		std::string_view data("stuff");
 		m_second_file.write(data.data(), data.size());
 
-		cosmos::FileStatus status2{m_second_file.getFD()};
+		cosmos::FileStatus status2{m_second_file.fd()};
 
-		if ((size_t)status2.getSize() != data.size()) {
+		if ((size_t)status2.size() != data.size()) {
 			bad("increased file size not reflected");
 		}
 
-		if (status2.getAllocatedBlocks() * 512 < status2.getSize()) {
+		if (status2.allocatedBlocks() * 512 < status2.size()) {
 			bad("allocated blocks less than actual file size?");
 		}
 	}
 
 	void checkDevInode() {
-		cosmos::FileStatus status1{m_first_file.getFD()};
-		cosmos::FileStatus status2{m_second_file.getFD()};
+		cosmos::FileStatus status1{m_first_file.fd()};
+		cosmos::FileStatus status2{m_second_file.fd()};
 
-		if (status1.getDevice() == status2.getDevice()) {
+		if (status1.device() == status2.device()) {
 			good("files on same device shared same DeviceID");
 		} else {
 			bad("files on same device have different DeviceIDs?");
 		}
 
-		if (status1.getInode() == status2.getInode()) {
+		if (status1.inode() == status2.inode()) {
 			bad("different files share same inode?!");
 		} else {
 			good("different files have different Inode");
@@ -199,7 +199,7 @@ public:
 
 		cosmos::FileStatus proc_status{"/proc"};
 
-		if (proc_status.getDevice() == status1.getDevice()) {
+		if (proc_status.device() == status1.device()) {
 			bad("/proc and our tmpdir share the same device?");
 		} else {
 			good("/proc and our tmpdir have different devices");
@@ -209,25 +209,25 @@ public:
 
 		cosmos::FileStatus link_status{"hardlink"};
 
-		if (link_status.getInode() == status1.getInode()) {
+		if (link_status.inode() == status1.inode()) {
 			good("linked files share inode");
 		} else {
 			bad("hardlinked file doesn't share inode?");
 		}
 
-		if (link_status.getNumLinks() < 2) {
+		if (link_status.numLinks() < 2) {
 			bad("hardlinked file has link count < 2?!");
 		}
 	}
 
 	void checkTimes() {
-		cosmos::FileStatus status{m_second_file.getFD()};
+		cosmos::FileStatus status{m_second_file.fd()};
 
-		if (status.getStatusTime() < status.getModTime()) {
+		if (status.statusTime() < status.modTime()) {
 			bad("file got modified but status didn't change?");
 		}
 
-		auto old_time = status.getModTime();
+		auto old_time = status.modTime();
 
 		std::string_view data("some data");
 
@@ -236,9 +236,9 @@ public:
 
 		m_second_file.write(data.data(), data.size());
 
-		status.updateFrom(m_second_file.getFD());
+		status.updateFrom(m_second_file.fd());
 
-		if (old_time < status.getModTime()) {
+		if (old_time < status.modTime()) {
 			good("modification timestamp changed");
 		} else {
 			bad("modification timestamp didn't change?");
@@ -276,7 +276,7 @@ public:
 		check("0o0007", "------rwx");
 
 		cosmos::FileStatus parent{"."};
-		ss << parent.getType() << parent.getMode();
+		ss << parent.type() << parent.mode();
 		check("d", "x");
 	}
 
@@ -295,7 +295,7 @@ public:
 
 			cosmos::FileStatus status{path};
 
-			if (status.getType().isSocket()) {
+			if (status.type().isSocket()) {
 				return path;
 			}
 		}

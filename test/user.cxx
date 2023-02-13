@@ -11,23 +11,23 @@ int main() {
 
 	cosmos::PasswdInfo pi(our_uid);
 
-	if (!pi.isValid()) {
+	if (!pi.valid()) {
 		std::cerr << "failed to get passwd entry for " << our_uid << std::endl;
 		return 1;
 	}
 
-	std::cout << "uid " << our_uid << " has username " << pi.getName() << std::endl;
+	std::cout << "uid " << our_uid << " has username " << pi.name() << std::endl;
 
-	cosmos::PasswdInfo pi2(pi.getName());
+	cosmos::PasswdInfo pi2(pi.name());
 
-	if (!pi.isValid()) {
-		std::cerr << "failed to get passwd entry for " << pi.getName() << std::endl;
+	if (!pi.valid()) {
+		std::cerr << "failed to get passwd entry for " << pi.name() << std::endl;
 		return 1;
 	}
 
-	std::cout << pi.getName() << " has uid " << pi.getUID() << std::endl;
+	std::cout << pi.name() << " has uid " << pi.uid() << std::endl;
 
-	if (our_uid != pi.getUID()) {
+	if (our_uid != pi.uid()) {
 		std::cerr << "mismatch in UIDs!" << std::endl;
 		return 1;
 	}
@@ -35,53 +35,53 @@ int main() {
 	const auto strange_user = "some_strange_user";
 	cosmos::PasswdInfo pi3(strange_user);
 
-	if (pi3.isValid()) {
+	if (pi3.valid()) {
 		std::cerr << "unexpectedly '" << strange_user << "' has a valid passwd entry" << std::endl;
 		return 1;
 	}
 
 	std::cout << strange_user << " has no valid password entry" << std::endl;
 
-	cosmos::GroupInfo gi{pi.getGID()};
+	cosmos::GroupInfo gi{pi.gid()};
 
-	if (!gi.isValid()) {
-		std::cerr << "failed to get group entry for " << pi.getGID() << std::endl;
+	if (!gi.valid()) {
+		std::cerr << "failed to get group entry for " << pi.gid() << std::endl;
 		return 1;
 	}
 
-	std::cout << "Group with ID " << gi.getGID() << " is named: " << gi.getName() << std::endl;
+	std::cout << "Group with ID " << gi.gid() << " is named: " << gi.name() << std::endl;
 
-	if (gi.getGID()  != pi.getGID()) {
+	if (gi.gid()  != pi.gid()) {
 		std::cerr << "got group entry for different GID?!" << std::endl;
 		return 1;
 	}
 
-	cosmos::GroupInfo gi2{gi.getName()};
+	cosmos::GroupInfo gi2{gi.name()};
 
-	if (!gi2.isValid()) {
-		std::cerr << "failed to get group entry for " << gi.getName() << std::endl;
+	if (!gi2.valid()) {
+		std::cerr << "failed to get group entry for " << gi.name() << std::endl;
 		return 1;
 	}
 
-	if (gi2.getGID() != gi.getGID()) {
+	if (gi2.gid() != gi.gid()) {
 		std::cerr << "group IDs for gi and gi2 don't match?!" << std::endl;
 		return 1;
 	}
 
-	std::cout << "Members of " << gi2.getName() << ": " << gi2.getMembers() << std::endl;
+	std::cout << "Members of " << gi2.name() << ": " << gi2.members() << std::endl;
 
 	gi2 = cosmos::GroupInfo{"root"};
 
-	if (!gi2.isValid()) {
+	if (!gi2.valid()) {
 		std::cerr << "failed to get group info for 'root'" << std::endl;
 		return 1;
 	}
 
-	std::cout << "Members of " << gi2.getName() << ": " << gi2.getMembers() << std::endl;
+	std::cout << "Members of " << gi2.name() << ": " << gi2.members() << std::endl;
 
 	gi2 = cosmos::GroupInfo{"strangegroup"};
 
-	if (gi2.isValid()) {
+	if (gi2.valid()) {
 		std::cerr << "strangegroup unexpectedly exists" << std::endl;
 		return 1;
 	}

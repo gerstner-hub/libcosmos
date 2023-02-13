@@ -18,7 +18,7 @@ public: // functions
 	 * if no corresponding entry was found during construction time then
 	 * this returns \c false.
 	 **/
-	bool isValid() const { return m_valid; }
+	bool valid() const { return m_valid; }
 
 	/// Zeroes out all data
 	void invalidate();

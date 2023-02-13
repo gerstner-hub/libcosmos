@@ -29,8 +29,8 @@ struct TermDimension : winsize {
 		ws_row = rows;
 	}
 
-	unsigned short getCols() const { return ws_col; }
-	unsigned short getRows() const { return ws_row; }
+	unsigned short cols() const { return ws_col; }
+	unsigned short rows() const { return ws_row; }
 };
 
 /// Access to Terminal information and ioctls
@@ -43,10 +43,10 @@ class COSMOS_API Terminal {
 public:
 	Terminal() {}
 	explicit Terminal(FileDescriptor fd) : m_fd(fd) {}
-	explicit Terminal(const File &f) : m_fd(f.getFD()) {}
+	explicit Terminal(const File &f) : m_fd(f.fd()) {}
 
 	void setFD(const File &f) {
-		m_fd = f.getFD();
+		m_fd = f.fd();
 	}
 
 	void setFD(FileDescriptor fd) {

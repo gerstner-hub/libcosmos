@@ -31,8 +31,8 @@ GroupInfo::GroupInfo(const GroupID gid) {
 		invalidate();
 }
 
-const StringViewVector GroupInfo::getMembers() const {
-	if (!isValid()) {
+const StringViewVector GroupInfo::members() const {
+	if (!valid()) {
 		cosmos_throw (UsageError{"cannot get members of invalid GroupInfo"});
 	}
 	

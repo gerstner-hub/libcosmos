@@ -136,8 +136,8 @@ public: // functions
 
 	int priority() const { return m_priority; }
 
-	int getMinPriority() const;
-	int getMaxPriority() const;
+	int minPriority() const;
+	int maxPriority() const;
 
 protected: // functions
 

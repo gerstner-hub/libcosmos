@@ -17,7 +17,7 @@ std::filesystem::path getTestDirPath() {
 
 	// do this in the home directory to avoid issues with security in
 	// shared /tmp
-	auto testdir = std::filesystem::path(our_info.getHomeDir());
+	auto testdir = std::filesystem::path(our_info.homeDir());
 
 	if (testdir.empty()) {
 		cosmos_throw (cosmos::RuntimeError("failed to get home directory"));
@@ -112,9 +112,9 @@ bool testUmask() {
 		cosmos::FileMode{cosmos::ModeT{0777}}
 	};
 
-	cosmos::FileStatus status{testfile.getFD()};
+	cosmos::FileStatus status{testfile.fd()};
 
-	if (status.getMode().raw() != cosmos::ModeT{0550}) {
+	if (status.mode().raw() != cosmos::ModeT{0550}) {
 		std::cerr << "umask did not work as expected\n";
 		return false;
 	}
@@ -164,21 +164,21 @@ bool testChmod() {
 
 	cosmos::fs::changeMode(modfile_base, cosmos::FileMode{cosmos::ModeT{0651}});
 
-	cosmos::FileStatus stat{modfile.getFD()};
+	cosmos::FileStatus stat{modfile.fd()};
 
-	if (stat.getMode().raw() != cosmos::ModeT{0651}) {
-		std::cerr << "New mode of modfile incorrect: " << stat.getMode() << "\n";
+	if (stat.mode().raw() != cosmos::ModeT{0651}) {
+		std::cerr << "New mode of modfile incorrect: " << stat.mode() << "\n";
 		return false;
 	}
 
 	std::cout << "changemode(path, ...): New mode of modfile is correct" << std::endl;
 
-	cosmos::fs::changeMode(modfile.getFD(), cosmos::FileMode{cosmos::ModeT{0711}});
+	cosmos::fs::changeMode(modfile.fd(), cosmos::FileMode{cosmos::ModeT{0711}});
 
-	stat.updateFrom(modfile.getFD());
+	stat.updateFrom(modfile.fd());
 
-	if (stat.getMode().raw() != cosmos::ModeT{0711}) {
-		std::cerr << "New mode of modfile incorrect: " << stat.getMode() << "\n";
+	if (stat.mode().raw() != cosmos::ModeT{0711}) {
+		std::cerr << "New mode of modfile incorrect: " << stat.mode() << "\n";
 		return false;
 	}
 
@@ -217,7 +217,7 @@ bool testChowner() {
 		cosmos::fs::changeOwner(ownfile_base, cosmos::UserID{1234});
 
 		cosmos::FileStatus status{ownfile_base};
-		if (status.getOwnerUID() != cosmos::UserID{1234}) {
+		if (status.uid() != cosmos::UserID{1234}) {
 			std::cerr << "changeOwner(path, ...) didn't do the right thing" << std::endl;
 			return false;
 		}
@@ -232,7 +232,7 @@ bool testChowner() {
 		cosmos::fs::changeOwner(ownfile_base, "root");
 
 		cosmos::FileStatus status{ownfile_base};
-		if (status.getOwnerUID() != cosmos::UserID::ROOT) {
+		if (status.uid() != cosmos::UserID::ROOT) {
 			std::cerr << "changeOwner(path, ...) didn't do the right thing" << std::endl;
 			return false;
 		}
@@ -247,7 +247,7 @@ bool testChowner() {
 		cosmos::fs::changeGroup(ownfile_base, cosmos::GroupID{1234});
 
 		cosmos::FileStatus status{ownfile_base};
-		if (status.getOwnerGID() != cosmos::GroupID{1234}) {
+		if (status.gid() != cosmos::GroupID{1234}) {
 			std::cerr << "changeGroup(path, ...) didn't do the right thing" << std::endl;
 			return false;
 		}
@@ -259,10 +259,10 @@ bool testChowner() {
 	}
 
 	try {
-		cosmos::fs::changeOwner(ownfile.getFD(), cosmos::UserID{1234});
+		cosmos::fs::changeOwner(ownfile.fd(), cosmos::UserID{1234});
 
 		cosmos::FileStatus status{ownfile_base};
-		if (status.getOwnerUID() != cosmos::UserID{1234}) {
+		if (status.uid() != cosmos::UserID{1234}) {
 			std::cerr << "changeUser(fd, ...) didn't do the right thing" << std::endl;
 			return false;
 		}
@@ -274,10 +274,10 @@ bool testChowner() {
 	}
 
 	try {
-		cosmos::fs::changeGroup(ownfile.getFD(), cosmos::GroupID{1234});
+		cosmos::fs::changeGroup(ownfile.fd(), cosmos::GroupID{1234});
 
 		cosmos::FileStatus status{ownfile_base};
-		if (status.getOwnerGID() != cosmos::GroupID{1234}) {
+		if (status.gid() != cosmos::GroupID{1234}) {
 			std::cerr << "changeGroup(fd, ...) didn't do the right thing" << std::endl;
 			return false;
 		}
@@ -293,7 +293,7 @@ bool testChowner() {
 
 	cosmos::FileStatus status{ownfile_base};
 
-	if (status.getOwnerUID() != our_uid) {
+	if (status.uid() != our_uid) {
 		std::cerr << "lchown() to self failed?!" << std::endl;
 		return false;
 	}
@@ -334,8 +334,8 @@ int testSymlink() {
 		cosmos::OpenMode{cosmos::OpenMode::READ_ONLY}
 	};
 
-	cosmos::FileStatus target_status{targetfile.getFD()};
-	cosmos::FileStatus link_status{linkfile.getFD()};
+	cosmos::FileStatus target_status{targetfile.fd()};
+	cosmos::FileStatus link_status{linkfile.fd()};
 
 	if (target_status.isSameFile(link_status)) {
 		std::cout << "symlink points to the expected file" << std::endl;

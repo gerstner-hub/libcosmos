@@ -12,14 +12,14 @@ void testCreateClose() {
 	// this tests for the robustness of double-create() and double-close()
 	cosmos::Poller poller;
 
-	if (poller.isValid()) {
+	if (poller.valid()) {
 		std::cerr << "poller already valid?!\n";
 		res = 1;
 	}
 
 	poller.create();
 
-	if (!poller.isValid()) {
+	if (!poller.valid()) {
 		std::cerr << "poller create() results in invalid?!\n";
 		res = 1;
 	}
@@ -27,7 +27,7 @@ void testCreateClose() {
 	poller.create();
 	poller.close();
 
-	if (poller.isValid()) {
+	if (poller.valid()) {
 		std::cerr << "closer poller still valid?!\n";
 		res = 1;
 	}
@@ -40,7 +40,7 @@ bool testBasicPoll() {
 	poller.create();
 	cosmos::Pipe pp;
 
-	poller.addFD(pp.getReadEnd(), cosmos::Poller::MonitorMask({cosmos::Poller::MonitorSetting::INPUT}));
+	poller.addFD(pp.readEnd(), cosmos::Poller::MonitorMask({cosmos::Poller::MonitorSetting::INPUT}));
 	
 	auto ready = poller.wait(std::chrono::milliseconds(500));
 
@@ -49,7 +49,7 @@ bool testBasicPoll() {
 		return false;
 	}
 
-	cosmos::StreamFile pipe_write(pp.getWriteEnd(), cosmos::StreamFile::AutoClose(false));
+	cosmos::StreamFile pipe_write(pp.writeEnd(), cosmos::StreamFile::AutoClose(false));
 
 	pipe_write.write("test", 4);
 
@@ -63,7 +63,7 @@ bool testBasicPoll() {
 	{
 		const auto &ev = ready[0];
 
-		if (ev.fd() != pp.getReadEnd()) {
+		if (ev.fd() != pp.readEnd()) {
 			std::cerr << "poller.wait() returned bad FD in event" << std::endl;
 			return false;
 		}
@@ -86,7 +86,7 @@ bool testBasicPoll() {
 	{
 		const auto &ev = ready[0];
 
-		if (ev.fd() != pp.getReadEnd()) {
+		if (ev.fd() != pp.readEnd()) {
 			std::cerr << "poller.wait() returned bad FD in event" << std::endl;
 			return false;
 		}

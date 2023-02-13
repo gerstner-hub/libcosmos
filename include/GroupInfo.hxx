@@ -31,16 +31,16 @@ public: // functions
 	explicit GroupInfo(const GroupID gid);
 
 	/// The groups numerical ID
-	GroupID getGID() const { return GroupID{m_info.gr_gid}; }
+	GroupID gid() const { return GroupID{m_info.gr_gid}; }
 
 	/// Returns the name associated with the group
-	const std::string_view getName() const { return to_string_view(m_info.gr_name); }
+	const std::string_view name() const { return to_string_view(m_info.gr_name); }
 
 	/// Returns the optional encrypted group password
-	const std::string_view getPasswd() const { return to_string_view(m_info.gr_passwd); }
+	const std::string_view passwd() const { return to_string_view(m_info.gr_passwd); }
 
 	/// Returns a vector containing the name of users that are members of this group
-	const StringViewVector getMembers() const;
+	const StringViewVector members() const;
 };
 
 } // end ns

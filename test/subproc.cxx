@@ -58,6 +58,7 @@ public:
 
 	cosmos::FileDescriptor getTempFile() {
 		m_tmp_file_path = "/tmp/subproc_test.XXXXXX";
+		// TODO: replace by tempfile facility
 		auto fd = mkostemp(&m_tmp_file_path[0], O_CLOEXEC);
 
 		cosmos::FileDescriptor ret(cosmos::FileNum{fd});
@@ -238,8 +239,8 @@ public:
 		 * read from the pipe
 		 */
 		cosmos::ChildCloner cloner{{m_head_path, "-n", ss.str()}};
-		cloner.setStdOut(m_pipe_from_head.getWriteEnd());
-		cloner.setStdIn(m_pipe_to_head.getReadEnd());
+		cloner.setStdOut(m_pipe_from_head.writeEnd());
+		cloner.setStdIn(m_pipe_to_head.readEnd());
 		m_proc = std::move(cloner.run());
 
 		// we need to close the write-end to successfully receive an
@@ -511,7 +512,7 @@ public:
 		cosmos::ChildCloner cloner{{"/usr/bin/env"}};
 		// run the env tool to inspect via pipe redirection whether
 		// the child process has got the expected environment
-		cloner.setStdOut(m_pipe_from_env.getWriteEnd());
+		cloner.setStdOut(m_pipe_from_env.writeEnd());
 		cosmos::StringVector env({"this=that", "misc=other"});
 		std::set<std::string> env_set;
 
@@ -572,7 +573,7 @@ public:
 		cosmos::Pipe pipe_from_cat;
 
 		cloner << "/bin/cat" << "/etc/passwd";
-		cloner.setStdOut(pipe_from_cat.getWriteEnd());
+		cloner.setStdOut(pipe_from_cat.writeEnd());
 
 		auto proc = cloner.run();
 
@@ -620,7 +621,7 @@ public:
 		cosmos::ChildCloner cloner{{"/bin/cat", "/proc/self/stat"}};
 
 		cosmos::Pipe stat_pipe;
-		cloner.setStdOut(stat_pipe.getWriteEnd());
+		cloner.setStdOut(stat_pipe.writeEnd());
 
 		cosmos::OtherSchedulerSettings sched_settings;
 		sched_settings.setNiceValue(sched_settings.maxNiceValue());
@@ -705,16 +706,16 @@ public:
 		cosmos::Pipe pipe;
 		cosmos::proc::setEnvVar(
 				"COPROC_PIPE_WRITE_FD",
-				std::to_string(cosmos::to_integral(pipe.getWriteEnd().raw())),
+				std::to_string(cosmos::to_integral(pipe.writeEnd().raw())),
 				cosmos::proc::OverwriteEnv{true});
-		cloner.addInheritFD(pipe.getWriteEnd());
+		cloner.addInheritFD(pipe.writeEnd());
 
 		auto coproc = cloner.run();
 
 		cosmos::proc::clearEnvVar("COPROC_PIPE_WRITE_FD");
 		pipe.closeWriteEnd();
 
-		cosmos::InputStreamAdaptor file{pipe.getReadEnd()};
+		cosmos::InputStreamAdaptor file{pipe.readEnd()};
 
 		const std::vector<std::string> expected{"Hello", "from", "PID"};
 

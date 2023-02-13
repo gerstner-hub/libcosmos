@@ -51,8 +51,8 @@ int main() {
 	cosmos::signal::raise(sigint);
 	sfd.readEvent(info);
 
-	assert( info.getSignal() == sigint );
-	std::cout << "received " << info.getSignal() << " from " << info.getSenderPID() << std::endl;
+	assert( info.signal() == sigint );
+	std::cout << "received " << info.signal() << " from " << info.senderPID() << std::endl;
 
 	return 0;
 }

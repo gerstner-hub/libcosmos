@@ -25,8 +25,8 @@ void FileStatus::updateFrom(const std::string_view path, const FollowSymlinks fo
 	}
 }
 
-DeviceID FileStatus::getRepresentedDevice() const {
-	switch (getType().raw()) {
+DeviceID FileStatus::representedDevice() const {
+	switch (type().raw()) {
 		case FileType::BLOCKDEV:
 		case FileType::CHARDEV:
 			return DeviceID{m_st.st_rdev};

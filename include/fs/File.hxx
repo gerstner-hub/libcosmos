@@ -111,7 +111,7 @@ public: // functions
 	bool isOpen() const { return m_fd.valid(); }
 
 	/// Allow befriended classes to get the FD with const semantics.
-	const FileDescriptor getFD() const { return m_fd; }
+	const FileDescriptor fd() const { return m_fd; }
 
 protected: // data
 

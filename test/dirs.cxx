@@ -71,7 +71,7 @@ public:
 
 		{
 			cosmos::FileStatus status{fd};
-			if (!status.getType().isDirectory()) {
+			if (!status.type().isDirectory()) {
 				std::cerr << "Directory FD refers to non-dir?!" << std::endl;
 				return 1;
 			}

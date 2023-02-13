@@ -16,7 +16,7 @@ protected:
 	void threadEntry(cosmos::Thread &t) override {
 		m_was_running = true;
 
-		if (t.getID() != t.getCallerID()) {
+		if (t.id() != t.callerID()) {
 			std::cerr << "thread ID comparison failed" << std::endl;
 			abort();
 		}
@@ -65,7 +65,7 @@ int main() {
 
 	cosmos::Thread th2(tu);
 
-	if (th2.getID() == cosmos::Thread::getCallerID()) {
+	if (th2.id() == cosmos::Thread::callerID()) {
 		std::cerr << "thread unexpectedly equals main thread!" << std::endl;
 		res = 1;
 	}

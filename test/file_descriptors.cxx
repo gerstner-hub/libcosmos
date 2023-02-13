@@ -39,7 +39,7 @@ int main(int, const char **argv) {
 	}
 
 	cosmos::StreamFile sf{argv[0], cosmos::OpenMode::READ_ONLY};
-	auto sf_fd = sf.getFD();
+	auto sf_fd = sf.fd();
 	// syncing a read-only FD is allowed in Linux
 	sf_fd.sync();
 	sf_fd.dataSync();

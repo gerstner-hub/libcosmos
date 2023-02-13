@@ -26,7 +26,7 @@ public: // functions
 	 * is thrown.
 	 *
 	 * If simply no matching entry exists then *no* exception is thrown
-	 * but isValid() return false and all members are empty.
+	 * but valid() return false and all members are empty.
 	 **/
 	explicit PasswdInfo(const std::string_view name);
 
@@ -36,24 +36,24 @@ public: // functions
 	 **/
 	explicit PasswdInfo(const UserID uid);
 
-	const std::string_view getName() const { return to_string_view(m_info.pw_name); }
+	const std::string_view name() const { return to_string_view(m_info.pw_name); }
 
 	/// Returns the optional encrypted password
-	const std::string_view getPasswd() const { return to_string_view(m_info.pw_passwd); }
+	const std::string_view passwd() const { return to_string_view(m_info.pw_passwd); }
 
-	UserID getUID() const { return UserID{m_info.pw_uid}; }
+	UserID uid() const { return UserID{m_info.pw_uid}; }
 
 	/// The user's main group ID
-	GroupID getGID() const { return GroupID{m_info.pw_gid}; }
+	GroupID gid() const { return GroupID{m_info.pw_gid}; }
 
 	/// Returns the comment field which is used for different things like a full user name
-	const std::string_view getGecos() const { return to_string_view(m_info.pw_gecos); }
+	const std::string_view gecos() const { return to_string_view(m_info.pw_gecos); }
 
 	/// Path to the user's home directory
-	const std::string_view getHomeDir() const { return to_string_view(m_info.pw_dir); }
+	const std::string_view homeDir() const { return to_string_view(m_info.pw_dir); }
 
 	/// Optional command interpreter for the user
-	const std::string_view getShell() const { return to_string_view(m_info.pw_shell); }
+	const std::string_view shell() const { return to_string_view(m_info.pw_shell); }
 };
 
 } // end ns

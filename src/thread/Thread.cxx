@@ -144,7 +144,7 @@ Thread::Request Thread::enterPause() {
 	return ret;
 }
 
-Thread::ID Thread::getCallerID() {
+Thread::ID Thread::callerID() {
 	return ID(pthread_self());
 }
 

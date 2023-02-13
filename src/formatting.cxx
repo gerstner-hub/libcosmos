@@ -69,10 +69,10 @@ std::ostream& operator<<(std::ostream& o, const cosmos::fmtnum_base<NUM> &fmtnum
 	// will be prepended to the "0x" prefix resulting in things like
 	// "0000x64".
 	if (fmtnum.showBase())
-		o << fmtnum.getBasePrefix();
-	o << std::setw(fmtnum.getWidth());
-	fmtnum.getSetBaseFN()(o);
-	o << std::setfill('0') << cosmos::to_printable_integer(fmtnum.getNum());
+		o << fmtnum.basePrefix();
+	o << std::setw(fmtnum.width());
+	fmtnum.baseFN()(o);
+	o << std::setfill('0') << cosmos::to_printable_integer(fmtnum.num());
 
 	o.flags(orig_flags);
 	o.fill(orig_fill);

@@ -140,10 +140,10 @@ public: // functions
 	void waitForState(const State s) const;
 
 	/// Returns an opaque thread ID object for the thread represented by this object
-	ID getID() const { return ID(m_pthread); }
+	ID id() const { return ID(m_pthread); }
 
 	/// Returns an opaque thread ID object for the calling thread
-	static ID getCallerID();
+	static ID callerID();
 
 	/// Enter a PAUSE state
 	/**
@@ -176,7 +176,7 @@ protected: // functions
 
 	/// Returns whether the caller is the associated thread
 	bool callerIsThread() const {
-		return getID() == getCallerID();
+		return id() == callerID();
 	}
 
 	/// Waits until a new request is issued, returns the new request state

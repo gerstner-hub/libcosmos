@@ -36,8 +36,8 @@ public: // functions
 	void closeReadEnd() { if (haveReadEnd()) m_read_end.close(); }
 	void closeWriteEnd() { if (haveWriteEnd()) m_write_end.close(); }
 
-	FileDescriptor getReadEnd() { return m_read_end; }
-	FileDescriptor getWriteEnd() { return m_write_end; }
+	FileDescriptor readEnd() { return m_read_end; }
+	FileDescriptor writeEnd() { return m_write_end; }
 
 	bool haveReadEnd() const { return m_read_end.valid(); }
 	bool haveWriteEnd() const { return m_write_end.valid(); }
@@ -48,7 +48,7 @@ public: // functions
 	 * and not be accessible at a later time anymore.
 	 **/
 	FileDescriptor takeReadEndOwnership() {
-		auto ret = getReadEnd();
+		auto ret = readEnd();
 		invalidateReadEnd();
 		return ret;
 	}
@@ -58,7 +58,7 @@ public: // functions
 	 * \see takeReadEndOwnership()
 	 **/
 	FileDescriptor takeWriteEndOwnership() {
-		auto ret = getWriteEnd();
+		auto ret = writeEnd();
 		invalidateWriteEnd();
 		return ret;
 	}

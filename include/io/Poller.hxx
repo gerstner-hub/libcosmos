@@ -104,7 +104,7 @@ public: // types
 		/// The file descriptor this event refers to
 		FileDescriptor fd() const { return FileDescriptor{FileNum{(this->data).fd}}; }
 
-		auto getEvents() const { return EventMask{static_cast<Event>(this->events)}; }
+		auto getEvents() const { return EventMask{static_cast<std::underlying_type<Event>::type>(this->events)}; }
 	};
 
 public: // functions
@@ -151,7 +151,7 @@ public: // functions
 	void close();
 
 	/// Returns whether currently a valid poll file descriptor exists
-	bool isValid() const { return m_poll_fd.valid(); }
+	bool valid() const { return m_poll_fd.valid(); }
 
 	/// Start monitoring the given file descriptor using the given settings
 	/**
