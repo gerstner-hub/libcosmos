@@ -29,11 +29,6 @@ public: // functions
 
 protected: // functions
 
-	const std::string_view getSV(const char *ptr) const {
-		// string_view can't take nullptr, thus use this
-		return ptr ? std::string_view{ptr} : std::string_view{};
-	}
-
 	/// Helper to drive the common getter function logic for getpw* and getgr*
 	bool getInfo(std::function<int(DB_STRUCT**)> get_func);
 

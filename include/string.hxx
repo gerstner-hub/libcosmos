@@ -41,6 +41,16 @@ inline bool isPrefix(const std::string_view s, const std::string_view prefix) {
 	return s.substr(0, prefix.length()) == prefix;
 }
 
+/// Simple wrapper that creates a string_view from \c s and supporting also nullptr
+/**
+ * The std::string_view constructor does not allow a nullptr argument. This
+ * wrapper makes this limitation transparent by returning an empty string_view
+ * for nullptr C strings.
+ **/
+inline std::string_view to_string_view(const char *s) {
+	return s ? std::string_view{s} : std::string_view{};
+}
+
 } // end ns
 
 #endif // inc. guard

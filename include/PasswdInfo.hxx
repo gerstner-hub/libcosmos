@@ -6,6 +6,7 @@
 
 // cosmos
 #include "cosmos/ostypes.hxx"
+#include "cosmos/string.hxx"
 #include "cosmos/InfoBase.hxx"
 
 namespace cosmos {
@@ -35,10 +36,10 @@ public: // functions
 	 **/
 	explicit PasswdInfo(const UserID uid);
 
-	const std::string_view getName() const { return getSV(m_info.pw_name); }
+	const std::string_view getName() const { return to_string_view(m_info.pw_name); }
 
 	/// Returns the optional encrypted password
-	const std::string_view getPasswd() const { return getSV(m_info.pw_passwd); }
+	const std::string_view getPasswd() const { return to_string_view(m_info.pw_passwd); }
 
 	UserID getUID() const { return UserID{m_info.pw_uid}; }
 
@@ -46,13 +47,13 @@ public: // functions
 	GroupID getGID() const { return GroupID{m_info.pw_gid}; }
 
 	/// Returns the comment field which is used for different things like a full user name
-	const std::string_view getGecos() const { return getSV(m_info.pw_gecos); }
+	const std::string_view getGecos() const { return to_string_view(m_info.pw_gecos); }
 
 	/// Path to the user's home directory
-	const std::string_view getHomeDir() const { return getSV(m_info.pw_dir); }
+	const std::string_view getHomeDir() const { return to_string_view(m_info.pw_dir); }
 
 	/// Optional command interpreter for the user
-	const std::string_view getShell() const { return getSV(m_info.pw_shell); }
+	const std::string_view getShell() const { return to_string_view(m_info.pw_shell); }
 };
 
 } // end ns
