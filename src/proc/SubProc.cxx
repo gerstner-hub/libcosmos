@@ -17,8 +17,8 @@
 namespace cosmos {
 
 SubProc::~SubProc() {
-	if (m_child_fd.valid()) {
-		std::cerr << "child process still running: " << to_integral(m_pid) << "\n";
+	if (running()) {
+		std::cerr << "[libcosmos] FATAL: destroying while child process still running\n";
 		std::abort();
 	}
 }
@@ -60,6 +60,18 @@ std::optional<WaitRes> SubProc::waitTimed(const std::chrono::milliseconds max) {
 	}
 
 	return wait();
+}
+
+SubProc& SubProc::operator=(SubProc &&other) noexcept {
+	if (running()) {
+		std::cerr << "[libcosmos] FATAL: moving into object with still running child process\n";
+		std::abort();
+	}
+	m_pid = other.m_pid;
+	m_child_fd = other.m_child_fd;
+	other.m_pid = ProcessID::INVALID;
+	other.m_child_fd.reset();
+	return *this;
 }
 
 } // end ns

@@ -29,16 +29,16 @@ namespace cosmos {
  * associated resources. The destructor will otherwise abort().
  **/
 class COSMOS_API SubProc {
+	/// disallow copy/assignment; this is a move-only type
+	SubProc(const SubProc &other) = delete;
+	SubProc& operator=(const SubProc &other) = delete;
+
 public: // functions
 
 	/// creates an empty sub process without state
 	SubProc() = default;
 
 	~SubProc();
-
-	/// disallow copy/assignment; this is a move-only type
-	SubProc(const SubProc &other) = delete;
-	SubProc& operator=(const SubProc &other) = delete;
 
 	/// implement move-semantics
 	/**
@@ -48,17 +48,11 @@ public: // functions
 	 *
 	 * The move-semantics allow to keep a SubProc as a class member.
 	 **/
-	SubProc(SubProc &&other) {
+	SubProc(SubProc &&other) noexcept {
 		*this = std::move(other);
 	}
 
-	SubProc& operator=(SubProc &&other) {
-		m_pid = other.m_pid;
-		m_child_fd = other.m_child_fd;
-		other.m_pid = ProcessID::INVALID;
-		other.m_child_fd.reset();
-		return *this;
-	}
+	SubProc& operator=(SubProc &&other) noexcept;
 
 	/// Returns whether a child process is still active
 	/**
