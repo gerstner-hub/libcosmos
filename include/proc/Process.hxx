@@ -66,6 +66,9 @@ COSMOS_API ProcessID createNewSession();
  * This terminates the calling process, using \c status as the process's exit
  * code. "immediately" refers to the fact that no userspace cleanup actions
  * like running libc `atexit()` handlers will take place.
+ *
+ * If multiple threads are running in the current process then they also will
+ * be terminated.
  **/
 COSMOS_API [[ noreturn ]] void exit(ExitStatus status);
 

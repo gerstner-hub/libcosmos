@@ -48,6 +48,8 @@ ProcessID createNewSession() {
 }
 
 void exit(ExitStatus status) {
+	// Note: the glibc wrapper we use here ends the complete process, the
+	// actual Linux system call _exit only ends the calling thread.
 	_exit(to_integral(status));
 }
 
