@@ -24,9 +24,9 @@
 
 namespace cosmos {
 
-/// base class for hexnum and octnum format output helpers
+/// base class for HexNum and OctNum format output helpers
 template <typename NUM>
-struct fmtnum_base {
+struct FormattedNumber {
 protected: // types
 
 	/// this function is supposed to apply the desired number base to the stream
@@ -34,13 +34,13 @@ protected: // types
 
 protected: // functions
 
-	fmtnum_base(const NUM num, size_t width, SetBaseFN fn, std::string_view base_prefix) :
+	FormattedNumber(const NUM num, size_t width, SetBaseFN fn, std::string_view base_prefix) :
 		m_num{num}, m_width{width}, m_setbase_fn{fn}, m_base_prefix{base_prefix} {}
 
 public: // functions
 
 	/// If we should show a prefix identifier the number's base (e.g. 0x for hex, default: yes)
-	const fmtnum_base& showBase(bool yes_no) { m_show_base = yes_no; return *this; }
+	const FormattedNumber& showBase(bool yes_no) { m_show_base = yes_no; return *this; }
 
 	size_t width() const { return m_width; }
 	bool showBase() const { return m_show_base; }
@@ -72,26 +72,26 @@ protected: // data
  *
  * The given field width will only count towards the actual digits the number
  * consists of. A possible base prefix is not counted towards the field width.
- * I.e. if showBase() is set to \c true then hexnum(0x10, 4) will be printed
+ * I.e. if showBase() is set to \c true then HexNum(0x10, 4) will be printed
  * as: "0x0010".
  **/
 template <typename NUM>
-struct hexnum :
-		public fmtnum_base<NUM> {
-	hexnum(const NUM num, size_t width) :
-		fmtnum_base<NUM>{num, width, [](std::ostream &o){ o << std::hex; }, "0x"}
+struct HexNum :
+		public FormattedNumber<NUM> {
+	HexNum(const NUM num, size_t width) :
+		FormattedNumber<NUM>{num, width, [](std::ostream &o){ o << std::hex; }, "0x"}
 	{}
 };
 
 /// Helper to output a primitive integer as octal in the style of 0o123
 /**
- * \see hexnum
+ * \see HexNum
  **/
 template <typename NUM>
-struct octnum :
-		public fmtnum_base<NUM> {
-	octnum(const NUM num, size_t width) :
-		fmtnum_base<NUM>{num, width, [](std::ostream &o){ o << std::oct; }, "0o"}
+struct OctNum :
+		public FormattedNumber<NUM> {
+	OctNum(const NUM num, size_t width) :
+		FormattedNumber<NUM>{num, width, [](std::ostream &o){ o << std::oct; }, "0o"}
 	{}
 };
 
@@ -108,7 +108,13 @@ auto to_printable_integer(T num) -> decltype(+num) {
 	return +num;
 }
 
-/// This is a C++ variant of the libc sprintf() function
+/// This is a C++ variant of the libc ::sprintf() function
+/**
+ * This function is taking care of the memory management details of sprintf()
+ * and returns the fully formatted string as a std::string object.
+ *
+ * On error an empty string is returned.
+ **/
 COSMOS_API std::string sprintf(const char *fmt, ...) COSMOS_FORMAT_PRINTF(1, 2);
 
 } // end ns cosmos
@@ -147,6 +153,6 @@ inline std::ostream& operator<<(std::ostream &o, const cosmos::FileNum &fd) {
 // this is implemented outlined with explicit template instantiations for the
 // currently necessary primitive types
 template <typename NUM>
-std::ostream& operator<<(std::ostream& o, const cosmos::fmtnum_base<NUM> &fmtnum);
+std::ostream& operator<<(std::ostream& o, const cosmos::FormattedNumber<NUM> &fmtnum);
 
 #endif // inc. guard

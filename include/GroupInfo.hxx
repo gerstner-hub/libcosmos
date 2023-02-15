@@ -8,9 +8,9 @@
 #include <string_view>
 
 // cosmos
-#include "cosmos/string.hxx"
 #include "cosmos/InfoBase.hxx"
 #include "cosmos/ostypes.hxx"
+#include "cosmos/string.hxx"
 #include "cosmos/types.hxx"
 
 namespace cosmos {

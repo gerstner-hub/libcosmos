@@ -9,7 +9,7 @@
 
 int main() {
 	// helper program for subproc test RedirectExtraTest()
-	auto envvar = cosmos::proc::getEnvVar("COPROC_PIPE_WRITE_FD");
+	auto envvar = cosmos::proc::get_env_var("COPROC_PIPE_WRITE_FD");
 
 	if (!envvar) {
 		std::cerr << "couldn't find COPROC_PIPE_WRITE_FD envvar\n";
@@ -29,7 +29,7 @@ int main() {
 
 	int ret = 0;
 
-	pipe_out << "Hello from PID " << cosmos::proc::getOwnPid() << std::flush;
+	pipe_out << "Hello from PID " << cosmos::proc::get_own_pid() << std::flush;
 	if (pipe_out.fail()) {
 		std::cerr << "failed to write to pipe\n";
 		ret = 1;

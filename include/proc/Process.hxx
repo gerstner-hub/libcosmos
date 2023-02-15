@@ -23,30 +23,30 @@
 namespace cosmos::proc {
 
 /// Returns the process ID of the current process
-COSMOS_API ProcessID getOwnPid();
+COSMOS_API ProcessID get_own_pid();
 
 /// Returns the process ID of the parent of the current process
-COSMOS_API ProcessID getParentPid();
+COSMOS_API ProcessID get_parent_pid();
 
 /// Returns the real user ID the current process is running as
-COSMOS_API UserID getRealUserID();
+COSMOS_API UserID get_real_user_id();
 
 /// Returns the effective user ID the current process is running as
 /**
- * This ID may differ from getRealUserID() if a privileged process
+ * This ID may differ from get_real_user_id() if a privileged process
  * temporarily drops privileges or an unprivileged user calls a
  * privileged program with setuid bit.
  **/
-COSMOS_API UserID getEffectiveUserID();
+COSMOS_API UserID get_effective_user_id();
 
 /// Returns the real group ID the current process is running as
-COSMOS_API GroupID getRealGroupID();
+COSMOS_API GroupID get_real_group_id();
 
 /// Returns the effective group ID the current process is running as
 /**
- * \see getEffectiveUserID()
+ * \see get_effective_user_id()
  **/
-COSMOS_API GroupID getEffectiveGroupID();
+COSMOS_API GroupID get_effective_group_id();
 
 /// Creates a new session with the current process as leader
 /**
@@ -59,7 +59,7 @@ COSMOS_API GroupID getEffectiveGroupID();
  *
  * The new session will not yet have a controlling terminal.
  **/
-COSMOS_API ProcessID createNewSession();
+COSMOS_API ProcessID create_new_session();
 
 /// Immediately terminate the calling process
 /**
@@ -78,9 +78,9 @@ COSMOS_API [[ noreturn ]] void exit(ExitStatus status);
  * named \c name and returns its value. If no such variable is found then
  * nothing is returned.
  **/
-COSMOS_API std::optional<std::string_view> getEnvVar(const std::string_view name);
+COSMOS_API std::optional<std::string_view> get_env_var(const std::string_view name);
 
-/// helper type to specify overwrite behaviour in setEnvVar()
+/// helper type to specify overwrite behaviour in set_env_var()
 using OverwriteEnv = NamedBool<struct overwrite_env_t, true>;
 
 /// Insert or replace an environment variable
@@ -93,7 +93,7 @@ using OverwriteEnv = NamedBool<struct overwrite_env_t, true>;
  * This call can fail with an exception (e.g. if the \c name contains invalid
  * characters).
  **/
-COSMOS_API void setEnvVar(const std::string_view name, const std::string_view val, const OverwriteEnv overwrite);
+COSMOS_API void set_env_var(const std::string_view name, const std::string_view val, const OverwriteEnv overwrite);
 
 /// Remove the given environment variable
 /**
@@ -104,14 +104,14 @@ COSMOS_API void setEnvVar(const std::string_view name, const std::string_view va
  * This call can fail with an exception (e.g. if the \c name contains invalid
  * characters).
  **/
-COSMOS_API void clearEnvVar(const std::string_view name);
+COSMOS_API void clear_env_var(const std::string_view name);
 
 /// helper type for caching PID an PPID information
 struct PidInfo {
 
 	PidInfo() :
-		own_pid{getOwnPid()},
-		parent_pid{getParentPid()}
+		own_pid{get_own_pid()},
+		parent_pid{get_parent_pid()}
 	{}
 
 	const ProcessID own_pid;

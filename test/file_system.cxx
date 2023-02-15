@@ -13,7 +13,7 @@
 #include "cosmos/PasswdInfo.hxx"
 
 std::filesystem::path getTestDirPath() {
-	cosmos::PasswdInfo our_info(cosmos::proc::getRealUserID());
+	cosmos::PasswdInfo our_info(cosmos::proc::get_real_user_id());
 
 	// do this in the home directory to avoid issues with security in
 	// shared /tmp
@@ -23,7 +23,7 @@ std::filesystem::path getTestDirPath() {
 		cosmos_throw (cosmos::RuntimeError("failed to get home directory"));
 	}
 
-	return testdir / cosmos::sprintf("cosmos_file_system_test.dir.%d", cosmos::to_integral(cosmos::proc::getOwnPid()));
+	return testdir / cosmos::sprintf("cosmos_file_system_test.dir.%d", cosmos::to_integral(cosmos::proc::get_own_pid()));
 }
 
 bool testCreateDir() {
@@ -31,18 +31,18 @@ bool testCreateDir() {
 
 	std::cout << "Attempting to create " << testdir << std::endl;
 
-	cosmos::fs::makeDir(testdir, cosmos::ModeT{0750});
+	cosmos::fs::make_dir(testdir, cosmos::ModeT{0750});
 
-	if (!cosmos::fs::existsFile(testdir)) {
+	if (!cosmos::fs::exists_file(testdir)) {
 		std::cerr << "created directory does not exist?!" << std::endl;
 		return false;
 	}
 
-	cosmos::fs::removeDir(testdir);
+	cosmos::fs::remove_dir(testdir);
 
 	std::cout << "Removed " << testdir << std::endl;
 
-	if (cosmos::fs::existsFile(testdir)) {
+	if (cosmos::fs::exists_file(testdir)) {
 		std::cerr << "removed directory still exists?!" << std::endl;
 		return false;
 	}
@@ -59,9 +59,9 @@ bool testCreateAllDirs() {
 
 	std::cout << "Attempting to create " << deepdir << std::endl;
 
-	auto res = cosmos::fs::makeAllDirs(deepdir.string(), dirmode);
+	auto res = cosmos::fs::make_all_dirs(deepdir.string(), dirmode);
 
-	if (!cosmos::fs::existsFile(deepdir.string())) {
+	if (!cosmos::fs::exists_file(deepdir.string())) {
 		std::cerr << "created directory tree does not exist?" << std::endl;
 		return false;
 	} else if (res != cosmos::Errno::NO_ERROR) {
@@ -69,7 +69,7 @@ bool testCreateAllDirs() {
 		return false;
 	}
 
-	res = cosmos::fs::makeAllDirs(deepdir.string(), dirmode);
+	res = cosmos::fs::make_all_dirs(deepdir.string(), dirmode);
 
 	if (res != cosmos::Errno::EXISTS) {
 		std::cerr << "directory tree created again?!" << std::endl;
@@ -79,9 +79,9 @@ bool testCreateAllDirs() {
 	// try some more ugly path
 	auto ugly_path = testdir.string() + "/another_dir/..///final_dir";
 
-	res = cosmos::fs::makeAllDirs(ugly_path, dirmode);
+	res = cosmos::fs::make_all_dirs(ugly_path, dirmode);
 
-	if (!cosmos::fs::existsFile(ugly_path)) {
+	if (!cosmos::fs::exists_file(ugly_path)) {
 		std::cerr << ugly_path << " doesn't exist" << std::endl;
 		return false;
 	} if (res != cosmos::Errno::NO_ERROR) {
@@ -89,10 +89,10 @@ bool testCreateAllDirs() {
 		return false;
 	}
 
-	cosmos::fs::removeTree(testdir.string());
+	cosmos::fs::remove_tree(testdir.string());
 
-	if (cosmos::fs::existsFile(testdir.string())) {
-		std::cerr << testdir << " still exists after removeTree?!" << std::endl;
+	if (cosmos::fs::exists_file(testdir.string())) {
+		std::cerr << testdir << " still exists after remove_tree?!" << std::endl;
 		return false;
 	}
 
@@ -103,7 +103,7 @@ bool testUmask() {
 
 	const auto new_mask = cosmos::FileMode{cosmos::ModeT{0227}};
 
-	cosmos::fs::setUmask(new_mask);
+	cosmos::fs::set_umask(new_mask);
 
 	cosmos::File testfile{
 		"umask.test",
@@ -119,9 +119,9 @@ bool testUmask() {
 		return false;
 	}
 
-	cosmos::fs::unlinkFile("umask.test");
+	cosmos::fs::unlink_file("umask.test");
 
-	const auto old = cosmos::fs::setUmask(cosmos::FileMode{cosmos::ModeT{0022}});
+	const auto old = cosmos::fs::set_umask(cosmos::FileMode{cosmos::ModeT{0022}});
 
 	if (new_mask != old) {
 		std::cerr << "old umask has unexpected value?!\n";
@@ -137,14 +137,14 @@ bool testUnlink() {
 	f << "testdata" << std::endl;
 	f.close();
 
-	if (!cosmos::fs::existsFile("testfile")) {
+	if (!cosmos::fs::exists_file("testfile")) {
 		std::cerr << "testfile wasn't created ?!\n";
 		return false;
 	}
 
-	cosmos::fs::unlinkFile("testfile");
+	cosmos::fs::unlink_file("testfile");
 
-	if (cosmos::fs::existsFile("testfile")) {
+	if (cosmos::fs::exists_file("testfile")) {
 		std::cerr << "testfile wasn't unlinked ?!\n";
 		return false;
 	}
@@ -162,7 +162,7 @@ bool testChmod() {
 		cosmos::FileMode{cosmos::ModeT{0600}}
 	};
 
-	cosmos::fs::changeMode(modfile_base, cosmos::FileMode{cosmos::ModeT{0651}});
+	cosmos::fs::change_mode(modfile_base, cosmos::FileMode{cosmos::ModeT{0651}});
 
 	cosmos::FileStatus stat{modfile.fd()};
 
@@ -173,7 +173,7 @@ bool testChmod() {
 
 	std::cout << "changemode(path, ...): New mode of modfile is correct" << std::endl;
 
-	cosmos::fs::changeMode(modfile.fd(), cosmos::FileMode{cosmos::ModeT{0711}});
+	cosmos::fs::change_mode(modfile.fd(), cosmos::FileMode{cosmos::ModeT{0711}});
 
 	stat.updateFrom(modfile.fd());
 
@@ -186,7 +186,7 @@ bool testChmod() {
 
 	modfile.close();
 
-	cosmos::fs::unlinkFile(modfile_base);
+	cosmos::fs::unlink_file(modfile_base);
 
 	return true;
 }
@@ -201,7 +201,7 @@ bool testChowner() {
 		cosmos::FileMode{cosmos::ModeT{0600}}
 	};
 
-	const auto our_uid = cosmos::proc::getRealUserID();
+	const auto our_uid = cosmos::proc::get_real_user_id();
 
 	// typically we'll run with non-root privileges so we won't be able to
 	// change owner or group ... so be prepared for that
@@ -214,52 +214,52 @@ bool testChowner() {
 	};
 
 	try {
-		cosmos::fs::changeOwner(ownfile_base, cosmos::UserID{1234});
+		cosmos::fs::change_owner(ownfile_base, cosmos::UserID{1234});
 
 		cosmos::FileStatus status{ownfile_base};
 		if (status.uid() != cosmos::UserID{1234}) {
-			std::cerr << "changeOwner(path, ...) didn't do the right thing" << std::endl;
+			std::cerr << "change_owner(path, ...) didn't do the right thing" << std::endl;
 			return false;
 		}
 	} catch (const cosmos::FileError &ex) {
-		std::cerr << "changeOwner(path, ...) failed: " << ex.what() << std::endl;
+		std::cerr << "change_owner(path, ...) failed: " << ex.what() << std::endl;
 
 		if (!tolerateEx(ex))
 			return false;
 	}
 
 	try {
-		cosmos::fs::changeOwner(ownfile_base, "root");
+		cosmos::fs::change_owner(ownfile_base, "root");
 
 		cosmos::FileStatus status{ownfile_base};
 		if (status.uid() != cosmos::UserID::ROOT) {
-			std::cerr << "changeOwner(path, ...) didn't do the right thing" << std::endl;
+			std::cerr << "change_owner(path, ...) didn't do the right thing" << std::endl;
 			return false;
 		}
 	} catch (const cosmos::FileError &ex) {
-		std::cerr << "changeOwner(path, string) failed: " << ex.what() << std::endl;
+		std::cerr << "change_owner(path, string) failed: " << ex.what() << std::endl;
 
 		if (!tolerateEx(ex))
 			return false;
 	}
 
 	try {
-		cosmos::fs::changeGroup(ownfile_base, cosmos::GroupID{1234});
+		cosmos::fs::change_group(ownfile_base, cosmos::GroupID{1234});
 
 		cosmos::FileStatus status{ownfile_base};
 		if (status.gid() != cosmos::GroupID{1234}) {
-			std::cerr << "changeGroup(path, ...) didn't do the right thing" << std::endl;
+			std::cerr << "change_group(path, ...) didn't do the right thing" << std::endl;
 			return false;
 		}
 	} catch (const cosmos::FileError &ex) {
-		std::cerr << "changeGroup(path, ...) failed: " << ex.what() << std::endl;
+		std::cerr << "change_group(path, ...) failed: " << ex.what() << std::endl;
 
 		if (!tolerateEx(ex))
 			return false;
 	}
 
 	try {
-		cosmos::fs::changeOwner(ownfile.fd(), cosmos::UserID{1234});
+		cosmos::fs::change_owner(ownfile.fd(), cosmos::UserID{1234});
 
 		cosmos::FileStatus status{ownfile_base};
 		if (status.uid() != cosmos::UserID{1234}) {
@@ -274,7 +274,7 @@ bool testChowner() {
 	}
 
 	try {
-		cosmos::fs::changeGroup(ownfile.fd(), cosmos::GroupID{1234});
+		cosmos::fs::change_group(ownfile.fd(), cosmos::GroupID{1234});
 
 		cosmos::FileStatus status{ownfile_base};
 		if (status.gid() != cosmos::GroupID{1234}) {
@@ -289,7 +289,7 @@ bool testChowner() {
 	}
 
 	// changing ownership to ourselves should always work
-	cosmos::fs::linkChangeOwner(ownfile_base, our_uid);
+	cosmos::fs::change_owner_nofollow(ownfile_base, our_uid);
 
 	cosmos::FileStatus status{ownfile_base};
 
@@ -300,7 +300,7 @@ bool testChowner() {
 
 	ownfile.close();
 
-	cosmos::fs::unlinkFile(ownfile_base);
+	cosmos::fs::unlink_file(ownfile_base);
 
 	return true;
 }
@@ -318,9 +318,9 @@ int testSymlink() {
 	targetfile.writeAll(std::string_view{"some data"});
 
 	const std::string_view symlink_base{"alink"};
-	cosmos::fs::makeSymlink(linktarget_base, symlink_base);
+	cosmos::fs::make_symlink(linktarget_base, symlink_base);
 
-	auto link_content = cosmos::fs::readSymlink(symlink_base);
+	auto link_content = cosmos::fs::read_symlink(symlink_base);
 
 	if (link_content == linktarget_base)  {
 		std::cout << "symlink content correct\n";
@@ -344,32 +344,32 @@ int testSymlink() {
 		return false;
 	}
 
-	cosmos::fs::unlinkFile(linktarget_base);
-	cosmos::fs::unlinkFile(symlink_base);
+	cosmos::fs::unlink_file(linktarget_base);
+	cosmos::fs::unlink_file(symlink_base);
 
 	return true;
 }
 
 int main(const int, const char **argv) {
 
-	if (!cosmos::fs::existsFile(argv[0])) {
+	if (!cosmos::fs::exists_file(argv[0])) {
 		std::cerr << "our own executable doesn't exist?" << std::endl;
 		return 1;
 	}
 
-	if (cosmos::fs::existsFile("/some/really/strange/path")) {
+	if (cosmos::fs::exists_file("/some/really/strange/path")) {
 		std::cerr << "a really strange path exists?" << std::endl;
 		return 1;
 	}
 
-	const auto orig_cwd = cosmos::fs::getWorkingDir();
-	cosmos::fs::changeDir("/tmp");
+	const auto orig_cwd = cosmos::fs::get_working_dir();
+	cosmos::fs::change_dir("/tmp");
 
-	if (cosmos::fs::getWorkingDir() != "/tmp") {
+	if (cosmos::fs::get_working_dir() != "/tmp") {
 		std::cerr << "new working directory is not reflected?!" << std::endl;
 		return 1;
 	}
-	cosmos::fs::changeDir(orig_cwd);
+	cosmos::fs::change_dir(orig_cwd);
 
 	auto ls_bin = cosmos::fs::which("ls");
 

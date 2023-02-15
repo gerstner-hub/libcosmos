@@ -93,10 +93,10 @@ public: // functions
 	WaitTimedRes waitTimed(const TimeSpec ts) const {
 		auto res = ::pthread_cond_timedwait(&m_pcond, &(m_lock.m_pmutex), &ts);
 
-		switch(res) {
+		switch(Errno{res}) {
 		default: cosmos_throw (ApiError(Errno{res})); return WaitTimedRes::TIMED_OUT; /* just to silence compiler warning */
-		case 0: return WaitTimedRes::SIGNALED;
-		case ETIMEDOUT: return WaitTimedRes::TIMED_OUT;
+		case Errno::NO_ERROR: return WaitTimedRes::SIGNALED;
+		case Errno::TIMEDOUT: return WaitTimedRes::TIMED_OUT;
 		}
 	}
 

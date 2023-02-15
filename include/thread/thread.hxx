@@ -19,10 +19,10 @@ namespace cosmos::thread {
  * On Linux a thread is natively treated very similar to a process, thus the
  * returned type is also a ProcessID.
  **/
-ProcessID COSMOS_API getTID();
+ProcessID COSMOS_API get_tid();
 
 /// Returns whether the calling thread is this process's main thread
-bool COSMOS_API isMainThread();
+bool COSMOS_API is_main_thread();
 
 } // end ns
 

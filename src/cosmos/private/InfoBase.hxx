@@ -37,7 +37,7 @@ bool InfoBase<DB_STRUCT>::getInfo(std::function<int(DB_STRUCT**)> get_func) {
 }
 
 template <typename DB_STRUCT>
-void InfoBase<DB_STRUCT>::invalidate() {
+void InfoBase<DB_STRUCT>::reset() {
 	m_buf.clear();
 	std::memset(&m_info, 0, sizeof(m_info));
 	m_valid = false;

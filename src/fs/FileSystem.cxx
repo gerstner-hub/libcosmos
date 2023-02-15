@@ -27,7 +27,7 @@
 
 namespace cosmos::fs {
 
-FileMode setUmask(const FileMode mode) {
+FileMode set_umask(const FileMode mode) {
 	auto raw_mode = to_integral(mode.raw());
 
 	if ((raw_mode & ~0777) != 0) {
@@ -39,35 +39,35 @@ FileMode setUmask(const FileMode mode) {
 	return FileMode{ModeT{old_mode}};
 }
 
-bool existsFile(const std::string_view path) {
+bool exists_file(const std::string_view path) {
 	struct stat s;
 	if (::lstat(path.data(), &s) == 0)
 		return true;
-	else if (getErrno() != Errno::NO_ENTRY)
+	else if (get_errno() != Errno::NO_ENTRY)
 		cosmos_throw (FileError(path, "lstat()"));
 
 	return false;
 }
 
-void unlinkFile(const std::string_view path) {
+void unlink_file(const std::string_view path) {
 	if (::unlink(path.data()) != 0) {
 		cosmos_throw (FileError(path, "unlink()"));
 	}
 }
 
-void changeDir(const std::string_view path) {
+void change_dir(const std::string_view path) {
 	if (::chdir(path.data()) != 0) {
 		cosmos_throw (FileError(path, "chdir()"));
 	}
 }
 
-std::string getWorkingDir() {
+std::string get_working_dir() {
 	std::string ret;
 	ret.resize(128);
 
 	while(true) {
 		if (auto res = ::getcwd(ret.data(), ret.size()); res == nullptr) {
-			switch (getErrno()) {
+			switch (get_errno()) {
 				case Errno::RANGE: {
 					// double the size and retry
 					ret.resize(ret.size() * 2);
@@ -122,7 +122,7 @@ std::optional<std::string> which(const std::string_view exec_base) noexcept {
 		return {};
 	}
 
-	const auto pathvar = proc::getEnvVar("PATH");
+	const auto pathvar = proc::get_env_var("PATH");
 	if (!pathvar)
 		return {};
 
@@ -142,19 +142,19 @@ std::optional<std::string> which(const std::string_view exec_base) noexcept {
 	return {};
 }
 
-void makeDir(const std::string_view path, const FileMode mode) {
+void make_dir(const std::string_view path, const FileMode mode) {
 	if (::mkdir(path.data(), to_integral(mode.raw())) != 0) {
 		cosmos_throw (FileError(path, "mkdir()"));
 	}
 }
 
-void removeDir(const std::string_view path) {
+void remove_dir(const std::string_view path) {
 	if (::rmdir(path.data()) != 0) {
 		cosmos_throw (FileError(path, "rmdir()"));
 	}
 }
 
-Errno makeAllDirs(const std::string_view path, const FileMode mode) {
+Errno make_all_dirs(const std::string_view path, const FileMode mode) {
 	size_t sep_pos = 0;
 	std::string prefix;
 	Errno ret{Errno::EXISTS};
@@ -176,7 +176,7 @@ Errno makeAllDirs(const std::string_view path, const FileMode mode) {
 		}
 
 		if (::mkdir(prefix.data(), to_integral(mode.raw())) != 0) {
-			if (getErrno() == Errno::EXISTS) {
+			if (get_errno() == Errno::EXISTS) {
 				continue;
 			}
 
@@ -190,7 +190,7 @@ Errno makeAllDirs(const std::string_view path, const FileMode mode) {
 	return ret;
 }
 
-void removeTree(const std::string_view path) {
+void remove_tree(const std::string_view path) {
 	// TODO implement this more efficiently using ulinkat() & friends
 	Directory dir{path};
 
@@ -214,37 +214,37 @@ void removeTree(const std::string_view path) {
 		case Type::DIRECTORY:
 		dircase:
 			// get down recursively 
-			removeTree(subpath);
+			remove_tree(subpath);
 			break;
 		default:
 		filecase:
-			unlinkFile(subpath);
+			unlink_file(subpath);
 			break;
 		}
 	};
 
-	removeDir(path);
+	remove_dir(path);
 }
 
-void changeMode(const std::string_view path, const FileMode mode) {
+void change_mode(const std::string_view path, const FileMode mode) {
 	if (::chmod(path.data(), to_integral(mode.raw())) != 0) {
 		cosmos_throw (FileError(path, "chmod()"));
 	}
 }
 
-void changeMode(const FileDescriptor fd, const FileMode mode) {
+void change_mode(const FileDescriptor fd, const FileMode mode) {
 	if (::fchmod(to_integral(fd.raw()), to_integral(mode.raw())) != 0) {
 		cosmos_throw (FileError("(fd)", "fchmod()"));
 	}
 }
 
-void changeOwner(const std::string_view path, const UserID uid, const GroupID gid) {
+void change_owner(const std::string_view path, const UserID uid, const GroupID gid) {
 	if (::chown(path.data(), to_integral(uid), to_integral(gid)) != 0) {
 		cosmos_throw (FileError(path, "chown()"));
 	}
 }
 
-void changeOwner(const FileDescriptor fd, const UserID uid, const GroupID gid) {
+void change_owner(const FileDescriptor fd, const UserID uid, const GroupID gid) {
 	if (::fchown(to_integral(fd.raw()), to_integral(uid), to_integral(gid)) != 0) {
 		cosmos_throw (FileError("(fd)", "fchown()"));
 	}
@@ -252,7 +252,7 @@ void changeOwner(const FileDescriptor fd, const UserID uid, const GroupID gid) {
 
 namespace {
 
-UserID resolveUser(const std::string_view user) {
+UserID resolve_user(const std::string_view user) {
 	if (user.empty()) {
 		return UserID::INVALID;
 	}
@@ -265,7 +265,7 @@ UserID resolveUser(const std::string_view user) {
 	return info.uid();
 }
 
-GroupID resolveGroup(const std::string_view group) {
+GroupID resolve_group(const std::string_view group) {
 	if (group.empty()) {
 		return GroupID::INVALID;
 	}
@@ -280,41 +280,41 @@ GroupID resolveGroup(const std::string_view group) {
 
 } // end anon ns
 
-void changeOwner(const std::string_view path, const std::string_view user,
+void change_owner(const std::string_view path, const std::string_view user,
 		const std::string_view group) {
 
-	const UserID uid = resolveUser(user);
-	const GroupID gid = resolveGroup(group);
-	changeOwner(path, uid, gid);
+	const UserID uid = resolve_user(user);
+	const GroupID gid = resolve_group(group);
+	change_owner(path, uid, gid);
 }
 
-void changeOwner(const FileDescriptor fd, const std::string_view user,
+void change_owner(const FileDescriptor fd, const std::string_view user,
 		const std::string_view group) {
-	const UserID uid = resolveUser(user);
-	const GroupID gid = resolveGroup(group);
-	changeOwner(fd, uid, gid);
+	const UserID uid = resolve_user(user);
+	const GroupID gid = resolve_group(group);
+	change_owner(fd, uid, gid);
 }
 
-void linkChangeOwner(const std::string_view path, const UserID uid, const GroupID gid) {
+void change_owner_nofollow(const std::string_view path, const UserID uid, const GroupID gid) {
 	if (::lchown(path.data(), to_integral(uid), to_integral(gid)) != 0) {
 		cosmos_throw (FileError(path, "lchown()"));
 	}
 }
 
-void linkChangeOwner(const std::string_view path, const std::string_view user,
+void change_owner_nofollow(const std::string_view path, const std::string_view user,
 		const std::string_view group) {
-	const UserID uid = resolveUser(user);
-	const GroupID gid = resolveGroup(group);
-	linkChangeOwner(path, uid, gid);
+	const UserID uid = resolve_user(user);
+	const GroupID gid = resolve_group(group);
+	change_owner_nofollow(path, uid, gid);
 }
 
-void makeSymlink(const std::string_view target, const std::string_view path) {
+void make_symlink(const std::string_view target, const std::string_view path) {
 	if (::symlink(target.data(), path.data()) != 0) {
 		cosmos_throw (FileError(path, "symlink()"));
 	}
 }
 
-std::string readSymlink(const std::string_view path) {
+std::string read_symlink(const std::string_view path) {
 	std::string ret;
 	ret.resize(128);
 

@@ -1,6 +1,3 @@
-// POSIX
-#include <unistd.h> // STD*_FILENO
-
 // C++
 #include <iostream>
 

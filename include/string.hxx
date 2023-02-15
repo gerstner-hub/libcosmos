@@ -11,13 +11,21 @@ namespace cosmos {
 /**
  * @file
  *
- * This header contains helper functions for dealing with std::string objects.
+ * This header contains helper functions and types for dealing with
+ * std::string objects and general string processing topics.
  **/
 
+/// Comparison type for std::map and similar containers with plain char* as keys
+struct CompareCString {
+	bool operator()(const char *a, const char *b) const {
+		return std::strcmp(a, b) < 0;
+	}
+};
+
 /// Returns an all lower case version of \c s
-std::string COSMOS_API toLower(const std::string_view s);
+std::string COSMOS_API to_lower(const std::string_view s);
 /// Returns an all upper case veersion of \c s
-std::string COSMOS_API toUpper(const std::string_view s);
+std::string COSMOS_API to_upper(const std::string_view s);
 
 /// Strips leading and trailing whitespace from the given string in-place
 void COSMOS_API strip(std::string &s);
@@ -29,15 +37,8 @@ inline std::string stripped(const std::string_view s) {
 	return ret;
 }
 
-/// Comparison type for std::map and similar containers with plain char* as keys
-struct compare_cstring {
-	bool operator()(const char *a, const char *b) const {
-		return std::strcmp(a, b) < 0;
-	}
-};
-
 /// Returns whether \c prefix is a prefix of \c s
-inline bool isPrefix(const std::string_view s, const std::string_view prefix) {
+inline bool is_prefix(const std::string_view s, const std::string_view prefix) {
 	return s.substr(0, prefix.length()) == prefix;
 }
 

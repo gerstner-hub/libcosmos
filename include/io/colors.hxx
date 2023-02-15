@@ -117,9 +117,9 @@ enum class ANSICode : size_t {
 /**
  * This can throw an exception on unexpected input.
  **/
-TermControl COSMOS_API getOffControl(const TermControl ctrl);
+TermControl COSMOS_API get_off_control(const TermControl ctrl);
 /// Returns the actual ANSI escape code number for the given color specification.
-ANSICode COSMOS_API getANSIColorCode(const ColorSpec &color);
+ANSICode COSMOS_API get_ansi_color_code(const ColorSpec &color);
 
 /// Base class to build nested ANSI feature objects.
 /**
@@ -164,7 +164,7 @@ protected:
 		FeatureBase{
 			text,
 			ANSICode{to_integral(feature)},
-			ANSICode{to_integral(getOffControl(feature))}
+			ANSICode{to_integral(get_off_control(feature))}
 		}
 	{}
 
@@ -172,7 +172,7 @@ protected:
 		FeatureBase{
 			next,
 			ANSICode{to_integral(feature)},
-			ANSICode{to_integral(getOffControl(feature))}
+			ANSICode{to_integral(get_off_control(feature))}
 		}
 	{}
 };
@@ -198,7 +198,7 @@ struct ColoredText : public FeatureBase {
 	explicit ColoredText(const std::string_view &text, const TermColor c, const ColorKind kind, const ColorIntensity intensity) :
 		FeatureBase{
 			text,
-			getANSIColorCode(ColorSpec{c, kind, intensity}),
+			get_ansi_color_code(ColorSpec{c, kind, intensity}),
 			getOffCode(kind)
 		}
 	{}
@@ -206,7 +206,7 @@ struct ColoredText : public FeatureBase {
 	explicit ColoredText(const FeatureBase &next, const TermColor c, const ColorKind kind, const ColorIntensity intensity) :
 		FeatureBase{
 			next,
-			getANSIColorCode(ColorSpec{c, kind, intensity}),
+			get_ansi_color_code(ColorSpec{c, kind, intensity}),
 			getOffCode(kind)
 		}
 	{}

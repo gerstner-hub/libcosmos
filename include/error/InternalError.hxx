@@ -12,7 +12,7 @@ namespace cosmos {
  * are not fulfilled.
  **/
 class COSMOS_API InternalError :
-	public CosmosError {
+		public CosmosError {
 public: // functions
 
 	explicit InternalError(const std::string_view msg) :

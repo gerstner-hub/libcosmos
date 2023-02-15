@@ -93,8 +93,8 @@ enum class Errno : int { // errnos are distinct positive `int` values says `man 
 };
 
 /// wrapper that returns the Errno strongly typed representation of the current \c errno
-inline Errno getErrno() { return Errno{errno}; }
-inline void resetErrno() { errno = static_cast<int>(Errno::NO_ERROR); }
-inline bool isErrnoSet() { return getErrno() != Errno::NO_ERROR; }
+inline Errno get_errno() { return Errno{errno}; }
+inline void reset_errno() { errno = static_cast<int>(Errno::NO_ERROR); }
+inline bool is_errno_set() { return get_errno() != Errno::NO_ERROR; }
 
 } // end ns

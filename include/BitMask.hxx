@@ -61,12 +61,12 @@ public: // functions
 	EnumBaseType raw() const { return m_flags; }
 
 	/// Return a string representation of the bit mask
-	explicit operator std::string() const { return to_string(); }
+	explicit operator std::string() const { return toString(); }
 
 	/// Returns a boolean value for the given bit position, \see test()
 	bool operator[] (const ENUM flag) const { return test(flag); }
 
-	std::string to_string() const {
+	std::string toString() const {
 		std::string ret;
 
 		// append each bit starting with the highest one

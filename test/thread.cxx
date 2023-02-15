@@ -41,7 +41,7 @@ protected: // functions
 		cosmos::PosixThread thread{{std::bind(&ThreadTest::simpleEntry, this, std::placeholders::_1)}, ThreadArg{815}, "simplethread"};
 		auto tid = thread.id();
 
-		if (tid == cosmos::pthread::getID()) {
+		if (tid == cosmos::pthread::get_id()) {
 			complain("main thread equals new thread?!");
 		}
 
@@ -175,7 +175,7 @@ protected: // functions
 			std::cout << "thread argument matches\n";
 		}
 
-		return ExitValue{(intptr_t)cosmos::pthread::getID().raw()};
+		return ExitValue{(intptr_t)cosmos::pthread::get_id().raw()};
 	}
 
 	ExitValue exitEntry(ThreadArg arg) {
@@ -200,21 +200,21 @@ protected:
 int main() {
 	cosmos::Init ci;
 
-	auto mytid = cosmos::thread::getTID();
+	auto mytid = cosmos::thread::get_tid();
 
 	std::cout << "my TID is " << static_cast<pid_t>(mytid) << std::endl;
-	if (!cosmos::thread::isMainThread()) {
+	if (!cosmos::thread::is_main_thread()) {
 		std::cerr << "I'm not the main thread?!" << std::endl;
 		return 1;
 	} else {
 		std::cout << "I am the main thread\n";
 	}
 
-	if (cosmos::pthread::getID() != cosmos::pthread::getID()) {
+	if (cosmos::pthread::get_id() != cosmos::pthread::get_id()) {
 		std::cerr << "My own ID differs towards itself?!\n";
 		return 1;
 	} else {
-		std::cout << "pthread::getID() == pthread::getID()\n";
+		std::cout << "pthread::get_id() == pthread::get_id()\n";
 	}
 
 	ThreadTest tt;

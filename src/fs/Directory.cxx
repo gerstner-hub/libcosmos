@@ -99,14 +99,14 @@ std::optional<DirEntry> Directory::nextEntry() {
 	 */
 
 	// needed to differentiate between end-of-stream and error condition
-	resetErrno();
+	reset_errno();
 	const auto entry = readdir(m_stream);
 
 	if (entry) {
 		return DirEntry{entry};
 	}
 
-	if (isErrnoSet()) {
+	if (is_errno_set()) {
 		cosmos_throw(ApiError());
 	}
 

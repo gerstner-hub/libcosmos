@@ -28,7 +28,7 @@ namespace cosmos {
  * is accessed.
  **/
 class COSMOS_API CosmosError :
-	public std::exception {
+		public std::exception {
 public: // functions
 
 	explicit CosmosError(const std::string_view error_class) :

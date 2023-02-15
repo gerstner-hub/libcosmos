@@ -20,7 +20,7 @@ bool ID::operator==(const ID &other) const {
 	return ::pthread_equal(this->m_id, other.m_id) != 0;
 }
 
-ID getID() {
+ID get_id() {
 	return ID{::pthread_self()};
 }
 
@@ -31,7 +31,7 @@ void exit(const ExitValue val) {
 	std::abort();
 }
 
-} // end ns
+} // end ns pthread
 
 namespace {
 
@@ -42,16 +42,16 @@ namespace {
 		ThreadArg arg;
 	};
 
-	Context fetchContext(void *par) {
+	Context fetch_context(void *par) {
 		auto ctx = reinterpret_cast<Context*>(par);
 		auto ret = *ctx;
 		delete ctx;
 		return ret;
 	}
 
-	void* threadEntry(void *par) {
+	void* thread_entry(void *par) {
 
-		Context ctx = fetchContext(par);
+		Context ctx = fetch_context(par);
 			
 		if (std::holds_alternative<PosixThread::PosixEntry>(ctx.entry)) {
 			auto entry = std::get<PosixThread::PosixEntry>(ctx.entry);
@@ -64,12 +64,12 @@ namespace {
 		}
 	}
 
-	void createThread(pthread_t &thread, Context *ctx) {
+	void create_thread(pthread_t &thread, Context *ctx) {
 
 		const auto error = ::pthread_create(
 			&thread,
 			nullptr /* keep default attributes */,
-			&threadEntry,
+			&thread_entry,
 			reinterpret_cast<void*>(ctx)
 		);
 
@@ -78,20 +78,20 @@ namespace {
 		}
 
 	}
-}
+} // end anon ns
 
 PosixThread::PosixThread(PosixEntry entry, pthread::ThreadArg arg, const std::string_view name) :
 		m_name{buildName(name, ++num_threads)} {
 	
 	pthread_t thread;
-	createThread(thread, new Context{entry, arg});
+	create_thread(thread, new Context{entry, arg});
 	m_pthread = thread;
 }
 
 PosixThread::PosixThread(Entry entry, const std::string_view name) :
 		m_name{buildName(name, ++num_threads)} {
 	pthread_t thread;
-	createThread(thread, new Context{entry, pthread::ThreadArg{0}});
+	create_thread(thread, new Context{entry, pthread::ThreadArg{0}});
 	m_pthread = thread;
 }
 

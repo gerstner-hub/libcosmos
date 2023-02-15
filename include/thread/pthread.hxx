@@ -49,7 +49,7 @@ enum class ExitValue : intptr_t {};
 enum class ThreadArg : intptr_t {};
 
 /// Returns the opaque thread ID object for the calling thread
-ID COSMOS_API getID();
+ID COSMOS_API get_id();
 
 /// Ends execution of the calling thread
 /**

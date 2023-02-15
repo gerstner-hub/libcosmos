@@ -17,7 +17,7 @@ namespace cosmos {
 
 namespace {
 
-	void setSignalMask(int op, const sigset_t *set, sigset_t *old) {
+	void set_signal_mask(int op, const sigset_t *set, sigset_t *old) {
 		auto res = ::pthread_sigmask(op, set, old);
 
 		if (res == 0)
@@ -25,7 +25,8 @@ namespace {
 
 		cosmos_throw (ApiError());
 	}
-}
+
+} // end anon ns
 
 std::string Signal::name() const {
 	return strsignal(to_integral(m_sig));
@@ -57,24 +58,24 @@ void send(const FileDescriptor pidfd, const Signal s) {
 }
 
 void block(const SigSet &s, std::optional<SigSet*> old) {
-	setSignalMask(SIG_BLOCK, s.raw(), old ? old.value()->raw() : nullptr);
+	set_signal_mask(SIG_BLOCK, s.raw(), old ? old.value()->raw() : nullptr);
 }
 
 void unblock(const SigSet &s, std::optional<SigSet*> old) {
-	setSignalMask(SIG_UNBLOCK, s.raw(), old ? old.value()->raw() : nullptr);
+	set_signal_mask(SIG_UNBLOCK, s.raw(), old ? old.value()->raw() : nullptr);
 }
 
-void setSigMask(const SigSet &s, std::optional<SigSet*> old) {
-	setSignalMask(SIG_SETMASK, s.raw(), old ? old.value()->raw() : nullptr);
+void set_sigmask(const SigSet &s, std::optional<SigSet*> old) {
+	set_signal_mask(SIG_SETMASK, s.raw(), old ? old.value()->raw() : nullptr);
 }
 
-SigSet getSigMask() {
+SigSet get_sigmask() {
 	SigSet ret;
-	setSignalMask(SIG_SETMASK, nullptr, ret.raw());
+	set_signal_mask(SIG_SETMASK, nullptr, ret.raw());
 	return ret;
 }
 
-} // end ns
+} // end ns signal
 } // end ns
 
 std::ostream& operator<<(std::ostream &o, const cosmos::Signal sig) {

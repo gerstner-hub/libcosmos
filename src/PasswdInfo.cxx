@@ -15,7 +15,7 @@ PasswdInfo::PasswdInfo(const std::string_view name) {
 	m_valid = getInfo(call);
 
 	if (!m_valid)
-		invalidate();
+		reset();
 }
 
 PasswdInfo::PasswdInfo(const UserID uid) {
@@ -28,7 +28,7 @@ PasswdInfo::PasswdInfo(const UserID uid) {
 	m_valid = getInfo(call);
 
 	if (!m_valid)
-		invalidate();
+		reset();
 }
 
 } // end ns

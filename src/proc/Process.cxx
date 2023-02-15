@@ -13,31 +13,31 @@
 
 namespace cosmos::proc {
 
-ProcessID getOwnPid() {
+ProcessID get_own_pid() {
 	return ProcessID{::getpid()};
 }
 
-ProcessID getParentPid() {
+ProcessID get_parent_pid() {
 	return ProcessID{::getppid()};
 }
 
-UserID getRealUserID() {
+UserID get_real_user_id() {
 	return UserID{::getuid()};
 }
 
-UserID getEffectiveUserID() {
+UserID get_effective_user_id() {
 	return UserID{::geteuid()};
 }
 
-GroupID getRealGroupID() {
+GroupID get_real_group_id() {
 	return GroupID{::getgid()};
 }
 
-GroupID getEffectiveGroupID() {
+GroupID get_effective_group_id() {
 	return GroupID{::getegid()};
 }
 
-ProcessID createNewSession() {
+ProcessID create_new_session() {
 	auto res = ProcessID{::setsid()};
 
 	if (res == ProcessID::INVALID) {
@@ -53,7 +53,7 @@ void exit(ExitStatus status) {
 	_exit(to_integral(status));
 }
 
-std::optional<std::string_view> getEnvVar(const std::string_view name) {
+std::optional<std::string_view> get_env_var(const std::string_view name) {
 	if (auto res = std::getenv(name.data()); res != nullptr) {
 		return {res};
 	}
@@ -61,7 +61,7 @@ std::optional<std::string_view> getEnvVar(const std::string_view name) {
 	return {};
 }
 
-void setEnvVar(const std::string_view name, const std::string_view val, const OverwriteEnv overwrite) {
+void set_env_var(const std::string_view name, const std::string_view val, const OverwriteEnv overwrite) {
 	// NOTE: this is POSIX, not existing in C specs
 	const auto res = ::setenv(name.data(), val.data(), overwrite ? 1 : 0);
 
@@ -70,7 +70,7 @@ void setEnvVar(const std::string_view name, const std::string_view val, const Ov
 	}
 }
 
-void clearEnvVar(const std::string_view name) {
+void clear_env_var(const std::string_view name) {
 	const auto res = ::unsetenv(name.data());
 
 	if (res != 0) {

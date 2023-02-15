@@ -89,7 +89,7 @@ char FileType::symbolic() const {
 } // end ns
 
 std::ostream& operator<<(std::ostream &o, const cosmos::FileMode mode) {
-	o << mode.symbolic() << " (" << cosmos::octnum{cosmos::to_integral(mode.raw()), 4} << ")";
+	o << mode.symbolic() << " (" << cosmos::OctNum{cosmos::to_integral(mode.raw()), 4} << ")";
 	return o;
 }
 

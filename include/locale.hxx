@@ -53,14 +53,14 @@ COSMOS_API std::string get(Category category);
 COSMOS_API void set(Category category, const std::string_view val);
 
 /// set the given locale category to its default value ("C" or "POSIX")
-COSMOS_API void setToDefault(Category category);
+COSMOS_API void set_to_default(Category category);
 
 /// set the given locale category according to present environment variables
 /**
  * This function call will inspect the environment variables and set the given
  * locale category accordingly (`setlocale(cat, "")`.
  **/
-COSMOS_API void setFromEnvironment(Category category);
+COSMOS_API void set_from_environment(Category category);
 
 } // end ns
 

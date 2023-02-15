@@ -1,6 +1,3 @@
-// C++
-#include <cassert>
-
 // cosmos
 #include "cosmos/error/UsageError.hxx"
 #include "cosmos/private/Initable.hxx"

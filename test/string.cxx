@@ -6,17 +6,17 @@ int main() {
 	int ret = 0;
 	const std::string test_string("A test string. Have a nice day!");
 
-	auto lower_string = cosmos::toLower(test_string);
+	auto lower_string = cosmos::to_lower(test_string);
 
 	if (lower_string != "a test string. have a nice day!") {
-		std::cerr << "toLower() returned unexpected result '" << lower_string << "'\n";
+		std::cerr << "to_lower() returned unexpected result '" << lower_string << "'\n";
 		ret = 1;
 	}
 
-	auto upper_string = cosmos::toUpper(test_string);
+	auto upper_string = cosmos::to_upper(test_string);
 
 	if (upper_string != "A TEST STRING. HAVE A NICE DAY!") {
-		std::cerr << "toUpper() returned unexpected result '" << upper_string << "'\n";
+		std::cerr << "to_upper() returned unexpected result '" << upper_string << "'\n";
 		ret = 1;
 	}
 
@@ -39,8 +39,8 @@ int main() {
 
 	const std::string test_prefix("A test");
 
-	if (!cosmos::isPrefix(test_string, test_prefix)) {
-		std::cerr << "isPrefix() returned unexpected result\n";
+	if (!cosmos::is_prefix(test_string, test_prefix)) {
+		std::cerr << "is_prefix() returned unexpected result\n";
 		ret = 1;
 	}
 

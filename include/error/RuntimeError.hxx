@@ -12,7 +12,7 @@ namespace cosmos {
  * logical conditions are violated that make continuing impossible.
  **/
 class COSMOS_API RuntimeError :
-	public CosmosError {
+		public CosmosError {
 public: // functions
 
 	explicit RuntimeError(const std::string_view msg) :

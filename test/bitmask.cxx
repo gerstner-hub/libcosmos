@@ -46,7 +46,7 @@ int main() {
 
 		std::string expected(27, '0');
 		expected += "00110";
-		assert (bitmask.to_string() == expected);
+		assert (bitmask.toString() == expected);
 	}
 
 	{
@@ -68,7 +68,7 @@ int main() {
 	{
 		MyBitMask bitmask;
 		bitmask.set(MyBitMask::all);
-		assert (bitmask.to_string() == std::string(32, '1'));
+		assert (bitmask.toString() == std::string(32, '1'));
 
 		bitmask.reset();
 		assert (bitmask.raw() == 0);
@@ -85,7 +85,7 @@ int main() {
 
 		bitmask.reset();
 		bitmask.flip();
-		assert (bitmask.to_string() == std::string(32, '1'));
+		assert (bitmask.toString() == std::string(32, '1'));
 
 		assert (bitmask.count() == 32);
 

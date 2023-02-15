@@ -24,7 +24,7 @@ public:
 	{}
 
 	int run() {
-		cosmos::fs::changeDir(m_tmp_dir);
+		cosmos::fs::change_dir(m_tmp_dir);
 		m_first_file.open("first", cosmos::OpenMode::WRITE_ONLY, m_flags, m_mode);
 		m_second_file.open("second", cosmos::OpenMode::WRITE_ONLY, m_flags, m_mode);
 
@@ -141,13 +141,13 @@ public:
 	void checkOwners() {
 		cosmos::FileStatus status{"first"};
 
-		if (status.uid() == cosmos::proc::getRealUserID()) {
+		if (status.uid() == cosmos::proc::get_real_user_id()) {
 			good("file is owned by us");
 		} else {
 			bad("file is owned by someone else?!");
 		}
 
-		if (status.gid() == cosmos::proc::getRealGroupID()) {
+		if (status.gid() == cosmos::proc::get_real_group_id()) {
 			good("file group is ours");
 		} else {
 			bad("file group is something else?!");
@@ -283,7 +283,7 @@ public:
 	std::optional<std::string> findSocket() const {
 		auto systemd_sock = "/run/systemd/notify";
 
-		if (cosmos::fs::existsFile(systemd_sock))
+		if (cosmos::fs::exists_file(systemd_sock))
 			return systemd_sock;
 
 		cosmos::Directory run{"/run"};
@@ -353,7 +353,7 @@ int main() {
 	TestFileStatus test{tmpdir};
 	const auto ret = test.run();
 
-	cosmos::fs::removeTree(tmpdir);
+	cosmos::fs::remove_tree(tmpdir);
 
 	return ret;
 }

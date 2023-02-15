@@ -16,7 +16,7 @@ GroupInfo::GroupInfo(const std::string_view name) {
 	m_valid = getInfo(call);
 
 	if (!m_valid)
-		invalidate();
+		reset();
 }
 
 GroupInfo::GroupInfo(const GroupID gid) {
@@ -28,7 +28,7 @@ GroupInfo::GroupInfo(const GroupID gid) {
 
 	m_valid = getInfo(call);
 	if (!m_valid)
-		invalidate();
+		reset();
 }
 
 const StringViewVector GroupInfo::members() const {

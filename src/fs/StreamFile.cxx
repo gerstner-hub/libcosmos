@@ -13,7 +13,7 @@ size_t StreamFile::read(void *buf, size_t length) {
 
 		if (res < 0) {
 			// transparent restart
-			if (auto_restart_syscalls && getErrno() == Errno::INTERRUPTED)
+			if (auto_restart_syscalls && get_errno() == Errno::INTERRUPTED)
 				continue;
 			cosmos_throw (ApiError("reading from file"));
 		}
@@ -41,7 +41,7 @@ size_t StreamFile::write(const void *buf, size_t length) {
 
 		if (res < 0) {
 			// transparent restart
-			if (auto_restart_syscalls && getErrno() == Errno::INTERRUPTED)
+			if (auto_restart_syscalls && get_errno() == Errno::INTERRUPTED)
 				continue;
 			cosmos_throw (ApiError("writing to file"));
 		}

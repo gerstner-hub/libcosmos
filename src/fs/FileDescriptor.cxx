@@ -53,34 +53,34 @@ void FileDescriptor::setStatusFlags(const StatusFlags flags) {
 
 namespace {
 
-template <typename SyncFunc>
-void syncHelper(FileDescriptor &fd, SyncFunc sync_func) {
-	while (true) {
-		if (sync_func(to_integral(fd.raw())) == 0) {
-			return;
-		}
-		else {
-			switch(getErrno()) {
-				default: break;
-				case Errno::INTERRUPTED: {
-					if (auto_restart_syscalls)
-						continue;
-				}
+	template <typename SyncFunc>
+	void sync_helper(FileDescriptor &fd, SyncFunc sync_func) {
+		while (true) {
+			if (sync_func(to_integral(fd.raw())) == 0) {
+				return;
 			}
+			else {
+				switch(get_errno()) {
+					default: break;
+					case Errno::INTERRUPTED: {
+						if (auto_restart_syscalls)
+							continue;
+					}
+				}
 
-			cosmos_throw (ApiError("failed to sync"));
+				cosmos_throw (ApiError("failed to sync"));
+			}
 		}
 	}
-}
 
 } // end anon ns
 
 void FileDescriptor::sync() {
-	syncHelper(*this, fsync);
+	sync_helper(*this, fsync);
 }
 
 void FileDescriptor::dataSync() {
-	syncHelper(*this, fdatasync);
+	sync_helper(*this, fdatasync);
 }
 
 FileDescriptor stdout(FileNum::STDOUT);

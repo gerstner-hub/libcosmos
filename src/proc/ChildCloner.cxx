@@ -26,64 +26,64 @@ namespace cosmos {
 
 namespace {
 
-// creates a vector of string pointers suitable to pass as envp to execve() and friends
-auto setupEnv(const StringVector &vars) {
-	CStringVector ret;
+	// creates a vector of string pointers suitable to pass as envp to execve() and friends
+	auto setup_env(const StringVector &vars) {
+		CStringVector ret;
 
-	for (const auto &var: vars) {
-		ret.push_back(var.c_str());
+		for (const auto &var: vars) {
+			ret.push_back(var.c_str());
+		}
+
+		ret.push_back(nullptr);
+
+		return ret;
 	}
 
-	ret.push_back(nullptr);
+	auto setup_argv(const StringVector &args) {
+		CStringVector ret;
 
-	return ret;
-}
+		for (const auto &arg: args) {
+			ret.push_back(arg.c_str());
+		}
 
-auto setupArgv(const StringVector &args) {
-	CStringVector ret;
+		ret.push_back(nullptr);
 
-	for (const auto &arg: args) {
-		ret.push_back(arg.c_str());
+		return ret;
 	}
 
-	ret.push_back(nullptr);
-
-	return ret;
-}
-
-void printChildError(const std::string_view context, const std::string_view error) {
-	std::cerr << "[" << proc::getOwnPid() << "]" << context << ": " << error << std::endl;
-}
-
-// execute program and inherit parent's environment
-void exec(CStringVector &v) {
-	if (v.empty()) {
-		cosmos_throw (InternalError("called with empty argument vector"));
+	void print_child_error(const std::string_view context, const std::string_view error) {
+		std::cerr << "[" << proc::get_own_pid() << "]" << context << ": " << error << std::endl;
 	}
 
-	::execvp (v[0], const_cast<char**>(v.data()));
+	// execute program and inherit parent's environment
+	void exec(CStringVector &v) {
+		if (v.empty()) {
+			cosmos_throw (InternalError("called with empty argument vector"));
+		}
 
-	cosmos_throw (ApiError("execvp failed"));
-}
+		::execvp (v[0], const_cast<char**>(v.data()));
 
-// execute program and use override environment
-void exec(CStringVector &v, CStringVector &e) {
-	if (v.empty()) {
-		cosmos_throw (InternalError("called with empty argument vector"));
-	} else if(e.empty()) {
-		// needs to contain at least a terminating nullptr
-		cosmos_throw (InternalError("called with empty environment vector"));
+		cosmos_throw (ApiError("execvp failed"));
 	}
 
-	::execvpe (v[0], const_cast<char**>(v.data()), const_cast<char**>(e.data()));
+	// execute program and use override environment
+	void exec(CStringVector &v, CStringVector &e) {
+		if (v.empty()) {
+			cosmos_throw (InternalError("called with empty argument vector"));
+		} else if(e.empty()) {
+			// needs to contain at least a terminating nullptr
+			cosmos_throw (InternalError("called with empty environment vector"));
+		}
 
-	cosmos_throw (ApiError("execvpe failed"));
-}
+		::execvpe (v[0], const_cast<char**>(v.data()), const_cast<char**>(e.data()));
 
-// for clone(3) there is no glibc wrapper yet so we need to wrap it ourselves
-pid_t clone3(struct clone_args &args) {
-	return syscall(SYS_clone3, &args, sizeof(args));
-}
+		cosmos_throw (ApiError("execvpe failed"));
+	}
+
+	// for clone(3) there is no glibc wrapper yet so we need to wrap it ourselves
+	pid_t clone3(struct clone_args &args) {
+		return syscall(SYS_clone3, &args, sizeof(args));
+	}
 
 } // end anon ns
 
@@ -128,16 +128,16 @@ SubProc ChildCloner::run() {
 	try {
 		postFork();
 
-		auto argv = setupArgv(m_argv);
+		auto argv = setup_argv(m_argv);
 
 		if (!m_env) {
 			exec(argv);
 		} else {
-			auto envp = setupEnv(m_env.value());
+			auto envp = setup_env(m_env.value());
 			exec(argv, envp);
 		}
 	} catch (const CosmosError &ce) {
-		printChildError("post fork/exec", ce.what());
+		print_child_error("post fork/exec", ce.what());
 		// use something else than "1" which might help debugging this
 		// situation a bit.
 		::_exit(3);
@@ -169,14 +169,14 @@ void ChildCloner::postFork() {
 		} catch(const std::exception &ex) {
 			// treat this as non-critical, the process can still
 			// run, even if not prioritized.
-			printChildError("sched_setscheduler", ex.what());
+			print_child_error("sched_setscheduler", ex.what());
 		}
 	}
 
 	resetSignals();
 
 	if (!m_cwd.empty()) {
-		fs::changeDir(m_cwd);
+		fs::change_dir(m_cwd);
 	}
 
 	redirectFD(cosmos::stdout, m_stdout);

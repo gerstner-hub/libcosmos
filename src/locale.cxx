@@ -6,7 +6,7 @@
 namespace cosmos::locale {
 
 namespace {
-	auto getCat(Category cat) {
+	auto get_cat(Category cat) {
 		return to_integral(cat);
 	}
 }
@@ -14,21 +14,21 @@ namespace {
 std::string get(Category category) {
 	// this string is potentially statically allocated and will be
 	// overwritten by future calls to setlocale()
-	char *locale = ::setlocale(getCat(category), nullptr);
+	char *locale = ::setlocale(get_cat(category), nullptr);
 	return locale;
 }
 
 void set(Category category, const std::string_view val) {
-	if (::setlocale(getCat(category), val.data()) == nullptr) {
+	if (::setlocale(get_cat(category), val.data()) == nullptr) {
 		cosmos_throw (ApiError("setlocale"));
 	}
 }
 
-void setToDefault(Category category) {
+void set_to_default(Category category) {
 	set(category, "C");
 }
 
-void setFromEnvironment(Category category) {
+void set_from_environment(Category category) {
 	set(category, "");
 }
 

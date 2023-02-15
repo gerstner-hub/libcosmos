@@ -81,7 +81,7 @@ std::vector<Poller::PollEvent> Poller::wait(const std::optional<std::chrono::mil
 			rawPollFD(), m_events.data(), m_events.size(), timeout ? timeout->count() : -1);
 
 		if (num_events < 0) {
-			if (auto_restart_syscalls && getErrno() == Errno::INTERRUPTED)
+			if (auto_restart_syscalls && get_errno() == Errno::INTERRUPTED)
 				// transparent restart
 				continue;
 			cosmos_throw (ApiError("Failed to epoll_wait()"));

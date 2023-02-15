@@ -9,7 +9,9 @@
 
 namespace cosmos {
 
-static std::string sprintfV(const char *fmt, va_list orig_args) {
+namespace {
+
+std::string sprintf_v(const char *fmt, va_list orig_args) {
 	std::string ret;
 	// let's use some arbitrary start size that should suffice for average uses
 	// and it will be increased if its not enough
@@ -47,10 +49,12 @@ static std::string sprintfV(const char *fmt, va_list orig_args) {
 	return ret;
 }
 
+} // end anon ns
+
 std::string sprintf(const char *fmt, ...) {
 	va_list varargs;
 	va_start(varargs, fmt);
-	const auto ret = sprintfV(fmt, varargs);
+	const auto ret = sprintf_v(fmt, varargs);
 	va_end(varargs);
 	return ret;
 }
@@ -58,7 +62,7 @@ std::string sprintf(const char *fmt, ...) {
 } // end ns
 
 template <typename NUM>
-std::ostream& operator<<(std::ostream& o, const cosmos::fmtnum_base<NUM> &fmtnum) {
+std::ostream& operator<<(std::ostream& o, const cosmos::FormattedNumber<NUM> &fmtnum) {
 	const auto orig_flags = o.flags();
 	const auto orig_fill = o.fill();
 
@@ -81,6 +85,6 @@ std::ostream& operator<<(std::ostream& o, const cosmos::fmtnum_base<NUM> &fmtnum
 
 /* explicit instantiations of the templated operator<< */
 
-template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::fmtnum_base<unsigned int>&);
-template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::fmtnum_base<int>&);
-template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::fmtnum_base<size_t>&);
+template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::FormattedNumber<unsigned int>&);
+template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::FormattedNumber<int>&);
+template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::FormattedNumber<size_t>&);

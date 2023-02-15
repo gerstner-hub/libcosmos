@@ -130,7 +130,7 @@ COSMOS_API void block(const SigSet &s, std::optional<SigSet *> old = {});
 COSMOS_API void unblock(const SigSet &s, std::optional<SigSet *> old = {});
 
 /// Assigns exactly the given signal mask to the current process
-COSMOS_API void setSigMask(const SigSet &s, std::optional<SigSet *> old = {});
+COSMOS_API void set_sigmask(const SigSet &s, std::optional<SigSet *> old = {});
 
 /// Restores the default signal handling behaviour for the given signal
 inline void restore(const Signal sig) {
@@ -138,7 +138,7 @@ inline void restore(const Signal sig) {
 }
 
 /// Returns the currently active signal mask for the calling thread
-COSMOS_API SigSet getSigMask();
+COSMOS_API SigSet get_sigmask();
 
 } // end ns
 

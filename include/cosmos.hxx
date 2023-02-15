@@ -65,7 +65,7 @@ struct Init {
  * This is a global setting that influences different kinds of libcosmos API
  * calls.
  **/
-void COSMOS_API setRestartSyscallOnInterrupt(const bool auto_restart);
+void COSMOS_API set_restart_syscall_on_interrupt(const bool auto_restart);
 
 } // end ns
 

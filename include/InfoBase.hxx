@@ -21,7 +21,7 @@ public: // functions
 	bool valid() const { return m_valid; }
 
 	/// Zeroes out all data
-	void invalidate();
+	void reset();
 
 	/// Grants access to the raw underlying datastructure
 	const DB_STRUCT* raw() const { return &m_info; }

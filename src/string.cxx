@@ -7,7 +7,7 @@
 
 namespace cosmos {
 
-std::string toLower(const std::string_view s) {
+std::string to_lower(const std::string_view s) {
 	std::string ret;
 	ret.resize(s.size());
 	// put it all to lower case
@@ -20,7 +20,7 @@ std::string toLower(const std::string_view s) {
 	return ret;
 }
 
-std::string toUpper(const std::string_view s) {
+std::string to_upper(const std::string_view s) {
 	std::string ret;
 	ret.resize(s.size());
 	// put it all to lower case

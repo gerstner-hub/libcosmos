@@ -16,11 +16,11 @@ void printCat(const std::string_view &label) {
 int main() {
 	printCat("startup");
 
-	cosmos::locale::setFromEnvironment(CAT);
+	cosmos::locale::set_from_environment(CAT);
 
 	printCat("environment");
 
-	cosmos::locale::setToDefault(CAT);
+	cosmos::locale::set_to_default(CAT);
 
 	printCat("default");
 

@@ -188,7 +188,7 @@ public: // functions
 
 	/// Returns whether the caller itself is the associated thread
 	bool isCallerThread() const {
-		return id() == pthread::getID();
+		return id() == pthread::get_id();
 	}
 
 protected: // functions

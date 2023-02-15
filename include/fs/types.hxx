@@ -247,8 +247,8 @@ public:
 	}
 
 	/// Returns the complete bitmask object
-	FileModeBits& getMask() { return m_mode; }
-	const FileModeBits& getMask() const { return m_mode; }
+	FileModeBits& mask() { return m_mode; }
+	const FileModeBits& mask() const { return m_mode; }
 
 	/// Returns a symbolic string representation of the mode
 	/**

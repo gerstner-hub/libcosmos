@@ -36,10 +36,10 @@ int main() {
 
 	some.clear();
 	some.set(sigint);
-	cosmos::signal::setSigMask(some, &old);
+	cosmos::signal::set_sigmask(some, &old);
 
 	assert( !old.isSet(sigint) );
-	some = cosmos::signal::getSigMask();
+	some = cosmos::signal::get_sigmask();
 	assert( some.isSet(sigint) );
 
 	cosmos::SignalFD sfd(sigint);

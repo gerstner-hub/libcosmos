@@ -21,9 +21,9 @@ int testHexnum() {
 	int res = 0;
 	std::stringstream ss;
 
-	ss << cosmos::hexnum(100, 4);
+	ss << cosmos::HexNum(100, 4);
 	check(res, ss, "0x0064");
-	ss << cosmos::hexnum(100, 4).showBase(false);
+	ss << cosmos::HexNum(100, 4).showBase(false);
 	check(res, ss, "0064");
 	ss << 110;
 	// make sure neither hex nor fill character nor field width got stuck
@@ -37,10 +37,10 @@ int testOctnum() {
 	int res = 0;
 	std::stringstream ss;
 
-	ss << cosmos::octnum(10, 4);
+	ss << cosmos::OctNum(10, 4);
 	check(res, ss, "0o0012");
 
-	ss << cosmos::octnum(13, 3).showBase(false);
+	ss << cosmos::OctNum(13, 3).showBase(false);
 	check(res, ss, "015");
 
 	return res;

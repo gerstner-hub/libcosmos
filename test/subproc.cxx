@@ -585,7 +585,7 @@ public:
 
 		while (true) {
 			std::getline(from_cat, passwd_line);
-			if (cosmos::isPrefix(passwd_line, "root:")) {
+			if (cosmos::is_prefix(passwd_line, "root:")) {
 				std::cout << "found root: entry in /etc/passwd";
 				found_root = true;
 				break;
@@ -704,7 +704,7 @@ public:
 		cosmos::ChildCloner cloner{{coproc_path}};
 
 		cosmos::Pipe pipe;
-		cosmos::proc::setEnvVar(
+		cosmos::proc::set_env_var(
 				"COPROC_PIPE_WRITE_FD",
 				std::to_string(cosmos::to_integral(pipe.writeEnd().raw())),
 				cosmos::proc::OverwriteEnv{true});
@@ -712,7 +712,7 @@ public:
 
 		auto coproc = cloner.run();
 
-		cosmos::proc::clearEnvVar("COPROC_PIPE_WRITE_FD");
+		cosmos::proc::clear_env_var("COPROC_PIPE_WRITE_FD");
 		pipe.closeWriteEnd();
 
 		cosmos::InputStreamAdaptor file{pipe.readEnd()};
