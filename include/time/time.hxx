@@ -30,7 +30,7 @@ namespace cosmos::time {
 inline void sleep(std::chrono::nanoseconds ns) {
 	auto clock = MonotonicClock{};
 	auto now = clock.now();
-	clock.sleep(now + TimeSpec{ns});
+	clock.sleep(now + MonotonicTime{ns});
 }
 
 /// \see sleep(std::chrono::nanoseconds)

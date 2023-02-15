@@ -7,7 +7,7 @@
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/io/Poller.hxx"
 #include "cosmos/private/cosmos.hxx"
-#include "cosmos/time/TimeSpec.hxx"
+#include "cosmos/time/types.hxx"
 
 namespace cosmos {
 

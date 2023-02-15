@@ -1,47 +1,11 @@
 #ifndef COSMOS_CLOCK_HXX
 #define COSMOS_CLOCK_HXX
 
-// Linux
-#include <time.h>
-
 // cosmos
-#include "cosmos/time/TimeSpec.hxx"
+#include "cosmos/time/types.hxx"
 #include "cosmos/types.hxx"
 
 namespace cosmos {
-
-/// Available clock types for time operations.
-enum class ClockType : clockid_t {
-	/// System-wide wall clock time, settable.
-	REALTIME = CLOCK_REALTIME,
-	/// A faster but less precise version of REALTIME, not settable.
-	REALTIME_COARSE = CLOCK_REALTIME_COARSE,
-	/// System-wide wall clock time based on international atomic time (TAI) - it is ignoring leap seconds.
-	ATOMIC_REALTIME = CLOCK_TAI,
-	/// System-wide clock representing monotonic time since some unspecified point in the past.
-	/**
-	 * On Linux this corresponds to the time since the system was started.
-	 **/
-	MONOTONIC = CLOCK_MONOTONIC,
-	/// Like MONOTONIC but not affected by NTP adjustments.
-	MONOTONIC_RAW = CLOCK_MONOTONIC_RAW,
-	/// A faster but less precise version of MONOTONIC, does not count suspend time.
-	MONOTONIC_COARSE = CLOCK_MONOTONIC_COARSE,
-	/// Like MONOTONIC but also counts suspend time.
-	BOOTTIME = CLOCK_BOOTTIME,
-	/// Counts the CPU time consumed by the calling process.
-	PROCESS_CPUTIME = CLOCK_PROCESS_CPUTIME_ID,
-	/// Counts the CPU time consumed by the calling thread.
-	THREAD_CPUTIME = CLOCK_THREAD_CPUTIME_ID,
-	INVALID = clockid_t{-1}
-};
-
-/// Base class for all clock types.
-class COSMOS_API ClockBase {
-protected:
-	void nowFromClock(TimeSpec &ts, ClockType clock) const;
-	void sleepOnClock(const TimeSpec until, ClockType clock) const;
-};
 
 /// C++ wrapper around the POSIX clocks and related functions.
 /**
@@ -49,17 +13,15 @@ protected:
  * other.
  **/
 template <ClockType CLOCK>
-class Clock : public ClockBase {
+class Clock {
 public: // functions
 
 	/// Retrieve the current value of the clock.
-	void now(TimeSpec &ts) const {
-		return this->nowFromClock(ts, CLOCK);
-	}
+	void now(TimeSpec<CLOCK> &ts) const;
 
 	/// Returns the current value of the clock by value.
-	TimeSpec now() const {
-		TimeSpec ret;
+	TimeSpec<CLOCK> now() const {
+		TimeSpec<CLOCK> ret;
 		now(ret);
 		return ret;
 	}
@@ -75,15 +37,21 @@ public: // functions
 	 * setting, this call can be interrupted by signals which will cause
 	 * an ApiError with Errno::INTERRUPTED to be thrown.
 	 **/
-	void sleep(const TimeSpec until) {
-		sleepOnClock(until, CLOCK);
-	}
+	void sleep(const TimeSpec<CLOCK> until) const;
 
 	static ClockType raw() { return CLOCK; }
 };
 
-using MonotonicClock = Clock<ClockType::MONOTONIC>;
-using RealtimeClock = Clock<ClockType::REALTIME>;
+// the following clocks are explicitly instantiated in the compilation unit
+using AtomicRealTimeClock  = Clock<ClockType::ATOMIC_REALTIME>;
+using BootTimeClock        = Clock<ClockType::BOOTTIME>;
+using CoarseMonotonicClock = Clock<ClockType::MONOTONIC_COARSE>;
+using CoarseRealTimeClock  = Clock<ClockType::REALTIME_COARSE>;
+using MonotonicClock       = Clock<ClockType::MONOTONIC>;
+using ProcessTimeClock     = Clock<ClockType::PROCESS_CPUTIME>;
+using RawMonotonicClock    = Clock<ClockType::MONOTONIC_RAW>;
+using RealTimeClock        = Clock<ClockType::REALTIME>;
+using ThreadTimeClock      = Clock<ClockType::THREAD_CPUTIME>;
 
 } // end ns
 

@@ -9,8 +9,7 @@
 
 // cosmos
 #include "cosmos/thread/pthread.hxx"
-#include "cosmos/time/Clock.hxx"
-#include "cosmos/time/TimeSpec.hxx"
+#include "cosmos/time/types.hxx"
 
 namespace cosmos {
 
@@ -63,8 +62,6 @@ public: // types
 	using PosixEntry = std::function<pthread::ExitValue (pthread::ThreadArg)>;
 	/// Entry function without parameters for use with member functions or lambdas.
 	using Entry = std::function<void (void)>;
-	/// The clock type used in joinTimed().
-	using Clock = RealtimeClock;
 
 public: // functions
 	
@@ -141,13 +138,13 @@ public: // functions
 	 * blocks for a given time period before the operation fails and no
 	 * value is returned.
 	 *
-	 * \warning The clock used for \c ts is the RealtimeClock (see
-	 * PosixThread::Clock), although the implementation (glibc) calculates
-	 * an offset that will in turn be measured against MonotonicClock. So
-	 * the timeout will be (somewhat) unaffected by discontinous changes
-	 * to the realtime clock.
+	 * \warning The clock used for \c ts is the RealTimeClock, although
+	 * the implementation (glibc) calculates an offset that will in turn
+	 * be measured against MonotonicClock. So the timeout will be
+	 * (somewhat) unaffected by discontinous changes to the realtime
+	 * clock.
 	 **/
-	std::optional<pthread::ExitValue> joinTimed(const TimeSpec ts);
+	std::optional<pthread::ExitValue> joinTimed(const RealTime ts);
 
 	/// Detach a joinable thread.
 	/**

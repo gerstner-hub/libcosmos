@@ -170,7 +170,7 @@ std::optional<pthread::ExitValue> PosixThread::tryJoin() {
 	return pthread::ExitValue{reinterpret_cast<intptr_t>(res)};
 }
 
-std::optional<pthread::ExitValue> PosixThread::joinTimed(const TimeSpec ts) {
+std::optional<pthread::ExitValue> PosixThread::joinTimed(const RealTime ts) {
 	assertJoinConditions();
 
 	void *res = nullptr;

@@ -13,7 +13,7 @@ int main() {
 	cosmos::MonotonicClock mclock;
 
 	auto pre_sleep = mclock.now();
-	auto sleep_end = pre_sleep + cosmos::TimeSpec{std::chrono::milliseconds{500}};
+	auto sleep_end = pre_sleep + cosmos::MonotonicTime{std::chrono::milliseconds{500}};
 	mclock.sleep(sleep_end);
 
 	if (mclock.now() < sleep_end) {

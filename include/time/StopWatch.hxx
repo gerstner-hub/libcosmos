@@ -36,18 +36,24 @@ public: // functions
 	}
 
 	/// Returns the currently set mark (undefined if mark() was never called!)
-	TimeSpec currentMark() const {
+	TimeSpec<CLOCK> currentMark() const {
 		return m_mark;
 	}
 
 protected: // data
 
-	TimeSpec m_mark;
+	TimeSpec<CLOCK> m_mark;
 	Clock<CLOCK> m_clock;
 };
 
-using MonotonicStopWatch = StopWatch<ClockType::MONOTONIC>;
-using RealtimeStopWatch = StopWatch<ClockType::REALTIME>;
+using AtomicRealTimeStopWatch  = StopWatch<ClockType::ATOMIC_REALTIME>;
+using CoarseMonotonicStopWatch = StopWatch<ClockType::MONOTONIC_COARSE>;
+using CoarseRealTimeStopWatch  = StopWatch<ClockType::REALTIME_COARSE>;
+using MonotonicStopWatch       = StopWatch<ClockType::MONOTONIC>;
+using ProcessStopWatch         = StopWatch<ClockType::PROCESS_CPUTIME>;
+using RawMonotonicStopWatch    = StopWatch<ClockType::MONOTONIC_RAW>;
+using RealTimeStopWatch        = StopWatch<ClockType::REALTIME>;
+using ThreadStopWatch          = StopWatch<ClockType::THREAD_CPUTIME>;
 
 } // end ns
 

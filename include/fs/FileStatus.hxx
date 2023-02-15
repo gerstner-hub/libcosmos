@@ -12,7 +12,7 @@
 #include "cosmos/dso_export.h"
 #include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/fs/types.hxx"
-#include "cosmos/time/TimeSpec.hxx"
+#include "cosmos/time/types.hxx"
 
 namespace cosmos {
 
@@ -178,13 +178,13 @@ public: // functions
 	// had second resolution integers in st_mtime, st_ctime, st_atime.
 
 	/// Returns the time of the last modification of the file content
-	const TimeSpec& modTime() const {
+	const RealTime& modTime() const {
 		// This is a bit dirty, casting the struct timespec to its
 		// wrapper type. Should work as long as we don't change the
 		// object size (is checked in the compilation unit for
 		// TimeSpec). This saves us some copying since struct timespec
 		// is 16 bytes in size.
-		return *reinterpret_cast<const TimeSpec*>(&m_st.st_mtim);
+		return *reinterpret_cast<const RealTime*>(&m_st.st_mtim);
 	}
 
 	/// Returns the time of the last status (inode) modification
@@ -192,8 +192,8 @@ public: // functions
 	 * This timestamp reflects the last change to the inode data i.e. the
 	 * metadata of the file (e.g. ownership, permissions etc.)
 	 **/
-	const TimeSpec& statusTime() const {
-		return *reinterpret_cast<const TimeSpec*>(&m_st.st_ctim);
+	const RealTime& statusTime() const {
+		return *reinterpret_cast<const RealTime*>(&m_st.st_ctim);
 	}
 
 	/// Returns the time of the last (read) access of the file content
@@ -202,8 +202,8 @@ public: // functions
 	 * circumstances, for example there is mount option `noatime` that
 	 * disables this for performance reasons.
 	 **/
-	const TimeSpec& accessTime() const {
-		return *reinterpret_cast<const TimeSpec*>(&m_st.st_atim);
+	const RealTime& accessTime() const {
+		return *reinterpret_cast<const RealTime*>(&m_st.st_atim);
 	}
 
 	/// Returns whether the two FileStatus objects refer to the same file

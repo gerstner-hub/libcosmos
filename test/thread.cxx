@@ -10,6 +10,7 @@
 #include "cosmos/thread/PosixThread.hxx"
 #include "cosmos/thread/pthread.hxx"
 #include "cosmos/thread/thread.hxx"
+#include "cosmos/time/Clock.hxx"
 
 using ThreadArg = cosmos::pthread::ThreadArg;
 using ExitValue = cosmos::pthread::ExitValue;
@@ -116,10 +117,10 @@ protected: // functions
 	}
 
 	void timedJoinTest() {
-		auto clock = cosmos::PosixThread::Clock();
+		auto clock = cosmos::RealTimeClock{};
 		cosmos::PosixThread thread{[]() {sleep(3);}};
 
-		auto maxwait = clock.now() + cosmos::TimeSpec{std::chrono::milliseconds{1000}};
+		auto maxwait = clock.now() + cosmos::RealTime{std::chrono::milliseconds{1000}};
 
 		if (thread.joinTimed(maxwait).has_value()) {
 			complain("timedJoin() worked right away?!");
@@ -129,7 +130,7 @@ protected: // functions
 
 		sleep(2);
 
-		maxwait = clock.now() + cosmos::TimeSpec{std::chrono::milliseconds{1000}};
+		maxwait = clock.now() + cosmos::RealTime{std::chrono::milliseconds{1000}};
 
 		if (!thread.joinTimed(maxwait)) {
 			complain("timedJoin() didn't work in the end?!");

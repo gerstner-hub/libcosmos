@@ -1,23 +1,39 @@
+// C++
+#include <type_traits>
+
 // Cosmos
 #include "cosmos/algs.hxx"
+#include "cosmos/dso_export.h"
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/private/cosmos.hxx"
 #include "cosmos/time/Clock.hxx"
 
 namespace cosmos {
 
-void ClockBase::nowFromClock(TimeSpec &ts, ClockType clock) const {
-	auto res = clock_gettime(to_integral(clock), &ts);
+// this is an important property since we want to take advantage of wrapping
+// existing struct timespec instances e.g. in FileStatus::getModeTime()
+static_assert(sizeof(RealTime) == sizeof(struct timespec));
+static_assert(sizeof(MonotonicTime) == sizeof(struct timespec));
+
+// this is sadly not true, because the type has custom constructors
+#if 0
+static_assert(std::is_trivial<RealTime>::value == true);
+#endif
+
+template <ClockType CLOCK>
+void Clock<CLOCK>::now(TimeSpec<CLOCK> &ts) const {
+	auto res = clock_gettime(to_integral(CLOCK), &ts);
 
 	if (res != 0) {
 		cosmos_throw (ApiError());
 	}
 }
 
-void ClockBase::sleepOnClock(const TimeSpec until, ClockType clock) const {
+template <ClockType CLOCK>
+void Clock<CLOCK>::sleep(const TimeSpec<CLOCK> until) const {
 	while (true) {
 		auto res = clock_nanosleep(
-				to_integral(clock),
+				to_integral(CLOCK),
 				TIMER_ABSTIME,
 				&until,
 				nullptr
@@ -39,5 +55,16 @@ void ClockBase::sleepOnClock(const TimeSpec until, ClockType clock) const {
 		cosmos_throw (ApiError(err));
 	}
 }
+
+/* explicit instantiations of the necessary clock variants */
+template class COSMOS_API Clock<ClockType::ATOMIC_REALTIME>;
+template class COSMOS_API Clock<ClockType::BOOTTIME>;
+template class COSMOS_API Clock<ClockType::MONOTONIC>;
+template class COSMOS_API Clock<ClockType::MONOTONIC_COARSE>;
+template class COSMOS_API Clock<ClockType::MONOTONIC_RAW>;
+template class COSMOS_API Clock<ClockType::PROCESS_CPUTIME>;
+template class COSMOS_API Clock<ClockType::REALTIME>;
+template class COSMOS_API Clock<ClockType::REALTIME_COARSE>;
+template class COSMOS_API Clock<ClockType::THREAD_CPUTIME>;
 
 } // end ns

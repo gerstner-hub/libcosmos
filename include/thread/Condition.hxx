@@ -10,7 +10,7 @@
 // cosmos
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/thread/Mutex.hxx"
-#include "cosmos/time/Clock.hxx"
+#include "cosmos/time/types.hxx"
 
 namespace cosmos {
 
@@ -82,15 +82,12 @@ public: // functions
 	 * This is like wait() but waits at most until the given absolute time
 	 * has been reached.
 	 *
-	 * The timeout operation is based on the clock defined in
-	 * Condition::Clock.
-	 *
 	 * Upon return the Mutex will again be owned by the caller, regardless
 	 * of whether the condition was signaled or a timeout occured.
 	 *
 	 * \return Whether a timeout or a signal occured.
 	 **/
-	WaitTimedRes waitTimed(const TimeSpec ts) const {
+	WaitTimedRes waitTimed(const MonotonicTime ts) const {
 		auto res = ::pthread_cond_timedwait(&m_pcond, &(m_lock.m_pmutex), &ts);
 
 		switch(Errno{res}) {
@@ -134,11 +131,6 @@ public: // functions
 	}
 
 	Mutex& mutex() { return m_lock; }
-
-public: // types
-
-	/// The clock type used by waitTimed()
-	using Clock = MonotonicClock;
 
 protected: // data
 

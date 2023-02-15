@@ -1,20 +1,48 @@
-#ifndef COSMOS_TIMESPEC_HXX
-#define COSMOS_TIMESPEC_HXX
-
-// C++
-#include <chrono>
+#ifndef COSMOS_TIME_TYPES_HXX
+#define COSMOS_TIME_TYPES_HXX
 
 // Linux
 #include <time.h>
 
+// C++
+#include <chrono>
+
+/**
+ * @file
+ *
+ * Basic time related type definitions.
+ **/
+
 namespace cosmos {
 
-/// A C++ wrapper around the POSIX struct timespec
-/**
- * TODO: The TimeSpec could also be coupled to the clock type it is compatible
- * with, thereby gaining type safety also on this level, it would not be
- * possible to use a TimeSpec from the wrong clock with an API.
- **/
+/// Available clock types for time operations.
+enum class ClockType : clockid_t {
+	/// System-wide wall clock time, settable.
+	REALTIME = CLOCK_REALTIME,
+	/// A faster but less precise version of REALTIME, not settable.
+	REALTIME_COARSE = CLOCK_REALTIME_COARSE,
+	/// System-wide wall clock time based on international atomic time (TAI) - it is ignoring leap seconds.
+	ATOMIC_REALTIME = CLOCK_TAI,
+	/// System-wide clock representing monotonic time since some unspecified point in the past.
+	/**
+	 * On Linux this corresponds to the time since the system was started.
+	 **/
+	MONOTONIC = CLOCK_MONOTONIC,
+	/// Like MONOTONIC but not affected by NTP adjustments.
+	MONOTONIC_RAW = CLOCK_MONOTONIC_RAW,
+	/// A faster but less precise version of MONOTONIC, does not count suspend time.
+	MONOTONIC_COARSE = CLOCK_MONOTONIC_COARSE,
+	/// Like MONOTONIC but also counts suspend time.
+	BOOTTIME = CLOCK_BOOTTIME,
+	/// Counts the CPU time consumed by the calling process.
+	PROCESS_CPUTIME = CLOCK_PROCESS_CPUTIME_ID,
+	/// Counts the CPU time consumed by the calling thread.
+	THREAD_CPUTIME = CLOCK_THREAD_CPUTIME_ID,
+	INVALID = clockid_t{-1}
+};
+
+/// A C++ wrapper around the POSIX struct timespec coupled to a specific CLOCK type
+template <ClockType CLOCK>
 class TimeSpec :
 		public timespec {
 public:
@@ -65,8 +93,8 @@ public:
 	}
 
 	TimeSpec& set(const std::chrono::nanoseconds ns) {
-		this->tv_sec = ns.count() / nanosecondBase();
-		this->tv_nsec = (ns.count() % nanosecondBase());
+		this->tv_sec = ns.count() / NANOSECOND_BASE;
+		this->tv_nsec = (ns.count() % NANOSECOND_BASE);
 		return *this;
 	}
 
@@ -117,7 +145,7 @@ public:
 
 		if (ret.tv_nsec < 0) {
 			--ret.tv_sec;
-			ret.tv_nsec += nanosecondBase();
+			ret.tv_nsec += NANOSECOND_BASE;
 		}
 
 		return ret;
@@ -129,9 +157,9 @@ public:
 		ret.tv_sec = this->tv_sec + other.tv_sec;
 		ret.tv_nsec = this->tv_nsec + other.tv_nsec;
 
-		if (ret.tv_nsec >= nanosecondBase()) {
+		if (ret.tv_nsec >= NANOSECOND_BASE) {
 			++ret.tv_sec;
-			ret.tv_nsec -= nanosecondBase();
+			ret.tv_nsec -= NANOSECOND_BASE;
 		}
 
 		return ret;
@@ -139,10 +167,18 @@ public:
 
 protected: // functions
 
-	constexpr long nanosecondBase() const {
-		return 1000 * 1000 * 1000;
-	}
+	static constexpr long NANOSECOND_BASE{1000 * 1000 * 1000};
 };
+
+typedef TimeSpec<ClockType::ATOMIC_REALTIME>  AtomicRealTime;
+typedef TimeSpec<ClockType::BOOTTIME>         BootTime;
+typedef TimeSpec<ClockType::MONOTONIC_COARSE> CoarseMonotonicTime;
+typedef TimeSpec<ClockType::MONOTONIC>        MonotonicTime;
+typedef TimeSpec<ClockType::MONOTONIC_RAW>    RawMonotonicTime;
+typedef TimeSpec<ClockType::PROCESS_CPUTIME>  ProcessCpuTime;
+typedef TimeSpec<ClockType::REALTIME_COARSE>  CoarseRealTime;
+typedef TimeSpec<ClockType::REALTIME>         RealTime;
+typedef TimeSpec<ClockType::THREAD_CPUTIME>   ThreadCpuTime;
 
 } // end ns
 

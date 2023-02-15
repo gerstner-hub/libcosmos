@@ -25,9 +25,9 @@ int main() {
 		cond.broadcast();
 
 		cosmos::ConditionMutex condmux;
-		cosmos::Condition::Clock clock;
+		cosmos::MonotonicClock clock;
 		auto starttime = clock.now();
-		auto endtime = starttime + cosmos::TimeSpec(5);
+		auto endtime = starttime + cosmos::MonotonicTime{5};
 
 		condmux.lock();
 		auto wait_res = condmux.waitTimed(endtime);
