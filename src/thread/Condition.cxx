@@ -1,4 +1,5 @@
 // Cosmos
+#include "cosmos/algs.hxx"
 #include "cosmos/thread/Condition.hxx"
 
 namespace cosmos {
@@ -21,7 +22,7 @@ Condition::Condition(Mutex &lock) :
 		 * operations on the condition, it's the most robust
 		 * clock available
 		 */
-		res = pthread_condattr_setclock(&attr, Condition::Clock::rawType());
+		res = pthread_condattr_setclock(&attr, to_integral(Condition::Clock::raw()));
 
 		if (auto err = Errno{res}; err != Errno::NO_ERROR) {
 			cosmos_throw (ApiError(err));

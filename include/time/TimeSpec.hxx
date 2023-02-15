@@ -10,6 +10,11 @@
 namespace cosmos {
 
 /// A C++ wrapper around the POSIX struct timespec
+/**
+ * TODO: The TimeSpec could also be coupled to the clock type it is compatible
+ * with, thereby gaining type safety also on this level, it would not be
+ * possible to use a TimeSpec from the wrong clock with an API.
+ **/
 class TimeSpec :
 		public timespec {
 public:
@@ -19,7 +24,11 @@ public:
 	}
 
 	explicit TimeSpec(const std::chrono::milliseconds ms) {
-		setAsMilliseconds(ms);
+		set(ms);
+	}
+
+	explicit TimeSpec(const std::chrono::nanoseconds ns) {
+		set(ns);
 	}
 
 	/// Deliberately don't initialize the members for performance reasons
@@ -29,16 +38,16 @@ public:
 	void reset() { this->tv_sec = 0; this->tv_nsec = 0; }
 
 	time_t getSeconds() const { return this->tv_sec; }
-	long getNanoSeconds() const { return this->tv_nsec; }
+	long getNanoseconds() const { return this->tv_nsec; }
 
 	void setSeconds(const time_t seconds) { this->tv_sec = seconds; }
-	void setNanoSeconds(const long nano_seconds) { this->tv_nsec = nano_seconds; }
+	void setNanoseconds(const long nano_seconds) { this->tv_nsec = nano_seconds; }
 
 	void addSeconds(const time_t seconds) {
 		this->tv_sec += seconds;
 	}
 
-	void addNanoSeconds(const long nano_seconds) {
+	void addNanoseconds(const long nano_seconds) {
 		this->tv_nsec += nano_seconds;
 	}
 
@@ -49,9 +58,15 @@ public:
 		return *this;
 	}
 
-	TimeSpec& setAsMilliseconds(const std::chrono::milliseconds ms) {
+	TimeSpec& set(const std::chrono::milliseconds ms) {
 		this->tv_sec = ms.count() / 1000;
 		this->tv_nsec = (ms.count() % 1000) * 1000 * 1000;
+		return *this;
+	}
+
+	TimeSpec& set(const std::chrono::nanoseconds ns) {
+		this->tv_sec = ns.count() / nanosecondBase();
+		this->tv_nsec = (ns.count() % nanosecondBase());
 		return *this;
 	}
 
