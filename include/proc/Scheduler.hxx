@@ -122,11 +122,11 @@ protected: // data
  * A thread with realtime scheduling always has a higher priority than threads
  * with non-realtime scheduling.
  **/
-class COSMOS_API RealtimeSchedulerSettings :
+class COSMOS_API RealTimeSchedulerSettings :
 		public SchedulerSettings {
 public: // functions
 
-	explicit RealtimeSchedulerSettings(const SchedulerPolicy policy) :
+	explicit RealTimeSchedulerSettings(const SchedulerPolicy policy) :
 		SchedulerSettings{policy}
 	{}
 
@@ -157,11 +157,11 @@ protected: // data
  * running thread * becomes blocked.
  **/
 class COSMOS_API FifoSchedulerSettings :
-		public RealtimeSchedulerSettings {
+		public RealTimeSchedulerSettings {
 public: // functions
 
 	FifoSchedulerSettings() :
-			RealtimeSchedulerSettings{SchedulerPolicy::FIFO}
+			RealTimeSchedulerSettings{SchedulerPolicy::FIFO}
 	{}
 };
 
@@ -174,11 +174,11 @@ public: // functions
  * time slice elapsed.
  **/
 class COSMOS_API RoundRobinSchedulerSettings :
-	public RealtimeSchedulerSettings {
+	public RealTimeSchedulerSettings {
 public: // functions
 
 	RoundRobinSchedulerSettings() :
-			RealtimeSchedulerSettings{SchedulerPolicy::ROUND_ROBIN}
+			RealTimeSchedulerSettings{SchedulerPolicy::ROUND_ROBIN}
 	{}
 };
 
