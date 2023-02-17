@@ -30,6 +30,27 @@ void Clock<CLOCK>::now(TimeSpec<CLOCK> &ts) const {
 }
 
 template <ClockType CLOCK>
+TimeSpec<CLOCK> Clock<CLOCK>::resolution() const {
+	TimeSpec<CLOCK> ret;
+	auto res = clock_getres(to_integral(CLOCK), &ret);
+
+	if (res != 0) {
+		cosmos_throw (ApiError());
+	}
+
+	return ret;
+}
+
+template <ClockType CLOCK>
+void Clock<CLOCK>::setTime(const TimeSpec<CLOCK> t) {
+	auto res = clock_settime(to_integral(CLOCK), &t);
+
+	if (res != 0) {
+		cosmos_throw (ApiError());
+	}
+}
+
+template <ClockType CLOCK>
 void Clock<CLOCK>::sleep(const TimeSpec<CLOCK> until) const {
 	while (true) {
 		auto res = clock_nanosleep(

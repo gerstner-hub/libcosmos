@@ -26,6 +26,24 @@ public: // functions
 		return ret;
 	}
 
+	/// Returns the resolution/precision of the represented clock
+	/**
+	 * The returned TimeSpec represents the smallest time unit that can be
+	 * processed / detected by the clock. When calling setTime() then the
+	 * used time value is truncated to a multiple of the resolution value
+	 * returned from this function.
+	 **/
+	TimeSpec<CLOCK> resolution() const;
+
+	/// Changes the current time value of the represented clock
+	/**
+	 * Elevated permissions are necessary to change most clocks e.g.
+	 * CAP_SYS_TIME to change the RealTimeClock. Not all clocks can be
+	 * set. If this is the case then an ApiError with Errno::INVALID_ARG
+	 * is thrown.
+	 **/
+	void setTime(const TimeSpec<CLOCK> t);
+
 	/// Suspend execution of the calling thread until the clock reaches the given time.
 	/**
 	 * The given \c until value is an absolute time in the future until

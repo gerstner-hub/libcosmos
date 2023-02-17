@@ -1,6 +1,7 @@
 #include <chrono>
 #include <iostream>
 
+#include "cosmos/error/ApiError.hxx"
 #include "cosmos/time/Clock.hxx"
 #include "cosmos/time/StopWatch.hxx"
 #include "cosmos/time/time.hxx"
@@ -31,6 +32,17 @@ int main() {
 	if (diff_time.toMilliseconds() < 500) {
 		std::cerr << "sleep time was shorter than requested (2)?! -> " << diff_time.toMilliseconds() << "\n";
 		return 1;
+	}
+
+	auto timeres = mclock.resolution();
+
+	std::cout << "monotonic clock resolution:\n";
+	std::cout << timeres.getSeconds() << "s " << timeres.getNanoseconds() << "ns\n";
+
+	try {
+		mclock.setTime(pre_sleep);
+	} catch (const cosmos::ApiError &e) {
+		std::cerr << "failed to set monotonic clock: " << e.what() << std::endl;
 	}
 
 	return 0;
