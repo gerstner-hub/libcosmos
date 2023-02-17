@@ -3,6 +3,8 @@
 
 // cosmos
 #include "cosmos/algs.hxx"
+#include "cosmos/formatting.hxx"
+#include "cosmos/private/cosmos.hxx"
 #include "cosmos/error/FileError.hxx"
 #include "cosmos/error/InternalError.hxx"
 #include "cosmos/error/UsageError.hxx"
@@ -16,7 +18,7 @@ File::~File() {
 	try {
 		this->close();
 	} catch (const std::exception &e) {
-		std::cerr << __FUNCTION__ << ": fd(" << orig_fd << "): " << e.what() << std::endl;
+		noncritical_error(sprintf("%s: failed to close fd(%d)", __FUNCTION__, to_integral(orig_fd)), e);
 	}
 }
 

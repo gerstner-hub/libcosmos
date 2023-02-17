@@ -7,6 +7,8 @@
 #include <iostream>
 
 // Cosmos
+#include "cosmos/formatting.hxx"
+#include "cosmos/private/cosmos.hxx"
 #include "cosmos/fs/Directory.hxx"
 
 namespace cosmos {
@@ -15,10 +17,9 @@ Directory::~Directory() {
 	try {
 		close();
 	} catch (const std::exception &ex) {
-		// ignore otherwise
-		std::cerr << __FUNCTION__
-			<< ": failed to close Directory stream: "
-			<< ex.what() << "\n";
+		noncritical_error(
+				sprintf("%s: failed to close directory stream", __FUNCTION__),
+				ex);
 	}
 }
 

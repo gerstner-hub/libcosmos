@@ -5,6 +5,7 @@
 // cosmos
 #include "cosmos/algs.hxx"
 #include "cosmos/error/ApiError.hxx"
+#include "cosmos/formatting.hxx"
 #include "cosmos/io/Poller.hxx"
 #include "cosmos/private/cosmos.hxx"
 #include "cosmos/time/types.hxx"
@@ -15,7 +16,9 @@ Poller::~Poller() {
 	try {
 		close();
 	} catch (const std::exception &ex) {
-		std::cerr << "failed to close " << __FUNCTION__ << ": " << ex.what() << std::endl;
+		noncritical_error(
+			sprintf("%s: failed to close()", __FUNCTION__),
+			ex);
 	}
 }
 

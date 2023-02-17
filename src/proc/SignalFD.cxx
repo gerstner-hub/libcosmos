@@ -6,6 +6,7 @@
 
 // cosmos
 #include "cosmos/algs.hxx"
+#include "cosmos/private/cosmos.hxx"
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/error/UsageError.hxx"
 #include "cosmos/error/RuntimeError.hxx"
@@ -17,7 +18,7 @@ SignalFD::~SignalFD() {
 	try {
 		close();
 	} catch (const std::exception &ex) {
-		std::cerr << "failed to close signal fd: " << ex.what() << std::endl;
+		noncritical_error("Failed to close signal fd", ex);
 	}
 }
 

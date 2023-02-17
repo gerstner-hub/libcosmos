@@ -33,12 +33,31 @@ extern RestartOnIntr auto_restart_syscalls;
  * - move constructors or assignment operators encounter similar situations as
  *   above in the context of destructors.
  *
- * This call will not return. Provide a description of the problem in \c msg,
+ * This call will not return. The process will be terminated after writing
+ * error context to stderr. Provide a description of the problem in \c msg,
  * optionally a related exception in \c ex.
  **/
 [[ noreturn ]] void fatal_error(
 		const std::string_view msg,
 		const std::exception *ex = nullptr);
+
+/// handle a noncritical library error that cannot be turned into an exception
+/**
+ * This function will take care of recoverable error conditions that cannot be
+ * expressed in form of exceptions, because they occur e.g. in an object's
+ * destructor (from where exceptions shouldn't ever be thrown)..
+ *
+ * This can be used e.g. when a close operation for a resource like a file
+ * descriptor fails. This is a rare event and even an application might not
+ * know what to do about it. If an application want to deal with the
+ * possibility of this happening then it can call an object's close method
+ * explicitly, catching possible exceptions. Otherwise this function call here
+ * will provide information about the condition on stderr and execution will
+ * continue - possibly leaving a small resource leak.
+ **/
+void noncritical_error(
+		const std::string_view msg,
+		const std::exception &ex);
 
 } // end ns
 

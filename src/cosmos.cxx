@@ -126,4 +126,11 @@ void fatal_error(const std::string_view msg, const std::exception *ex) {
 	std::abort();
 }
 
+void noncritical_error(
+		const std::string_view msg,
+		const std::exception &ex) {
+	std::cerr << "[libcosmos] WARNING: " << msg << "\n";
+	std::cerr << "Exception context:\n\n" << ex.what() << "\n";
+}
+
 } // end ns
