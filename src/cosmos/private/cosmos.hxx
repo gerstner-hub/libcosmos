@@ -1,3 +1,6 @@
+#ifndef COSMOS_PRIVATE_COSMOS_HXX
+#define COSMOS_PRIVATE_COSMOS_HXX
+
 // C++
 #include <exception>
 #include <optional>
@@ -38,3 +41,5 @@ extern RestartOnIntr auto_restart_syscalls;
 		const std::exception *ex = nullptr);
 
 } // end ns
+
+#endif // inc. guard
