@@ -117,4 +117,13 @@ void set_restart_syscall_on_interrupt(const bool auto_restart) {
 	auto_restart_syscalls = RestartOnIntr{auto_restart};
 }
 
+void fatal_error(const std::string_view msg, const std::exception *ex) {
+	std::cerr << "[libcosmos] FATAL: " << msg << "\n";
+	if (ex) {
+		std::cerr << "Exception context:\n\n" << ex->what() << "\n";
+	}
+	std::cerr << "Aborting program.\n";
+	std::abort();
+}
+
 } // end ns

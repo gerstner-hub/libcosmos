@@ -12,14 +12,14 @@
 #include "cosmos/algs.hxx"
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/io/Poller.hxx"
+#include "cosmos/private/cosmos.hxx"
 #include "cosmos/proc/SubProc.hxx"
 
 namespace cosmos {
 
 SubProc::~SubProc() {
 	if (running()) {
-		std::cerr << "[libcosmos] FATAL: destroying while child process still running\n";
-		std::abort();
+		fatal_error("destroying SubProc while child process still running");
 	}
 }
 
@@ -64,8 +64,7 @@ std::optional<WaitRes> SubProc::waitTimed(const std::chrono::milliseconds max) {
 
 SubProc& SubProc::operator=(SubProc &&other) noexcept {
 	if (running()) {
-		std::cerr << "[libcosmos] FATAL: moving into object with still running child process\n";
-		std::abort();
+		fatal_error("moving into SubProc object with still running child process");
 	}
 	m_pid = other.m_pid;
 	m_child_fd = other.m_child_fd;

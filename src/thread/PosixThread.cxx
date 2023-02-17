@@ -8,6 +8,8 @@
 // cosmos
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/error/UsageError.hxx"
+#include "cosmos/formatting.hxx"
+#include "cosmos/private/cosmos.hxx"
 #include "cosmos/thread/PosixThread.hxx"
 
 using namespace cosmos::pthread;
@@ -101,15 +103,13 @@ PosixThread::PosixThread(PosixThread &&other) noexcept {
 
 PosixThread::~PosixThread() {
 	if (joinable()) {
-		std::cerr << "[libcosmos] FATAL: Thread " << name() << " destroyed but not joined!\n";
-		std::abort();
+		fatal_error(sprintf("Thread %s destroyed but not joined!", name().c_str()));
 	}
 }
 
 PosixThread& PosixThread::operator=(PosixThread &&other) noexcept {
 	if (joinable()) {
-		std::cerr << "[libcosmos] FATAL: moving into not-yet-joined thread\n";
-		std::abort();
+		fatal_error("moving into not-yet-joined thread");
 	}
 	m_name = other.m_name;
 	m_pthread = *(other.m_pthread);
