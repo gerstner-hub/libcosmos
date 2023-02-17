@@ -2,14 +2,14 @@
 #include "cosmos/algs.hxx"
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/error/RuntimeError.hxx"
-#include "cosmos/fs/StreamFile.hxx"
+#include "cosmos/io/StreamIO.hxx"
 #include "cosmos/private/cosmos.hxx"
 
 namespace cosmos {
 
-size_t StreamFile::read(void *buf, size_t length) {
+size_t StreamIO::read(void *buf, size_t length) {
 	while (true) {
-		auto res = ::read(to_integral(m_fd.raw()), buf, length);
+		auto res = ::read(to_integral(m_stream_fd.raw()), buf, length);
 
 		if (res < 0) {
 			// transparent restart
@@ -22,7 +22,7 @@ size_t StreamFile::read(void *buf, size_t length) {
 	}
 }
 
-void StreamFile::readAll(void *buf, size_t length) {
+void StreamIO::readAll(void *buf, size_t length) {
 	size_t res;
 	while (length != 0) {
 		res = read(buf, length);
@@ -35,9 +35,9 @@ void StreamFile::readAll(void *buf, size_t length) {
 	}
 }
 
-size_t StreamFile::write(const void *buf, size_t length) {
+size_t StreamIO::write(const void *buf, size_t length) {
 	while (true) {
-		auto res = ::write(to_integral(m_fd.raw()), buf, length);
+		auto res = ::write(to_integral(m_stream_fd.raw()), buf, length);
 
 		if (res < 0) {
 			// transparent restart
@@ -50,7 +50,7 @@ size_t StreamFile::write(const void *buf, size_t length) {
 	}
 }
 
-void StreamFile::writeAll(const void *buf, size_t length) {
+void StreamIO::writeAll(const void *buf, size_t length) {
 	size_t res;
 
 	while (length != 0) {
@@ -60,8 +60,8 @@ void StreamFile::writeAll(const void *buf, size_t length) {
 	}
 }
 
-off_t StreamFile::seek(const SeekType type, off_t off) {
-	const auto res = ::lseek(to_integral(m_fd.raw()), off, to_integral(type));
+off_t StreamIO::seek(const SeekType type, off_t off) {
+	const auto res = ::lseek(to_integral(m_stream_fd.raw()), off, to_integral(type));
 
 	if (res == static_cast<off_t>(-1)) {
 		cosmos_throw (ApiError("seeking in file"));

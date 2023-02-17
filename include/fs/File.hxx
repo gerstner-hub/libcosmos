@@ -3,6 +3,7 @@
 
 // C++
 #include <optional>
+#include <string_view>
 
 // cosmos
 #include "cosmos/BitMask.hxx"
@@ -110,7 +111,7 @@ public: // functions
 	/// Returns whether currently a FileDescriptor is opened
 	bool isOpen() const { return m_fd.valid(); }
 
-	/// Allow befriended classes to get the FD with const semantics.
+	/// Allows access to the underlying fd with const semantics
 	const FileDescriptor fd() const { return m_fd; }
 
 protected: // data

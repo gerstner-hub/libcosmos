@@ -1,14 +1,9 @@
 #ifndef COSMOS_STREAMFILE_HXX
 #define COSMOS_STREAMFILE_HXX
 
-// Linux
-#include <unistd.h>
-
-// C++
-#include <string_view>
-
 // cosmos
 #include "cosmos/fs/File.hxx"
+#include "cosmos/io/StreamIO.hxx"
 
 namespace cosmos {
 
@@ -18,119 +13,36 @@ namespace cosmos {
  * operating system and data is exchanged by means of read/write operations
  * that transfer data from the current process to the file and vice versa.
  *
- * This is the most common access mode for files but also somewhat
- * inefficient. In contrast e.g. memory mapped files can be more efficient.
+ * \see StreamIO
  **/
-class COSMOS_API StreamFile :
-		public File {
-public: // types
-
-	/// Different methods for changing the file read/write position
-	enum class SeekType : int {
-		SET = SEEK_SET, /// Set a new absolute position
-		CUR = SEEK_CUR, /// Set a position relative to the current one
-		END = SEEK_END, /// Set a position relative to the end of the file
-		/// Seek to a non-hole position
-		/**
-		 * For files with holes in them this seeks the next position
-		 * containing data that is equal or greater to the provided
-		 * offset.
-		 **/
-		DATA = SEEK_DATA,
-		/// Seek to a hole position
-		/**
-		 * For files with holes in them this seeks the next position
-		 * that is part of a hole that is equal or greater to the
-		 * provided offset. The end-of-file is considered a whole in
-		 * this context.
-		 **/
-		HOLE = SEEK_HOLE
-	};
+class StreamFile :
+		public File,
+		public StreamIO {
 public: // functions
 
-	StreamFile() {}
+	StreamFile() :
+		StreamIO{m_fd}
+	{}
 
 	StreamFile(const std::string_view path, const OpenMode mode) :
-		File{path, mode, OpenFlags{{OpenSettings::CLOEXEC}}} {}
+		File{path, mode, OpenFlags{{OpenSettings::CLOEXEC}}},
+		StreamIO{m_fd}
+	{}
 
 	StreamFile(const std::string_view path, const OpenMode mode, const OpenFlags flags) :
-		File{path, mode, flags} {}
+		File{path, mode, flags},
+		StreamIO{m_fd}
+	{}
 
 	StreamFile(const std::string_view path, const OpenMode mode, const OpenFlags flags, const FileMode fmode) :
-		File{path, mode, flags, fmode} {}
+		File{path, mode, flags, fmode},
+		StreamIO{m_fd}
+	{}
 
 	StreamFile(FileDescriptor fd, const AutoClose auto_close) :
-		File{fd, auto_close} {}
-
-	/// Read up to \p length bytes from the file into \p buf
-	/**
-	 * An attempt is made to read data from the underlying file object and
-	 * place it into \p buf. \p buf needs to be able to hold at least \p
-	 * length bytes. Short reads can occur in which case less bytes will
-	 * be read. The number of bytes actually read is returned from this
-	 * function.
-	 *
-	 * A return value of zero indicates that the End-of-File has been
-	 * reached and no further data can be obtained.
-	 *
-	 * On error conditions an exception is thrown.
-	 **/
-	size_t read(void *buf, size_t length);
-
-	/// Write up to \p length bytes from \p buf into the underlying file
-	/**
-	 * An attempt is made to write data from the given \p buf and pass it
-	 * to the underlying file object. \p buf needs to hold at least \c
-	 * length bytes of data. Short writes can occur in which case less
-	 * bytes will be written. The number of bytes actually written is
-	 * returned from this function.
-	 *
-	 * On error conditions an exception is thrown.
-	 **/
-	size_t write(const void *buf, size_t length);
-
-	/// string_view wrapper around write(const void*, size_t)
-	size_t write(const std::string_view data) {
-		return write(data.data(), data.size());
-	}
-
-	/// Read *all* \p length bytes from the underlying file
-	/**
-	 * This behaves just like read() with the exception that on short
-	 * reads the operation will be continued until all \c length bytes
-	 * have been obtained from the file.
-	 *
-	 * An End-of-File condition is considered an error in this context and
-	 * results in a RuntimeError exception. If the function returns
-	 * normally then all \c length bytes will have been obtained.
-	 **/
-	void readAll(void *buf, size_t length);
-
-	/// Write *all* \p length bytes into the underyling file
-	/**
-	 * This behaves just like write() with the exception that on short
-	 * writes the operation will be continued until all \c length bytes
-	 * have been written to the file.
-	 *
-	 * If the function returns normally then all \c length bytes will have
-	 * been transferred.
-	 **/
-	void writeAll(const void *buf, size_t length);
-
-	/// string_view wrapper around writeAll(const void*, size_t)
-	void writeAll(const std::string_view data) {
-		return writeAll(data.data(), data.size());
-	}
-
-	/// Seek to the given offset based on the given offset \p type
-	off_t seek(const SeekType type, off_t off);
-
-	/// Seek to the given offset relative to the start of the file
-	off_t seekFromStart(off_t off) { return seek(SeekType::SET, off); }
-	/// Seek to the given offset relative to the current file position
-	off_t seekFromCurrent(off_t off) { return seek(SeekType::CUR, off); }
-	/// Seek to the given offset relative to the end of the file
-	off_t seekFromEnd(off_t off) { return seek(SeekType::END, off); }
+		File{fd, auto_close},
+       		StreamIO{m_fd}
+	{}
 };
 
 }
