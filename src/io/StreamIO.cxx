@@ -2,6 +2,7 @@
 #include "cosmos/algs.hxx"
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/error/RuntimeError.hxx"
+#include "cosmos/error/WouldBlock.hxx"
 #include "cosmos/io/StreamIO.hxx"
 #include "cosmos/private/cosmos.hxx"
 
@@ -15,6 +16,9 @@ size_t StreamIO::read(void *buf, size_t length) {
 			// transparent restart
 			if (auto_restart_syscalls && get_errno() == Errno::INTERRUPTED)
 				continue;
+			else if (in_list(get_errno(), {Errno::AGAIN, Errno::WOULD_BLOCK}))
+				cosmos_throw (WouldBlock("writing to file"));
+
 			cosmos_throw (ApiError("reading from file"));
 		}
 
@@ -43,6 +47,9 @@ size_t StreamIO::write(const void *buf, size_t length) {
 			// transparent restart
 			if (auto_restart_syscalls && get_errno() == Errno::INTERRUPTED)
 				continue;
+			else if (in_list(get_errno(), {Errno::AGAIN, Errno::WOULD_BLOCK}))
+				cosmos_throw (WouldBlock("writing to file"));
+
 			cosmos_throw (ApiError("writing to file"));
 		}
 
