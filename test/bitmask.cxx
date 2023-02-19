@@ -22,7 +22,7 @@ protected: // types
 
 	typedef cosmos::BitMask<MyEnum> MyBitMask;
 public:
-	void run() {
+	void runTests() override {
 		testCtors();
 		testStringRep();
 		testSetters();
@@ -165,9 +165,7 @@ public:
 };
 
 
-int main() {
+int main(const int argc, const char **argv) {
 	BitMaskTest test;
-	test.run();
-
-	return test.finishTest();
+	return test.run(argc, argv);
 }

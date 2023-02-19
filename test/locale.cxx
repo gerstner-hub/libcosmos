@@ -1,47 +1,67 @@
+// C++
 #include <iostream>
 
+// cosmos
 #include "cosmos/locale.hxx"
 
-using Category = cosmos::locale::Category;
+// Test
+#include "TestBase.hxx"
 
-constexpr auto LABEL = "LC_MESSAGES";
-const auto CAT = Category::MESSAGES;
-constexpr auto CUSTOM_LOCALE = "de_DE.utf8";
+class LocaleTest :
+		public cosmos::TestBase {
 
-void printCat(const std::string_view &label) {
-	auto val = cosmos::locale::get(CAT);
-	std::cout << "(" << label << ") " << val << " = " << val << std::endl;
-}
+	using Category = cosmos::locale::Category;
+	static constexpr auto LABEL = "LC_MESSAGES";
+	static const auto CAT = Category::MESSAGES;
+	static constexpr auto CUSTOM_LOCALE = "de_DE.utf8";
 
-int main() {
-	printCat("startup");
-
-	cosmos::locale::set_from_environment(CAT);
-
-	printCat("environment");
-
-	cosmos::locale::set_to_default(CAT);
-
-	printCat("default");
-
-	try {
-		cosmos::locale::set(CAT, "stuff");
-		std::cerr << "setting locale to 'stuff' unexpectedly succeeded" << std::endl;
-		return 1;
-	} catch (const std::exception &ex) {
-		std::cout << "trying to set locale to 'stuff': " << ex.what() << std::endl;
+	void printCat(const std::string_view &label) {
+		auto val = cosmos::locale::get(CAT);
+		std::cout << "(" << label << ") " << val << " = " << val << std::endl;
 	}
 
-	try {
-		cosmos::locale::set(CAT, CUSTOM_LOCALE);
+protected:
+
+	void runTests() override {
+		initialTests();
+		testCustom();
+	}
+
+	void initialTests() {
+		START_TEST("initial");
+
+		printCat("startup");
+
+		cosmos::locale::set_from_environment(CAT);
+
+		printCat("environment");
+		RUN_STEP("set-cat-from-env", true);
+
+		cosmos::locale::set_to_default(CAT);
+
+		printCat("default");
+		RUN_STEP("restore-cat-to-default", true);
+	}
+
+	void testCustom() {
+		START_TEST("custom locale");
+
+		EXPECT_EXCEPTION("set-invalid-locale-throws", cosmos::locale::set(CAT, "stuff"));
+
 		try {
-			cosmos::locale::set(CAT, "stuff");
+			cosmos::locale::set(CAT, CUSTOM_LOCALE);
+			try {
+				cosmos::locale::set(CAT, "stuff");
+			} catch (const std::exception &ex) {
+				std::cout << "locale setting error message in " << CUSTOM_LOCALE << ": " << ex.what() << std::endl;
+			}
 		} catch (const std::exception &ex) {
-			std::cout << "locale setting error message in " << CUSTOM_LOCALE << ": " << ex.what() << std::endl;
+			std::cout << "cannot test with custom locale " << CUSTOM_LOCALE << ": " << ex.what() << std::endl;
 		}
-	} catch (const std::exception &ex) {
-		std::cout << "cannot test with custom locale " << CUSTOM_LOCALE << ": " << ex.what() << std::endl;
 	}
+};
 
-	return 0;
+int main(const int argc, const char **argv) {
+	LocaleTest test;
+	return test.run(argc, argv);
 }

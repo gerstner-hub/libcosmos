@@ -1,5 +1,4 @@
-// stdlib
-#include <cassert>
+// C++
 #include <iostream>
 
 // cosmos
@@ -8,51 +7,69 @@
 #include "cosmos/proc/SigSet.hxx"
 #include "cosmos/proc/Process.hxx"
 
+// Test
+#include "TestBase.hxx"
+
 using namespace cosmos;
 
-int main() {
-	cosmos::SigSet empty;
-	cosmos::SigSet full(cosmos::SigSet::filled);
-	cosmos::SigSet some;
+class SignalTest :
+		public cosmos::TestBase {
 
-	for (auto sig: {signal::INTERRUPT, signal::TERMINATE, signal::KILL, signal::IO_EVENT, signal::BUS}) {
-		assert( !empty.isSet(sig) );
-		assert( full.isSet(sig) );
-		some.set(sig);
-		full.del(sig);
-		assert( some.isSet(sig) );
-		assert( !full.isSet(sig) );
+	void runTests() override {
+		testSets();
 	}
 
-	full.fill();
-	cosmos::SigSet old;
-	cosmos::signal::block(full, &old);
+	void testSets() {
+		START_TEST("SigSet");
+		cosmos::SigSet empty;
+		cosmos::SigSet full{cosmos::SigSet::filled};
+		cosmos::SigSet some;
 
-	std::cout << "SIGINT was " << (old.isSet(signal::INTERRUPT) ? "blocked" : "not blocked") << std::endl;
-	cosmos::signal::unblock(full, &old);
-	std::cout << "SIGINT was " << (old.isSet(signal::INTERRUPT) ? "blocked" : "not blocked") << std::endl;
+		for (auto sig: {signal::INTERRUPT, signal::TERMINATE, signal::KILL, signal::IO_EVENT, signal::BUS}) {
+			RUN_STEP("not-in-empty", !empty.isSet(sig));
+			RUN_STEP("is-in-full", full.isSet(sig));
+			some.set(sig);
+			full.del(sig);
+			RUN_STEP("in-set-after-add", some.isSet(sig));
+			RUN_STEP("not-there-after-del", !full.isSet(sig));
+		}
+	}
 
-	const auto sigint = signal::INTERRUPT;
+	void testSigmask() {
+		START_TEST("Sigmask");
+		cosmos::SigSet full{cosmos::SigSet::filled};
+		cosmos::SigSet old;
+		cosmos::signal::block(full, &old);
 
-	some.clear();
-	some.set(sigint);
-	cosmos::signal::set_sigmask(some, &old);
+		std::cout << "SIGINT was " << (old.isSet(signal::INTERRUPT) ? "blocked" : "not blocked") << std::endl;
+		cosmos::signal::unblock(full, &old);
+		std::cout << "SIGINT was " << (old.isSet(signal::INTERRUPT) ? "blocked" : "not blocked") << std::endl;
 
-	assert( !old.isSet(sigint) );
-	some = cosmos::signal::get_sigmask();
-	assert( some.isSet(sigint) );
+		const auto sigint = signal::INTERRUPT;
 
-	cosmos::SignalFD sfd(sigint);
+		cosmos::SigSet set;
+		set.set(sigint);
+		cosmos::signal::set_sigmask(set, &old);
 
-	assert( sfd.valid() );
+		RUN_STEP("old-mask-correct", !old.isSet(sigint));
+		set = cosmos::signal::get_sigmask();
+		RUN_STEP("get-mask-correct", set.isSet(sigint));
 
-	cosmos::SignalFD::SigInfo info;
+		cosmos::SignalFD sfd{sigint};
 
-	cosmos::signal::raise(sigint);
-	sfd.readEvent(info);
+		RUN_STEP("signalfd-validity", sfd.valid());
 
-	assert( info.signal() == sigint );
-	std::cout << "received " << info.signal() << " from " << info.senderPID() << std::endl;
+		cosmos::SignalFD::SigInfo info;
 
-	return 0;
+		cosmos::signal::raise(sigint);
+		sfd.readEvent(info);
+
+		RUN_STEP("received-sig-correct", info.signal() == sigint);
+		std::cout << "received " << info.signal() << " from " << info.senderPID() << std::endl;
+	}
+};
+
+int main(const int argc, const char **argv) {
+	SignalTest test;
+	return test.run(argc, argv);
 }

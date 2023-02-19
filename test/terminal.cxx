@@ -1,32 +1,34 @@
+// C++
 #include <iostream>
 
+// cosmos
 #include "cosmos/fs/File.hxx"
 #include "cosmos/io/Terminal.hxx"
 
-int main() {
-	int res = 0;
-	cosmos::Terminal sin(cosmos::stdin);
+// Test
+#include "TestBase.hxx"
 
-	if (sin.isTTY() != true) {
-		std::cerr << "stdin is not a terminal?!" << std::endl;
-		res = 1;
-	}
+class TerminalTest :
+		public cosmos::TestBase {
 
-	try {
-		auto dim = sin.getSize();
+	void runTests() override {
+		START_TEST("terminal");
+		cosmos::Terminal sin(cosmos::stdin);
+
+		RUN_STEP("verify-stdin-is-term", sin.isTTY() == true);
+
+		cosmos::TermDimension dim;
+		DOES_NOT_THROW("get-size-no-exception", dim = sin.getSize());
 		std::cout << "terminal dimension is " << dim.cols() << " x " << dim.rows() << std::endl;
-	} catch (const std::exception &e) {
-		std::cerr << "failed to get terminal dimension: " << e.what() << std::endl;
-		res = 1;
+
+		cosmos::File f("/etc/fstab", cosmos::OpenMode::READ_ONLY);
+		cosmos::Terminal fstab(f);
+
+		RUN_STEP("verify-file-not-term", fstab.isTTY() == false);
 	}
+};
 
-	cosmos::File f("/etc/fstab", cosmos::OpenMode::READ_ONLY);
-	cosmos::Terminal fstab(f);
-
-	if (fstab.isTTY() != false) {
-		std::cerr << "fstab is a terminal?!" << std::endl;
-		res = 1;
-	}
-
-	return res;
+int main(const int argc, const char **argv) {
+	TerminalTest test;
+	return test.run(argc, argv);
 }

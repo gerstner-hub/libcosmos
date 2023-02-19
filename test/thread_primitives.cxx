@@ -1,18 +1,22 @@
+// C++
+#include <iostream>
+
 // Cosmos
 #include "cosmos/cosmos.hxx"
 #include "cosmos/thread/Mutex.hxx"
 #include "cosmos/thread/Condition.hxx"
 #include "cosmos/time/Clock.hxx"
 
-// C++
-#include <iostream>
+// Test
+#include "TestBase.hxx"
 
-int main() {
-	cosmos::Init init;
+class ThreadPrimTest :
+		public cosmos::TestBase {
 
-	try {
+	void runTests() override {
+		START_TEST("thread primitives");
 		/*
-		 * lacking actualy threads yet this is a bit of a over
+		 * lacking actual threads yet this is a bit of a over
 		 * simplified test, but still better than nothing.
 		 */
 		cosmos::Mutex lock;
@@ -32,25 +36,18 @@ int main() {
 		condmux.lock();
 		auto wait_res = condmux.waitTimed(endtime);
 
-		if (wait_res != cosmos::Condition::WaitTimedRes::TIMED_OUT) {
-			std::cerr << "got signaled?!" << std::endl;
-			return 1;
-		}
+		RUN_STEP("timedout-no-signaled", wait_res == cosmos::Condition::WaitTimedRes::TIMED_OUT);
 		condmux.unlock();
 
 		auto time_spent = clock.now() - starttime;
 
-		if (time_spent.getSeconds() < 5) {
-			std::cerr << "spent not enough time in waitTimed()?! getSeconds() = " << time_spent.getSeconds() << std::endl;
-			return 1;
-		}
+		RUN_STEP("enough-time-spent-in-wait", time_spent.getSeconds() >= 5);
 		// be generous with the upper limit
-		else if (time_spent.getSeconds() > 60) {
-			std::cerr << "spent too much time in waitTimed()?!" << std::endl;
-		}
+		RUN_STEP("returned-from-wait-in-time", time_spent.getSeconds() <= 60);
 	}
-	catch (const cosmos::CosmosError &ex) {
-		std::cerr << ex.what() << std::endl;
-		return 1;
-	}
+};
+
+int main(const int argc, const char **argv) {
+	ThreadPrimTest test;
+	return test.run(argc, argv);
 }

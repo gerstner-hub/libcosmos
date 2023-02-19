@@ -1,77 +1,74 @@
-#include "cosmos/formatting.hxx"
-
+// C++
 #include <iostream>
 #include <sstream>
 #include <string>
 
-void check(int &res, std::stringstream &ss, const std::string &cmp) {
-	std::string s = ss.str();
-	ss.str("");
+// cosmos
+#include "cosmos/formatting.hxx"
 
-	if (s == cmp) {
-		std::cout << s << " == " << cmp << "\n";
-		return;
+// Test
+#include "TestBase.hxx"
+
+class FormattingTest :
+		public cosmos::TestBase {
+
+	void runTests() override {
+		testHexnum();
+		testOctnum();
+		testSprintf();
 	}
 
-	std::cerr << s << " != " << cmp << std::endl;
-	res = 1;
-}
-
-int testHexnum() {
-	int res = 0;
-	std::stringstream ss;
-
-	ss << cosmos::HexNum(100, 4);
-	check(res, ss, "0x0064");
-	ss << cosmos::HexNum(100, 4).showBase(false);
-	check(res, ss, "0064");
-	ss << 110;
-	// make sure neither hex nor fill character nor field width got stuck
-	// on the original stream
-	check(res, ss, "110");
-
-	return res;
-}
-
-int testOctnum() {
-	int res = 0;
-	std::stringstream ss;
-
-	ss << cosmos::OctNum(10, 4);
-	check(res, ss, "0o0012");
-
-	ss << cosmos::OctNum(13, 3).showBase(false);
-	check(res, ss, "015");
-
-	return res;
-}
-
-void check(int &res, const std::string &val, const std::string &cmp)
-{
-	if (val == cmp) {
-		std::cout << val << " == " << cmp << "\n";
-		return;
+	void check(const std::string &val, const std::string &cmp) {
+		FINISH_STEP(val == cmp);
 	}
 
-	std::cerr << val << " != " << cmp << std::endl;
-	res = 1;
-}
+	void check(std::stringstream &ss, const std::string &cmp) {
+		std::string s = ss.str();
+		ss.str("");
+		check(s, cmp);
+	}
 
-int testSprintf() {
-	int res = 0;
+	void testHexnum() {
+		START_TEST("hexnum");
 
-	auto printed = cosmos::sprintf("this is a test string: %s %zd\n", "varstring", 50UL);
+		std::stringstream ss;
 
-	check(res, printed, "this is a test string: varstring 50\n");
-	
-	return res;
-}
+		START_STEP("hexnum-with-base");
+		ss << cosmos::HexNum(100, 4);
+		check(ss, "0x0064");
+		START_STEP("hexnum-no-base");
+		ss << cosmos::HexNum(100, 4).showBase(false);
+		check(ss, "0064");
+		START_STEP("hexnum-stream-reset");
+		ss << 110;
+		// make sure neither hex nor fill character nor field width got stuck
+		// on the original stream
+		check(ss, "110");
+	}
 
-int main() {
-	int res = testHexnum();
+	void testOctnum() {
+		START_TEST("octnum");
+		std::stringstream ss;
 
-	res = testOctnum() || res;
-	res = testSprintf() || res;
+		START_STEP("octnum-with-base");
+		ss << cosmos::OctNum(10, 4);
+		check(ss, "0o0012");
 
-	return res;
+		START_STEP("octnum-no-base");
+		ss << cosmos::OctNum(13, 3).showBase(false);
+		check(ss, "015");
+	}
+
+	void testSprintf() {
+		START_TEST("sprintf");
+		auto printed = cosmos::sprintf("this is a test string: %s %zd\n", "varstring", 50UL);
+
+		START_STEP("sprintf-with-args");
+		check(printed, "this is a test string: varstring 50\n");
+	}
+};
+
+int main(const int argc, const char **argv) {
+	FormattingTest test;
+	return test.run(argc, argv);
 }

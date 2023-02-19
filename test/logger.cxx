@@ -1,7 +1,8 @@
+// C++
+#include <iostream>
+
 // cosmos
 #include "cosmos/io/StdLogger.hxx"
-
-#include <iostream>
 
 int main() {
 	auto logger = cosmos::StdLogger();

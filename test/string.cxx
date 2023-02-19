@@ -1,48 +1,60 @@
+// C++
 #include <iostream>
 
+// cosmos
 #include "cosmos/string.hxx"
 
-int main() {
-	int ret = 0;
-	const std::string test_string("A test string. Have a nice day!");
+// Test
+#include "TestBase.hxx"
 
-	auto lower_string = cosmos::to_lower(test_string);
+class StringTest :
+		public cosmos::TestBase {
 
-	if (lower_string != "a test string. have a nice day!") {
-		std::cerr << "to_lower() returned unexpected result '" << lower_string << "'\n";
-		ret = 1;
+	void runTests() override {
+		testLowerUpper();
+		testStrip();
+		testPrefix();
 	}
 
-	auto upper_string = cosmos::to_upper(test_string);
+	void testLowerUpper() {
+		START_TEST("lower/upper");
 
-	if (upper_string != "A TEST STRING. HAVE A NICE DAY!") {
-		std::cerr << "to_upper() returned unexpected result '" << upper_string << "'\n";
-		ret = 1;
+
+		auto lower_string = cosmos::to_lower(m_test_string);
+
+		RUN_STEP("lower-is-lower", lower_string == "a test string. have a nice day!");
+
+		auto upper_string = cosmos::to_upper(m_test_string);
+
+		RUN_STEP("upper-is-upper", upper_string == "A TEST STRING. HAVE A NICE DAY!");
 	}
 
-	const std::string spacy_string(" how is that ? ");
+	void testStrip() {
+		START_TEST("strip");
 
-	auto stripped = cosmos::stripped(spacy_string);
+		const std::string spacy_string(" how is that ? ");
 
-	if (stripped != "how is that ?") {
-		std::cerr << "stripped() returned unexpected result '" << stripped << "'\n";
-		ret = 1;
+		auto stripped = cosmos::stripped(spacy_string);
+
+		RUN_STEP("strip-in-out", stripped == "how is that ?");
+
+		std::string spacy_copy(spacy_string);
+		cosmos::strip(spacy_copy);
+
+		RUN_STEP("strip-by-value", spacy_copy == stripped);
 	}
 
-	std::string spacy_copy(spacy_string);
-	cosmos::strip(spacy_copy);
+	void testPrefix() {
+		START_TEST("prefix");
+		const std::string test_prefix("A test");
 
-	if (spacy_copy != stripped) {
-		std::cerr << "strip() returned unexpected result '" << spacy_copy << "'\n";
-		ret = 1;
+		RUN_STEP("prefix-matches", cosmos::is_prefix(m_test_string, test_prefix));
 	}
 
-	const std::string test_prefix("A test");
+	const std::string m_test_string ="A test string. Have a nice day!";
+};
 
-	if (!cosmos::is_prefix(test_string, test_prefix)) {
-		std::cerr << "is_prefix() returned unexpected result\n";
-		ret = 1;
-	}
-
-	return ret;
+int main(const int argc, const char **argv) {
+	StringTest test;
+	return test.run(argc, argv);
 }

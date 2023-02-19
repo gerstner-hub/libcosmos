@@ -1,88 +1,81 @@
+// C++
 #include <iostream>
 #include <sstream>
 
 // cosmos
 #include "cosmos/proc/Process.hxx"
 
-int main() {
-	const auto our_pid = cosmos::proc::get_own_pid();
-	const auto parent_pid = cosmos::proc::get_parent_pid();
+// Test
+#include "TestBase.hxx"
 
-	if (our_pid == parent_pid) {
-		std::cerr << "we have the same PID as our parent?" << std::endl;
-		return 1;
-	}
+class ProcessTest :
+		public cosmos::TestBase {
 
-	if (cosmos::proc::get_real_user_id() != cosmos::proc::get_effective_user_id()) {
+	void runTests() override {
+		testProperties();
+		testEnv();
+	};
+
+	void testProperties() {
+		START_TEST("process properties");
+		const auto our_pid = cosmos::proc::get_own_pid();
+		const auto parent_pid = cosmos::proc::get_parent_pid();
+
+		RUN_STEP("pid-differs-from-ppid", our_pid != parent_pid);
 		// we don't expect to run set-uid
-		std::cerr << "real-user-id != effective-userid?!" << std::endl;
-		return 1;
-	}
-
-	if (cosmos::proc::get_real_group_id() != cosmos::proc::get_effective_group_id()) {
+		RUN_STEP("not-setuid", cosmos::proc::get_real_user_id() == cosmos::proc::get_effective_user_id());
 		// we don't expect to run set-gid
-		std::cerr << "real-group-id != effective-groupid?!" << std::endl;
-		return 1;
+		RUN_STEP("not-setgid", cosmos::proc::get_real_group_id() == cosmos::proc::get_effective_group_id());
 	}
-
-	// proc::exit() is already implicitly tested in test_subproc
 	
-	auto path = cosmos::proc::get_env_var("PATH");
+	void testEnv() {
+		START_TEST("environment variables");
 
-	if (!path) {
-		std::cerr << "no PATH envvar?!" << std::endl;
-		return 1;
+		// proc::exit() is already implicitly tested in test_subproc
+
+		auto path = cosmos::proc::get_env_var("PATH");
+
+		RUN_STEP("non-empty-PATH", path != std::nullopt);
+
+		std::istringstream path_stream;
+		path_stream.str(std::string(*path));
+		size_t parts = 0;
+
+		while (true) {
+			std::string dir;
+			std::getline(path_stream, dir, ':');
+			if (path_stream.eof())
+				break;
+			std::cout << "PATH entry: " << dir << "\n";
+			parts++;
+		}
+
+		// expected a couple of entires
+		RUN_STEP("PATH-has-content", parts >= 2);
+
+		RUN_STEP("strange-envvar-not-existing", cosmos::proc::get_env_var("STRANGE_ENV_VAR") == std::nullopt);
+
+		cosmos::proc::set_env_var("PATH", "newval", cosmos::proc::OverwriteEnv(false));
+
+		auto new_path = cosmos::proc::get_env_var("PATH");
+
+		RUN_STEP("PATH-no-overwrite", new_path != std::nullopt && *new_path == *path);
+
+		cosmos::proc::set_env_var("PATH", "newval", cosmos::proc::OverwriteEnv(true));
+
+		new_path = cosmos::proc::get_env_var("PATH");
+
+		RUN_STEP("PATH-yes-overwrite", new_path != std::nullopt && *new_path == "newval");
+
+		cosmos::proc::clear_env_var("PATH");
+
+		new_path = cosmos::proc::get_env_var("PATH");
+
+		RUN_STEP("PATH-is-cleared", new_path == std::nullopt);
 	}
+};
 
-	std::istringstream path_stream;
-	path_stream.str(std::string(*path));
-	size_t parts = 0;
-
-	while (true) {
-		std::string dir;
-		std::getline(path_stream, dir, ':');
-		if (path_stream.eof())
-			break;
-		std::cout << "PATH entry: " << dir << "\n";
-		parts++;
-	}
-
-	if (parts < 2) {
-		std::cerr << "expected a couple of entires in PATH variable: " << *path << std::endl;
-		return 1;
-	}
-
-	if (auto opt_val = cosmos::proc::get_env_var("STRANGE_ENV_VAR"); opt_val) {
-		std::cerr << "unexpectedly STRANGE_ENV_VAR exists: " << *opt_val << std::endl;
-		return 1;
-	}
-
-	cosmos::proc::set_env_var("PATH", "newval", cosmos::proc::OverwriteEnv(false));
-
-	auto new_path = cosmos::proc::get_env_var("PATH");
-
-	if (!new_path || *new_path != *path) {
-		std::cerr << "PATH envvar was overwritten unexpectedly" << std::endl;
-		return 1;
-	}
-
-	cosmos::proc::set_env_var("PATH", "newval", cosmos::proc::OverwriteEnv(true));
-
-	new_path = cosmos::proc::get_env_var("PATH");
-
-	if (!new_path || *new_path != "newval") {
-		std::cerr << "PATH envvar was unexpectedly not overwritten" << std::endl;
-		return 1;
-	}
-
-	cosmos::proc::clear_env_var("PATH");
-
-	new_path = cosmos::proc::get_env_var("PATH");
-
-	if (new_path) {
-		std::cerr << "PATH envvar unexpectedly still exists" << std::endl;
-		return 1;
-	}
-
-	return 0;
+int main(const int argc, const char **argv) {
+	ProcessTest test;
+	return test.run(argc, argv);
 }

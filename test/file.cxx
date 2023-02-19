@@ -1,46 +1,52 @@
+// C++
 #include <cassert>
 #include <iostream>
 #include <limits.h>
 
+// cosmos
 #include "cosmos/error/CosmosError.hxx"
 #include "cosmos/fs/File.hxx"
 #include "cosmos/fs/StreamFile.hxx"
 
-int main() {
-	int res = 0;
-	cosmos::File f;
+// Test
+#include "TestBase.hxx"
 
-	if (f.isOpen() != false) {
-		std::cerr << "default ctor file is open?!\n";
-		res = 1;
+class FileTest :
+		public cosmos::TestBase {
+public:
+
+	void runTests() override {
+		testOpenState();
+		testOpen();
+		testReadFile();
+		testWriteFile();
 	}
 
-	f.open("/etc/fstab", cosmos::OpenMode::READ_ONLY);
+	void testOpenState() {
+		START_TEST("Open state of File");
+		cosmos::File f;
 
-	if (f.isOpen() != true) {
-		std::cerr << "opened file is not open?!\n";
-		res = 1;
+		RUN_STEP("open-by-default", !f.isOpen());
+
+		f.open("/etc/fstab", cosmos::OpenMode::READ_ONLY);
+
+		RUN_STEP("open-after-open", f.isOpen());
+
+		f.close();
+
+		RUN_STEP("open-after-close", !f.isOpen());
 	}
 
-	f.close();
-
-	if (f.isOpen() != false) {
-		std::cerr << "closed file is still open?!";
-		res = 1;
+	void testOpen() {
+		START_TEST("Test opening of files");
+		EXPECT_EXCEPTION("open-nonexisting", cosmos::File("/etc/strangetab", cosmos::OpenMode::READ_ONLY));
 	}
 
-	try {
-		f.open("/etc/strangetab", cosmos::OpenMode::READ_ONLY);
-		std::cerr << "non-existing file could be opened?!\n";
-		res = 1;
-	} catch (const cosmos::CosmosError &e) {
-		std::cout << "non-existing file correctly threw error: " << e.what() << "\n";
-	}
+	void testReadFile() {
+		START_TEST("Test reading files");
 
-	std::string hosts;
-
-	{
 		cosmos::StreamFile sf;
+		START_STEP("Opening /etc/hosts");
 		sf.open("/etc/hosts", cosmos::OpenMode::READ_ONLY);
 
 		char line[LINE_MAX];
@@ -48,24 +54,38 @@ int main() {
 			auto bytes = sf.read(line, LINE_MAX);
 			if (!bytes)
 				break;
-			hosts.append(line, bytes);
+			m_hosts_content.append(line, bytes);
 		}
 
-		std::cout << hosts << std::endl;
+		std::cout << m_hosts_content << std::endl;
+		FINISH_STEP(true);
 	}
 
-	{
+	void testWriteFile() {
+		START_TEST("Test writing files");
+
 		cosmos::StreamFile sf;
+		START_STEP("Writing hosts data to tmpfile");
 		sf.open("/tmp", cosmos::OpenMode::READ_WRITE, cosmos::OpenFlags({cosmos::OpenSettings::TMPFILE}), cosmos::ModeT{0700});
-		sf.writeAll(hosts.data(), hosts.size());
+		sf.writeAll(m_hosts_content.data(), m_hosts_content.size());
 		sf.seekFromStart(0);
+		FINISH_STEP(true);
+
+		START_STEP("Reading back data from tmpfile");
 		std::string hosts2;
-		hosts2.resize(hosts.size());
+		hosts2.resize(m_hosts_content.size());
 		sf.readAll(hosts2.data(), hosts2.size());
-		assert( hosts == hosts2 );
+		EVAL_STEP(m_hosts_content == hosts2);
 		auto read = sf.read(hosts2.data(), 1);
-		assert( read == 0 );
+		FINISH_STEP(read == 0);
 	}
 
-	return res;
+protected:
+
+	std::string m_hosts_content;
+};
+
+int main(const int argc, const char **argv) {
+	FileTest test;
+	return test.run(argc, argv);
 }

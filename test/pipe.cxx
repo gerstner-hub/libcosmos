@@ -8,24 +8,36 @@
 #include "cosmos/proc/SubProc.hxx"
 #include "cosmos/cosmos.hxx"
 
-int main() {
-	cosmos::Init init;
-	cosmos::Pipe pip;
-	cosmos::OutputStreamAdaptor pip_out(pip);
-	cosmos::InputStreamAdaptor pip_in(pip);
+// Test
+#include "TestBase.hxx"
 
-	pip_out << "test" << std::flush;
-	pip_out.close();
-	std::string s;
-	pip_in >> s;
+class PipeTest :
+		public cosmos::TestBase {
 
-	if (s != "test") {
-		std::cerr << "Didn't get exact copy back from pipe!\n" << std::endl;
-		std::cerr << "Got '" << s << "' instead\n" << std::endl;
-		return 1;
+	void runTests() override {
+		testLoopback();
 	}
 
-	std::cout << "successfully transmitted test data over pipe" << std::endl;
+	void testLoopback() {
+		START_TEST("loopback pipe");
+		cosmos::Pipe pip;
+		cosmos::OutputStreamAdaptor pip_out(pip);
+		cosmos::InputStreamAdaptor pip_in(pip);
 
-	return 0;
+		pip_out << "test" << std::flush;
+		pip_out.close();
+		std::string s;
+		pip_in >> s;
+
+		RUN_STEP("received-data-matches", s == "test");
+		if (s != "test") {
+			std::cerr << "Didn't get exact copy back from pipe!\n" << std::endl;
+			std::cerr << "Got '" << s << "' instead\n" << std::endl;
+		}
+	}
+};
+
+int main(const int argc, const char **argv) {
+	PipeTest test;
+	return test.run(argc, argv);
 }

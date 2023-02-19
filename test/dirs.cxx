@@ -1,80 +1,54 @@
-// Cosmos
-#include "cosmos/error/ApiError.hxx"
-#include "cosmos/fs/FileStatus.hxx"
-#include "cosmos/fs/Directory.hxx"
-
 // C++
 #include <exception>
 #include <iostream>
 #include <map>
 
-class DirsTest {
+// Cosmos
+#include "cosmos/error/ApiError.hxx"
+#include "cosmos/fs/FileStatus.hxx"
+#include "cosmos/fs/Directory.hxx"
+
+// Test
+#include "TestBase.hxx"
+
+class DirsTest :
+		public cosmos::TestBase {
 public:
 
-	DirsTest() :
-		m_dir_path("/usr/include/linux")
-	{}
+	void runTests() override {
+		testBasicLogic();
+		testOpenDir();
+	}
 
-
-	int testBasicLogic() {
+	void testBasicLogic() {
+		START_TEST("Basic Directory Logic");
 		cosmos::Directory dir;
 
-		if (dir.isOpen()) {
-			std::cerr << "default constructed Directory isOpen() ?!" << std::endl;
-			return 1;
-		}
+		RUN_STEP("not-open-by-default", !dir.isOpen());
 
 		// should do nothing
 		dir.close();
 
-		try {
-			dir.fd();
-			std::cerr << "Directory.fd() returned something for closed dir?!" << std::endl;
-			return 1;
-		}
-		catch(...) {
-			// error is expected
-		}
+		EXPECT_EXCEPTION("throw-if-no-fd", dir.fd());
 
-		try {
-			dir.tell();
-			std::cerr << "Directory.tell() returned something for closed dir?!" << std::endl;
-			return 1;
-		}
-		catch(...) {
-			// error is expected
-		}
+		EXPECT_EXCEPTION("no-tell-if-no-fd", dir.tell());
 
-		try {
-			dir.nextEntry();
-			std::cerr << "Directory.nextEntry() returned something for closed dir?!" << std::endl;
-			return 1;
-		}
-		catch(...) {
-			// error is expected
-		}
-
-		return 0;
+		EXPECT_EXCEPTION("no-nextentry-if-no-fd", dir.nextEntry());
 	}
 
-	int testOpenDir() {
+	void testOpenDir() {
+		START_TEST("Test Opening Dir");
+		const std::string dir_path("/usr/include/linux");
 		cosmos::Directory dir;
+		dir.open(dir_path);
 
-		dir.open(m_dir_path);
-
-		if (dir.isOpen() != true) {
-			std::cerr << "Directory was opened but isOpen() returns false?!" << std::endl;
-			return 1;
-		}
+		RUN_STEP("dir-open", dir.isOpen());
 
 		auto fd = dir.fd();
 
 		{
 			cosmos::FileStatus status{fd};
-			if (!status.type().isDirectory()) {
-				std::cerr << "Directory FD refers to non-dir?!" << std::endl;
-				return 1;
-			}
+			RUN_STEP("check-fd-has-dirtype", status.type().isDirectory());
 		}
 
 		auto startpos = dir.tell();
@@ -93,14 +67,15 @@ public:
 			{EntryType::UNKNOWN, '?'}
 		};
 
+		START_STEP("Evaluating dir entries");
 		for (auto entry: dir) {
-			if (auto it = TYPE_MAP.find(entry.type()); it != TYPE_MAP.end()) {
-				std::cout << it->second << " ";
-			} else {
-				std::cerr << "invalid type encountered" << std::endl;
-				return 1;
-			}
+			auto it = TYPE_MAP.find(entry.type());
+			EVAL_STEP(it != TYPE_MAP.end());
+
+#if 0
+			std::cout << it->second << " ";
 			std::cout << entry.name() << std::endl;
+#endif
 
 			auto sname = std::string(entry.name());
 
@@ -109,74 +84,29 @@ public:
 			}
 
 			if (sname == "." || sname == "..") {
-				if (entry.isDotEntry() != true) {
-					std::cerr << sname << " != isDotEntry()?!" << std::endl;
-					return 1;
-				}
+				EVAL_STEP(entry.isDotEntry());
 			} else {
-				if (entry.isDotEntry() != false) {
-					std::cerr << sname << " == isDotEntry()?!" << std::endl;
-					return 1;
-				}
+				EVAL_STEP(!entry.isDotEntry());
 			}
 
-			if (sname.size() != entry.nameLength()) {
-				std::cerr << "len(" << sname << ") == " << entry.nameLength() << "?!" << std::endl;
-				return 1;
-			} else if (sname.size() != entry.view().size()) {
-				std::cerr << "length of view() and name() don't match" << std::endl;
-				return 1;
-			}
+			EVAL_STEP(sname.size() == entry.nameLength());
+			EVAL_STEP(sname.size() == entry.view().size());
 		}
+		FINISH_STEP(true);
 
 		dir.seek(startpos);
 		std::optional<cosmos::DirEntry> entry;
 		entry = dir.nextEntry();
 
-		if (first_name != entry->name()) {
-			std::cerr << "tell() / seek() failed ?!" << std::endl;
-
-			return 1;
-		}
+		RUN_STEP("seek-to-start", first_name == entry->name());
 
 		dir.close();
 
-		try {
-			cosmos::FileStatus status{fd};
-			std::cerr << "dirfd still valid after close?" << std::endl;
-			return 1;
-		} catch (const cosmos::ApiError &ex) {
-			if (ex.errnum() != cosmos::Errno::BAD_FD) {
-				std::cerr << "fstat() reports errno != EBADF?!" << std::endl;
-				return 1;
-			}
-		}
-
-		return 0;
+		EXPECT_EXCEPTION("file-fd-invalid-after-close", cosmos::FileStatus status{fd});
 	}
-
-	int run() {
-		auto ret = testBasicLogic();
-
-		if (ret != 0)
-			return ret;
-
-		ret = testOpenDir();
-
-		return 0;
-	}
-
-protected:
-
-	const std::string m_dir_path;
 };
 
-int main() {
-	try {
-		DirsTest test;
-		return test.run();
-	}
-	catch (const std::exception &ex) {
-		std::cerr << "test failed: " << ex.what() << std::endl;
-	}
+int main(const int argc, const char **argv) {
+	DirsTest test;
+	return test.run(argc, argv);
 }

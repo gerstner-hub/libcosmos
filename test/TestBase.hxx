@@ -8,7 +8,10 @@
 // cosmos
 #include "cosmos/cosmos.hxx"
 #include "cosmos/error/UsageError.hxx"
+#include "cosmos/error/RuntimeError.hxx"
 #include "cosmos/formatting.hxx"
+#include "cosmos/proc/ChildCloner.hxx"
+#include "cosmos/proc/Process.hxx"
 #include "cosmos/types.hxx"
 #include "cosmos/io/colors.hxx"
 #include "cosmos/io/StdLogger.hxx"
@@ -18,16 +21,14 @@
 #define EVAL_STEP(expr) do { \
 		const bool good = expr; \
 		if (!good) { \
-			finishStep(false, [&](std::ostream &o) { \
-				o << #expr; }); \
+			finishStep(false, #expr); \
 			finishTest(false); \
 			return; \
 		} \
 	} while(false)
 #define FINISH_STEP(expr) do { \
 		const bool good = expr; \
-		finishStep(good, [&](std::ostream &o) { \
-			o << #expr; }); \
+		finishStep(good, #expr); \
 		if (!good) { \
 			finishTest(false); \
 			return; \
@@ -38,6 +39,29 @@
 		FINISH_STEP(expr); \
 	} \
 	while(false)
+#define EXPECT_EXCEPTION(text, expr) startStep(text); \
+	do { \
+		try { \
+			expr; \
+			finishStep(false, #expr); \
+			finishTest(false); \
+		} catch (const cosmos::CosmosError &) { \
+			finishStep(true, #expr); \
+		} \
+	} \
+	while (false)
+#define DOES_NOT_THROW(text, expr) startStep(text); \
+	do { \
+		try { \
+			expr; \
+			finishStep(true, #expr); \
+		} catch (const cosmos::CosmosError &) { \
+			finishStep(false, #expr); \
+			finishTest(false); \
+		} \
+	} \
+	while (false)
+
 
 namespace cosmos {
 
@@ -75,7 +99,8 @@ protected: // functions
 		auto text = std::string("\"") + m_active_test + (good ? "\" succeeded" : "\" failed");
 
 		if (good) {
-			std::cout << "\n" << Green{text} << "\n\n";
+			//std::cout << "\n" << Green{text} << "\n\n";
+			std::cout << "\n";
 		} else {
 			std::cerr << "\n" << Red{text} << "\n\n";
 		}
@@ -84,6 +109,12 @@ protected: // functions
 
 	void startStep(const std::string_view s) {
 		std::cout << "> " << s << " ... " << std::flush;
+	}
+
+	void finishStep(const bool good, const std::string_view text) {
+		finishStep(good, [&](std::ostream &o) {
+			o << text << "\n";
+		});
 	}
 
 	void finishStep(const bool good, std::function<void (std::ostream&)> step_report) {
@@ -113,6 +144,38 @@ protected: // functions
 		return m_good_tests.size() + m_bad_tests.size();
 	}
 
+	std::string getTempDir() const {
+		std::string base{m_argv.at(0)};
+		base = base.substr(base.rfind('/') + 1);
+		std::string tmp_dir = cosmos::sprintf("/tmp/%s.XXXXXX", base.c_str());
+
+		// TODO: replace this with a cosmos tmpdir API once available
+		if (::mkdtemp(tmp_dir.data()) == nullptr) {
+			std::cerr << "Failed to create temporary directory\n";
+			throw 1;
+		}
+
+		return tmp_dir;
+	}
+
+	void setArgv(int argc, const char **argv) {
+		for (int i = 0; i < argc; i++) {
+			m_argv.push_back(argv[i]);
+		}
+	}
+
+	void runTool(const std::vector<std::string_view> args) {
+		std::cout << "Running " << args << std::endl;
+		cosmos::ChildCloner cloner{args};
+		auto proc = cloner.run();
+		auto res = proc.wait();
+		if (!res.exitedSuccessfully()) {
+			cosmos_throw (cosmos::RuntimeError("running tool failed"));
+		}
+	}
+
+	virtual void runTests() = 0;
+
 public: // functions
 
 	int finishTest() {
@@ -135,12 +198,30 @@ public: // functions
 		return 1;
 	}
 
+	int run(int argc, const char **argv) {
+		setArgv(argc, argv);
+		try {
+			runTests();
+			return finishTest();
+		} catch (const std::exception &ex) {
+			std::cerr << "test failed: " << ex.what() << std::endl;
+			return 1;
+		}
+	}
+
+	void runOrThrow(int argc, const char **argv) {
+		if (run(argc, argv) != 0) {
+			cosmos_throw (cosmos::RuntimeError("test failed"));
+		}
+	}
+
 protected: // data
 	Init m_init;
 	StdLogger m_logger;
 	std::string m_active_test;
 	StringVector m_good_tests;
 	StringVector m_bad_tests;
+	cosmos::StringViewVector m_argv;
 };
 
 }

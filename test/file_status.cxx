@@ -12,18 +12,26 @@
 #include "cosmos/fs/FileStatus.hxx"
 #include "cosmos/fs/FileSystem.hxx"
 #include "cosmos/fs/StreamFile.hxx"
-#include "cosmos/proc/ChildCloner.hxx"
-#include "cosmos/proc/Process.hxx"
 
-class TestFileStatus {
+// Test
+#include "TestBase.hxx"
+
+class TestFileStatus :
+		public cosmos::TestBase {
 public:
-	TestFileStatus(const std::string_view tmp_dir) :
-		m_flags{cosmos::OpenSettings::CREATE},
-		m_mode{cosmos::ModeT{0600}},
-		m_tmp_dir(tmp_dir)
-	{}
+	explicit TestFileStatus() :
+			m_flags{cosmos::OpenSettings::CREATE},
+			m_mode{cosmos::ModeT{0600}} {
+	}
 
-	int run() {
+	~TestFileStatus() {
+		if (!m_tmp_dir.empty()) {
+			cosmos::fs::remove_tree(m_tmp_dir);
+		}
+	}
+
+	void runTests() override {
+		m_tmp_dir = getTempDir();
 		cosmos::fs::change_dir(m_tmp_dir);
 		m_first_file.open("first", cosmos::OpenMode::WRITE_ONLY, m_flags, m_mode);
 		m_second_file.open("second", cosmos::OpenMode::WRITE_ONLY, m_flags, m_mode);
@@ -37,195 +45,133 @@ public:
 		checkDevInode();
 		checkTimes();
 		checkFormatting();
-		return m_res;
 	}
 
 	void checkValidity() {
+		START_TEST("object validity");
 		cosmos::FileStatus status;
 
-		if (status.valid()) {
-			bad("empty FileStatus is valid?!");
-		} else {
-			good("empty FileStatus is invalid");
-		}
+		RUN_STEP("default-ctor-invalid", !status.valid());
 
 		status.updateFrom(".");
 
-		if (status.valid()) {
-			good("filled FileStatus is valid");
-		} else {
-			bad("filled FileStatus is invalid");
-		}
+		RUN_STEP("valid-after-update", status.valid());
 
 		status.reset();
-		if (status.valid()) {
-			bad("reset FileStatus is valid?!");
-		} else {
-			good("reset FileStatus is invalid");
-		}
+
+		RUN_STEP("invalid-after-reset", !status.valid());
 	}
 
 	void checkPathEqualsFDStat() {
+		START_TEST("object fd vs. path equality");
 
 		cosmos::FileStatus status1, status2;
 		status1.updateFrom("first");
 		status2.updateFrom(m_first_file.fd());
 
-		if (status1 == status2) {
-			good("updateFrom(string_view) equals updateFrom(FileDescriptor");
-		} else {
-			bad("X FileStatus from path doesn't match FileStatus from FD");
-		}
+
+		RUN_STEP("update-from-fd-equals-update-from-path", status1 == status2);
 	}
 
 	void checkFileTypes() {
+		START_TEST("check file types");
 		cosmos::FileStatus status{m_first_file.fd()};
-		verifyType(status.type().isRegular(), "regular");
+		RUN_STEP("check-regular", status.type().isRegular());
 
 		status.updateFrom(m_tmp_dir);
-		verifyType(status.type().isDirectory(), "directory");
+		RUN_STEP("check-directory", status.type().isDirectory());
 
 		runTool({"ln", "-s", "first", "symlink"});
 
 		status.updateFrom("symlink");
-		verifyType(status.type().isLink(), "symlink");
+		RUN_STEP("check-symlink", status.type().isLink());
 
 		status.updateFrom("symlink", cosmos::FollowSymlinks{true});
-		verifyType(status.type().isRegular(), "regular symlink target");
+		RUN_STEP("check-regular symlink target", status.type().isRegular());
 
 		status.updateFrom("/dev/null");
-		verifyType(status.type().isCharDev(), "chardev");
+		RUN_STEP("check-chardev", status.type().isCharDev());
 
 		status.updateFrom("/dev/loop0");
-		verifyType(status.type().isBlockDev(), "blockdev");
+		RUN_STEP("check-blockdev", status.type().isBlockDev());
 
 		runTool({"mkfifo", "./fifo"});
 		status.updateFrom("./fifo");
-		verifyType(status.type().isFIFO(), "fifo");
+		RUN_STEP("check-fifo", status.type().isFIFO());
 
+		START_STEP("check-socket");
 		auto sockpath = findSocket();
 
-		if (!sockpath) {
-			bad("couldn't find socket to check");
-		} else {
-			good(std::string{"found socket in "} + *sockpath);
-			status.updateFrom(*sockpath);
-			verifyType(status.type().isSocket(), "socket");
-		}
+		EVAL_STEP(sockpath != std::nullopt);
+
+		status.updateFrom(*sockpath);
+		FINISH_STEP(status.type().isSocket());
 	}
 
 	void checkFileModes() {
+		START_TEST("check file modes");
 		cosmos::FileStatus status{m_first_file.fd()};
 
-		if (status.mode() == m_mode) {
-			good("created file has matching mode");
-		} else {
-			bad("created file has non-matching mode");
-		}
+		RUN_STEP("check-creation-mode", status.mode() == m_mode);
 
+		START_STEP("check-bin-mode");
 		auto ls_bin = cosmos::fs::which("ls");
-		if (!ls_bin) {
-			bad("failed to find 'ls' program path");
-			return;
-		}
+		EVAL_STEP(ls_bin != std::nullopt);
 
 		status.updateFrom(*ls_bin);
 
-		if (status.mode().canAnyExec()) {
-			good("ls program is executable");
-		} else {
-			bad("ls program is not executable?");
-		}
+		FINISH_STEP(status.mode().canAnyExec());
 	}
 
 	void checkOwners() {
+		START_TEST("check file ownership");
 		cosmos::FileStatus status{"first"};
 
-		if (status.uid() == cosmos::proc::get_real_user_id()) {
-			good("file is owned by us");
-		} else {
-			bad("file is owned by someone else?!");
-		}
-
-		if (status.gid() == cosmos::proc::get_real_group_id()) {
-			good("file group is ours");
-		} else {
-			bad("file group is something else?!");
-		}
+		RUN_STEP("file-owner-by-us", status.uid() == cosmos::proc::get_real_user_id());
+		RUN_STEP("file-group-ours", status.gid() == cosmos::proc::get_real_group_id());
 	}
 
 	void checkSize() {
+		START_TEST("check file size");
 		cosmos::FileStatus status1{m_first_file.fd()};
 
-		if (status1.blockSize() <= 0) {
-			bad("non-positive I/O block size?");
-		}
-
-		if (status1.size() == 0) {
-			good("empty file has 0 bytes size");
-		} else {
-			bad("empty file has non-0 size?!");
-		}
+		RUN_STEP("positive-blocksize", status1.blockSize() > 0);
+		RUN_STEP("non-zero-size", status1.size() == 0);
 
 		std::string_view data("stuff");
 		m_second_file.write(data.data(), data.size());
 
 		cosmos::FileStatus status2{m_second_file.fd()};
 
-		if ((size_t)status2.size() != data.size()) {
-			bad("increased file size not reflected");
-		}
-
-		if (status2.allocatedBlocks() * 512 < status2.size()) {
-			bad("allocated blocks less than actual file size?");
-		}
+		RUN_STEP("increased-size-reflected", (size_t)status2.size() == data.size());
+		RUN_STEP("alloc-blocks-sanity", status2.allocatedBlocks() * 512 >= status2.size());
 	}
 
 	void checkDevInode() {
+		START_TEST("check device files");
 		cosmos::FileStatus status1{m_first_file.fd()};
 		cosmos::FileStatus status2{m_second_file.fd()};
 
-		if (status1.device() == status2.device()) {
-			good("files on same device shared same DeviceID");
-		} else {
-			bad("files on same device have different DeviceIDs?");
-		}
-
-		if (status1.inode() == status2.inode()) {
-			bad("different files share same inode?!");
-		} else {
-			good("different files have different Inode");
-		}
+		RUN_STEP("same-underlying-dev", status1.device() == status2.device());
+		RUN_STEP("differing-inodes", status1.inode() != status2.inode());
 
 		cosmos::FileStatus proc_status{"/proc"};
 
-		if (proc_status.device() == status1.device()) {
-			bad("/proc and our tmpdir share the same device?");
-		} else {
-			good("/proc and our tmpdir have different devices");
-		}
+		RUN_STEP("differing-proc-dev", proc_status.device() != status1.device());
 
 		runTool({"ln", "first", "hardlink"});
 
 		cosmos::FileStatus link_status{"hardlink"};
 
-		if (link_status.inode() == status1.inode()) {
-			good("linked files share inode");
-		} else {
-			bad("hardlinked file doesn't share inode?");
-		}
-
-		if (link_status.numLinks() < 2) {
-			bad("hardlinked file has link count < 2?!");
-		}
+		RUN_STEP("hardlink-same-inode", link_status.inode() == status1.inode());
+		RUN_STEP("hardlink-increased-link-count", link_status.numLinks() >= 2);
 	}
 
 	void checkTimes() {
+		START_TEST("check time fields");
 		cosmos::FileStatus status{m_second_file.fd()};
 
-		if (status.statusTime() < status.modTime()) {
-			bad("file got modified but status didn't change?");
-		}
+		RUN_STEP("status-fresh-as-modtime", status.statusTime() >= status.modTime());
 
 		auto old_time = status.modTime();
 
@@ -238,24 +184,18 @@ public:
 
 		status.updateFrom(m_second_file.fd());
 
-		if (old_time < status.modTime()) {
-			good("modification timestamp changed");
-		} else {
-			bad("modification timestamp didn't change?");
-		}
+		RUN_STEP("modtime-changes", old_time < status.modTime());
 	}
 
 	void checkFormatting() {
+		START_TEST("check-mode-formatting");
 
 		std::stringstream ss;
 
 		auto check = [this, &ss](const std::string &oct, const std::string &sym) {
+			auto label = std::string("check-mode-") + oct;
 			auto s = ss.str();
-			if (s.find(oct) != s.npos && s.find(sym) != s.npos) {
-				good(s + std::string{" contains "} + oct + std::string{" and "} + sym);
-			} else {
-				bad(ss.str()  + " does not match expected oct/symbolic output");
-			}
+			RUN_STEP(label, s.find(oct) != s.npos && s.find(sym) != s.npos);
 			ss.str("");
 		};
 
@@ -303,57 +243,15 @@ public:
 		return {};
 	}
 
-	void good(const std::string_view msg) {
-		std::cout << "+ " << msg << std::endl;
-	}
-
-	void bad(const std::string_view msg) {
-		std::cerr << "X " << msg << "\n";
-		m_res = 1;
-	}
-
-	void runTool(const std::vector<std::string_view> args) {
-		std::cout << "Running " << args << std::endl;
-		cosmos::ChildCloner cloner{args};
-		auto proc = cloner.run();
-		auto res = proc.wait();
-		if (!res.exitedSuccessfully()) {
-			bad("running tool failed");
-		}
-	}
-
-	void verifyType(const bool res, const std::string_view label) {
-		std::string text{label};
-		if (res) {
-			good(text + " file type matches");
-		} else {
-			bad(text + " file type mismatch!");
-		}
-	}
-
 protected:
 	const cosmos::OpenFlags m_flags{cosmos::OpenSettings::CREATE};
 	const cosmos::FileMode m_mode{cosmos::ModeT{0600}};
 	cosmos::File m_first_file;
 	cosmos::StreamFile m_second_file;
-	std::string_view m_tmp_dir;
-	int m_res = 0;
+	std::string m_tmp_dir;
 };
 
-int main() {
-
-	char tmpdir[PATH_MAX]{"/tmp/file_status.XXXXXX"};
-
-	// TODO: replace this with a cosmos tmpdir API once available
-	if (::mkdtemp(tmpdir) == nullptr) {
-		std::cerr << "Failed to create temporary directory\n";
-		return 1;
-	}
-
-	TestFileStatus test{tmpdir};
-	const auto ret = test.run();
-
-	cosmos::fs::remove_tree(tmpdir);
-
-	return ret;
+int main(const int argc, const char **argv) {
+	TestFileStatus test;
+	return test.run(argc, argv);
 }

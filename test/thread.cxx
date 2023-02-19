@@ -1,8 +1,7 @@
-// stdlib
+// C++
 #include <iostream>
 #include <thread>
 #include <chrono>
-
 
 // cosmos
 #include "cosmos/cosmos.hxx"
@@ -12,12 +11,17 @@
 #include "cosmos/thread/thread.hxx"
 #include "cosmos/time/Clock.hxx"
 
+// Test
+#include "TestBase.hxx"
+
 using ThreadArg = cosmos::pthread::ThreadArg;
 using ExitValue = cosmos::pthread::ExitValue;
 
-class ThreadTest {
-public:
-	int run() {
+class ThreadTest :
+		public cosmos::TestBase {
+
+	void runTests() override {
+		testIDs();
 		emptyTest();
 		simpleTest();
 		exitTest();
@@ -25,145 +29,113 @@ public:
 		tryJoinTest();
 		timedJoinTest();
 		detachedTest();
-		return m_res;
 	}
 
 protected: // functions
 
+	void testIDs() {
+		START_TEST("thread ids");
+		auto mytid = cosmos::thread::get_tid();
+
+		std::cout << "my TID is " << static_cast<pid_t>(mytid) << std::endl;
+		RUN_STEP("verify-main-thread", cosmos::thread::is_main_thread());
+
+		RUN_STEP("pthread-id-equals", cosmos::pthread::get_id() == cosmos::pthread::get_id());
+	}
+
 	void emptyTest() {
+		START_TEST("empty thread");
 		cosmos::PosixThread thread;
-		if (thread.joinable()) {
-			complain("empty thread is joinable?!");
-		}
+		RUN_STEP("empty-not-joinable", !thread.joinable());
 	}
 
 	void simpleTest() {
+		START_TEST("simple thread");
 		m_was_running = false;
-		cosmos::PosixThread thread{{std::bind(&ThreadTest::simpleEntry, this, std::placeholders::_1)}, ThreadArg{815}, "simplethread"};
+		cosmos::PosixThread thread{
+			{std::bind(&ThreadTest::simpleEntry, this, std::placeholders::_1)},
+				ThreadArg{815}, "simplethread"};
 		auto tid = thread.id();
 
-		if (tid == cosmos::pthread::get_id()) {
-			complain("main thread equals new thread?!");
-		}
-
-		if (!thread.joinable()) {
-			complain("My thread isn't joinable?!");
-		}
-
-		if (thread.isCallerThread()) {
-			complain("I am my own thread?!");
-		}
-
-		if (thread.name().find("simplethread") == std::string::npos) {
-			complain("my thread lost its name?!");
-		}
+		RUN_STEP("has-different-id", tid != cosmos::pthread::get_id());
+		RUN_STEP("is-joinable", thread.joinable());
+		RUN_STEP("us-not-the-thread", !thread.isCallerThread());
+		RUN_STEP("proper-name", thread.name().find("simplethread") != std::string::npos);
 
 		auto res = thread.join();
 
 		auto tid2 = cosmos::pthread::ID{static_cast<pthread_t>(res)};
 
-		if (tid != tid2) {
-			complain("thread ID comparison failed");
-		} else {
-			praise("thread IDs match");
-		}
+		RUN_STEP("returned-it-matches", tid == tid2);
 
-		if (!m_was_running) {
-			complain("thread didn't actually run?!");
-		}
+		RUN_STEP("thread-was-running", m_was_running);
 	}
 
 	void exitTest() {
-		cosmos::PosixThread thread{{std::bind(&ThreadTest::exitEntry, this, std::placeholders::_1)}, ThreadArg{4711}, "exitthread"};
+		START_TEST("exit test");
+		cosmos::PosixThread thread{
+			{std::bind(&ThreadTest::exitEntry, this, std::placeholders::_1)},
+				ThreadArg{4711}, "exitthread"};
 		
 		auto res = thread.join();
 
-		if (res != ExitValue{4711}) {
-			complain("pthread::exit didn't work?!");
-			m_res = 1;
-		} else {
-			praise("pthread::exit did the right thing");
-		}
+		RUN_STEP("exit-value-matches", res == ExitValue{4711});
 	}
 
 	void normalEntryTest() {
-		m_normal_thread = cosmos::PosixThread{{std::bind(&ThreadTest::normalEntry, this)}, "normal-thread"};
+		START_TEST("normal thread");
+		m_normal_thread = cosmos::PosixThread{
+			{std::bind(&ThreadTest::normalEntry, this)}, "normal-thread"};
 
 		auto res = m_normal_thread.join();
 
-		if (res != ExitValue{0}) {
-			complain("normal entry thread returned non-zero value?!");
-		}
+		RUN_STEP("zero-exit-value", res == ExitValue{0});
 
 		cosmos::PosixThread lambda_thread{[]() { std::cout << "Hello from a lambda thread\n";}};
 		lambda_thread.join();
 	}
 
 	void tryJoinTest() {
+		START_TEST("try join");
 		cosmos::PosixThread thread{[]() {sleep(3);}};
-		if (thread.tryJoin().has_value()) {
-			complain("tryJoin() worked right away?!");
-		} else {
-			praise("first tryJoin() failed");
-		}
+		RUN_STEP("immediate-join-fails", !thread.tryJoin().has_value());
 
 		sleep(4);
 
-		if (!thread.tryJoin()) {
-			complain("tryJoin() didn't work in the end?!");
-		} else {
-			praise("final tryJoin() worked");
-		}
+		RUN_STEP("late-join-succeeds", thread.tryJoin().has_value());
 	}
 
 	void timedJoinTest() {
+		START_TEST("timed join");
 		auto clock = cosmos::RealTimeClock{};
 		cosmos::PosixThread thread{[]() {sleep(3);}};
 
 		auto maxwait = clock.now() + cosmos::RealTime{std::chrono::milliseconds{1000}};
 
-		if (thread.joinTimed(maxwait).has_value()) {
-			complain("timedJoin() worked right away?!");
-		} else {
-			praise("first timedJoin() failed");
-		}
+		RUN_STEP("immediate-join-fails", !thread.joinTimed(maxwait).has_value());
 
 		sleep(2);
 
 		maxwait = clock.now() + cosmos::RealTime{std::chrono::milliseconds{1000}};
 
-		if (!thread.joinTimed(maxwait)) {
-			complain("timedJoin() didn't work in the end?!");
-		} else {
-			praise("final timedJoin() worked");
-		}
+		RUN_STEP("late-join-succeeds", thread.joinTimed(maxwait).has_value());
 	}
 
 	void detachedTest() {
+		START_TEST("detached thread");
 		m_was_running = false;
 		{
-			cosmos::PosixThread thread{[this]() { sleep(1); std::cout << "a detached thread\n"; m_was_running = true;}};
+			cosmos::PosixThread thread{
+				[this]() { sleep(1); std::cout << "a detached thread\n"; m_was_running = true;}
+			};
 			thread.detach();
 
-			if (thread.joinable()) {
-				complain("detached thread is still joinable?!");
-			}
+			RUN_STEP("detached-not-joinable", !thread.joinable());
 		}
 
 		sleep(2);
 
-		if (!m_was_running) {
-			complain("detached thread was not running?!");
-		}
-	}
-
-	void complain(std::string_view text) {
-		std::cerr << text << "\n";
-		m_res = 1;
-	}
-
-	void praise(std::string_view text) {
-		std::cout << text << "\n";
+		RUN_STEP("detached-was-still-running", m_was_running);
 	}
 
 	ExitValue simpleEntry(ThreadArg arg) {
@@ -171,9 +143,7 @@ protected: // functions
 
 		if (arg != ThreadArg{815}) {
 			std::cerr << "Received unexpected thread argument\n";
-			m_res = 1;
-		} else {
-			std::cout << "thread argument matches\n";
+			finishTest(false);
 		}
 
 		return ExitValue{(intptr_t)cosmos::pthread::get_id().raw()};
@@ -185,40 +155,15 @@ protected: // functions
 	}
 
 	void normalEntry() {
-		if (!m_normal_thread.isCallerThread()) {
-			complain("I don't really belong to my thread object?!");
-		} else {
-			praise("I belong to my thread object");
-		}
+		RUN_STEP("thread-is-caller-thread", m_normal_thread.isCallerThread());
 	}
 
 protected:
 	bool m_was_running = false;
-	int m_res = 0;
 	cosmos::PosixThread m_normal_thread;
 };
 
-int main() {
-	cosmos::Init ci;
-
-	auto mytid = cosmos::thread::get_tid();
-
-	std::cout << "my TID is " << static_cast<pid_t>(mytid) << std::endl;
-	if (!cosmos::thread::is_main_thread()) {
-		std::cerr << "I'm not the main thread?!" << std::endl;
-		return 1;
-	} else {
-		std::cout << "I am the main thread\n";
-	}
-
-	if (cosmos::pthread::get_id() != cosmos::pthread::get_id()) {
-		std::cerr << "My own ID differs towards itself?!\n";
-		return 1;
-	} else {
-		std::cout << "pthread::get_id() == pthread::get_id()\n";
-	}
-
-	ThreadTest tt;
-
-	return tt.run();
+int main(const int argc, const char **argv) {
+	ThreadTest test;
+	return test.run(argc, argv);
 }

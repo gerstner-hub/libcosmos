@@ -1,21 +1,3 @@
-// Cosmos
-#include "cosmos/cosmos.hxx"
-#include "cosmos/error/ApiError.hxx"
-#include "cosmos/error/CosmosError.hxx"
-#include "cosmos/error/InternalError.hxx"
-#include "cosmos/formatting.hxx"
-#include "cosmos/fs/FileDescriptor.hxx"
-#include "cosmos/io/Pipe.hxx"
-#include "cosmos/io/StreamAdaptor.hxx"
-#include "cosmos/proc/ChildCloner.hxx"
-#include "cosmos/proc/Process.hxx"
-#include "cosmos/proc/SubProc.hxx"
-#include "cosmos/string.hxx"
-#include "cosmos/types.hxx"
-
-// POSIX
-#include <fcntl.h>
-
 // C++
 #include <cstdlib>
 #include <fstream>
@@ -25,34 +7,38 @@
 #include <string>
 #include <vector>
 
+// Cosmos
+#include "cosmos/cosmos.hxx"
+#include "cosmos/error/ApiError.hxx"
+#include "cosmos/error/CosmosError.hxx"
+#include "cosmos/error/InternalError.hxx"
+#include "cosmos/formatting.hxx"
+#include "cosmos/fs/FileDescriptor.hxx"
+#include "cosmos/fs/FileSystem.hxx"
+#include "cosmos/io/Pipe.hxx"
+#include "cosmos/io/StreamAdaptor.hxx"
+#include "cosmos/proc/ChildCloner.hxx"
+#include "cosmos/proc/Process.hxx"
+#include "cosmos/proc/SubProc.hxx"
+#include "cosmos/string.hxx"
+#include "cosmos/types.hxx"
+
+// Test
+#include "TestBase.hxx"
+
 using ExitStatus = cosmos::ExitStatus;
 
-std::string_view argv0;
-
-class TestBase {
-protected:
-	constexpr TestBase(const std::string_view title) :
-		m_title(title)
-	{}
-
+class RedirectOutputBase :
+		public cosmos::TestBase {
 public:
+	RedirectOutputBase() :
+		m_cat_path(*cosmos::fs::which("cat")) {}
 
-	std::string_view getTitle() const { return m_title; }
-
-protected:
-	const std::string_view m_title;
-};
-
-class RedirectOutputTestBase {
-public:
-	RedirectOutputTestBase() :
-		m_cat_path("/bin/cat")
-	{}
-
-	~RedirectOutputTestBase()
-	{
-		if (unlink(m_tmp_file_path.c_str()) != 0) {
-			std::cerr << "Failed to remove " << m_tmp_file_path << std::endl;
+	~RedirectOutputBase() {
+		try {
+			cosmos::fs::unlink_file(m_tmp_file_path);
+		} catch (const std::exception &ex) {
+			std::cerr << "Failed to remove " << m_tmp_file_path << ": " << ex.what() << std::endl;
 		}
 	}
 
@@ -81,16 +67,14 @@ protected:
 
 // test whether redirecting stdout works
 class RedirectStdoutTest :
-	public RedirectOutputTestBase,
-	public TestBase {
+		public RedirectOutputBase {
 public:
 	RedirectStdoutTest() :
-		TestBase{"redirecting stdout"},
-		m_cat_file("/etc/fstab")
-	{}
+		m_cat_file{"/etc/fstab"} {}
 
-	void run() {
-		cosmos::InputStreamAdaptor file(getTempFile());
+	void runTests() override {
+		START_TEST("Redirect Stdout");
+		cosmos::InputStreamAdaptor file{getTempFile()};
 
 		/*
 		 * the test case is:
@@ -105,9 +89,7 @@ public:
 		m_proc = std::move(cloner.run());
 		auto res = m_proc.wait();
 
-		if (! res.exitedSuccessfully()) {
-			cosmos_throw (cosmos::InternalError("Child process with redirected stdout failed"));
-		}
+		RUN_STEP("cat-exit-success", res.exitedSuccessfully());
 
 		compareFiles(file);
 	}
@@ -118,9 +100,9 @@ public:
 		// need to rewind
 		copy.seekg(0);
 
-		if (!copy.good() || !orig.good()) {
-			cosmos_throw (cosmos::InternalError("bad stream state(s)"));
-		}
+		START_STEP("compare-content");
+
+		EVAL_STEP(copy.good() && orig.good());
 
 		std::string line1, line2;
 
@@ -130,22 +112,13 @@ public:
 
 			if (orig.eof() && copy.eof())
 				break;
-			else if (orig.fail() || copy.fail()) {
-				std::cout << "orig.fail(): " << orig.fail() << std::endl;
-				std::cout << "copy.fail(): " << copy.fail() << std::endl;
-				cosmos_throw (cosmos::InternalError("inconsistent stream state(s)"));
-			}
-			else if (line1 != line2) {
-				std::cerr
-					<< "output file doesn't match input file\n"
-					<< line1 << " != " << line2 << std::endl;
-				cosmos_throw (cosmos::InternalError("file comparison failed"));
-			}
 
-			//std::cout << line1 << " == " << line2 << "\n";
+			EVAL_STEP(!orig.fail() && !copy.fail());
+
+			EVAL_STEP(line1 == line2);
 		}
 
-		std::cout << "File comparison successful" << std::endl;
+		FINISH_STEP(true);
 	}
 
 protected:
@@ -155,16 +128,14 @@ protected:
 
 // test whether redirecting stderr works
 class RedirectStderrTest :
-	public RedirectOutputTestBase,
-	public TestBase {
+		public RedirectOutputBase {
 public:
 	RedirectStderrTest() :
-		TestBase{"redirecting stderr"},
-		m_nonexisting_file("/non/existing/file")
-	{}
+		m_nonexisting_file{"/non/existing/file"} {}
 
-	void run() {
-		cosmos::InputStreamAdaptor file(getTempFile());
+	void runTests() override {
+		START_TEST("Redirect Stderr");
+		cosmos::InputStreamAdaptor file{getTempFile()};
 
 		/*
 		 * the test case is:
@@ -179,38 +150,30 @@ public:
 		m_proc = std::move(cloner.run());
 		auto res = m_proc.wait();
 
-		if (! res.exited() || res.exitStatus() != ExitStatus(1)) {
-			std::cerr << res << std::endl;
-			cosmos_throw (cosmos::InternalError("Child process with redirected stderr ended in unexpected state"));
-		}
+		RUN_STEP("child-exit-success", res.exited() && res.exitStatus() == ExitStatus(1));
 
 		checkErrorMessage(file);
 	}
 
-	void checkErrorMessage(std::istream &errfile)
-	{
+	void checkErrorMessage(std::istream &errfile) {
 		errfile.seekg(0);
 
 		std::string line;
 		std::getline(errfile, line);
 
-		if (errfile.fail()) {
-			cosmos_throw (cosmos::InternalError("Failed to read back cat error message"));
-		}
+		START_STEP("verify-error");
+
+		EVAL_STEP(!errfile.fail());
 
 		// be aware of locale settings that might change the error message content
 		// -
 		// but the default locale should be active for us
-		const std::string errmsg("No such file or directory");
+		const std::string errmsg{"No such file or directory"};
 		for (const auto &item: {m_nonexisting_file, m_cat_path, errmsg}) {
-			if (line.find(item) != line.npos)
-				continue;
-
-			std::cerr << "Couldn't find '" << item << "' in error message: '" << line << "'\n";
-			cosmos_throw (cosmos::InternalError("Couldn't find expected item in error message"));
+			EVAL_STEP(line.find(item) != line.npos);
 		}
 
-		std::cout << "error message contains expected elements" << std::endl;
+		FINISH_STEP(true);
 	}
 
 protected:
@@ -219,15 +182,16 @@ protected:
 };
 
 // tests a more complex child process setup using Pipe I/O
-class PipeInTest : public TestBase {
+class PipeInTest :
+		public cosmos::TestBase {
 public:
 	explicit PipeInTest() :
-		TestBase{"pipe I/O"},
-		m_head_path("/usr/bin/head"),
-		m_test_file("/etc/services")
+		m_head_path{*cosmos::fs::which("head")},
+		m_test_file{"/etc/services"}
 	{}
 
-	void run() {
+	void runTests() override {
+		START_TEST("pipe input");
 		std::stringstream ss;
 		ss << m_expected_lines;
 		/*
@@ -261,9 +225,7 @@ public:
 
 		auto res = m_proc.wait();
 
-		if (!res.exitedSuccessfully()) {
-			cosmos_throw (cosmos::InternalError("Child process with redirected stdin failed"));
-		}
+		RUN_STEP("exit-with-success", res.exitedSuccessfully());
 	}
 
 	void performPipeIO() {
@@ -273,6 +235,8 @@ public:
 			ss << "Test line " << i << "\n";
 			test_lines.push_back(ss.str());
 		}
+
+		START_STEP("pipe-io");
 
 		cosmos::InputStreamAdaptor from_head(m_pipe_from_head);
 		cosmos::OutputStreamAdaptor to_head(m_pipe_to_head);
@@ -296,27 +260,18 @@ public:
 
 			if (from_head.eof())
 				break;
-			else if (from_head.fail()) {
-				cosmos_throw (cosmos::InternalError("bad stream state"));
-			}
+
+			EVAL_STEP(!from_head.fail());
 
 			// re-add the newline for comparison
 			copy_line += "\n";
 
-			if (test_lines.at(received_lines) != copy_line) {
-				std::cerr << "'" << copy_line << "' != '" << test_lines[received_lines] << "'" << std::endl;
-				cosmos_throw (cosmos::InternalError("received bad line copy"));
-			}
-			else {
-				//std::cout << "line nr. " << received_lines << " is correct" << std::endl;
-			}
+			EVAL_STEP(test_lines.at(received_lines) == copy_line);
 
 			++received_lines;
 		}
 
-		if (received_lines != m_expected_lines) {
-			cosmos_throw (cosmos::InternalError("Didn't receive back the expected amount of lines"));
-		}
+		FINISH_STEP(received_lines == m_expected_lines);
 
 		from_head.close();
 		to_head.close();
@@ -335,40 +290,34 @@ protected:
 };
 
 // tests the waitTimed() functionality
-class TimeoutTest : public TestBase {
+class TimeoutTest :
+		public cosmos::TestBase {
 public:
 	explicit TimeoutTest() :
-		TestBase{"wait with timeout"},
-		m_sleep_bin("/usr/bin/sleep")
+		m_sleep_bin{*cosmos::fs::which("sleep")}
 	{}
 
-	void run() {
+	void runTests() override {
+		START_TEST("wait with timeout test");
 		// let the child sleep some seconds
 		cosmos::ChildCloner cloner{{m_sleep_bin, "5"}};
 		m_proc = std::move(cloner.run());
 
 		size_t num_timeouts = 0;
 
-		while (true) {
+		while (m_proc.running()) {
 			// wait at max one second
-			auto res = m_proc.waitTimed(std::chrono::milliseconds(500));
+			auto res = m_proc.waitTimed(std::chrono::milliseconds{500});
 
 			if (!res) {
 				num_timeouts++;
 				continue;
 			}
-			else if (res->exited() && res->exitStatus() == ExitStatus::SUCCESS) {
-				// correctly exited
-				break;
-			}
-			else {
-				cosmos_throw (cosmos::InternalError("Child process unexpectedly exited unsuccesfully"));
-			}
+
+			RUN_STEP("check-exit-status", res->exited() && res->exitStatus() == ExitStatus::SUCCESS);
 		}
 
-		if (num_timeouts == 0) {
-			cosmos_throw (cosmos::InternalError("Child process waitTimed() unexpectedly didn't timeout"));
-		}
+		RUN_STEP("check-num-timeouts", num_timeouts != 0);
 
 		std::cout << "Child process wait timed out " << num_timeouts << " times. Successfully tested timeouts" << std::endl;
 	}
@@ -388,12 +337,11 @@ protected:
  *
  * Therefor test this situation.
  */
-class MixedWaitInvocationTest : public TestBase {
+class MixedWaitInvocationTest :
+		public cosmos::TestBase {
 public:
 	explicit MixedWaitInvocationTest() :
-		TestBase{"parallel wait invocation"},
-		m_sleep_bin("/usr/bin/sleep")
-	{}
+		m_sleep_bin{*cosmos::fs::which("/usr/bin/sleep")} {}
 
 	void collectResults() {
 		/*
@@ -405,29 +353,25 @@ public:
 		const auto short_pid = m_short_proc.pid();
 		const auto long_pid = m_long_proc.pid();
 
-		if (wr) {
-			cosmos_throw (cosmos::InternalError("long running proc unexpectedly returned early"));
-		}
+		RUN_STEP("no-early-return", wr == std::nullopt);
 
 		wr = m_long_proc.waitTimed(std::chrono::milliseconds(10000));
 
-		if (!wr) {
-			cosmos_throw (cosmos::InternalError("long running proc unexpectedly didn't return in time"));
-		}
+		RUN_STEP("long-return-in-time", wr != std::nullopt);
 
 		std::cout << "PID " << long_pid << " returned:\n" << *wr << "\n\n";
 
 		// this should long have exited
 		wr = m_short_proc.waitTimed(std::chrono::milliseconds(10000));
 
-		if (!wr) {
-			cosmos_throw (cosmos::InternalError("short running proc seemingly didn't return in time"));
-		}
+		RUN_STEP("short-return-in-time", wr != std::nullopt);
 
 		std::cout << "PID " << short_pid << " returned:\n" << *wr << "\n\n";
 	}
 
-	void run() {
+	void runTests() override {
+		START_TEST("mixed wait invocation");
+
 		cosmos::ChildCloner cloner;
 		cloner.setArgs({m_sleep_bin, "5"});
 		m_short_proc = cloner.run();
@@ -439,10 +383,8 @@ public:
 
 		try {
 			collectResults();
-		}
-		catch (const std::exception &ex) {
+		} catch (const std::exception &ex) {
 			std::cerr << "Failed: " << ex.what() << std::endl;
-
 			const auto sig = cosmos::signal::KILL;
 
 			for (auto *proc: { &m_short_proc, &m_long_proc }) {
@@ -451,6 +393,8 @@ public:
 				proc->kill(sig);
 				proc->wait();
 			}
+
+			return finishTest(false);
 		}
 
 	}
@@ -462,17 +406,15 @@ protected:
 };
 
 // tests whether the setPostForkCB() works
-class PostForkTest : public TestBase {
+class PostForkTest :
+		public cosmos::TestBase {
 public:
-	PostForkTest() :
-		TestBase{"post fork callback"}
-	{}
 
 	void postFork(const cosmos::ChildCloner &cloner) {
 		if (&cloner != &m_cloner) {
 			std::cerr << "proc != m_true_proc ?!" << std::endl;
 			std::cerr << (void*)&cloner << " != " << (void*)&m_cloner << std::endl;
-			_exit(2);
+			cosmos::proc::exit(cosmos::ExitStatus{2});
 		}
 
 		// let's exit with this status instead of actually executing
@@ -481,15 +423,16 @@ public:
 		cosmos::proc::exit(REPLACE_EXIT);
 	}
 
-	void run() {
+	void runTests() override {
+		START_TEST("post fork");
 		m_cloner.setExe("/usr/bin/true");
-		cosmos::ChildCloner::Callback cb = std::bind( &PostForkTest::postFork, this, std::placeholders::_1 );
+		cosmos::ChildCloner::Callback cb = std::bind(
+				&PostForkTest::postFork, this, std::placeholders::_1 );
 		m_cloner.setPostForkCB(cb);
 		m_true_proc = m_cloner.run();
 		auto res = m_true_proc.wait();
-		if (!res.exited() || res.exitStatus() != REPLACE_EXIT) {
-			cosmos_throw (cosmos::InternalError("post fork child didn't act as expected"));
-		}
+
+		RUN_STEP("correct-post-fork-exit", res.exited() && res.exitStatus() == REPLACE_EXIT);
 
 		std::cout << "/usr/bin/true child has been shortcut by postFork CB()" << std::endl;
 	}
@@ -501,15 +444,13 @@ protected:
 };
 
 // tests whether overriding child environment works
-class EnvironmentTest : public TestBase {
+class EnvironmentTest :
+		public cosmos::TestBase {
 public:
 
-	EnvironmentTest() :
-		TestBase{"environment override"}
-	{}
-
-	void run() {
-		cosmos::ChildCloner cloner{{"/usr/bin/env"}};
+	void runTests() override {
+		START_TEST("environment");
+		cosmos::ChildCloner cloner{{*cosmos::fs::which("env")}};
 		// run the env tool to inspect via pipe redirection whether
 		// the child process has got the expected environment
 		cloner.setStdOut(m_pipe_from_env.writeEnd());
@@ -530,24 +471,22 @@ public:
 		std::string env_line;
 		size_t hits = 0;
 
+		START_STEP("compare in-proc-env to sub-proc-env");
+
 		while (true) {
 			std::getline(from_env, env_line);
 
 			if (from_env.eof())
 				break;
-			else if (from_env.fail())
-				cosmos_throw (cosmos::InternalError("bad stream state"));
 
-			if (env_set.find(env_line) == env_set.end()) {
-				cosmos_throw (cosmos::InternalError("unexpected environment variable found"));
-			}
+			EVAL_STEP(!from_env.fail());
+
+			EVAL_STEP(env_set.find(env_line) != env_set.end());
 
 			hits++;
 		}
 
-		if (hits != env_set.size()) {
-			cosmos_throw (cosmos::InternalError("environment variable missing from env output"));
-		}
+		FINISH_STEP(hits == env_set.size());
 
 		std::cout << "found all expected environment variables in child process" << std::endl;
 
@@ -561,18 +500,16 @@ protected:
 
 // tests whether the operator<< to add executable and command line arguments
 // works as expected
-class ArgOperatorTest : public TestBase {
+class ArgOperatorTest :
+		public cosmos::TestBase {
 public:
 
-	ArgOperatorTest() :
-		TestBase{"arg operator<<"}
-	{}
-
-	void run() {
+	void runTests() override {
+		START_TEST("arg operator");
 		cosmos::ChildCloner cloner;
 		cosmos::Pipe pipe_from_cat;
 
-		cloner << "/bin/cat" << "/etc/passwd";
+		cloner << *cosmos::fs::which("cat") << "/etc/passwd";
 		cloner.setStdOut(pipe_from_cat.writeEnd());
 
 		auto proc = cloner.run();
@@ -595,21 +532,17 @@ public:
 		pipe_from_cat.closeReadEnd();
 		proc.wait();
 
-		if (!found_root) {
-			cosmos_throw( cosmos::InternalError("couldn't find root: eintry in /etc/passwd") );
-		}
+		RUN_STEP("find-root-in-passwd", found_root);
 	}
 };
 
 // tests whether scheduler settings actually apply
-class SchedulerTest : public TestBase {
+class SchedulerTest :
+		public cosmos::TestBase {
 public:
 
-	SchedulerTest() :
-		TestBase{"scheduler priority setting"}
-	{}
-
-	void run() {
+	void runTests() override {
+		START_TEST("scheduler settings");
 		// we test the "OtherSchedulerSettings" i.e. raising the nice
 		// value (i.e. lowering nice priority). This is the only
 		// scheduler change we can perform without special
@@ -618,7 +551,7 @@ public:
 		// The nice value of the process can be found in
 		// /proc/<pid>/stat so use cat on this and parse the output
 		// via a Pipe
-		cosmos::ChildCloner cloner{{"/bin/cat", "/proc/self/stat"}};
+		cosmos::ChildCloner cloner{{*cosmos::fs::which("cat"), "/proc/self/stat"}};
 
 		cosmos::Pipe stat_pipe;
 		cloner.setStdOut(stat_pipe.writeEnd());
@@ -648,10 +581,7 @@ public:
 		stat_pipe.closeReadEnd();
 
 		auto res = proc.wait();
-		if (!res.exitedSuccessfully()) {
-			std::cerr << "cat /proc/self/stat failed" << std::endl;
-			cosmos::proc::exit(ExitStatus(1));
-		}
+		RUN_STEP("exit-success", res.exitedSuccessfully());
 	}
 
 	void verifyNiceValue(const std::string stat_line) {
@@ -675,31 +605,21 @@ public:
 			auto prio = std::strtoul(field.c_str(), &end, 10);
 			if (static_cast<size_t>(end - field.data()) != field.size()) {
 				std::cerr << "couldn't parse /proc/self/stat" << std::endl;
-			} else if (prio != cosmos::OtherSchedulerSettings::maxNiceValue()) {
-				std::cerr << "encountered nice prio " << prio << " doesn't match max nice prio " << cosmos::OtherSchedulerSettings::maxNiceValue() << std::endl;
-			} else {
-				std::cout << "child process has correct maximum nice value" << std::endl;
-				// found correct prio
-				return;
 			}
-
-			break;
+			RUN_STEP("find-correct-nice-prio", prio == cosmos::OtherSchedulerSettings::maxNiceValue());
+			return;
 		}
-
-		cosmos_throw( cosmos::InternalError("Failed to verify nice prio of child") );
 	}
 };
 
-class RedirectExtraTest :
-	public TestBase {
+class RedirectNonStdTest :
+		public cosmos::TestBase {
 public:
-	RedirectExtraTest() :
-		TestBase{"test inheritance of non-std file descriptor"}
-	{}
 
-	void run() {
-		auto sep = argv0.rfind('/');
-		std::string coproc_path{argv0.substr(0, sep+1)};
+	void runTests() override {
+		START_TEST("redirect non-std-fd");
+		auto sep = m_argv[0].rfind('/');
+		std::string coproc_path{m_argv[0].substr(0, sep+1)};
 		coproc_path += "coproc";
 		cosmos::ChildCloner cloner{{coproc_path}};
 
@@ -722,10 +642,7 @@ public:
 		for (auto &word: expected) {
 			std::string part;
 			file >> part;
-			if (part != word) {
-				std::cerr << "Expected " << word << " but got " << part << "\n";
-				cosmos_throw( cosmos::InternalError("unexpected word") );
-			}
+			RUN_STEP("verify-exchanged-word", part == word);
 		}
 
 		// and finally the child process PID
@@ -733,59 +650,36 @@ public:
 		file >> num;
 
 		cosmos::ProcessID peer_pid{std::stoi(num, nullptr)};
+		RUN_STEP("verify-peer-pid", peer_pid == coproc.pid());
 
 		pipe.closeReadEnd();
 		auto res = coproc.wait();
 
-		if (peer_pid != coproc.pid()) {
-			std::cerr << "PID reported on pipe doesn't match actual child pid!\n";
-			cosmos_throw( cosmos::InternalError("PID mismatch") );
-		} else {
-			std::cout << "child process " << peer_pid << " reported correct PID over pipe\n";
-		}
-
-		if (!res.exitedSuccessfully()) {
-			cosmos_throw( cosmos::InternalError("coproc exited != 0") );
-		}
+		RUN_STEP("exit-success", res.exitedSuccessfully());
 	}
 };
 
-template <class T>
-void runTest() {
+template <typename T>
+void runTest(const int argc, const char **argv) {
 	T test;
-	try {
-		std::cout << "\n\n=================\n";
-		std::cout <<     "running sub-test: " << test.getTitle() << "\n";
-		std::cout <<     "=================\n" << std::endl;
-		test.run();
-		std::cout << "\n\n";
-	} catch (const std::exception &ex) {
-		std::cerr << "failed to run test: " << ex.what() << std::endl;
-	}
+	test.runOrThrow(argc, argv);
+	std::cout << "\n";
 }
 
-int main(int, const char **argv) {
+int main(const int argc, const char **argv) {
 	try {
-		cosmos::Init init;
-		argv0 = argv[0];
-		/*
-		 * test redirection of each std. file descriptor
-		 */
-
-		runTest<RedirectStdoutTest>();
-		runTest<RedirectStderrTest>();
-		runTest<PipeInTest>();
-		runTest<TimeoutTest>();
-		runTest<MixedWaitInvocationTest>();
-		runTest<PostForkTest>();
-		runTest<EnvironmentTest>();
-		runTest<ArgOperatorTest>();
-		runTest<SchedulerTest>();
-		runTest<RedirectExtraTest>();
-
+		runTest<RedirectStdoutTest>(argc, argv);
+		runTest<RedirectStderrTest>(argc, argv);
+		runTest<PipeInTest>(argc, argv);
+		runTest<TimeoutTest>(argc, argv);
+		runTest<MixedWaitInvocationTest>(argc, argv);
+		runTest<PostForkTest>(argc, argv);
+		runTest<EnvironmentTest>(argc, argv);
+		runTest<ArgOperatorTest>(argc, argv);
+		runTest<SchedulerTest>(argc, argv);
+		runTest<RedirectNonStdTest>(argc, argv);
 		return 0;
-	}
-	catch (const cosmos::CosmosError &ex) {
+	} catch (const cosmos::CosmosError &ex) {
 		std::cerr << ex.what() << std::endl;
 		return 1;
 	}

@@ -1,77 +1,79 @@
+// C++
 #include <iostream>
 #include <cassert>
 
+// cosmos
 #include "cosmos/algs.hxx"
 #include "cosmos/types.hxx"
 
-struct CharPtrGuard : public cosmos::ResourceGuard<char*> {
-	explicit CharPtrGuard(char *p) :
-		ResourceGuard(p, [](char *_p) { delete[] _p; })
-	{}
-};
+// Test
+#include "TestBase.hxx"
 
-int main() {
-	int res = 0;
+class MiscTest :
+		public cosmos::TestBase {
 
-	if (!cosmos::in_range(10, 5, 15)) {
-		std::cerr << "in_range returned bad negative result\n";
-		res = 1;
+	void runTests() override {
+		testRanges();
+		testNumElements();
+		testInList();
+		testResGuard();
 	}
 
-	if (cosmos::in_range(10, 15, 20)) {
-		std::cerr << "in_range returned bad positive result\n";
-		res = 1;
+	void testRanges() {
+		START_TEST("in_range");
+
+		RUN_STEP("in-range", cosmos::in_range(10, 5, 15));
+		RUN_STEP("out-of-range", !cosmos::in_range(10, 15, 20));
+		RUN_STEP("inclusiveness", cosmos::in_range(10, 10, 10));
+		RUN_STEP("lower-border", cosmos::in_range(10, 10, 15));
+		RUN_STEP("upper-border", cosmos::in_range(10, 5, 10));
+
+		size_t unsig = 3;
+		RUN_STEP("unsigned-out-of-range", !cosmos::in_range(unsig, 10, 20));
 	}
 
-	if (!cosmos::in_range(10, 10, 10)) {
-		std::cerr << "in_range returned bad negative/equal result\n";
-		res = 1;
-	}
-	else if (!cosmos::in_range(10, 10, 15)) {
-		std::cerr << "in_range returned bad negative/equal result\n";
-		res = 1;
-	}
-	else if (!cosmos::in_range(10, 5, 10)) {
-		std::cerr << "in_range returned bad negative/equal result\n";
-		res = 1;
+	void testNumElements() {
+		START_TEST("num_elements");
+		const int ARR[5] = {1, 2, 3, 4, 5};
+		RUN_STEP("correct-num-elements", cosmos::num_elements(ARR) == 5);
 	}
 
-	size_t unsig = 3;
+	void testInList() {
+		START_TEST("in_list");
 
-	if (cosmos::in_range(unsig, 10, 20)) {
-		std::cerr << "bad\n";
-		res = 1;
-	}
-
-	const int ARR[5] = {1, 2, 3, 4, 5};
-
-	assert (cosmos::num_elements(ARR) == 5);
-
-	{
-		char *stuff = new char[500];
-		CharPtrGuard stuff_guard(stuff);
-	}
-
-	{
-		char *stuff = new char[500];
-		CharPtrGuard stuff_guard(stuff);
-		stuff_guard.disarm();
-		delete[] stuff;
-	}
-
-	{
 		const int i = 5;
 
-		if (!cosmos::in_list(i, {1, 5, 20})) {
-			std::cerr << "in_list returned bad negative result\n";
-			res = 1;
-		}
-		else if (cosmos::in_list(i, {1, 20})) {
-			std::cerr << "in_list returned bad positive result\n";
-			res = 1;
-		}
+		RUN_STEP("in-list", cosmos::in_list(i, {1, 5, 20}));
+		RUN_STEP("not-in-list", !cosmos::in_list(i, {1, 20}));
 	}
 
+	struct CharPtrGuard :
+			public cosmos::ResourceGuard<char*> {
+		explicit CharPtrGuard(char *p) :
+			ResourceGuard(p, [](char *_p) { delete[] _p; })
+		{}
+	};
 
-	return res;
+	void testResGuard() {
+		START_TEST("resource guard");
+
+		{
+			char *stuff = new char[500];
+			CharPtrGuard stuff_guard(stuff);
+			RUN_STEP("auto-delete", true);
+		}
+
+		{
+			char *stuff = new char[500];
+			CharPtrGuard stuff_guard(stuff);
+			stuff_guard.disarm();
+			delete[] stuff;
+			RUN_STEP("manual-delete", true);
+		}
+	}
+};
+
+int main(const int argc, const char **argv) {
+	MiscTest test;
+	return test.run(argc, argv);
 }

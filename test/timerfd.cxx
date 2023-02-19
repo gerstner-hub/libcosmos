@@ -1,114 +1,104 @@
-// Linux
+// C++
 #include <iostream>
 
-// comos
+// cosmos
 #include "cosmos/io/Poller.hxx"
 #include "cosmos/time/time.hxx"
 #include "cosmos/time/TimerFD.hxx"
 
-int main() {
+// Test
+#include "TestBase.hxx"
+
+class TimerFdTest :
+		public cosmos::TestBase {
+
 	using TimerFD = cosmos::MonotonicTimerFD;
-	TimerFD tfd;
 
-	if (tfd.valid()) {
-		std::cerr << "empty timer fd is valid?!\n";
-		return 1;
+	void runTests() override {
+		testValidity();
+		testTicks();
 	}
 
-	tfd = TimerFD{TimerFD::defaults};
+	void testValidity() {
+		START_TEST("validity");
+		TimerFD tfd;
 
-	if (!tfd.valid()) {
-		std::cerr << "default settings timer fd is invalid?\n";
-		return 1;
+		RUN_STEP("default-not-valid", !tfd.valid());
+
+		tfd = TimerFD{TimerFD::defaults};
+
+		RUN_STEP("defsettings-valid", tfd.valid());
+
+		tfd.close();
+
+		RUN_STEP("invalid-after-close", !tfd.valid());
+
+		tfd = TimerFD{TimerFD::CreateFlags{TimerFD::CreateSettings::NONBLOCK}};
+
+		RUN_STEP("custom-settings-valid", tfd.valid());
+
+		tfd.close();
+
+		tfd.create();
+
+		RUN_STEP("create-valid", tfd.valid());
+
+		tfd.create();
+
+		RUN_STEP("double-create-valid", tfd.valid());
+
+		tfd.close();
+		tfd.close();
+
+		RUN_STEP("double-close-invalid", !tfd.valid());
 	}
 
-	tfd.close();
+	void testTicks() {
+		START_TEST("ticks");
 
-	if (tfd.valid()) {
-		std::cerr << "timer fd still valid after close?\n";
-		return 1;
+		TimerFD tfd;
+		tfd.create();
+
+		TimerFD::TimerSpec ts;
+		ts.initial().setSeconds(2);
+
+		tfd.setTime(ts);
+
+		uint64_t ticks = tfd.wait();
+
+		RUN_STEP("wait-for-initial-ticks", ticks == 1);
+
+		cosmos::Poller poller{16};
+		poller.addFD(tfd.fd(), cosmos::Poller::MonitorMask{cosmos::Poller::MonitorSetting::INPUT});
+
+		auto events = poller.wait(std::chrono::milliseconds{5000});
+
+		RUN_STEP("no-interval-no-retick", events.empty());
+
+		ts.interval().setSeconds(1);
+
+		tfd.setTime(ts);
+
+		cosmos::time::sleep(std::chrono::milliseconds{3000});
+
+		ticks = tfd.wait();
+
+		RUN_STEP("yes-interval-retick", ticks >= 2);
+
+		poller.delFD(tfd.fd());
+		tfd.close();
+		tfd.create();
+		poller.addFD(tfd.fd(), cosmos::Poller::MonitorMask{cosmos::Poller::MonitorSetting::INPUT});
+
+		tfd.setTime(ts);
+		tfd.disarm();
+		events = poller.wait(std::chrono::milliseconds{3000});
+
+		RUN_STEP("disarm-stops-tick", events.empty());
 	}
+};
 
-	tfd = TimerFD{TimerFD::CreateFlags{TimerFD::CreateSettings::NONBLOCK}};
-
-	if (!tfd.valid()) {
-		std::cerr << "timer fd with custom settings is invalid?\n";
-		return 1;
-	}
-
-	tfd.close();
-
-	tfd.create();
-
-	if (!tfd.valid()) {
-		std::cerr << "create() didn't create valid timer fd?\n";
-		return 1;
-	}
-
-	tfd.create();
-
-	if (!tfd.valid()) {
-		std::cerr << "second create() didn't create valid timer fd?\n";
-		return 1;
-	}
-
-	tfd.close();
-	tfd.close();
-
-	if (tfd.valid()) {
-		std::cerr << "double close resulted in valid timer fd?\n";
-	}
-
-	tfd.create();
-
-	TimerFD::TimerSpec ts;
-	ts.initial().setSeconds(2);
-
-	tfd.setTime(ts);
-
-	uint64_t ticks = tfd.wait();
-
-	if (ticks != 1) {
-		std::cerr << "wait() did not result in a tick?\n";
-		return 1;
-	}
-
-	cosmos::Poller poller{16};
-	poller.addFD(tfd.fd(), cosmos::Poller::MonitorMask{cosmos::Poller::MonitorSetting::INPUT});
-
-	auto events = poller.wait(std::chrono::milliseconds{5000});
-
-	if (!events.empty()) {
-		std::cerr << "timer without interval re-ticked?!\n";
-		return 1;
-	}
-
-	ts.interval().setSeconds(1);
-
-	tfd.setTime(ts);
-
-	cosmos::time::sleep(std::chrono::milliseconds{3000});
-
-	ticks = tfd.wait();
-
-	if (ticks < 2) {
-		std::cerr << "timer with interval ticked less than two times?\n";
-		return 1;
-	}
-
-	poller.delFD(tfd.fd());
-	tfd.close();
-	tfd.create();
-	poller.addFD(tfd.fd(), cosmos::Poller::MonitorMask{cosmos::Poller::MonitorSetting::INPUT});
-
-	tfd.setTime(ts);
-	tfd.disarm();
-	events = poller.wait(std::chrono::milliseconds{3000});
-
-	if (!events.empty()) {
-		std::cerr << "disarmed timer still ticked?\n";
-		return 1;
-	}
-
-	return 0;
+int main(const int argc, const char **argv) {
+	TimerFdTest test;
+	return test.run(argc, argv);
 }
