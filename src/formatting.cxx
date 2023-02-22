@@ -88,3 +88,4 @@ std::ostream& operator<<(std::ostream& o, const cosmos::FormattedNumber<NUM> &fm
 template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::FormattedNumber<unsigned int>&);
 template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::FormattedNumber<int>&);
 template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::FormattedNumber<size_t>&);
+template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::FormattedNumber<char>&);
