@@ -57,7 +57,14 @@ T1& append(T1 &v1, const T2 &v2) {
 /// Casts an enum constant value into its underlying primitive type
 template<typename ENUM>
 constexpr auto to_integral(const ENUM e) -> typename std::underlying_type<ENUM>::type {
-   return static_cast<typename std::underlying_type<ENUM>::type>(e);
+	return static_cast<typename std::underlying_type<ENUM>::type>(e);
+}
+
+/// Returns a pointer casted to the underlying type of the given enum
+template<typename ENUM>
+auto to_raw_ptr(ENUM *e) {
+	using UT = typename std::underlying_type<ENUM>::type;
+	return reinterpret_cast<UT*>(e);
 }
 
 template <typename VARIANT>
