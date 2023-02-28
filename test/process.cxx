@@ -36,6 +36,7 @@ class ProcessTest :
 		auto path = cosmos::proc::get_env_var("PATH");
 
 		RUN_STEP("non-empty-PATH", path != std::nullopt);
+		RUN_STEP("PATH-exists", cosmos::proc::exists_env_var("PATH") == true);
 
 		std::istringstream path_stream;
 		path_stream.str(std::string(*path));

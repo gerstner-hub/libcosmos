@@ -80,6 +80,11 @@ COSMOS_API [[ noreturn ]] void exit(ExitStatus status);
  **/
 COSMOS_API std::optional<std::string_view> get_env_var(const std::string_view name);
 
+/// Returns whether the given environment variable exists, ignoring its content
+inline bool exists_env_var(const std::string_view name) {
+	return get_env_var(name) != std::nullopt;
+}
+
 /// helper type to specify overwrite behaviour in set_env_var()
 using OverwriteEnv = NamedBool<struct overwrite_env_t, true>;
 
