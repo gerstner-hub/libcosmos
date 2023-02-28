@@ -20,10 +20,10 @@
 #include "cosmos/fs/DirIterator.hxx"
 #include "cosmos/fs/File.hxx"
 #include "cosmos/fs/FileStatus.hxx"
-#include "cosmos/fs/FileSystem.hxx"
+#include "cosmos/fs/filesystem.hxx"
 #include "cosmos/GroupInfo.hxx"
 #include "cosmos/PasswdInfo.hxx"
-#include "cosmos/proc/Process.hxx"
+#include "cosmos/proc/process.hxx"
 
 namespace cosmos::fs {
 

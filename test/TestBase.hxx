@@ -11,7 +11,7 @@
 #include "cosmos/error/RuntimeError.hxx"
 #include "cosmos/formatting.hxx"
 #include "cosmos/proc/ChildCloner.hxx"
-#include "cosmos/proc/Process.hxx"
+#include "cosmos/proc/process.hxx"
 #include "cosmos/types.hxx"
 #include "cosmos/io/colors.hxx"
 #include "cosmos/io/StdLogger.hxx"

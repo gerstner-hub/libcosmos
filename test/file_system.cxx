@@ -7,11 +7,11 @@
 #include "cosmos/error/FileError.hxx"
 #include "cosmos/error/RuntimeError.hxx"
 #include "cosmos/formatting.hxx"
-#include "cosmos/fs/FileSystem.hxx"
+#include "cosmos/fs/filesystem.hxx"
 #include "cosmos/fs/FileStatus.hxx"
 #include "cosmos/fs/StreamFile.hxx"
 #include "cosmos/proc/ChildCloner.hxx"
-#include "cosmos/proc/Process.hxx"
+#include "cosmos/proc/process.hxx"
 #include "cosmos/PasswdInfo.hxx"
 
 // Test

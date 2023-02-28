@@ -10,7 +10,7 @@
 #include "cosmos/fs/DirIterator.hxx"
 #include "cosmos/fs/File.hxx"
 #include "cosmos/fs/FileStatus.hxx"
-#include "cosmos/fs/FileSystem.hxx"
+#include "cosmos/fs/filesystem.hxx"
 #include "cosmos/fs/StreamFile.hxx"
 
 // Test

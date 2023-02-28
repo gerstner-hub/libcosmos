@@ -5,7 +5,7 @@
 #include "cosmos/formatting.hxx"
 #include "cosmos/GroupInfo.hxx"
 #include "cosmos/PasswdInfo.hxx"
-#include "cosmos/proc/Process.hxx"
+#include "cosmos/proc/process.hxx"
 
 // Test
 #include "TestBase.hxx"

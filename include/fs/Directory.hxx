@@ -16,7 +16,7 @@
 #include "cosmos/fs/DirEntry.hxx"
 #include "cosmos/fs/DirFD.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
-#include "cosmos/fs/FileSystem.hxx"
+#include "cosmos/fs/filesystem.hxx"
 
 namespace cosmos {
 

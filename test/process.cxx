@@ -3,7 +3,7 @@
 #include <sstream>
 
 // cosmos
-#include "cosmos/proc/Process.hxx"
+#include "cosmos/proc/process.hxx"
 
 // Test
 #include "TestBase.hxx"

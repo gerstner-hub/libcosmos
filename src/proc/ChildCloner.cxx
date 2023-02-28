@@ -15,10 +15,10 @@
 #include "cosmos/error/InternalError.hxx"
 #include "cosmos/error/UsageError.hxx"
 #include "cosmos/formatting.hxx"
-#include "cosmos/fs/FileSystem.hxx"
+#include "cosmos/fs/filesystem.hxx"
 #include "cosmos/private/Scheduler.hxx"
 #include "cosmos/proc/ChildCloner.hxx"
-#include "cosmos/proc/Process.hxx"
+#include "cosmos/proc/process.hxx"
 #include "cosmos/proc/SigSet.hxx"
 #include "cosmos/proc/SubProc.hxx"
 
