@@ -23,6 +23,48 @@
  **/
 
 namespace cosmos {
+	template <typename NUM>
+	struct FormattedNumber;
+}
+
+inline std::ostream& operator<<(std::ostream &o, const cosmos::ProcessID &pid) {
+	// we could also think about using a consistent annotation of process
+	// ids in the output like @1234 or <pid: 1234> something like that.
+	o << cosmos::to_integral(pid);
+	return o;
+}
+
+inline std::ostream& operator<<(std::ostream &o, const cosmos::UserID &uid) {
+	// similarly we could use special annotation here
+	o << cosmos::to_integral(uid);
+	return o;
+}
+
+inline std::ostream& operator<<(std::ostream &o, const cosmos::GroupID &gid) {
+	// similarly we could use special annotation here
+	o << cosmos::to_integral(gid);
+	return o;
+}
+
+inline std::ostream& operator<<(std::ostream &o, const cosmos::SignalNr &sig) {
+	// similarly we could use special annotation here
+	o << cosmos::to_integral(sig);
+	return o;
+}
+
+inline std::ostream& operator<<(std::ostream &o, const cosmos::FileNum &fd) {
+	// similarly we could use special annotation here
+	o << cosmos::to_integral(fd);
+	return o;
+}
+
+// this is implemented outlined with explicit template instantiations for the
+// currently necessary primitive types
+template <typename NUM>
+std::ostream& operator<<(std::ostream& o, const cosmos::FormattedNumber<NUM> &fmtnum);
+
+
+namespace cosmos {
 
 /// base class for HexNum and OctNum format output helpers
 template <typename NUM>
@@ -118,41 +160,5 @@ auto to_printable_integer(T num) -> decltype(+num) {
 COSMOS_API std::string sprintf(const char *fmt, ...) COSMOS_FORMAT_PRINTF(1, 2);
 
 } // end ns cosmos
-
-inline std::ostream& operator<<(std::ostream &o, const cosmos::ProcessID &pid) {
-	// we could also think about using a consistent annotation of process
-	// ids in the output like @1234 or <pid: 1234> something like that.
-	o << cosmos::to_integral(pid);
-	return o;
-}
-
-inline std::ostream& operator<<(std::ostream &o, const cosmos::UserID &uid) {
-	// similarly we could use special annotation here
-	o << cosmos::to_integral(uid);
-	return o;
-}
-
-inline std::ostream& operator<<(std::ostream &o, const cosmos::GroupID &gid) {
-	// similarly we could use special annotation here
-	o << cosmos::to_integral(gid);
-	return o;
-}
-
-inline std::ostream& operator<<(std::ostream &o, const cosmos::SignalNr &sig) {
-	// similarly we could use special annotation here
-	o << cosmos::to_integral(sig);
-	return o;
-}
-
-inline std::ostream& operator<<(std::ostream &o, const cosmos::FileNum &fd) {
-	// similarly we could use special annotation here
-	o << cosmos::to_integral(fd);
-	return o;
-}
-
-// this is implemented outlined with explicit template instantiations for the
-// currently necessary primitive types
-template <typename NUM>
-std::ostream& operator<<(std::ostream& o, const cosmos::FormattedNumber<NUM> &fmtnum);
 
 #endif // inc. guard
