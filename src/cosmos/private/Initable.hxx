@@ -25,7 +25,7 @@ enum class InitPrio : std::size_t {
  * system will call libInit() and libExit() at the appropriate times.
  **/
 class Initable {
-	friend class InitData;
+	friend struct InitData;
 
 protected: // functions
 

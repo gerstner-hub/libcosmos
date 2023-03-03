@@ -253,6 +253,10 @@ using RealTimeTimerFD  = TimerFD<ClockType::REALTIME>;
 using MonotonicTimerFD = TimerFD<ClockType::MONOTONIC>;
 using BootTimeTimerFD  = TimerFD<ClockType::BOOTTIME>;
 
+extern template class COSMOS_API TimerFD<ClockType::BOOTTIME>;
+extern template class COSMOS_API TimerFD<ClockType::MONOTONIC>;
+extern template class COSMOS_API TimerFD<ClockType::REALTIME>;
+
 } // end ns
 
 #endif // inc. guard

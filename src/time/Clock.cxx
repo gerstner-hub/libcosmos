@@ -78,14 +78,14 @@ void Clock<CLOCK>::sleep(const TimeSpec<CLOCK> until) const {
 }
 
 /* explicit instantiations of the necessary clock variants */
-template class COSMOS_API Clock<ClockType::ATOMIC_REALTIME>;
-template class COSMOS_API Clock<ClockType::BOOTTIME>;
-template class COSMOS_API Clock<ClockType::MONOTONIC>;
-template class COSMOS_API Clock<ClockType::MONOTONIC_COARSE>;
-template class COSMOS_API Clock<ClockType::MONOTONIC_RAW>;
-template class COSMOS_API Clock<ClockType::PROCESS_CPUTIME>;
-template class COSMOS_API Clock<ClockType::REALTIME>;
-template class COSMOS_API Clock<ClockType::REALTIME_COARSE>;
-template class COSMOS_API Clock<ClockType::THREAD_CPUTIME>;
+template class Clock<ClockType::ATOMIC_REALTIME>;
+template class Clock<ClockType::BOOTTIME>;
+template class Clock<ClockType::MONOTONIC>;
+template class Clock<ClockType::MONOTONIC_COARSE>;
+template class Clock<ClockType::MONOTONIC_RAW>;
+template class Clock<ClockType::PROCESS_CPUTIME>;
+template class Clock<ClockType::REALTIME>;
+template class Clock<ClockType::REALTIME_COARSE>;
+template class Clock<ClockType::THREAD_CPUTIME>;
 
 } // end ns

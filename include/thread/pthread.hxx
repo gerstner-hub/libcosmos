@@ -61,7 +61,7 @@ ID COSMOS_API get_id();
  * from main(), in which case other pthreads in the process are allowed to
  * continue running.
  **/
-COSMOS_API [[ noreturn ]] void exit(const ExitValue val = ExitValue{0});
+[[ noreturn ]] COSMOS_API void exit(const ExitValue val = ExitValue{0});
 
 } // end ns
 

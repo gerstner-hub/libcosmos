@@ -75,8 +75,8 @@ uint64_t TimerFD<CLOCK>::wait() {
 	return ret;
 }
 
-template class COSMOS_API TimerFD<ClockType::BOOTTIME>;
-template class COSMOS_API TimerFD<ClockType::MONOTONIC>;
-template class COSMOS_API TimerFD<ClockType::REALTIME>;
+template class TimerFD<ClockType::BOOTTIME>;
+template class TimerFD<ClockType::MONOTONIC>;
+template class TimerFD<ClockType::REALTIME>;
 
 } // end ns

@@ -71,6 +71,16 @@ using RawMonotonicClock    = Clock<ClockType::MONOTONIC_RAW>;
 using RealTimeClock        = Clock<ClockType::REALTIME>;
 using ThreadTimeClock      = Clock<ClockType::THREAD_CPUTIME>;
 
+extern template class COSMOS_API Clock<ClockType::ATOMIC_REALTIME>;
+extern template class COSMOS_API Clock<ClockType::BOOTTIME>;
+extern template class COSMOS_API Clock<ClockType::MONOTONIC>;
+extern template class COSMOS_API Clock<ClockType::MONOTONIC_COARSE>;
+extern template class COSMOS_API Clock<ClockType::MONOTONIC_RAW>;
+extern template class COSMOS_API Clock<ClockType::PROCESS_CPUTIME>;
+extern template class COSMOS_API Clock<ClockType::REALTIME>;
+extern template class COSMOS_API Clock<ClockType::REALTIME_COARSE>;
+extern template class COSMOS_API Clock<ClockType::THREAD_CPUTIME>;
+
 } // end ns
 
 #endif // inc. guard

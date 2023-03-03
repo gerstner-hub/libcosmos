@@ -70,7 +70,7 @@ COSMOS_API ProcessID create_new_session();
  * If multiple threads are running in the current process then they also will
  * be terminated.
  **/
-COSMOS_API [[ noreturn ]] void exit(ExitStatus status);
+[[ noreturn ]] COSMOS_API void exit(ExitStatus status);
 
 /// Returns the value for the environment variable named \c name
 /**

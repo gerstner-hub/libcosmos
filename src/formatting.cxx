@@ -11,6 +11,7 @@ namespace cosmos {
 
 namespace {
 
+/* silence clang warning about non-literal fmt */ COSMOS_FORMAT_PRINTF(1, 0)
 std::string sprintf_v(const char *fmt, va_list orig_args) {
 	std::string ret;
 	// let's use some arbitrary start size that should suffice for average uses
@@ -21,7 +22,7 @@ std::string sprintf_v(const char *fmt, va_list orig_args) {
 
 	while (true) {
 		// copy the list of arguments in any case, since we
-		// potentially need to evaluated it multiple times
+		// potentially need to evaluate it multiple times
 		va_copy(varargs, orig_args);
 
 		written = vsnprintf(&ret[0], ret.size() + 1, fmt, varargs);

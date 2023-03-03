@@ -86,7 +86,7 @@ public:
 		 */
 		cosmos::ChildCloner cloner{{m_cat_path, m_cat_file}};
 		cloner.setStdOut(file.fileDesc());
-		m_proc = std::move(cloner.run());
+		m_proc = cloner.run();
 		auto res = m_proc.wait();
 
 		RUN_STEP("cat-exit-success", res.exitedSuccessfully());
@@ -147,7 +147,7 @@ public:
 		 */
 		cosmos::ChildCloner cloner{{m_cat_path, m_nonexisting_file}};
 		cloner.setStdErr(file.fileDesc());
-		m_proc = std::move(cloner.run());
+		m_proc = cloner.run();
 		auto res = m_proc.wait();
 
 		RUN_STEP("child-exit-success", res.exited() && res.exitStatus() == ExitStatus(1));
@@ -205,7 +205,7 @@ public:
 		cosmos::ChildCloner cloner{{m_head_path, "-n", ss.str()}};
 		cloner.setStdOut(m_pipe_from_head.writeEnd());
 		cloner.setStdIn(m_pipe_to_head.readEnd());
-		m_proc = std::move(cloner.run());
+		m_proc = cloner.run();
 
 		// we need to close the write-end to successfully receive an
 		// EOF indication on the read end when the sub process
@@ -301,7 +301,7 @@ public:
 		START_TEST("wait with timeout test");
 		// let the child sleep some seconds
 		cosmos::ChildCloner cloner{{m_sleep_bin, "5"}};
-		m_proc = std::move(cloner.run());
+		m_proc = cloner.run();
 
 		size_t num_timeouts = 0;
 

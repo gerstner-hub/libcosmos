@@ -25,7 +25,7 @@ public: // functions
 	{}
 
 	StreamFile(const std::string_view path, const OpenMode mode) :
-		File{path, mode, OpenFlags{{OpenSettings::CLOEXEC}}},
+		File{path, mode, OpenFlags{OpenSettings::CLOEXEC}},
 		StreamIO{m_fd}
 	{}
 
