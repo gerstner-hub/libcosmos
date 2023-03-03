@@ -189,7 +189,9 @@ def initSCons(project, rtti=True):
     ]
 
     if use_clang:
-        pass
+        warnings.extend([
+            "no-deprecated-copy"
+        ])
     else:
         warnings.extend([
             "duplicated-cond",
