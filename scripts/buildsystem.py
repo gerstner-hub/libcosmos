@@ -121,7 +121,8 @@ def initSCons(project, rtti=True):
     """
 
     # some basic cross compilation support using GCC
-    prefix = os.environ.get("SCONS_CROSS_PREFIX", None)
+    gcc_prefix = ARGUMENTS.get("gcc-prefix", None)
+    use_clang = ARGUMENTS.get("use-clang", "0").lower() in ["1", "true", "yes"]
 
     env_options = {
             "ENV": {
@@ -130,22 +131,26 @@ def initSCons(project, rtti=True):
                 "TERM": os.environ["TERM"],
                 "PATH": os.environ["PATH"],
                 "HOME": os.environ["HOME"]
-            }
+            },
+            "tools": ['default']
     }
 
-    if prefix:
+    if gcc_prefix:
         env_options.update({
-            "CC"    : f"{prefix}-gcc",
-            "CXX"   : f"{prefix}-g++",
-            "LD"    : f"{prefix}-g++",
-            "AR"    : f"{prefix}-ar",
-            "STRIP" : f"{prefix}-strip",
+            "CC"    : f"{gcc_prefix}-gcc",
+            "CXX"   : f"{gcc_prefix}-g++",
+            "LD"    : f"{gcc_prefix}-g++",
+            "AR"    : f"{gcc_prefix}-ar",
+            "STRIP" : f"{gcc_prefix}-strip",
         })
+    elif use_clang:
+        env_options['tools'].extend(["clang", "clangxx"])
     # use colorgcc wrapper if available
     elif shutil.which("colorgcc"):
         # TODO: how can we find out where exactly the symlinks are located
         # independently of the distribution?
         env_options.update({
+            "CC"    : "/usr/lib/colorgcc/bin/gcc",
             "CXX"   : "/usr/lib/colorgcc/bin/g++"
         })
 
@@ -178,11 +183,19 @@ def initSCons(project, rtti=True):
     if not rtti:
         env.Append(CXXFLAGS = ["-fno-rtti"])
 
-    warnings = (
-        "all", "extra", "duplicated-cond",
-        "duplicated-branches", "logical-op", "shadow", "format=2",
+    warnings = [
+        "all", "extra", "shadow", "format=2",
         "double-promotion", "null-dereference"
-    )
+    ]
+
+    if use_clang:
+        pass
+    else:
+        warnings.extend([
+            "duplicated-cond",
+            "duplicated-branches",
+            "logical-op",
+        ])
 
     env.Append(CCFLAGS = [f"-W{warning}" for warning in warnings])
 
