@@ -164,8 +164,8 @@ def initSCons(project, rtti=True):
     if "CXXFLAGS" in os.environ:
         # add user specified flags
         env.MergeFlags(os.environ["CXXFLAGS"])
-    env.Append(CCFLAGS = ["-g", "-flto"])
-    env.Append(LINKFLAGS = ["-Wl,--as-needed", "-flto"])
+    env.Append(CCFLAGS = ["-g", "-flto=auto"])
+    env.Append(LINKFLAGS = ["-Wl,--as-needed", "-flto=auto"])
 
     if ARGUMENTS.get('sanitizer', 0):
         sanitizers = ["address", "return", "undefined", "leak"]
