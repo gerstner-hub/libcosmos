@@ -201,7 +201,17 @@ def initSCons(project, rtti=True):
 
     env.Append(CCFLAGS = [f"-W{warning}" for warning in warnings])
 
-    buildroot = Dir("build").srcnode().abspath + "/"
+    buildroot_base = "build"
+    # support parallel buildroots for certain different configurations
+    flavour = None
+
+    if use_clang:
+        flavour = "clang"
+
+    if flavour:
+        buildroot_base += f".{flavour}"
+
+    buildroot = Dir(buildroot_base).srcnode().abspath + "/"
 
     env.VariantDir(buildroot, ".", duplicate=False)
 
