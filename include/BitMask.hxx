@@ -28,7 +28,7 @@ public: // types
 	struct All {};
 	static constexpr All all{};
 
-	typedef typename std::underlying_type<ENUM>::type EnumBaseType;
+	using EnumBaseType = typename std::underlying_type<ENUM>::type;
 
 public: // functions
 
@@ -100,7 +100,7 @@ public: // functions
 
 	/// Sets all bits to zero
 	BitMask& reset() {
-		m_flags = EnumBaseType(0);
+		m_flags = EnumBaseType{0};
 		return *this;
 	}
 
@@ -220,6 +220,11 @@ public: // functions
 	/// Checks whether the given bit is set, \see test()
 	bool operator&(const ENUM bit) const {
 		return test(bit);
+	}
+
+	/// returns an ENUM value containing only the values found in both masks
+	ENUM operator&(const BitMask &other) const {
+		return ENUM{other.raw() & this->raw()};
 	}
 
 protected: // data
