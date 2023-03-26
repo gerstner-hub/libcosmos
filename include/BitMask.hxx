@@ -8,7 +8,7 @@
 
 namespace cosmos {
 
-/// A typesafe bit mask representation using enums
+/// A typesafe bit mask representation using class enums.
 /**
  * Instead of using a plain integer type and preprocessor constants to denote
  * certain bit positions, this type provides a type safe implementation of a
@@ -33,7 +33,7 @@ public: // types
 public: // functions
 
 	/// Sets all bits to zero
-	BitMask() {}
+	constexpr BitMask() {}
 
 	/// Sets all bits zo one
 	explicit BitMask(const All a) {
@@ -41,19 +41,19 @@ public: // functions
 	}
 
 	/// Sets only the flags found in the given initializer list
-	explicit BitMask(const std::initializer_list<ENUM> &init_list) {
+	explicit constexpr BitMask(const std::initializer_list<ENUM> &init_list) {
 		for (auto bit: init_list) {
 			m_flags |= static_cast<EnumBaseType>(bit);
 		}
 	}
 
 	/// Sets exactly the given bit to one
-	explicit BitMask(const ENUM bit) :
+	explicit constexpr BitMask(const ENUM bit) :
 		m_flags{static_cast<EnumBaseType>(bit)}
 	{}
 
 	/// Sets exactly the given primitive type bitmask
-	explicit BitMask(const EnumBaseType value) :
+	explicit constexpr BitMask(const EnumBaseType value) :
 		m_flags{value}
 	{}
 
@@ -78,13 +78,13 @@ public: // functions
 		return ret;
 	}
 
-	/// Sets all bits it the set
+	/// Sets all bits it the set.
 	BitMask& set(const All) {
 		m_flags = ~EnumBaseType(0);
 		return *this;
 	}
 
-	/// Assigns the given value to the given bit position
+	/// Assigns the given value to the given bit position.
 	BitMask& set(const ENUM bit, bool val = true) {
 		const auto bitval = static_cast<EnumBaseType>(bit);
 		m_flags = (val ? (m_flags|bitval) : (m_flags & ~bitval));
@@ -95,6 +95,12 @@ public: // functions
 		for (auto flag: flags) {
 			set(flag);
 		}
+		return *this;
+	}
+
+	/// Sets all the bits that are also set in \c other.
+	BitMask& set(const BitMask other) {
+		m_flags |= other.m_flags;
 		return *this;
 	}
 
@@ -118,6 +124,16 @@ public: // functions
 		return *this;
 	}
 
+	BitMask& reset(const BitMask other) {
+		m_flags &= ~(other.raw());
+		return *this;
+	}
+
+	BitMask reset(const BitMask other) const {
+		auto ret = *this;
+		return ret.reset(other);
+	}
+
 	/// Sets all bits to zero except the given flags
 	BitMask& limit(const std::initializer_list<ENUM> &flags) {
 		EnumBaseType mask = 0;
@@ -132,6 +148,16 @@ public: // functions
 	/// Sets all bits to zero except the given flag
 	BitMask& limit(const ENUM flag) {
 		return limit({flag});
+	}
+
+	BitMask& limit(const BitMask other) {
+		m_flags &= other.raw();
+		return *this;
+	}
+
+	BitMask limit(const BitMask other) const {
+		auto ret = *this;
+		return ret.limit(other);
 	}
 
 	/// Flip every bit in the bit mask
@@ -204,6 +230,10 @@ public: // functions
 		return false;
 	}
 
+	bool anyOf(const BitMask other) const {
+		return (m_flags & other.m_flags) != 0;
+	}
+
 	/// Returns whether no bit in the bitset is set
 	bool none() const {
 		return !this->any();
@@ -225,6 +255,34 @@ public: // functions
 	/// returns an ENUM value containing only the values found in both masks
 	ENUM operator&(const BitMask &other) const {
 		return ENUM{other.raw() & this->raw()};
+	}
+
+	BitMask operator~() const {
+		return BitMask{~m_flags};
+	}
+
+	/// Returns an object containing all the bits found in \c first without the bits found inc \c second.
+	friend BitMask operator-(const BitMask &first, const BitMask &second) {
+		BitMask ret{first};
+		return ret.reset(second);
+	}
+
+	/// Returns an object containing all the bits found in \c first without \c bit.
+	friend BitMask operator-(const BitMask &first, const ENUM bit) {
+		BitMask ret{first};
+		return ret.reset(bit);
+	}
+
+	/// Returns an object containing all the bits found in \c first and \c secopnd.
+	friend BitMask operator+(const BitMask &first, const BitMask &second) {
+		BitMask ret{first};
+		return ret.set(second);
+	}
+
+	/// Returns an object containing all the bits found in \c first and /also \c bit.
+	friend BitMask operator+(const BitMask &first, const ENUM bit) {
+		BitMask ret{first};
+		return ret.set(bit);
 	}
 
 protected: // data
