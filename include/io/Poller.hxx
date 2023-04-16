@@ -61,19 +61,19 @@ public: // types
 	/// Flags used to declare interest in specific events and options in addFD() and modFD()
 	enum class MonitorSetting : uint32_t {
 		/// Monitor for read() operation becoming possible
-		INPUT = EPOLLIN,
+		INPUT          = EPOLLIN,
 		/// Monitor for write() operation becoming possible
-		OUTPUT = EPOLLOUT,
+		OUTPUT         = EPOLLOUT,
 		/// Monitor for stream socket peer closed or shut down the write half of the connection (data may still be pending)
-		SOCKET_HANGUP = EPOLLRDHUP,
+		SOCKET_HANGUP  = EPOLLRDHUP,
 		/// Monitor for exceptional conditions occuring on the file descriptor, depending on the actual file type
-		EXCEPTIONS = EPOLLPRI,
+		EXCEPTIONS     = EPOLLPRI,
 		/// Operate in edge triggered mode instead of level triggered (which is the default)
 		EDGE_TRIGGERED = EPOLLET,
 		/// Only report events once, then disable monitoring until this flag is set again using modFD()
-		ONESHOT = EPOLLONESHOT,
+		ONESHOT        = EPOLLONESHOT,
 		/// If the process has the CAP_BLOCK_SUSPEND capability then the system won't enter a suspend state until the process that received this event calls wait() again.
-		STAY_AWAKE = EPOLLWAKEUP
+		STAY_AWAKE     = EPOLLWAKEUP
 	};
 
 	typedef BitMask<MonitorSetting> MonitorMask;
@@ -81,17 +81,17 @@ public: // types
 	/// Flags found in PollEvent that indicate the events that occured on a file descriptor
 	enum class Event : uint32_t {
 		/// \c see MonitorSettings::INPUT
-		INPUT_READY = EPOLLIN,
+		INPUT_READY       = EPOLLIN,
 		/// \c see MonitorSettings::OUTPUT
-		OUTPUT_READY = EPOLLOUT,
+		OUTPUT_READY      = EPOLLOUT,
 		/// \c see MonitorSettings::SOCKET_HANGUP
-		SOCKET_HANGUP = EPOLLRDHUP,
+		SOCKET_HANGUP     = EPOLLRDHUP,
 		/// \c see MonitorSettings::EXCEPTIONS
 		EXCEPTION_OCCURED = EPOLLPRI,
 		/// An error condition occured on the file descriptor (this is also reported for the write end of a pipe, if the read end is closed). This event is always reported independently of MonitorSettings.
-		ERROR_OCCURED = EPOLLERR,
+		ERROR_OCCURED     = EPOLLERR,
 		/// Socket or pipe peer has hung up. Data may still be pending though. This event is always reported independently of MonitorSettings.
-		HANGUP_OCCURED = EPOLLHUP
+		HANGUP_OCCURED    = EPOLLHUP
 	};
 
 	typedef BitMask<Event> EventMask;

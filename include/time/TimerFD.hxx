@@ -46,7 +46,7 @@ public: // types
 		/// Create a non-blocking file descriptor.
 		NONBLOCK = TFD_NONBLOCK,
 		/// Sets the close-on-exec flag upon creation.
-		CLOEXEC = TFD_CLOEXEC
+		CLOEXEC  = TFD_CLOEXEC
 	};
 
 	using CreateFlags = BitMask<CreateSettings>;
@@ -54,7 +54,7 @@ public: // types
 	/// Settings available for starting a TimerFD .
 	enum class StartSettings : int {
 		/// Interpret the initial (not the interval!) timer setting as an absolute clock time value.
-		ABSTIME = TFD_TIMER_ABSTIME,
+		ABSTIME       = TFD_TIMER_ABSTIME,
 		/// For RealTime based clocks report discontinous clock changes via Errno::CANCELED.
 		CANCEL_ON_SET = TFD_TIMER_CANCEL_ON_SET
 	};

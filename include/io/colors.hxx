@@ -98,13 +98,13 @@ struct BackColor : public ColorSpec {
 
 /// Various feature controls for ANSI terminals.
 enum class TermControl : size_t {
-	RESET = 0, /// Remove all attributes currently set (including colors)
-	UNDERLINE_ON = 4, /// Underlined text
-	UNDERLINE_OFF = 24,
-	BLINK_ON = 5, /// Blinking text
-	BLINK_OFF = 25,
-	INVERSE_ON = 7, /// Inverse fg/bg colors
-	INVERSE_OFF = 27,
+	RESET            = 0, /// Remove all attributes currently set (including colors)
+	UNDERLINE_ON     = 4, /// Underlined text
+	UNDERLINE_OFF    = 24,
+	BLINK_ON         = 5, /// Blinking text
+	BLINK_OFF        = 25,
+	INVERSE_ON       = 7, /// Inverse fg/bg colors
+	INVERSE_OFF      = 27,
 	DEFAULT_FG_COLOR = 39, /// Set default fg color
 	DEFAULT_BG_COLOR = 49 /// Set default bg color
 };

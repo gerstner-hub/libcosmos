@@ -18,13 +18,13 @@ struct sched_attr;
 
 /// Available scheduling policies on Linux
 enum class SchedulerPolicy : int {
-	FIFO = SCHED_FIFO,
+	FIFO        = SCHED_FIFO,
 	ROUND_ROBIN = SCHED_RR,
-	DEADLINE = SCHED_DEADLINE,
-	OTHER = SCHED_OTHER,
-	BATCH = SCHED_BATCH,
-	IDLE = SCHED_IDLE,
-	INVALID = -1
+	DEADLINE    = SCHED_DEADLINE,
+	OTHER       = SCHED_OTHER,
+	BATCH       = SCHED_BATCH,
+	IDLE        = SCHED_IDLE,
+	INVALID     = -1
 };
 
 /// Base class for changing process scheduling options

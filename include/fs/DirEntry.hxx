@@ -38,13 +38,13 @@ public: // types
 	/// Strong enum type expressing the dir entry file type
 	enum class Type : unsigned char {
 		BLOCK_DEVICE = DT_BLK,
-		CHAR_DEVICE = DT_CHR,
-		DIRECTORY = DT_DIR,
-		FIFO = DT_FIFO,
-		SYMLINK = DT_LNK,
-		REGULAR = DT_REG,
-		UNIX_SOCKET = DT_SOCK,
-		UNKNOWN = DT_UNKNOWN
+		CHAR_DEVICE  = DT_CHR,
+		DIRECTORY    = DT_DIR,
+		FIFO         = DT_FIFO,
+		SYMLINK      = DT_LNK,
+		REGULAR      = DT_REG,
+		UNIX_SOCKET  = DT_SOCK,
+		UNKNOWN      = DT_UNKNOWN
 	};
 
 protected: // functions

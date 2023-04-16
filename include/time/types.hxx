@@ -18,27 +18,27 @@ namespace cosmos {
 /// Available clock types for time operations.
 enum class ClockType : clockid_t {
 	/// System-wide wall clock time, settable.
-	REALTIME = CLOCK_REALTIME,
+	REALTIME         = CLOCK_REALTIME,
 	/// A faster but less precise version of REALTIME, not settable.
-	REALTIME_COARSE = CLOCK_REALTIME_COARSE,
+	REALTIME_COARSE  = CLOCK_REALTIME_COARSE,
 	/// System-wide wall clock time based on international atomic time (TAI) - it is ignoring leap seconds.
-	ATOMIC_REALTIME = CLOCK_TAI,
+	ATOMIC_REALTIME  = CLOCK_TAI,
 	/// System-wide clock representing monotonic time since some unspecified point in the past.
 	/**
 	 * On Linux this corresponds to the time since the system was started.
 	 **/
-	MONOTONIC = CLOCK_MONOTONIC,
+	MONOTONIC        = CLOCK_MONOTONIC,
 	/// Like MONOTONIC but not affected by NTP adjustments.
-	MONOTONIC_RAW = CLOCK_MONOTONIC_RAW,
+	MONOTONIC_RAW    = CLOCK_MONOTONIC_RAW,
 	/// A faster but less precise version of MONOTONIC, does not count suspend time.
 	MONOTONIC_COARSE = CLOCK_MONOTONIC_COARSE,
 	/// Like MONOTONIC but also counts suspend time.
-	BOOTTIME = CLOCK_BOOTTIME,
+	BOOTTIME         = CLOCK_BOOTTIME,
 	/// Counts the CPU time consumed by the calling process.
-	PROCESS_CPUTIME = CLOCK_PROCESS_CPUTIME_ID,
+	PROCESS_CPUTIME  = CLOCK_PROCESS_CPUTIME_ID,
 	/// Counts the CPU time consumed by the calling thread.
-	THREAD_CPUTIME = CLOCK_THREAD_CPUTIME_ID,
-	INVALID = clockid_t{-1}
+	THREAD_CPUTIME   = CLOCK_THREAD_CPUTIME_ID,
+	INVALID          = clockid_t{-1}
 };
 
 /// A C++ wrapper around the POSIX struct timespec coupled to a specific CLOCK type
