@@ -1,5 +1,5 @@
-#ifndef COSMOS_DIRECTORY_HXX
-#define COSMOS_DIRECTORY_HXX
+#ifndef COSMOS_DIRSTREAM_HXX
+#define COSMOS_DIRSTREAM_HXX
 
 // C++
 #include <exception>
@@ -20,46 +20,46 @@
 
 namespace cosmos {
 
-/// Access directory contents in the file system
+/// Access directory contents in the file system.
 /**
  * Using this type you can open directories in the file system either by path
- * or by using an already opened file descriptor. The directory contents can
- * then be iterated over.
+ * or by using an already opened FileDescriptor or DirFD. The directory
+ * contents can then be iterated over.
  *
  * Note that the directory contents will be returned by the operating system
  * in an undefined order (i.e. not alphabetically or otherwise sorted). Also
  * entries for "." and ".." by convention should show up and often need to be
- * filtered by applications.
+ * filtered by applications, if necessary.
  **/
-class COSMOS_API Directory {
+class COSMOS_API DirStream {
 public: // functions
 
-	/// Creates an object no associated to a directory
-	Directory() = default;
+	/// Creates an object not associated to a directory
+	DirStream() = default;
 
-	/// Create a Directory using the given file descriptor
+	/// Create a DirStream using the given file descriptor
 	/**
 	 * \see open(FileDescriptor fd)
 	 **/
-	explicit Directory(const FileDescriptor fd) {
+	explicit DirStream(const FileDescriptor fd) {
 		open(fd);
 	}
 
-	/// Create a Directory object operating on the directory at the given path location
-	explicit Directory(const std::string_view path) {
+	/// Create a DirStream object operating on the directory at the given path location
+	explicit DirStream(const std::string_view path) {
 		open(path);
 	}
 
 	/// Closes the underlying directory object, if currently open
-	~Directory();
+	~DirStream();
 
 	/// Close the currently associated directory
 	/**
-	 * This will disassociate the Directory object and further attempts to
+	 * This will disassociate the DirStream object and further attempts to
 	 * iterate over directory contents will fail.
 	 *
 	 * If closing causes an error then an exception is thrown, but the
-	 * state of the Directory object will be invalidated, to avoid
+	 * state of the DirStream object will be invalidated, to avoid
 	 * recurring errors trying to close() or reuse the object.
 	 *
 	 * If the object is not currently associated with a directory then a
@@ -71,8 +71,8 @@ public: // functions
 	/**
 	 * The implementation takes ownership of the file descriptor. You must
 	 * not modify the file descriptor's state, otherwise the usage of the
-	 * Directory object will become undefined. Also during close() the
-	 * file descriptor will be closed by the Directory object.
+	 * DirStream object will become undefined. Also during close() the
+	 * file descriptor will be closed by the DirStream object.
 	 *
 	 * If the object is already associated with another directory then
 	 * this previous association will be implicitly close()'d.
@@ -89,7 +89,7 @@ public: // functions
 	/// Indicates whether currently a directory is associated with this object
 	auto isOpen() const { return m_stream != nullptr; }
 
-	/// Return the file descriptor associated with the current Directory object
+	/// Return the file descriptor associated with the current DirStream object
 	/**
 	 * The caller must not modify the state of this file descriptor,
 	 * otherwise further attempts to iterate over directory contents will
@@ -130,9 +130,9 @@ public: // functions
 	/**
 	 * Calls to this function are only allowed if isOpen() returns \c
 	 * true. The validity of the returned object is tied to the lifetime
-	 * of the Directory instance it came from. Also any call to
+	 * of the DirStream instance it came from. Also any call to
 	 * nextEntry() will invalidate previously returned DirEntry instances
-	 * returned from the same Directory instance.
+	 * returned from the same DirStream instance.
 	 *
 	 * When the end of the directory has been reached then \c nullopt is
 	 * returned.
@@ -143,7 +143,7 @@ protected: // functions
 
 	void requireOpenStream(const std::string_view context) const {
 		if (!isOpen()) {
-			cosmos_throw (UsageError(std::string(context) + " on unassociated Directory instance"));
+			cosmos_throw (UsageError(std::string(context) + " on unassociated DirStream instance"));
 		}
 	}
 

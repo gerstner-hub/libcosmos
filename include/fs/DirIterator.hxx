@@ -2,19 +2,19 @@
 #define COSMOS_DIRITERATOR_HXX
 
 // cosmos
-#include "cosmos/fs/Directory.hxx"
+#include "cosmos/fs/DirStream.hxx"
 
 namespace cosmos {
 
-/// this type implements range based for loop iterator semantics for Directory
+/// This type implements range based for loop iterator semantics for DirStream.
 /**
- * This type and the related begin(Direcotry&) and end(Directory&) functions
- * allow to use range based for loops with Directory objects.
+ * This type and the related begin(DirStream&) and end(DirStream&) functions
+ * allow to use range based for loops with DirStream objects.
  **/
 class DirIterator {
 public: // functions
 
-	explicit DirIterator(Directory &dir, bool at_end) :
+	explicit DirIterator(DirStream &dir, bool at_end) :
 			m_dir{dir} {
 		if (!at_end)
 			m_entry = dir.nextEntry();
@@ -41,15 +41,15 @@ public: // functions
 	}
 
 protected: // data
-	Directory &m_dir;
+	DirStream &m_dir;
 	std::optional<DirEntry> m_entry;
 };
 
-inline DirIterator begin(Directory &dir) {
+inline DirIterator begin(DirStream &dir) {
 	return DirIterator{dir, false};
 }
 
-inline DirIterator end(Directory &dir) {
+inline DirIterator end(DirStream &dir) {
 	return DirIterator{dir, true};
 }
 

@@ -9,11 +9,11 @@
 // Cosmos
 #include "cosmos/formatting.hxx"
 #include "cosmos/private/cosmos.hxx"
-#include "cosmos/fs/Directory.hxx"
+#include "cosmos/fs/DirStream.hxx"
 
 namespace cosmos {
 
-Directory::~Directory() {
+DirStream::~DirStream() {
 	try {
 		close();
 	} catch (const std::exception &ex) {
@@ -23,7 +23,7 @@ Directory::~Directory() {
 	}
 }
 
-void Directory::close() {
+void DirStream::close() {
 	if (!m_stream) {
 		return;
 	}
@@ -36,7 +36,7 @@ void Directory::close() {
 	}
 }
 
-void Directory::open(const std::string_view path, const FollowSymlinks follow_links) {
+void DirStream::open(const std::string_view path, const FollowSymlinks follow_links) {
 	close();
 
 	/*
@@ -66,7 +66,7 @@ void Directory::open(const std::string_view path, const FollowSymlinks follow_li
 	}
 }
 
-void Directory::open(const FileDescriptor fd) {
+void DirStream::open(const FileDescriptor fd) {
 	close();
 
 	m_stream = fdopendir(to_integral(fd.raw()));
@@ -76,7 +76,7 @@ void Directory::open(const FileDescriptor fd) {
 	}
 }
 
-DirFD Directory::fd() const {
+DirFD DirStream::fd() const {
 	requireOpenStream(__FUNCTION__);
 	auto fd = dirfd(m_stream);
 	DirFD ret{FileNum{fd}};
@@ -88,7 +88,7 @@ DirFD Directory::fd() const {
 	return ret;
 }
 
-std::optional<DirEntry> Directory::nextEntry() {
+std::optional<DirEntry> DirStream::nextEntry() {
 	requireOpenStream(__FUNCTION__);
 
 	/*

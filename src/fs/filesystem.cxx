@@ -16,8 +16,8 @@
 #include "cosmos/error/InternalError.hxx"
 #include "cosmos/error/RuntimeError.hxx"
 #include "cosmos/error/UsageError.hxx"
-#include "cosmos/fs/Directory.hxx"
 #include "cosmos/fs/DirIterator.hxx"
+#include "cosmos/fs/DirStream.hxx"
 #include "cosmos/fs/File.hxx"
 #include "cosmos/fs/FileStatus.hxx"
 #include "cosmos/fs/filesystem.hxx"
@@ -191,8 +191,8 @@ Errno make_all_dirs(const std::string_view path, const FileMode mode) {
 }
 
 void remove_tree(const std::string_view path) {
-	// TODO implement this more efficiently using ulinkat() & friends
-	Directory dir{path};
+	// TODO implement this more efficiently using unlinkat() & friends
+	DirStream dir{path};
 
 	using Type = DirEntry::Type;
 

@@ -15,14 +15,14 @@
 
 namespace cosmos {
 
-/// A single Directory entry as returned from Directory::nextEntry()
+/// A single directory entry as returned from DirStream::nextEntry()
 /**
- * The stored data is only valid as long as the Directory object it was
- * returned from is valid and as long as Directory::nextEntry() isn't called
+ * The stored data is only valid as long as the DirStream object it was
+ * returned from is valid and as long as DirStream::nextEntry() isn't called
  * again.
  **/
 class COSMOS_API DirEntry {
-	friend class Directory;
+	friend class DirStream;
 	friend class DirIterator;
 
 public: // types
@@ -66,10 +66,10 @@ public: // functions
 	 **/
 	Inode inode() const { return Inode{m_entry->d_ino}; }
 
-	/// Returns the position of this entry in its associated Directory object
+	/// Returns the position of this entry in its associated DirStream object
 	/**
-	 * This is the same as Directory::tell(), it can be used in
-	 * Directory::seek() at a later time to return to the original
+	 * This is the same as DirStream::tell(), it can be used in
+	 * DirStream::seek() at a later time to return to the original
 	 * position.
 	 **/
 	DirPos dirPos() const { return DirPos{m_entry->d_off}; }
@@ -103,7 +103,7 @@ public: // functions
 	/// Returns the file type of this directory entry
 	/**
 	 * For increased efficiency the file type of directory entries can be
-	 * delivered directly with the Directory readdir() data. This is not
+	 * delivered directly with the DirStream readdir() data. This is not
 	 * supported by all underlying file systems, however.  Therefore be
 	 * prepared to receive Type::UNKNOWN at all times in which case you
 	 * will need to perform an explicit fstatat() or similar call to

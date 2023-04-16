@@ -6,7 +6,7 @@
 // Cosmos
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/fs/FileStatus.hxx"
-#include "cosmos/fs/Directory.hxx"
+#include "cosmos/fs/DirStream.hxx"
 
 // Test
 #include "TestBase.hxx"
@@ -22,7 +22,7 @@ public:
 
 	void testBasicLogic() {
 		START_TEST("Basic Directory Logic");
-		cosmos::Directory dir;
+		cosmos::DirStream dir;
 
 		RUN_STEP("not-open-by-default", !dir.isOpen());
 
@@ -39,7 +39,7 @@ public:
 	void testOpenDir() {
 		START_TEST("Test Opening Dir");
 		const std::string dir_path("/usr/include/linux");
-		cosmos::Directory dir;
+		cosmos::DirStream dir;
 		dir.open(dir_path);
 
 		RUN_STEP("dir-open", dir.isOpen());

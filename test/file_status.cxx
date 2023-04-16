@@ -6,8 +6,8 @@
 
 // cosmos
 #include "cosmos/formatting.hxx"
-#include "cosmos/fs/Directory.hxx"
 #include "cosmos/fs/DirIterator.hxx"
+#include "cosmos/fs/DirStream.hxx"
 #include "cosmos/fs/File.hxx"
 #include "cosmos/fs/FileStatus.hxx"
 #include "cosmos/fs/filesystem.hxx"
@@ -226,7 +226,7 @@ public:
 		if (cosmos::fs::exists_file(systemd_sock))
 			return systemd_sock;
 
-		cosmos::Directory run{"/run"};
+		cosmos::DirStream run{"/run"};
 		for (auto &entry: run) {
 			if (entry.isDotEntry())
 				continue;
