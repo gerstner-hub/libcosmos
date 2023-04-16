@@ -11,15 +11,19 @@ namespace cosmos {
 /**
  * A file descriptor representing a directory node on the file system. These
  * are needed in a number of situation like using the *at() file system calls
- * to operate relate to a directory. Therefore it makes sense to have a
+ * to operate relative to a directory. Therefore it makes sense to have a
  * dedicated strong type for this to avoid mixups.
  **/
-class DirFD : public FileDescriptor {
+class DirFD :
+		public FileDescriptor {
 public: // functions
 
-	explicit DirFD(FileNum fd = FileNum::INVALID) :
+	explicit constexpr DirFD(FileNum fd = FileNum::INVALID) :
 		FileDescriptor{fd} {}
 };
+
+/// Special dir file descriptor that refers to the CWD in the *at family of API calls
+inline constexpr DirFD at_cwd{FileNum::AT_CWD};
 
 } // end ns
 

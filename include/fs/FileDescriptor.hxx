@@ -38,7 +38,7 @@ public: // types
 
 public: // functions
 
-	explicit FileDescriptor(FileNum fd = FileNum::INVALID) : m_fd{fd} {}
+	explicit constexpr FileDescriptor(FileNum fd = FileNum::INVALID) : m_fd{fd} {}
 
 	/// Returns whether currently a valid file descriptor number is assigned.
 	bool valid() const { return m_fd != FileNum::INVALID; }

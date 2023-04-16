@@ -2,9 +2,10 @@
 #define COSMOS_OSTYPES_HXX
 
 // Linux
-#include <unistd.h>
+#include <fcntl.h>
 #include <signal.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 namespace cosmos {
 
@@ -91,7 +92,9 @@ enum class FileNum : int {
 	INVALID = -1,
 	STDIN   = STDIN_FILENO,
 	STDOUT  = STDOUT_FILENO,
-	STDERR  = STDERR_FILENO
+	STDERR  = STDERR_FILENO,
+	/// special constant denoting the CWD in the *at family of API calls
+	AT_CWD  = AT_FDCWD
 };
 
 } // end ns
