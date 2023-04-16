@@ -322,6 +322,27 @@ COSMOS_API void make_symlink(const std::string_view target, const std::string_vi
  **/
 COSMOS_API std::string read_symlink(const std::string_view path);
 
+/// Creates a new (hard) link of the file found in \c old_path at \c new_path.
+/**
+ * Hard links only work on the same file system. An attempt to create a hard
+ * link across different mounts will result in an ApiError with
+ * Errno::CROSS_DEVICE.
+ *
+ * If \c new_path already exists then it will not be overwritten but
+ * Errno::EXISTS will be thrown.
+ *
+ * Hard links don't work for directories, if \c old_path refers to one then
+ * Errno::PERMISSION will be thrown.
+ *
+ * Furthermore a range of errors related to lack of permissions, lack of
+ * memory, lack of disk space, problems in path resolution and so on can
+ * occur.
+ *
+ * On success both names will refer to the same file and it cannot be
+ * determined any more which was was the "original".
+ **/
+COSMOS_API void link(const std::string_view old_path, const std::string_view new_path);
+
 } // end ns
 
 #endif // inc. guard

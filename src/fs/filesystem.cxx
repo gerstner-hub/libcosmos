@@ -342,4 +342,10 @@ std::string read_symlink(const std::string_view path) {
 	}
 }
 
+void link(const std::string_view old_path, const std::string_view new_path) {
+	if (::link(old_path.data(), new_path.data()) != 0) {
+		cosmos_throw (FileError(new_path, std::string{"linking "} + std::string{old_path}));
+	}
+}
+
 } // end ns

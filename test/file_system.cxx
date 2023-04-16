@@ -24,6 +24,7 @@ class FileSystemTest :
 		testBasics();
 		testUmask();
 		testUnlink();
+		testLink();
 		testCreateDir();
 		testCreateAllDirs();
 		testChmod();
@@ -147,6 +148,25 @@ class FileSystemTest :
 		cosmos::fs::unlink_file("testfile");
 
 		RUN_STEP("unlinked-file-gone", !cosmos::fs::exists_file("testfile"));
+	}
+
+	void testLink() {
+		START_TEST("link");
+		std::ofstream f;
+		f.open("testfile");
+		f.close();
+
+		cosmos::fs::link("testfile", "testfile2");
+
+		RUN_STEP("linked-file-exists", cosmos::fs::exists_file("testfile2"));
+
+		cosmos::FileStatus status1{"testfile"};
+		cosmos::FileStatus status2{"testfile2"};
+
+		RUN_STEP("links-share-inode", status1.inode() == status2.inode());
+
+		cosmos::fs::unlink_file("testfile");
+		cosmos::fs::unlink_file("testfile2");
 	}
 
 	void testChmod() {
