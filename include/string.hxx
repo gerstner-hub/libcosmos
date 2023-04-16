@@ -2,6 +2,7 @@
 #define COSMOS_STRING_HXX
 
 // C++
+#include <cctype>
 #include <cstring>
 #include <string>
 #include <string_view>
@@ -50,6 +51,18 @@ inline bool is_prefix(const std::string_view s, const std::string_view prefix) {
  **/
 inline std::string_view to_string_view(const char *s) {
 	return s ? std::string_view{s} : std::string_view{};
+}
+
+/// Simple wrapper around std::isprint that implicitly casts to unsigned char.
+/**
+ * std::isprint is undefined if the passed value is not an unsigned 8 bit type
+ * or EOF. Thus cast different character types to unsigned char in this
+ * wrapper to avoid this trap.
+ **/
+template <typename CH>
+inline bool printable(CH ch) {
+	// TODO: make some compile time CH type checks?
+	return std::isprint(static_cast<unsigned char>(ch));
 }
 
 } // end ns
