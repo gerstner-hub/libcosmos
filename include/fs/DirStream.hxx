@@ -50,6 +50,10 @@ public: // functions
 		open(path);
 	}
 
+	// Prevent copying due to the directory stream ownership.
+	DirStream(const DirStream&) = delete;
+	DirStream& operator=(const DirStream&) = delete;
+
 	/// Closes the underlying directory object, if currently open
 	~DirStream();
 

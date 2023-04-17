@@ -26,6 +26,10 @@ namespace cosmos {
  * the necessary end to a child process.
  **/
 class COSMOS_API Pipe {
+	// disallow copy/assignment
+	Pipe(const Pipe&) = delete;
+	Pipe& operator=(const Pipe&) = delete;
+
 public: // functions
 
 	/// Creates a pipe with both ends stored in the object

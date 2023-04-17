@@ -58,6 +58,10 @@ public: // functions
 		open(fd, auto_close);
 	}
 
+	// Prevent copying due to the file descriptor ownership.
+	File(const File&) = delete;
+	File& operator=(const File&) = delete;
+
 	virtual ~File();
 
 	/// \see File(const std::string_view , const OpenMode )

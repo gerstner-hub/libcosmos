@@ -66,6 +66,10 @@ public: // functions
 		create(SigSet{{s}});
 	}
 
+	// Prevent copying due to the file descriptor ownership.
+	SignalFD(const SignalFD&) = delete;
+	SignalFD& operator=(const SignalFD&) = delete;
+
 	/// Creates a new SignalFD
 	/**
 	 * if a SignalFD is already open then it will be closed first. If an
