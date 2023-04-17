@@ -44,7 +44,7 @@ class StreamAdaptor :
 	public STREAM_TYPE {
 public: // functions
 
-	/// Close the underlying file descriptor
+	/// Close the underlying file descriptor.
 	virtual void close() {
 		m_buffer.close();
 	}
@@ -66,7 +66,7 @@ protected: // data
 	StdioFileBuf m_buffer;
 };
 
-/// Wraps a file descriptor in a std::istream interface
+/// Wraps a file descriptor in a std::istream interface.
 class InputStreamAdaptor :
 	public StreamAdaptor<std::istream> {
 public: // functions
@@ -81,7 +81,7 @@ public: // functions
 	{}
 };
 
-/// Wraps a file descriptor in a std::ostream interface
+/// Wraps a file descriptor in a std::ostream interface.
 class OutputStreamAdaptor :
 	public StreamAdaptor<std::ostream> {
 public: // functions
@@ -101,7 +101,7 @@ public: // functions
 	}
 };
 
-/// Wraps a file descriptor in a std::iostream interface
+/// Wraps a file descriptor in a std::iostream interface.
 class InputOutputStreamAdaptor :
 	public StreamAdaptor<std::iostream> {
 public: // functions

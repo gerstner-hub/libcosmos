@@ -22,7 +22,8 @@
 namespace cosmos {
 
 /// Represents a terminal dimension in characters
-struct TermDimension : winsize {
+struct TermDimension :
+		winsize {
 
 	explicit TermDimension(size_t cols = 0, size_t rows = 0) {
 		ws_col = cols;

@@ -7,7 +7,7 @@
 
 namespace cosmos {
 
-/// A simple standard logger that logs to cout/cerr
+/// A simple standard logger that logs to cout/cerr.
 /**
  * Except for the error stream all logged data goes to std::cout. The error
  * stream, of course, goes to std::cerr.
