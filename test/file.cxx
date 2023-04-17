@@ -7,6 +7,7 @@
 #include "cosmos/error/CosmosError.hxx"
 #include "cosmos/fs/File.hxx"
 #include "cosmos/fs/StreamFile.hxx"
+#include "cosmos/io/Pipe.hxx"
 
 // Test
 #include "TestBase.hxx"
@@ -20,6 +21,7 @@ public:
 		testOpen();
 		testReadFile();
 		testWriteFile();
+		testPipeStream();
 	}
 
 	void testOpenState() {
@@ -78,6 +80,23 @@ public:
 		EVAL_STEP(m_hosts_content == hosts2);
 		auto read = sf.read(hosts2.data(), 1);
 		FINISH_STEP(read == 0);
+	}
+
+	void testPipeStream() {
+		START_TEST("stream data over pipe");
+		cosmos::Pipe pipe;
+		cosmos::StreamFile reader{pipe.readEnd(), cosmos::File::AutoClose{false}};
+		cosmos::StreamFile writer{pipe.writeEnd(), cosmos::File::AutoClose{false}};
+
+		const std::string_view message{"going over the pipe"};
+		writer.writeAll(message);
+		pipe.closeWriteEnd();
+
+		std::string message2;
+		reader.readAll(message2, message.size());
+
+		RUN_STEP("message received", message == message2);
+		RUN_STEP("check for EOF", reader.read(message2.data(), 1) == 0);
 	}
 
 protected:

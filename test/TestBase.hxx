@@ -2,6 +2,7 @@
 #define COSMOS_TEST_BASE_HXX
 
 // C++
+#include <iostream>
 #include <string>
 #include <string_view>
 
