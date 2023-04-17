@@ -5,6 +5,7 @@
 #include <unistd.h>
 
 // C++
+#include <string>
 #include <string_view>
 
 // cosmos
@@ -102,6 +103,17 @@ public: // functions
 	 * normally then all \c length bytes will have been obtained.
 	 **/
 	void readAll(void *buf, size_t length);
+
+	/// Like readAll(void*, size_t) using an STL string.
+	void readAll(std::string &s, size_t length) {
+		s.resize(length);
+		try {
+			readAll(s.data(), length);
+		} catch(...) {
+			s.clear();
+			throw;
+		}
+	}
 
 	/// Write *all* \p length bytes into the underyling file
 	/**
