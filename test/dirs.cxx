@@ -7,6 +7,7 @@
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/fs/FileStatus.hxx"
 #include "cosmos/fs/DirStream.hxx"
+#include "cosmos/fs/Directory.hxx"
 
 // Test
 #include "TestBase.hxx"
@@ -18,6 +19,7 @@ public:
 	void runTests() override {
 		testBasicLogic();
 		testOpenDir();
+		testDirFD();
 	}
 
 	void testBasicLogic() {
@@ -103,6 +105,20 @@ public:
 		dir.close();
 
 		EXPECT_EXCEPTION("file-fd-invalid-after-close", cosmos::FileStatus status{fd});
+	}
+
+	void testDirFD() {
+		START_TEST("Directory descriptor test");
+
+		cosmos::Directory dir{"/etc"};
+
+		RUN_STEP("dir-is-open", dir.isOpen());
+
+		dir.close();
+
+		RUN_STEP("dir-is-closed", !dir.isOpen());
+
+		EXPECT_EXCEPTION("opening-nondir-fails", dir.open("/etc/fstab"));
 	}
 };
 

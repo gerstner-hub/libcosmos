@@ -6,7 +6,6 @@
 #include <string_view>
 
 // cosmos
-#include "cosmos/BitMask.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/fs/types.hxx"
 #include "cosmos/ostypes.hxx"
@@ -14,7 +13,7 @@
 
 namespace cosmos {
 
-/// Representation of open file objects
+/// Representation of open file objects.
 /**
  * On the level of this type mainly the means to open a file are provided
  * (usually by path name or by using an existing file descriptor). Some
@@ -27,11 +26,11 @@ namespace cosmos {
 class COSMOS_API File {
 public: // functions
 
-	File() {}
+	File() = default;
 
 	/// Open a file without special flags (close-on-exec will be set)
 	File(const std::string_view path, const OpenMode mode) :
-		File{path, mode, OpenFlags{OpenSettings::CLOEXEC}} {}
+			File{path, mode, OpenFlags{OpenSettings::CLOEXEC}} {}
 
 	/// Open a file using specific OpenFlags
 	/**
@@ -91,8 +90,8 @@ public: // functions
 	/**
 	 * If currently no file is open then this does nothing. If currently
 	 * an external FileDescriptor is wrapped and auto-close is not set
-	 * then only the objet's state will be invalidated. Otherwise the
-	 * reference file descriptor will also be closed on OS-level.
+	 * then only the object's state will be invalidated. Otherwise the
+	 * referenced file descriptor will also be closed on OS-level.
 	 **/
 	void close() {
 		if (!isOpen())
@@ -111,7 +110,7 @@ public: // functions
 	bool isOpen() const { return m_fd.valid(); }
 
 	/// Allows access to the underlying fd with const semantics
-	const FileDescriptor fd() const { return m_fd; }
+	FileDescriptor fd() const { return m_fd; }
 
 protected: // data
 
