@@ -10,6 +10,7 @@
 
 // cosmos
 #include "cosmos/dso_export.h"
+#include "cosmos/fs/DirFD.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/fs/types.hxx"
 #include "cosmos/time/types.hxx"
@@ -44,6 +45,10 @@ public: // functions
 		updateFrom(fd);
 	}
 
+	explicit FileStatus(const DirFD fd, const std::string_view path, const FollowSymlinks follow = FollowSymlinks{false}) {
+		updateFrom(fd, path, follow);
+	}
+
 	/// Obtains stat data for the file object at the given path (stat, lstat).
 	/**
 	 * On error an ApiError exception is thrown. Typical errors are:
@@ -63,6 +68,23 @@ public: // functions
 	 * - Errno::BAD_FD: file descriptor is invalid
 	 **/
 	void updateFrom(const FileDescriptor fd);
+
+	/// Obtains stat data for the \c path relative to \c fd.
+	/**
+	 * If \c path is an absolute path then this behaves like
+	 * updateFrom(const std::string_view, const FollowSymlinks) and \c fd
+	 * is ignored.
+	 *
+	 * If \c path is relative then it will be looked up relative to the
+	 * given dir \c fd. You can pass \c cosmos::AT_CWD as \c fd to lookup
+	 * \c path relative to the current working directory.
+	 *
+	 * If \c path is an empty string then this behaves similar to
+	 * updateFrom(const FileDescriptor) and \c fd can be any type of file
+	 * descriptor (but this usage is not encouraged due to libcosmos' type
+	 * modeling).
+	 **/
+	void updateFrom(const DirFD fd, const std::string_view path, const FollowSymlinks follow = FollowSymlinks{false});
 
 	void reset() {
 		// we identify an invalid stat structure by clearing the mode

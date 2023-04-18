@@ -6,6 +6,7 @@
 
 // cosmos
 #include "cosmos/formatting.hxx"
+#include "cosmos/fs/Directory.hxx"
 #include "cosmos/fs/DirIterator.hxx"
 #include "cosmos/fs/DirStream.hxx"
 #include "cosmos/fs/File.hxx"
@@ -45,6 +46,7 @@ public:
 		checkDevInode();
 		checkTimes();
 		checkFormatting();
+		checkStatAt();
 	}
 
 	void checkValidity() {
@@ -241,6 +243,20 @@ public:
 		}
 
 		return {};
+	}
+
+	void checkStatAt() {
+		START_TEST("check fstatat()");
+
+		cosmos::FileStatus first{"."};
+		cosmos::FileStatus second{cosmos::AT_CWD, "."};
+
+		RUN_STEP("check AT_CWD refers to cwd", first.isSameFile(second));
+
+		cosmos::Directory etc{"/etc"};
+		second.updateFrom(etc.fd(), "fstab");
+
+		RUN_STEP("openat /etc -> fstab", second.valid());
 	}
 
 protected:

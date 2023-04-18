@@ -1,6 +1,7 @@
 // cosmos
 #include "cosmos/algs.hxx"
 #include "cosmos/error/ApiError.hxx"
+#include "cosmos/error/FileError.hxx"
 #include "cosmos/error/UsageError.hxx"
 #include "cosmos/formatting.hxx"
 #include "cosmos/fs/FileStatus.hxx"
@@ -18,10 +19,19 @@ void FileStatus::updateFrom(const FileDescriptor fd) {
 }
 
 void FileStatus::updateFrom(const std::string_view path, const FollowSymlinks follow) {
-	auto statfunc = follow ? stat : lstat;
+	auto statfunc = follow ? ::stat : ::lstat;
 
 	if (statfunc(path.data(), &m_st) != 0) {
-		cosmos_throw (ApiError());
+		cosmos_throw (FileError(path, follow ? "stat" : "lstat"));
+	}
+}
+
+void FileStatus::updateFrom(const DirFD fd, const std::string_view path, const FollowSymlinks follow) {
+
+	auto res = ::fstatat(to_integral(fd.raw()), path.data(), &m_st, follow ? 0 : AT_SYMLINK_NOFOLLOW);
+
+	if (res != 0) {
+		cosmos_throw (FileError(path, "fstatat()"));
 	}
 }
 
