@@ -23,7 +23,7 @@ public: // functions
 };
 
 /// Special dir file descriptor that refers to the CWD in the *at family of API calls
-inline constexpr DirFD at_cwd{FileNum::AT_CWD};
+inline constexpr DirFD AT_CWD{FileNum::AT_CWD};
 
 } // end ns
 
