@@ -40,7 +40,7 @@ void DirStream::open(const std::string_view path, const FollowSymlinks follow_li
 	close();
 
 	/*
-	 * reuse the open(FileDescriptor) logic and only open the file
+	 * reuse the open(DirFD) logic and only open the file
 	 * descriptor before. This allows us to pass needful flags like
 	 * O_CLOEXEC. This gives us more control than when using opendir().
 	 */
@@ -49,7 +49,7 @@ void DirStream::open(const std::string_view path, const FollowSymlinks follow_li
 		O_RDONLY | O_CLOEXEC | O_DIRECTORY | (follow_links ? O_NOFOLLOW : 0)
 	);
 
-	FileDescriptor fd{FileNum{res}};
+	DirFD fd{FileNum{res}};
 
 	if (fd.invalid()) {
 		cosmos_throw (ApiError());
@@ -66,7 +66,7 @@ void DirStream::open(const std::string_view path, const FollowSymlinks follow_li
 	}
 }
 
-void DirStream::open(const FileDescriptor fd) {
+void DirStream::open(const DirFD fd) {
 	close();
 
 	m_stream = fdopendir(to_integral(fd.raw()));

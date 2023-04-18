@@ -15,7 +15,6 @@
 #include "cosmos/error/UsageError.hxx"
 #include "cosmos/fs/DirEntry.hxx"
 #include "cosmos/fs/DirFD.hxx"
-#include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/fs/filesystem.hxx"
 
 namespace cosmos {
@@ -23,7 +22,7 @@ namespace cosmos {
 /// Access directory contents in the file system.
 /**
  * Using this type you can open directories in the file system either by path
- * or by using an already opened FileDescriptor or DirFD. The directory
+ * or by using an already opened Directory file descriptor. The directory
  * contents can then be iterated over.
  *
  * Note that the directory contents will be returned by the operating system
@@ -39,9 +38,9 @@ public: // functions
 
 	/// Create a DirStream using the given file descriptor
 	/**
-	 * \see open(FileDescriptor fd)
+	 * \see open(DirFD fd)
 	 **/
-	explicit DirStream(const FileDescriptor fd) {
+	explicit DirStream(const DirFD fd) {
 		open(fd);
 	}
 
@@ -81,7 +80,7 @@ public: // functions
 	 * If the object is already associated with another directory then
 	 * this previous association will be implicitly close()'d.
 	 **/
-	void open(const FileDescriptor fd);
+	void open(const DirFD fd);
 
 	/// Associate with the directory at the given file system path locaton
 	/**
