@@ -39,7 +39,7 @@ public: // functions
 		StreamIO{m_fd}
 	{}
 
-	StreamFile(FileDescriptor fd, const AutoClose auto_close) :
+	StreamFile(FileDescriptor fd, const AutoCloseFD auto_close) :
 		File{fd, auto_close},
        		StreamIO{m_fd}
 	{}

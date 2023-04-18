@@ -85,8 +85,8 @@ public:
 	void testPipeStream() {
 		START_TEST("stream data over pipe");
 		cosmos::Pipe pipe;
-		cosmos::StreamFile reader{pipe.readEnd(), cosmos::File::AutoClose{false}};
-		cosmos::StreamFile writer{pipe.writeEnd(), cosmos::File::AutoClose{false}};
+		cosmos::StreamFile reader{pipe.readEnd(), cosmos::AutoCloseFD{false}};
+		cosmos::StreamFile writer{pipe.writeEnd(), cosmos::AutoCloseFD{false}};
 
 		const std::string_view message{"going over the pipe"};
 		writer.writeAll(message);

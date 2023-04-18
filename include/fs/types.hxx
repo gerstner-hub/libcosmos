@@ -19,6 +19,9 @@ namespace cosmos {
 /// Strong boolean type to enable following of symlinks in the file system
 using FollowSymlinks = NamedBool<struct follow_links_t, false>;
 
+/// Strong boolean type for expressing the responsibility to close file descriptors
+using AutoCloseFD = NamedBool<struct close_file_t, true>;
+
 /// Strong enum type wrapper for the basic open() mode flag
 enum class OpenMode : int {
 	READ_ONLY  = O_RDONLY,

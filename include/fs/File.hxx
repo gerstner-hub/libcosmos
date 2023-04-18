@@ -25,11 +25,6 @@ namespace cosmos {
  * I/O.
  **/
 class COSMOS_API File {
-public: // types
-
-	// strong boolean type for specifying close-file responsibility
-	using AutoClose = NamedBool<struct close_file_t, true>;
-
 public: // functions
 
 	File() {}
@@ -54,7 +49,7 @@ public: // functions
 	}
 
 	/// Wrap the given file descriptor applying the specified auto-close behaviour
-	explicit File(FileDescriptor fd, const AutoClose auto_close) {
+	explicit File(FileDescriptor fd, const AutoCloseFD auto_close) {
 		open(fd, auto_close);
 	}
 
@@ -87,7 +82,7 @@ public: // functions
 	 * descriptor is closed on OS level if deemed necessary by the
 	 * implementation.
 	 **/
-	void open(FileDescriptor fd, const AutoClose auto_close) {
+	void open(FileDescriptor fd, const AutoCloseFD auto_close) {
 		m_fd = fd;
 		m_auto_close = auto_close;
 	}
@@ -109,7 +104,7 @@ public: // functions
 			m_fd.reset();
 		}
 
-		m_auto_close = AutoClose(true);
+		m_auto_close = AutoCloseFD{true};
 	}
 
 	/// Returns whether currently a FileDescriptor is opened
@@ -120,7 +115,7 @@ public: // functions
 
 protected: // data
 
-	AutoClose m_auto_close;
+	AutoCloseFD m_auto_close;
 	FileDescriptor m_fd;
 };
 
