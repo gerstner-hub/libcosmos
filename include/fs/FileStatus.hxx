@@ -16,7 +16,7 @@
 
 namespace cosmos {
 
-/// Obtain and access file status information
+/// Obtain and access file status information.
 /**
  * The file status contains metadata information about a file object at a
  * certain point in time. The information can be looked up either by path or
@@ -36,15 +36,15 @@ public: // functions
 		reset();
 	}
 
-	explicit FileStatus(const std::string_view path) {
-		updateFrom(path);
+	explicit FileStatus(const std::string_view path, const FollowSymlinks follow = FollowSymlinks{false}) {
+		updateFrom(path, follow);
 	}
 
 	explicit FileStatus(const FileDescriptor fd) {
 		updateFrom(fd);
 	}
 
-	/// Obtains stat data for the file object at the given path (stat, lstat)
+	/// Obtains stat data for the file object at the given path (stat, lstat).
 	/**
 	 * On error an ApiError exception is thrown. Typical errors are:
 	 *
@@ -54,7 +54,7 @@ public: // functions
 	 **/
 	void updateFrom(const std::string_view path, const FollowSymlinks follow = FollowSymlinks{false});
 
-	/// Obtains stat data for the file object represented by the given FD (fstat)
+	/// Obtains stat data for the file object represented by the given FD (fstat).
 	/**
 	 * On error an ApiError exception is thrown. Typical errors are like
 	 * in updateFrom(const std::string_view, const FollowSymlinks), with
@@ -75,27 +75,27 @@ public: // functions
 		return m_st.st_mode != 0;
 	}
 
-	/// Returns the composite ModeT for the file
+	/// Returns the composite ModeT for the file.
 	ModeT rawMode() const {
 		return ModeT{m_st.st_mode};
 	}
 
-	/// Returns the file mode bitmask containing the permission bits for the file
+	/// Returns the file mode bitmask containing the permission bits for the file.
 	FileMode mode() const {
 		return FileMode{rawMode()};
 	}
 
-	/// Returns the FileType representation for the file
+	/// Returns the FileType representation for the file.
 	FileType type() const {
 		return FileType{rawMode()};
 	}
 
-	/// Returns the identifier for the block device this file resides on
+	/// Returns the identifier for the block device this file resides on.
 	DeviceID device() const {
 		return DeviceID{m_st.st_dev};
 	}
 
-	/// Returns the unique file inode for the file
+	/// Returns the unique file inode for the file.
 	/**
 	 * The pair of data device() and inode() allow to uniquely
 	 * identifier a file on the system. For example this allows to detect
@@ -105,22 +105,22 @@ public: // functions
 		return Inode{m_st.st_ino};
 	}
 
-	/// Returns the number of hard links for this file
+	/// Returns the number of hard links for this file.
 	nlink_t numLinks() const {
 		return m_st.st_nlink;
 	}
 
-	/// Returns the UID of the owner of the file
+	/// Returns the UID of the owner of the file.
 	UserID uid() const {
 		return UserID{m_st.st_uid};
 	}
 
-	/// Returns the GID of the owner of the file
+	/// Returns the GID of the owner of the file.
 	GroupID gid() const {
 		return GroupID{m_st.st_gid};
 	}
 
-	/// Returns the size of the file in bytes
+	/// Returns the size of the file in bytes.
 	/**
 	 * The size only has meaning for the following file types:
 	 *
@@ -144,7 +144,7 @@ public: // functions
 		}
 	};
 
-	/// Returns the identifier of the device this file represents
+	/// Returns the identifier of the device this file represents.
 	/**
 	 * This is only valid if
 	 *
@@ -154,7 +154,7 @@ public: // functions
 	 **/
 	DeviceID representedDevice() const;
 
-	/// Preferred block size for file system I/O
+	/// Preferred block size for file system I/O.
 	/**
 	 * This returns the optimal size for individual read and write
 	 * operations on this file system with regards to performance. The
@@ -165,7 +165,7 @@ public: // functions
 		return m_st.st_blksize;
 	}
 
-	/// Returns the number of blocks in 512 byte units allocated to the file
+	/// Returns the number of blocks in 512 byte units allocated to the file.
 	/**
 	 * This can be smaller than the result of size() / 512 if the file
 	 * has holes in it.
@@ -187,7 +187,7 @@ public: // functions
 		return *reinterpret_cast<const RealTime*>(&m_st.st_mtim);
 	}
 
-	/// Returns the time of the last status (inode) modification
+	/// Returns the time of the last status (inode) modification.
 	/**
 	 * This timestamp reflects the last change to the inode data i.e. the
 	 * metadata of the file (e.g. ownership, permissions etc.)
@@ -196,7 +196,7 @@ public: // functions
 		return *reinterpret_cast<const RealTime*>(&m_st.st_ctim);
 	}
 
-	/// Returns the time of the last (read) access of the file content
+	/// Returns the time of the last (read) access of the file content.
 	/**
 	 * This timestamp may not be available on all file systems or in all
 	 * circumstances, for example there is mount option `noatime` that
@@ -217,7 +217,7 @@ public: // functions
 			this->device() == other.device();
 	}
 
-	/// compares the two objects on raw data level
+	/// Compares the two objects on raw data level.
 	/**
 	 * All file status fields need to be equal for this to match. To
 	 * compare file objects on a logical level (i.e. if they refer to the
