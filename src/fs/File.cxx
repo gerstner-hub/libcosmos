@@ -19,7 +19,8 @@ File::~File() {
 	}
 }
 
-void File::open(const std::string_view path, const OpenMode mode, const OpenFlags flags, const std::optional<FileMode> fmode) {
+void File::open(const std::string_view path, const OpenMode mode, const OpenFlags flags,
+		const std::optional<FileMode> fmode) {
 	int raw_flags = flags.raw() | to_integral(mode);
 
 	if (flags.anyOf({OpenSettings::CREATE, OpenSettings::TMPFILE}) && !fmode) {
@@ -32,6 +33,24 @@ void File::open(const std::string_view path, const OpenMode mode, const OpenFlag
 
 	if (!isOpen()) {
 		cosmos_throw (FileError(path, "open"));
+	}
+}
+
+void File::open(const DirFD dir_fd, const std::string_view path, const OpenMode mode, const OpenFlags flags,
+		const std::optional<FileMode> fmode) {
+	int raw_flags = flags.raw() | to_integral(mode);
+
+	if (flags.anyOf({OpenSettings::CREATE, OpenSettings::TMPFILE}) && !fmode) {
+		cosmos_throw (UsageError("the given open flags require an fmode argument"));
+	}
+
+	auto fd = ::openat(to_integral(dir_fd.raw()), path.data(),
+				raw_flags, fmode ? to_integral(fmode.value().raw()) : 0);
+
+	m_fd.setFD(FileNum{fd});
+
+	if (!isOpen()) {
+		cosmos_throw (FileError(path, "openat"));
 	}
 }
 

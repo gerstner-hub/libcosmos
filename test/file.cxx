@@ -5,7 +5,9 @@
 
 // cosmos
 #include "cosmos/error/CosmosError.hxx"
+#include "cosmos/fs/Directory.hxx"
 #include "cosmos/fs/File.hxx"
+#include "cosmos/fs/filesystem.hxx"
 #include "cosmos/fs/StreamFile.hxx"
 #include "cosmos/io/Pipe.hxx"
 
@@ -19,6 +21,7 @@ public:
 	void runTests() override {
 		testOpenState();
 		testOpen();
+		testOpenAt();
 		testReadFile();
 		testWriteFile();
 		testPipeStream();
@@ -42,6 +45,25 @@ public:
 	void testOpen() {
 		START_TEST("Test opening of files");
 		EXPECT_EXCEPTION("open-nonexisting", cosmos::File("/etc/strangetab", cosmos::OpenMode::READ_ONLY));
+	}
+
+	void testOpenAt() {
+		START_TEST("Test opening of files relative to dirfd");
+
+		cosmos::Directory etc{"/etc"};
+
+		cosmos::File f;
+
+		f.open(etc.fd(), "fstab", cosmos::OpenMode::READ_ONLY);
+
+		RUN_STEP("open-relative-to-etc-works", f.isOpen());
+
+		EXPECT_EXCEPTION("open-relative-with-bad-fd-fails", f.open(cosmos::DirFD{cosmos::FileNum::INVALID}, "fstab", cosmos::OpenMode::READ_ONLY));
+
+		f.open(cosmos::AT_CWD, "new_file", cosmos::OpenMode::READ_WRITE, cosmos::OpenFlags{cosmos::OpenSettings::CREATE}, cosmos::FileMode{cosmos::ModeT{0600}});
+		RUN_STEP("create-at-cwd-works", f.isOpen());
+
+		cosmos::fs::unlink_file("new_file");
 	}
 
 	void testReadFile() {

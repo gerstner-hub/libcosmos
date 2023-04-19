@@ -6,6 +6,7 @@
 #include <string_view>
 
 // cosmos
+#include "cosmos/fs/DirFD.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/fs/types.hxx"
 #include "cosmos/ostypes.hxx"
@@ -43,6 +44,15 @@ public: // functions
 		open(path, mode, flags, fmode);
 	}
 
+	/// Open the given path relative to the given directory file descriptor \c dir_fd.
+	/**
+	 * \see open(const DirFD, const std::string_view, const OpenFlags, const std::optional<FileMode>).
+	 **/
+	File(const DirFD dir_fd, const std::string_view path, const OpenMode mode,
+			const OpenFlags flags, const std::optional<FileMode> fmode = {}) {
+		open(dir_fd, path, mode, flags, fmode);
+	}
+
 	/// Wrap the given file descriptor applying the specified auto-close behaviour.
 	File(const FileDescriptor fd, const AutoCloseFD auto_close) {
 		open(fd, auto_close);
@@ -65,6 +75,31 @@ public: // functions
 	 * \p fmode, otherwise an exception is thrown.
 	 **/
 	void open(const std::string_view path, const OpenMode mode,
+			const OpenFlags flags, const std::optional<FileMode> fmode = {});
+
+	/// \see open(const DirFD, const std::string_view, const OpenMode, const OpenFlags, const std::optional<FileMode>).
+	void open(const DirFD dir_fd, const std::string_view path, const OpenMode mode) {
+		open(dir_fd, path, mode, OpenFlags{OpenSettings::CLOEXEC});
+	}
+
+	/// Open the given path relative to the given directory file descriptor \c dir_fd.
+	/**
+	 * This open variant behaves similar to open(const std::string_view,
+	 * const OpenMode, const OpenFlags, const std::optional<FileMode>).
+	 * The following differences exist:
+	 *
+	 * - if \c path is an absolute path then \c dir_fd is ignored and the
+	 *   behaviour is identical to the other open variants.
+	 * - if \c path is a relative path and \c dir_fd is an invalid file
+	 *   descriptor then the open fails (this can explicitly be used to
+	 *   enforce absolute path specifications.
+	 * - if \c path is a relative path and \c dir_fd is a valid directory file
+	 *   descriptor, then the path is looked up relative to \c dir_fd. \c dir_fd
+	 *   needs to be opened with OpenMode::READ_ONLY or with
+	 *   OpenSettings::PATH. The special DirFD value cosmos::AT_CWD can be
+	 *   used to open files relative to the current working directory.
+	 **/
+	void open(const DirFD dir_fd, const std::string_view path, const OpenMode mode,
 			const OpenFlags flags, const std::optional<FileMode> fmode = {});
 
 	/// Takes the already open file descriptor fd and operates on it
