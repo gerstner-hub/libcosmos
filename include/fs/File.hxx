@@ -28,27 +28,23 @@ public: // functions
 
 	File() = default;
 
-	/// Open a file without special flags (close-on-exec will be set)
+	/// Open a file without special flags (close-on-exec will be set).
 	File(const std::string_view path, const OpenMode mode) :
 			File{path, mode, OpenFlags{OpenSettings::CLOEXEC}} {}
 
-	/// Open a file using specific OpenFlags
+	/// Open a file using specific OpenFlags, potentially creating it first using the given \c fmode.
 	/**
-	 * \warning Don't use this for creating a file, you need to specify
+	 * \warning If used for creating a file, then you need to specify
 	 * also the FileMode in that case. An exception will the thrown if
 	 * this condition is violated.
 	 **/
-	File(const std::string_view path, const OpenMode mode, const OpenFlags flags) {
-		open(path, mode, flags);
-	}
-
-	/// Open a file, potentially creating it and assigning the given \p fmode
-	File(const std::string_view path, const OpenMode mode, const OpenFlags flags, const FileMode fmode) {
+	File(const std::string_view path, const OpenMode mode, const OpenFlags flags,
+			const std::optional<FileMode> fmode = {}) {
 		open(path, mode, flags, fmode);
 	}
 
-	/// Wrap the given file descriptor applying the specified auto-close behaviour
-	explicit File(FileDescriptor fd, const AutoCloseFD auto_close) {
+	/// Wrap the given file descriptor applying the specified auto-close behaviour.
+	File(const FileDescriptor fd, const AutoCloseFD auto_close) {
 		open(fd, auto_close);
 	}
 
@@ -58,12 +54,12 @@ public: // functions
 
 	virtual ~File();
 
-	/// \see File(const std::string_view , const OpenMode )
+	/// \see File(const std::string_view, const OpenMode).
 	void open(const std::string_view path, const OpenMode mode) {
 		return open(path, mode, OpenFlags{OpenSettings::CLOEXEC});
 	}
 
-	/// Open the given path applying the specified mode and flags
+	/// Open the given path applying the specified mode and flags.
 	/**
 	 * If in \p flags the #CREATE bit is set then you \b must specify also
 	 * \p fmode, otherwise an exception is thrown.
@@ -81,12 +77,12 @@ public: // functions
 	 * descriptor is closed on OS level if deemed necessary by the
 	 * implementation.
 	 **/
-	void open(FileDescriptor fd, const AutoCloseFD auto_close) {
+	void open(const FileDescriptor fd, const AutoCloseFD auto_close) {
 		m_fd = fd;
 		m_auto_close = auto_close;
 	}
 
-	/// Close the current file object
+	/// Close the current file object.
 	/**
 	 * If currently no file is open then this does nothing. If currently
 	 * an external FileDescriptor is wrapped and auto-close is not set
@@ -106,10 +102,10 @@ public: // functions
 		m_auto_close = AutoCloseFD{true};
 	}
 
-	/// Returns whether currently a FileDescriptor is opened
+	/// Returns whether currently a FileDescriptor is opened.
 	bool isOpen() const { return m_fd.valid(); }
 
-	/// Allows access to the underlying fd with const semantics
+	/// Allows access to the underlying fd with const semantics.
 	FileDescriptor fd() const { return m_fd; }
 
 protected: // data
