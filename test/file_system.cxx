@@ -7,6 +7,7 @@
 #include "cosmos/error/FileError.hxx"
 #include "cosmos/error/RuntimeError.hxx"
 #include "cosmos/formatting.hxx"
+#include "cosmos/fs/Directory.hxx"
 #include "cosmos/fs/filesystem.hxx"
 #include "cosmos/fs/FileStatus.hxx"
 #include "cosmos/fs/StreamFile.hxx"
@@ -23,9 +24,10 @@ class FileSystemTest :
 	void runTests() override {
 		testBasics();
 		testUmask();
-		testUnlink();
+		testUnlinkAt();
 		testLink();
 		testCreateDir();
+		testCreateDirAt();
 		testCreateAllDirs();
 		testChmod();
 		testChowner();
@@ -77,6 +79,26 @@ class FileSystemTest :
 		cosmos::fs::remove_dir(testdir);
 
 		FINISH_STEP(!cosmos::fs::exists_file(testdir));
+	}
+
+	void testCreateDirAt() {
+		START_TEST("create dir at");
+
+		auto testdir = getTestDirPath().string();
+
+		auto subdir = "createdir";
+
+		START_STEP("creating-testdir-at");
+
+		auto testdir_obj = cosmos::Directory{testdir};
+
+		cosmos::fs::make_dir_at(testdir_obj.fd(), subdir, cosmos::ModeT{0750});
+
+		EVAL_STEP(cosmos::fs::exists_file(testdir + "/" + subdir));
+
+		cosmos::fs::remove_dir_at(testdir_obj.fd(), subdir);
+
+		FINISH_STEP(!cosmos::fs::exists_file(testdir + "/" + subdir));
 	}
 
 	void testCreateAllDirs() {
@@ -146,6 +168,20 @@ class FileSystemTest :
 		RUN_STEP("created-file-exists", cosmos::fs::exists_file("testfile"));
 
 		cosmos::fs::unlink_file("testfile");
+
+		RUN_STEP("unlinked-file-gone", !cosmos::fs::exists_file("testfile"));
+	}
+
+	void testUnlinkAt() {
+		START_TEST("unlinkat");
+		std::ofstream f;
+		f.open("testfile");
+		f << "testdata" << std::endl;
+		f.close();
+
+		RUN_STEP("created-file-exists", cosmos::fs::exists_file("testfile"));
+
+		cosmos::fs::unlink_file_at(cosmos::Directory{"."}.fd(), "testfile");
 
 		RUN_STEP("unlinked-file-gone", !cosmos::fs::exists_file("testfile"));
 	}

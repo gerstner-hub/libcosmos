@@ -55,6 +55,12 @@ void unlink_file(const std::string_view path) {
 	}
 }
 
+void unlink_file_at(const DirFD dir_fd, const std::string_view path) {
+	if (::unlinkat(to_integral(dir_fd.raw()), path.data(), 0) != 0) {
+		cosmos_throw (FileError(path, "unlinkat()"));
+	}
+}
+
 void change_dir(const std::string_view path) {
 	if (::chdir(path.data()) != 0) {
 		cosmos_throw (FileError(path, "chdir()"));
@@ -148,9 +154,21 @@ void make_dir(const std::string_view path, const FileMode mode) {
 	}
 }
 
+void make_dir_at(const DirFD dir_fd, const std::string_view path, const FileMode mode) {
+	if (::mkdirat(to_integral(dir_fd.raw()), path.data(), to_integral(mode.raw())) != 0) {
+		cosmos_throw (FileError(path, "mkdirat()"));
+	}
+}
+
 void remove_dir(const std::string_view path) {
 	if (::rmdir(path.data()) != 0) {
 		cosmos_throw (FileError(path, "rmdir()"));
+	}
+}
+
+void remove_dir_at(const DirFD dir_fd, const std::string_view path) {
+	if (::unlinkat(to_integral(dir_fd.raw()), path.data(), AT_REMOVEDIR) != 0) {
+		cosmos_throw (FileError(path, "unlinkat(AT_REMOVEDIR)"));
 	}
 }
 

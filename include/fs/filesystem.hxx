@@ -9,6 +9,7 @@
 // cosmos
 #include "cosmos/error/errno.hxx"
 #include "cosmos/dso_export.h"
+#include "cosmos/fs/DirFD.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/fs/types.hxx"
 
@@ -80,6 +81,20 @@ COSMOS_API bool exists_file(const std::string_view path);
  **/
 COSMOS_API void unlink_file(const std::string_view path);
 
+/// Removes the file object found at \c path relative to \c dir_fd.
+/**
+ * This behaves similar to unlink_file:
+ *
+ * - if path is an absolute path then \c dir_fd is ignored and the call is
+ *   equivalent to unlink_file().
+ * - if path is a relative path and \c dir_fd has the special value
+ *   cosmos::AT_CWD, then \c path is looked up relative to the current working
+ *   directory, equivalent to unlink_file().
+ * - if path is a relative path and \c dir_fd is a valid open directory file
+ *   descriptor then \c path is looked up relative to that directory.
+ **/
+COSMOS_API void unlink_file_at(const DirFD dir_fd, const std::string_view path);
+
 /// Change the calling process's current working directory to \c path
 /**
  * On error a FileError exception is thrown.
@@ -119,12 +134,30 @@ COSMOS_API std::optional<std::string> which(const std::string_view exec_base) no
  **/
 COSMOS_API void make_dir(const std::string_view path, const FileMode mode);
 
+/// Creates a directory at the location relative to \c dir_fd.
+/**
+ * This relates to make_dir() the same way unlink_file_at() relates to
+ * unlink_file().
+ *
+ * \see unlink_file_at().
+ **/
+COSMOS_API void make_dir_at(const DirFD dir_fd, const std::string_view path, const FileMode mode);
+
 /// Removes an empty directory at the given location
 /**
  * The directory must exist and must be empty for the call to succeed. On
  * error a FileError is thrown.
  **/
 COSMOS_API void remove_dir(const std::string_view path);
+
+/// Removes an empty directory relative to \c dir_fd.
+/**
+ * This relates to remove_dir() the same way unlink_file_at() relates to
+ * unlink_file().
+ *
+ * \see unlink_file_at().
+ **/
+COSMOS_API void remove_dir_at(const DirFD dir_fd, const std::string_view path);
 
 /// Creates a directory, potentially creating multiple directory components
 /**
