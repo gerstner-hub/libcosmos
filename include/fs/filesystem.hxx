@@ -7,6 +7,7 @@
 #include <string_view>
 
 // cosmos
+#include "cosmos/error/errno.hxx"
 #include "cosmos/dso_export.h"
 #include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/fs/types.hxx"
