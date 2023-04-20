@@ -1,4 +1,5 @@
 Import('env')
+import os
 
 tests = env.GatherSources(suffixes=[".cxx"], recursive=False)
 
@@ -30,3 +31,33 @@ env.Requires("run_cosmos_test_subproc", coproc)
 
 env.Alias("tests", "cosmos_tests")
 env.Alias("run_tests", "run_cosmos_tests")
+
+# setup compilation tests for each individual header to make sure no includes
+# are missing anywhere and everything compiles.
+
+def inc_test_builder(env, target, source):
+    inc = str(source[0]).split("include/")[1]
+    with open(str(target[0]), 'w') as fd:
+        fd.write(f'#include "{str(inc)}"\n\nint main() {{ return 0; }}')
+
+srcroot = '/'.join(Dir(".").srcnode().abspath.split("/")[:-1])
+incroot = srcroot + "/include/cosmos"
+
+for root, dr, fls in os.walk(incroot):
+    for fl in fls:
+        if not fl.endswith(".hxx"):
+            continue
+
+        path = root + "/" + fl
+        idx = path.rfind("cosmos")
+        if idx == -1:
+            continue
+        include = path[idx:]
+        include_src = srcroot + "/include/" + include
+        gensrc = include.replace('/', '_').split(".hxx")[0]
+        test_env.Command(f"{gensrc}.cxx", include_src, action=inc_test_builder)
+        prog = test_env.Program(f"{gensrc}_test", f"{gensrc}.cxx")
+
+        env.Alias("include_compile_tests", prog)
+
+env.Alias("tests", "include_compile_tests")
