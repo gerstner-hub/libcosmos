@@ -17,6 +17,7 @@ public:
 	void runTests() override {
 		testStdinFD();
 		testDup();
+		testStatusFlags();
 	}
 
 	void testStdinFD() {
@@ -48,6 +49,33 @@ public:
 		// syncing a read-only FD is allowed in Linux
 		DOES_NOT_THROW("sync-on-ro-fd", sf_fd.sync());
 		DOES_NOT_THROW("data-sync-on-ro-fd", sf_fd.dataSync());
+	}
+
+	void testStatusFlags() {
+		START_TEST("Testing status flag retrieval/setting");
+		cosmos::StreamFile sf{
+			".",
+				cosmos::OpenMode::WRITE_ONLY,
+				cosmos::OpenFlags{cosmos::OpenSettings::TMPFILE},
+				cosmos::FileMode{cosmos::ModeT{0700}}};
+
+		auto fd = sf.fd();
+
+		auto [mode, flags] = fd.getStatusFlags();
+
+		RUN_STEP("mode-matches", mode == cosmos::OpenMode::WRITE_ONLY);
+		RUN_STEP("flags-have-tmpfile", flags[cosmos::OpenSettings::TMPFILE]);
+		RUN_STEP("flags-no-nonblock", !flags[cosmos::OpenSettings::NONBLOCK]);
+
+		flags.set(cosmos::OpenSettings::NONBLOCK);
+
+		fd.setStatusFlags(flags);
+
+		auto [mode2, flags2] = fd.getStatusFlags();
+
+		RUN_STEP("mode-still-matches", mode == mode2);
+		RUN_STEP("flags-have-nonblock", flags[cosmos::OpenSettings::NONBLOCK]);
+
 	}
 protected: // data
 

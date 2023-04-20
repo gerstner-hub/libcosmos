@@ -51,6 +51,28 @@ void FileDescriptor::setFlags(const DescFlags flags) {
 	}
 }
 
+std::tuple<OpenMode, OpenFlags> FileDescriptor::getStatusFlags() const {
+	auto flags = fcntl(to_integral(m_fd), F_GETFL);
+
+	if (flags == -1) {
+		cosmos_throw (ApiError("failed to get status flags (F_GETFL)"));
+	}
+
+	OpenMode mode{flags & (O_RDONLY|O_WRONLY|O_RDWR)};
+	OpenFlags settings{flags & ~to_integral(mode)};
+
+	return {mode, settings};
+}
+
+void FileDescriptor::setStatusFlags(const OpenFlags flags) {
+	
+	auto res = fcntl(to_integral(m_fd), F_SETFL, flags.raw());
+
+	if (res == -1) {
+		cosmos_throw (ApiError("failed to set status flags (F_SETFL)"));
+	}
+}
+
 namespace {
 
 	template <typename SyncFunc>

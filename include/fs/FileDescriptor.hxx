@@ -1,11 +1,15 @@
 #ifndef COSMOS_FILEDESCRIPTOR_HXX
 #define COSMOS_FILEDESCRIPTOR_HXX
 
+// C++
+#include <tuple>
+
 // Linux
 #include <fcntl.h>
 
 // cosmos
 #include "cosmos/BitMask.hxx"
+#include "cosmos/fs/types.hxx"
 #include "cosmos/ostypes.hxx"
 #include "cosmos/types.hxx"
 
@@ -99,6 +103,17 @@ public: // functions
 	void setCloseOnExec(bool on_off) {
 		setFlags(on_off ? DescFlags{Flags::CLOEXEC} : DescFlags{0});
 	}
+
+	/// Retrieve the file's OpenMode and current OpenFlags.
+	std::tuple<OpenMode, OpenFlags> getStatusFlags() const;
+
+	/// Change certain file descriptor status flags.
+	/**
+	 * The basic file OpenMode cannot be changed for an open file
+	 * descriptor. From OpenSettings only the flags APPEND, ASYNC, DIRECT,
+	 * NOATIME and NONBLOCK can be changed afterwards.
+	 **/
+	void setStatusFlags(const OpenFlags flags);
 
 	/// Flush oustanding writes to disk.
 	/**
