@@ -39,6 +39,16 @@ public: // functions
 		open(path, mode, flags);
 	}
 
+	/// Open a directory by path relative to \c dir_fd using the given mode and default flags.
+	Directory(const DirFD dir_fd, const std::string_view path, const OpenMode mode = OpenMode::READ_ONLY) :
+			Directory{dir_fd, path, mode, OpenFlags{OpenSettings::CLOEXEC}} {}
+
+	/// Open a directory by path relative to \c dir_fd using the given mode and flags.
+	Directory(const DirFD dir_fd, const std::string_view path, const OpenMode mode,
+			const OpenFlags flags) {
+		open(dir_fd, path, mode, flags);
+	}
+
 	// Prevent copying due to the DirFD ownership.
 	Directory(const Directory&) = delete;
 	Directory& operator=(const Directory&) = delete;
@@ -57,6 +67,15 @@ public: // functions
 	 * descriptor will refer to a directory.
 	 **/
 	void open(const std::string_view path, const OpenMode mode, OpenFlags flags);
+
+	/// Open a directory by path relative to \c dir_fd using the given mode and default flags.
+	void open(const DirFD dir_fd, const std::string_view path, const OpenMode mode) {
+		open(dir_fd, path, mode, OpenFlags{OpenSettings::CLOEXEC});
+	}
+
+	/// Open a directory by path relative to \c dir_fd using the given mode and flags.
+	void open(const DirFD dir_fd, const std::string_view path, const OpenMode mode,
+			const OpenFlags flags);
 
 	/// Takes the already open directory file descriptor fd and operators on it.
 	/**

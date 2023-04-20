@@ -31,4 +31,20 @@ void Directory::open(const std::string_view path, const OpenMode mode, OpenFlags
 	}
 }
 
+void Directory::open(const DirFD dir_fd, const std::string_view path, const OpenMode mode, OpenFlags flags) {
+	m_auto_close = AutoCloseFD{true};
+
+	flags.set(OpenSettings::DIRECTORY);
+
+	int raw_flags = flags.raw() | to_integral(mode);
+
+	auto fd = ::openat(to_integral(dir_fd.raw()), path.data(), raw_flags, 0);
+
+	m_fd.setFD(FileNum{fd});
+
+	if (!isOpen()) {
+		cosmos_throw (FileError(path, "openat"));
+	}
+}
+
 } // end ns
