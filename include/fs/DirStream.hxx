@@ -72,10 +72,9 @@ public: // functions
 
 	/// Associate with the directory represented by the given file descriptor
 	/**
-	 * The implementation takes ownership of the file descriptor. You must
-	 * not modify the file descriptor's state, otherwise the usage of the
-	 * DirStream object will become undefined. Also during close() the
-	 * file descriptor will be closed by the DirStream object.
+	 * The implementation operates on a duplicate of the given file
+	 * descriptor. You must not modify the file descriptor's state,
+	 * otherwise the usage of the DirStream object will become undefined.
 	 *
 	 * If the object is already associated with another directory then
 	 * this previous association will be implicitly close()'d.

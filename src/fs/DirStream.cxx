@@ -69,7 +69,9 @@ void DirStream::open(const std::string_view path, const FollowSymlinks follow_li
 void DirStream::open(const DirFD fd) {
 	close();
 
-	m_stream = fdopendir(to_integral(fd.raw()));
+	auto duplicate = fd.duplicate();
+
+	m_stream = fdopendir(to_integral(duplicate.raw()));
 
 	if (!m_stream) {
 		cosmos_throw (ApiError());
