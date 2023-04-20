@@ -16,6 +16,7 @@
 #include "cosmos/error/InternalError.hxx"
 #include "cosmos/error/RuntimeError.hxx"
 #include "cosmos/error/UsageError.hxx"
+#include "cosmos/fs/Directory.hxx"
 #include "cosmos/fs/DirIterator.hxx"
 #include "cosmos/fs/DirStream.hxx"
 #include "cosmos/fs/File.hxx"
@@ -208,39 +209,51 @@ Errno make_all_dirs(const std::string_view path, const FileMode mode) {
 	return ret;
 }
 
+namespace {
+
+	void remove_tree(Directory &dir) {
+		auto dir_fd{dir.fd()};
+		DirStream stream{dir_fd};
+
+		using Type = DirEntry::Type;
+
+		for (const auto entry: stream) {
+
+			if (entry.isDotEntry())
+				continue;
+
+			const auto name = entry.name();
+
+			switch(entry.type()) {
+				case Type::UNKNOWN: {
+					FileStatus fs{dir_fd, name};
+					if (fs.type().isDirectory())
+						goto dircase;
+					else
+						goto filecase;
+				}
+				case Type::DIRECTORY:
+				dircase: {
+					// get down recursively 
+					Directory subdir{dir_fd, name};
+					remove_tree(subdir);
+					remove_dir_at(dir_fd, name);
+					break;
+				}
+				default:
+				filecase:
+					unlink_file_at(dir_fd, name);
+					break;
+			}
+		};
+
+	}
+
+} // end anon ns
+
 void remove_tree(const std::string_view path) {
-	// TODO implement this more efficiently using unlinkat() & friends
-	DirStream dir{path};
-
-	using Type = DirEntry::Type;
-
-	for (const auto entry: dir) {
-
-		if (entry.isDotEntry())
-			continue;
-
-		const auto subpath = std::string{path} + "/" + entry.name();
-
-		switch(entry.type()) {
-		case Type::UNKNOWN: {
-			FileStatus fs{subpath};
-			if (fs.type().isDirectory())
-				goto dircase;
-			else
-				goto filecase;
-		}
-		case Type::DIRECTORY:
-		dircase:
-			// get down recursively 
-			remove_tree(subpath);
-			break;
-		default:
-		filecase:
-			unlink_file(subpath);
-			break;
-		}
-	};
-
+	Directory dir{path};
+	remove_tree(dir);
 	remove_dir(path);
 }
 
