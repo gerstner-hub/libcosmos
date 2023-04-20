@@ -93,6 +93,17 @@ public: // functions
 	 **/
 	void duplicate(const FileDescriptor new_fd, const CloseOnExec cloexec = CloseOnExec{true}) const;
 
+	/// Get a duplicate file descriptor using the lowest available free file descriptor number.
+	/**
+	 * Be careful to close the returned file descriptor again when
+	 * necessary. It is best to turn it into some object that manages file
+	 * descriptor lifetime automatically.
+	 *
+	 * \param[in] cloexec Denotes whether the duplicate file descriptor
+	 * will have the close-on-exec flag set.
+	 **/
+	FileDescriptor duplicate(const CloseOnExec cloexec = CloseOnExec{true}) const;
+
 	/// Retrieves the current file descriptor flags.
 	DescFlags getFlags() const;
 

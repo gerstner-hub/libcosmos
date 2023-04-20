@@ -49,6 +49,15 @@ public:
 		// syncing a read-only FD is allowed in Linux
 		DOES_NOT_THROW("sync-on-ro-fd", sf_fd.sync());
 		DOES_NOT_THROW("data-sync-on-ro-fd", sf_fd.dataSync());
+
+		new_fd.close();
+
+		auto dup = m_stdin_fd.duplicate();
+
+		DOES_NOT_THROW("flags-on-dup", dup.getFlags());
+		dup.close();
+		// check that m_stdin_fd is still valid
+		DOES_NOT_THROW("flags-on-stdin", m_stdin_fd.getFlags());
 	}
 
 	void testStatusFlags() {

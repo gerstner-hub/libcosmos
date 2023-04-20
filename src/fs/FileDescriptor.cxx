@@ -29,8 +29,18 @@ void FileDescriptor::duplicate(const FileDescriptor new_fd, const CloseOnExec cl
 	auto res = ::dup3(to_integral(m_fd), to_integral(new_fd.raw()), cloexec ? O_CLOEXEC : 0);
 
 	if (res == -1) {
-		cosmos_throw (ApiError("failed to duplicate file descriptor"));
+		cosmos_throw (ApiError("failed to duplicate file descriptor (dup3)"));
 	}
+}
+
+FileDescriptor FileDescriptor::duplicate(const CloseOnExec cloexec) const {
+	const auto fd = fcntl(to_integral(m_fd), cloexec ? F_DUPFD_CLOEXEC : F_DUPFD);
+
+	if (fd == -1) {
+		cosmos_throw (ApiError("failed to duplicate file descriptor (F_DUPFD)"));
+	}
+
+	return FileDescriptor{FileNum{fd}};
 }
 
 FileDescriptor::DescFlags FileDescriptor::getFlags() const {
