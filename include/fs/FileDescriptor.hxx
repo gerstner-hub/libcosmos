@@ -11,7 +11,7 @@
 
 namespace cosmos {
 
-/// Strong boolean to indicate CloseOnExec behaviour on file descriptors
+/// Strong boolean to indicate CloseOnExec behaviour on file descriptors.
 using CloseOnExec = NamedBool<struct cloexec_t, true>;
 
 /// Thin Wrapper around OS File Descriptors.
@@ -28,23 +28,24 @@ using CloseOnExec = NamedBool<struct cloexec_t, true>;
 class COSMOS_API FileDescriptor {
 public: // types
 
-	/// Configurable per file-descriptors flags
+	/// Configurable per file-descriptors flags.
 	enum class Flags : int {
 		CLOEXEC = FD_CLOEXEC
 	};
 
-	/// Collection of OpenSettings used for opening files
-	typedef BitMask<Flags> StatusFlags;
+	/// Collection of OpenSettings used for opening files.
+	typedef BitMask<Flags> DescFlags;
 
 public: // functions
 
-	explicit constexpr FileDescriptor(FileNum fd = FileNum::INVALID) : m_fd{fd} {}
+	explicit constexpr FileDescriptor(FileNum fd = FileNum::INVALID) :
+			m_fd{fd} {}
 
 	/// Returns whether currently a valid file descriptor number is assigned.
 	bool valid() const { return m_fd != FileNum::INVALID; }
 	bool invalid() const { return !valid(); }
 
-	/// Assigns a new primitive file descriptor to the object
+	/// Assigns a new primitive file descriptor to the object.
 	/**
 	 * A potentially already contained file descriptor will *not* be
 	 * closed, the caller is responsible for preventing leaks.
@@ -76,7 +77,7 @@ public: // functions
 	 **/
 	void close();
 
-	/// Get a duplicate file descriptor that will further be known as new_fd
+	/// Get a duplicate file descriptor that will further be known as new_fd.
 	/**
 	 * The currently stored file descriptor will be duplicated and the
 	 * primitive file descriptor number set in \c new_fd will be used as
@@ -88,18 +89,18 @@ public: // functions
 	 **/
 	void duplicate(const FileDescriptor new_fd, const CloseOnExec cloexec = CloseOnExec{true}) const;
 
-	/// retrieves the current file descriptor status flags
-	StatusFlags getStatusFlags() const;
+	/// Retrieves the current file descriptor flags.
+	DescFlags getFlags() const;
 
-	/// changes the current file descriptor status flags
-	void setStatusFlags(const StatusFlags flags);
+	/// Changes the current file descriptor flags.
+	void setFlags(const DescFlags flags);
 
-	/// convenience wrapper around setStatusFlags to change CLOEXEC setting
+	/// convenience wrapper around setFlags to change CLOEXEC setting
 	void setCloseOnExec(bool on_off) {
-		setStatusFlags(on_off ? StatusFlags{Flags::CLOEXEC} : StatusFlags{0});
+		setFlags(on_off ? DescFlags{Flags::CLOEXEC} : DescFlags{0});
 	}
 
-	/// Flush oustanding writes to disk
+	/// Flush oustanding writes to disk.
 	/**
 	 * Kernel buffering may cause written data to stay in memory until it
 	 * is deemed necessary to actually write to disk. Use this function to
@@ -126,7 +127,7 @@ public: // functions
 	 **/
 	void sync();
 
-	/// Flush outstanding writes to disk except metadata
+	/// Flush outstanding writes to disk except metadata.
 	/**
 	 * This is an optimization of sync() that only writes out the actual
 	 * file data, but not the metadata. This can make sense if e.g. the
@@ -135,7 +136,7 @@ public: // functions
 	 **/
 	void dataSync();
 
-	/// Returns the primitive file descriptor contained in the object
+	/// Returns the primitive file descriptor contained in the object.
 	FileNum raw() const { return m_fd; }
 
 	bool operator==(const FileDescriptor &other) const {

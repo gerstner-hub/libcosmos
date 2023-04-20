@@ -28,7 +28,7 @@ public:
 		RUN_STEP("is-stdin-valid", m_stdin_fd.valid());
 		RUN_STEP("raw-matches-stdin", m_stdin_fd.raw() == cosmos::FileNum::STDIN);
 		RUN_STEP("comparison-works", m_stdin_fd == cosmos::FileDescriptor{cosmos::FileNum::STDIN});
-		RUN_STEP("cloexec-off", m_stdin_fd.getStatusFlags()[Flags::CLOEXEC] != true);
+		RUN_STEP("cloexec-off", m_stdin_fd.getFlags()[Flags::CLOEXEC] != true);
 	}
 
 	void testDup() {
@@ -37,11 +37,11 @@ public:
 
 		m_stdin_fd.duplicate(new_fd);
 
-		RUN_STEP("dup-is-cloxec", new_fd.getStatusFlags()[Flags::CLOEXEC] == true);
+		RUN_STEP("dup-is-cloxec", new_fd.getFlags()[Flags::CLOEXEC] == true);
 
 		new_fd.setCloseOnExec(false);
 
-		RUN_STEP("set-cloxec", new_fd.getStatusFlags()[Flags::CLOEXEC] == false);
+		RUN_STEP("set-cloxec", new_fd.getFlags()[Flags::CLOEXEC] == false);
 
 		cosmos::StreamFile sf{m_argv[0], cosmos::OpenMode::READ_ONLY};
 		auto sf_fd = sf.fd();

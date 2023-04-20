@@ -33,21 +33,21 @@ void FileDescriptor::duplicate(const FileDescriptor new_fd, const CloseOnExec cl
 	}
 }
 
-FileDescriptor::StatusFlags FileDescriptor::getStatusFlags() const {
+FileDescriptor::DescFlags FileDescriptor::getFlags() const {
 	const auto flags = fcntl(to_integral(m_fd), F_GETFD);
 
 	if (flags == -1) {
-		cosmos_throw (ApiError("failed to get F_GETFD status flags"));
+		cosmos_throw (ApiError("failed to get flags (F_GETFD)"));
 	}
 	
-	return StatusFlags{flags};
+	return DescFlags{flags};
 }
 
-void FileDescriptor::setStatusFlags(const StatusFlags flags) {
+void FileDescriptor::setFlags(const DescFlags flags) {
 	auto res = fcntl(to_integral(m_fd), F_SETFD, flags.raw());
 
 	if (res != 0) {
-		cosmos_throw (ApiError("failed to set F_SETFD status flags"));
+		cosmos_throw (ApiError("failed to set flags (F_SETFD)"));
 	}
 }
 
