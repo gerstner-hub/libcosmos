@@ -78,14 +78,14 @@ public:
 		START_STEP("Setting various bitmask combinations");
 		// should report true even if only one of the bits is set
 		bitmask.set(MyEnum::VAL4);
-		EVAL_STEP(bitmask[MyEnum::MASK45] == true);
+		EVAL_STEP(bitmask[MyEnum::MASK45] == false);
 
 		bitmask.set(MyEnum::VAL5);
 		// when both are set it should still be true
 		EVAL_STEP(bitmask[MyEnum::MASK45] == true);
 
 		bitmask.set(MyEnum::VAL4, false);
-		EVAL_STEP(bitmask[MyEnum::MASK45] == true);
+		EVAL_STEP(bitmask[MyEnum::MASK45] == false);
 
 		bitmask.set(MyEnum::VAL5, false);
 		EVAL_STEP(bitmask[MyEnum::MASK45] == false);
