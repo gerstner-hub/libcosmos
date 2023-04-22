@@ -15,6 +15,42 @@
 
 namespace cosmos::fs {
 
+/// Open a file using specific OpenFlags, potentially creating it first using the given \c fmode.
+/**
+ * \warning If used for creating a file, then you need to specify
+ * also the FileMode in that case. An exception will the thrown if
+ * this condition is violated.
+ *
+ * The returned FileDescriptor object does not manage the lifetime of the file
+ * descriptor, you have to take care of closing it at the appropriate time
+ * yourself!
+ **/
+COSMOS_API FileDescriptor open(
+		const std::string_view path, const OpenMode mode,
+		const OpenFlags flags, const std::optional<FileMode> fmode = {});
+
+/// Open the given path relative to the given directory file descriptor \c dir_fd.
+/**
+ * This open variant behaves similar to open(const std::string_view,
+ * const OpenMode, const OpenFlags, const std::optional<FileMode>).
+ * The following differences exist:
+ *
+ * - if \c path is an absolute path then \c dir_fd is ignored and the
+ *   behaviour is identical to the other open variants.
+ * - if \c path is a relative path and \c dir_fd is an invalid file
+ *   descriptor then the open fails (this can explicitly be used to
+ *   enforce absolute path specifications.
+ * - if \c path is a relative path and \c dir_fd is a valid directory file
+ *   descriptor, then the path is looked up relative to \c dir_fd. \c dir_fd
+ *   needs to be opened with OpenMode::READ_ONLY or with
+ *   OpenSettings::PATH. The special DirFD value cosmos::AT_CWD can be
+ *   used to open files relative to the current working directory.
+ **/
+COSMOS_API FileDescriptor open_at(
+		const DirFD dir_fd, const std::string_view path,
+		const OpenMode mode, const OpenFlags flags,
+		const std::optional<FileMode> fmode = {});
+
 /// Sets the process's file creation mask
 /**
  * The file creation mask is a process wide attribute that determines an upper

@@ -116,11 +116,41 @@ public: // functions
 
 	DirFD fd() const { return m_fd; }
 
+	// \see fs::unlink_file_at
+	inline void unlinkFileAt(const std::string_view path) const;
+
+	// \see fs::make_dir_at
+	inline void makeDirAt(const std::string_view path, const FileMode mode) const;
+
+	// \see fs::remove_dir_at
+	inline void removeDirAt(const std::string_view path) const;
+
 protected: // data
 	
 	AutoCloseFD m_auto_close;
 	DirFD m_fd;
 };
+
+} // end ns
+
+// only include this here, because of dependency issues
+#include "cosmos/fs/filesystem.hxx"
+
+namespace cosmos {
+
+void Directory::unlinkFileAt(const std::string_view path) const {
+	fs::unlink_file_at(m_fd, path);
+}
+
+// \see make_dir_at
+void Directory::makeDirAt(const std::string_view path, const FileMode mode) const {
+	fs::make_dir_at(m_fd, path, mode);
+}
+
+// \see remove_dir_at
+void Directory::removeDirAt(const std::string_view path) const {
+	fs::remove_dir_at(m_fd, path);
+}
 
 } // end ns
 
