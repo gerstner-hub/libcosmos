@@ -251,10 +251,10 @@ Errno make_all_dirs(const std::string_view path, const FileMode mode) {
 
 namespace {
 
-	void remove_tree(Directory &dir) {
-		auto dir_fd{dir.fd()};
-		DirStream stream{dir_fd};
+	void remove_tree(DirStream &stream) {
 
+		const auto dir_fd = stream.fd();
+		const Directory dir{dir_fd, AutoCloseFD{false}};
 		using Type = DirEntry::Type;
 
 		for (const auto entry: stream) {
@@ -266,7 +266,7 @@ namespace {
 
 			switch(entry.type()) {
 				case Type::UNKNOWN: {
-					FileStatus fs{dir_fd, name};
+					const FileStatus fs{dir_fd, name};
 					if (fs.type().isDirectory())
 						goto dircase;
 					else
@@ -275,14 +275,14 @@ namespace {
 				case Type::DIRECTORY:
 				dircase: {
 					// get down recursively 
-					Directory subdir{dir_fd, name};
+					DirStream subdir{dir_fd, name};
 					remove_tree(subdir);
-					remove_dir_at(dir_fd, name);
+					dir.removeDirAt(name);
 					break;
 				}
 				default:
 				filecase:
-					unlink_file_at(dir_fd, name);
+					dir.unlinkFileAt(name);
 					break;
 			}
 		};
@@ -292,7 +292,7 @@ namespace {
 } // end anon ns
 
 void remove_tree(const std::string_view path) {
-	Directory dir{path};
+	DirStream dir{path};
 	remove_tree(dir);
 	remove_dir(path);
 }
