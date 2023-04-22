@@ -9,6 +9,7 @@
 // Cosmos
 #include "cosmos/formatting.hxx"
 #include "cosmos/private/cosmos.hxx"
+#include "cosmos/fs/filesystem.hxx"
 #include "cosmos/fs/DirStream.hxx"
 
 namespace cosmos {
@@ -71,7 +72,20 @@ void DirStream::open(const DirFD fd) {
 
 	auto duplicate = fd.duplicate();
 
-	m_stream = fdopendir(to_integral(duplicate.raw()));
+	m_stream = ::fdopendir(to_integral(duplicate.raw()));
+
+	if (!m_stream) {
+		cosmos_throw (ApiError());
+	}
+}
+
+void DirStream::open(const DirFD dir_fd, const std::string_view subpath) {
+
+	const auto flags = OpenFlags{OpenSettings::DIRECTORY};
+	auto fd = fs::open_at(dir_fd, subpath, OpenMode::READ_ONLY, flags);
+
+	// ownership is transferred to the stream
+	m_stream = ::fdopendir(to_integral(fd.raw()));
 
 	if (!m_stream) {
 		cosmos_throw (ApiError());

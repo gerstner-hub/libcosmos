@@ -44,6 +44,11 @@ public: // functions
 		open(fd);
 	}
 
+	/// Open the directory \c subpath relative to \c fd.
+	DirStream(const DirFD fd, const std::string_view subpath) {
+		open(fd, subpath);
+	}
+
 	/// Create a DirStream object operating on the directory at the given path location
 	explicit DirStream(const std::string_view path) {
 		open(path);
@@ -80,6 +85,9 @@ public: // functions
 	 * this previous association will be implicitly close()'d.
 	 **/
 	void open(const DirFD fd);
+
+	/// Open the directory \c subpath relative to \c fd.
+	void open(const DirFD dir_fd, const std::string_view subpath);
 
 	/// Associate with the directory at the given file system path locaton
 	/**
