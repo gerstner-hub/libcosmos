@@ -22,14 +22,14 @@
 #define EVAL_STEP(expr) do { \
 		const bool good = expr; \
 		if (!good) { \
-			finishStep(false, #expr); \
+			finishStep(false, #expr, __LINE__); \
 			finishTest(false); \
 			return; \
 		} \
 	} while(false)
 #define FINISH_STEP(expr) do { \
 		const bool good = expr; \
-		finishStep(good, #expr); \
+		finishStep(good, #expr, __LINE__); \
 		if (!good) { \
 			finishTest(false); \
 			return; \
@@ -44,10 +44,10 @@
 	do { \
 		try { \
 			expr; \
-			finishStep(false, #expr); \
+			finishStep(false, #expr, __LINE__); \
 			finishTest(false); \
 		} catch (const cosmos::CosmosError &) { \
-			finishStep(true, #expr); \
+			finishStep(true, #expr, __LINE__); \
 		} \
 	} \
 	while (false)
@@ -55,9 +55,9 @@
 	do { \
 		try { \
 			expr; \
-			finishStep(true, #expr); \
+			finishStep(true, #expr, __LINE__); \
 		} catch (const cosmos::CosmosError &) { \
-			finishStep(false, #expr); \
+			finishStep(false, #expr, __LINE__); \
 			finishTest(false); \
 		} \
 	} \
@@ -112,9 +112,9 @@ protected: // functions
 		std::cout << "> " << s << " ... " << std::flush;
 	}
 
-	void finishStep(const bool good, const std::string_view text) {
+	void finishStep(const bool good, const std::string_view text, const size_t line) {
 		finishStep(good, [&](std::ostream &o) {
-			o << text << "\n";
+			o << "Line " << line << ": " << text << "\n";
 		});
 	}
 
