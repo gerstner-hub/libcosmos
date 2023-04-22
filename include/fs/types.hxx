@@ -283,5 +283,7 @@ protected: // data
 COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::FileMode mode);
 /// Outputs a symbolic type character onto the stream
 COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::FileType type);
+/// Outputs a friendly versino of the OpenFlags bitmask onto the stream
+COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::OpenFlags flags);
 
 #endif // inc. guard

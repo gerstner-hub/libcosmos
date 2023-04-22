@@ -1,3 +1,6 @@
+// C++
+#include <utility>
+
 // cosmos
 #include "cosmos/algs.hxx"
 #include "cosmos/error/ApiError.hxx"
@@ -105,5 +108,42 @@ std::ostream& operator<<(std::ostream &o, const cosmos::FileMode mode) {
 
 std::ostream& operator<<(std::ostream &o, const cosmos::FileType type) {
 	o << type.symbolic();
+	return o;
+}
+
+std::ostream& operator<<(std::ostream &o, const cosmos::OpenFlags flags) {
+	using Settings = cosmos::OpenSettings;
+	bool first = true;
+
+	for (const auto &pair: {
+			std::make_pair(Settings::APPEND,    "APPEND"),
+			              {Settings::ASYNC,     "ASYNC"},
+				      {Settings::CLOEXEC,   "CLOEXEC"},
+				      {Settings::CREATE,    "CREATE"},
+				      {Settings::DIRECT,    "DIRECT"},
+				      {Settings::DIRECTORY, "DIRECTORY"},
+				      {Settings::DSYNC,     "DSYNC"},
+				      {Settings::EXCLUSIVE, "EXCLUSIVE"},
+				      {Settings::NOATIME,   "NOATIME"},
+				      {Settings::NO_CONTROLLING_TTY, "NO_CONTROLLING_TTY"},
+				      {Settings::NOFOLLOW,  "NOFOLLOW"},
+				      {Settings::NONBLOCK,  "NONBLOCK"},
+				      {Settings::PATH,      "PATH"},
+				      {Settings::SYNC,      "SYNC"},
+				      {Settings::TMPFILE,   "TMPFILE"},
+				      {Settings::TRUNCATE,  "TRUNCATE"}
+	}) {
+		auto [flag, label] = pair;
+
+		if (flags[flag]) {
+			if (first)
+				first = false;
+			else
+				o << ", ";
+
+			o << label;
+		}
+	}
+
 	return o;
 }
