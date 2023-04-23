@@ -47,6 +47,9 @@ public:
 		checkTimes();
 		checkFormatting();
 		checkStatAt();
+
+		m_first_file.close();
+		m_second_file.close();
 	}
 
 	void checkValidity() {

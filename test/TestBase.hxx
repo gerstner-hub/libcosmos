@@ -5,12 +5,15 @@
 #include <iostream>
 #include <string>
 #include <string_view>
+#include <vector>
 
 // cosmos
 #include "cosmos/cosmos.hxx"
 #include "cosmos/error/UsageError.hxx"
 #include "cosmos/error/RuntimeError.hxx"
 #include "cosmos/formatting.hxx"
+#include "cosmos/fs/DirStream.hxx"
+#include "cosmos/fs/filesystem.hxx"
 #include "cosmos/proc/ChildCloner.hxx"
 #include "cosmos/proc/process.hxx"
 #include "cosmos/types.hxx"
@@ -177,6 +180,47 @@ protected: // functions
 
 	virtual void runTests() = 0;
 
+	// checks that no open file descriptors have leaked.
+	// do this via /proc
+	bool verifyNoFileLeaks() {
+		cosmos::DirStream proc_fds{"/proc/self/fd"};
+		size_t pos;
+		std::vector<std::pair<int, std::string>> excess_fds;
+
+		for (const auto entry: proc_fds) {
+			if (entry.isDotEntry())
+				continue;
+			const std::string fd_str{entry.view()};
+			auto fd_num = std::stoi(fd_str, &pos);
+
+			if (pos < fd_str.size()) {
+				cosmos_throw (cosmos::RuntimeError("failed to convert /proc/self/fd number"));
+			}
+
+			if (fd_num >= 0 && fd_num <= 2)
+				continue;
+			else if (cosmos::FileNum{fd_num} == proc_fds.fd().raw())
+				continue;
+			else {
+				auto label = cosmos::fs::read_symlink_at(proc_fds.fd(), entry.view());
+				excess_fds.push_back({fd_num, label});
+			}
+		}
+
+		if (excess_fds.empty())
+			return true;
+
+		using namespace cosmos::term;
+
+		std::cerr << Red{"The following file descriptors haven't been closed:\n"};
+		for (const auto &info: excess_fds) {
+			const auto [fd, label] = info;
+			std::cerr << "- FD " << fd << ": " << label << "\n";
+		}
+
+		return false;
+	}
+
 public: // functions
 
 	int finishTest() {
@@ -203,7 +247,13 @@ public: // functions
 		setArgv(argc, argv);
 		try {
 			runTests();
-			return finishTest();
+			auto ret = finishTest();
+
+			if (ret == 0 && !verifyNoFileLeaks()) {
+				ret = 1;
+			}
+
+			return ret;
 		} catch (const std::exception &ex) {
 			std::cerr << "test failed: " << ex.what() << std::endl;
 			return 1;
