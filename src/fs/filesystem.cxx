@@ -385,6 +385,13 @@ void make_symlink(const std::string_view target, const std::string_view path) {
 	}
 }
 
+void make_symlink_at(const std::string_view target, const DirFD dir_fd,
+		const std::string_view path) {
+	if (::symlinkat(target.data(), to_integral(dir_fd.raw()), path.data()) != 0) {
+		cosmos_throw (FileError(path, "symlinkat()"));
+	}
+}
+
 std::string read_symlink(const std::string_view path) {
 	std::string ret;
 	ret.resize(128);
@@ -415,7 +422,29 @@ std::string read_symlink(const std::string_view path) {
 
 void link(const std::string_view old_path, const std::string_view new_path) {
 	if (::link(old_path.data(), new_path.data()) != 0) {
-		cosmos_throw (FileError(new_path, std::string{"linking "} + std::string{old_path}));
+		cosmos_throw (FileError(new_path, std::string{"link() for "} + std::string{old_path}));
+	}
+}
+
+void linkat(const DirFD old_dir, const std::string_view old_path,
+		const DirFD new_dir, const std::string_view new_path,
+		const FollowSymlinks follow_old) {
+	if (::linkat(
+				to_integral(old_dir.raw()), old_path.data(),
+				to_integral(new_dir.raw()), new_path.data(),
+				follow_old ? AT_SYMLINK_FOLLOW : 0) != 0) {
+		cosmos_throw (FileError(new_path, std::string{"linkat() for "} + std::string{old_path}));
+	}
+}
+
+void linkat_fd(const FileDescriptor fd, const DirFD new_dir,
+		const std::string_view new_path) {
+	if (::linkat(
+				to_integral(fd.raw()), "",
+				to_integral(new_dir.raw()), new_path.data(),
+				AT_EMPTY_PATH) != 0) {
+
+		cosmos_throw (FileError(new_path, std::string{"linkat(AT_EMPTY_PATH)"}));
 	}
 }
 

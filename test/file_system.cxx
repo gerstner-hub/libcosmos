@@ -26,6 +26,8 @@ class FileSystemTest :
 		testUmask();
 		testUnlinkAt();
 		testLink();
+		testLinkAt();
+		testLinkAtFD();
 		testCreateDir();
 		testCreateDirAt();
 		testCreateAllDirs();
@@ -205,6 +207,47 @@ class FileSystemTest :
 		cosmos::fs::unlink_file("testfile2");
 	}
 
+	void testLinkAt() {
+		START_TEST("linkat");
+		auto testdir = getTestDirPath();
+
+		cosmos::Directory testdir_obj{testdir.string()};
+		std::ofstream f;
+		f.open(testdir / "testfile");
+		f.close();
+
+		cosmos::fs::linkat(testdir_obj.fd(), "testfile", testdir_obj.fd(), "linkedfile");
+
+		RUN_STEP("linkat-file-exists", cosmos::fs::exists_file((testdir / "linkedfile").string()));
+
+		cosmos::FileStatus status1{(testdir / "testfile").string()};
+		cosmos::FileStatus status2{(testdir / "linkedfile").string()};
+
+		RUN_STEP("linkat-share-inode", status1.inode() == status2.inode());
+
+		cosmos::fs::remove_tree(testdir.string());
+	}
+
+	void testLinkAtFD() {
+		START_TEST("linkat_fd");
+		cosmos::Directory tmp{"/tmp"};
+		cosmos::StreamFile tmpfile{
+			tmp.fd(),
+			".",
+			cosmos::OpenMode{cosmos::OpenMode::WRITE_ONLY},
+			cosmos::OpenFlags{cosmos::OpenSettings::TMPFILE},
+			cosmos::FileMode{cosmos::ModeT{0600}}
+		};
+
+		if (cosmos::proc::get_effective_user_id() == cosmos::UserID::ROOT) {
+			cosmos::fs::linkat_fd(tmpfile.fd(), tmp.fd(), "my_tmp_file.txt");
+			RUN_STEP("linked-fd-exists", cosmos::fs::exists_file("/tmp/my_tmp_file.txt"));
+		} else {
+			EXPECT_EXCEPTION("linkat_fd failes with ENOENT due to missing CAP_DAC_READ_SEARCH", 
+					cosmos::fs::linkat_fd(tmpfile.fd(), tmp.fd(), "my_tmp_file.txt"));
+		}
+	}
+
 	void testChmod() {
 		START_TEST("chmod");
 		auto testdir = getTestDirPath();
@@ -363,6 +406,15 @@ class FileSystemTest :
 		cosmos::FileStatus link_status{linkfile.fd()};
 
 		RUN_STEP("linktarget-matches", target_status.isSameFile(link_status));
+
+		cosmos::Directory testdir_obj{testdir.string()};
+
+		cosmos::fs::make_symlink_at(linkbase, testdir_obj.fd(), "another_link");
+
+		linkfile.open((testdir / "another_link").string(), cosmos::OpenMode{cosmos::OpenMode::READ_ONLY});
+		link_status.updateFrom(linkfile.fd());
+
+		RUN_STEP("linkattarget-matches", target_status.isSameFile(link_status));
 
 		cosmos::fs::remove_tree(testdir.string());
 	}

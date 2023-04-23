@@ -380,6 +380,14 @@ COSMOS_API void change_owner_nofollow(const std::string_view path, const std::st
  **/
 COSMOS_API void make_symlink(const std::string_view target, const std::string_view path);
 
+/// Creates a symbolic link relative to \c dir_fd pointing to \c target.
+/**
+ * This behaves just like make_symlink(). It relates to make_symlink() the
+ * same way unlink_file_at() relates to unlink_file().
+ **/
+COSMOS_API void make_symlink_at(const std::string_view target, const DirFD dir_fd,
+		const std::string_view path);
+
 /// Returns the target (content) of the symbolic at \c path.
 /**
  * This returns the target path of the symlink present at the given \c path.
@@ -412,6 +420,37 @@ COSMOS_API std::string read_symlink(const std::string_view path);
  * determined any more which was was the "original".
  **/
 COSMOS_API void link(const std::string_view old_path, const std::string_view new_path);
+
+/// Creates a new (hard) link based on lookups relative to \c old_dir and \c new_dir.
+/**
+ * This behaves similar to link(). For \c old_path and \c new_path the usual
+ * at() API rules apply:
+ *
+ * - if the path is absolute then related DirFD is ignored.
+ * - else if the DirFD has the special value cosmos::AT_CWD then path is
+ *   interpreted relative to the current working directory.
+ * - else the path is interpreted relative to the directory represented by
+ *   DirFD.
+ *
+ * \c follow_old determines whether symlink's encountered at \c old_path will
+ * be resolved or not.
+ **/
+COSMOS_API void linkat(const DirFD old_dir, const std::string_view old_path,
+		const DirFD new_dir, const std::string_view new_path,
+		const FollowSymlinks follow_old = FollowSymlinks{false});
+
+/// Special variant of linkat() that can link arbitrary file descriptors at a new location.
+/**
+ * Contrary to linkat() this call can give the specified file descriptor a new
+ * name at \c new_dir / \c new_path, without specifying a source name. This
+ * generally only works for files that have a non-zero link count. This does
+ * not work for directory file descriptors. As a special case this *does* work
+ * for file descriptors opened with OpenSettings::PATH and for temporary files
+ * opened with OpenSettings::TMPFILE but without OpenSettings::EXCLUSIVE (in
+ * this case a link count of 0 is accepted).
+ **/
+COSMOS_API void linkat_fd(const FileDescriptor fd, const DirFD new_dir,
+		const std::string_view new_path);
 
 } // end ns
 
