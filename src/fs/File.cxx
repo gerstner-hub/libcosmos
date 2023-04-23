@@ -23,12 +23,14 @@ File::~File() {
 void File::open(const std::string_view path, const OpenMode mode, const OpenFlags flags,
 		const std::optional<FileMode> fmode) {
 
+	close();
 	m_fd = fs::open(path, mode, flags, fmode);
 }
 
 void File::open(const DirFD dir_fd, const std::string_view path, const OpenMode mode, const OpenFlags flags,
 		const std::optional<FileMode> fmode) {
 
+	close();
 	m_fd = fs::open_at(dir_fd, path, mode, flags, fmode);
 }
 
