@@ -69,6 +69,56 @@ FileDescriptor open_at(
 	return FileDescriptor{FileNum{fd}};
 }
 
+namespace {
+
+	std::pair<std::string, int> expand_temp_path(const std::string_view _template) {
+		std::string path;
+		std::string base;
+		auto lastsep = _template.rfind('/');
+
+		if (lastsep != _template.npos) {
+			path = _template.substr(0, lastsep + 1);
+			base = _template.substr(lastsep + 1);
+		} else {
+			base = _template;
+		}
+
+		if (base.empty()) {
+			cosmos_throw (UsageError("empty basename not allowed"));
+		}
+
+		constexpr auto XS = "XXXXXX";
+		constexpr auto PLACEHOLDER = "{}";
+		int suffixlen = 0;
+
+		if (auto placeholder_pos = base.rfind(PLACEHOLDER); placeholder_pos != base.npos) {
+			suffixlen = base.size() - placeholder_pos - 2;
+			base.replace(placeholder_pos, 2, XS);
+		} else {
+			base.append(XS);
+		}
+
+		path += base;
+
+		return {path, suffixlen};
+	}
+
+}
+
+std::pair<FileDescriptor, std::string> make_tempfile(
+		const std::string_view _template, const OpenFlags flags) {
+
+	auto [path, suffixlen] = expand_temp_path(_template);
+
+	const auto fd = ::mkostemps(path.data(), suffixlen, flags.raw());
+
+	if (fd == -1) {
+		cosmos_throw (ApiError("mkostemps()"));
+	}
+
+	return {FileDescriptor{FileNum{fd}}, path};
+}
+
 FileMode set_umask(const FileMode mode) {
 	auto raw_mode = to_integral(mode.raw());
 

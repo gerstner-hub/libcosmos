@@ -1,6 +1,7 @@
 // C++
 #include <cassert>
 #include <iostream>
+#include <fstream>
 #include <limits.h>
 
 // cosmos
@@ -9,6 +10,7 @@
 #include "cosmos/fs/File.hxx"
 #include "cosmos/fs/filesystem.hxx"
 #include "cosmos/fs/StreamFile.hxx"
+#include "cosmos/fs/TempFile.hxx"
 #include "cosmos/io/Pipe.hxx"
 
 // Test
@@ -25,6 +27,7 @@ public:
 		testReadFile();
 		testWriteFile();
 		testPipeStream();
+		testTempFile();
 	}
 
 	void testOpenState() {
@@ -119,6 +122,24 @@ public:
 
 		RUN_STEP("message received", message == message2);
 		RUN_STEP("check for EOF", reader.read(message2.data(), 1) == 0);
+	}
+
+	void testTempFile() {
+		START_TEST("testing temporary file");
+		std::string tmp_path;
+		{
+			constexpr auto LINE{"some data"};
+			cosmos::TempFile tf{"/tmp/some.{}.txt"};
+			tf.write("some data");
+
+			std::ifstream is(tf.path());
+			std::string line;
+			std::getline(is, line);
+			RUN_STEP("read-back-tempfile-data", !is.fail() && line == LINE);
+			tmp_path = tf.path();
+		}
+
+		RUN_STEP("verify-tempfile-unlinked", !cosmos::fs::exists_file(tmp_path));
 	}
 
 protected:

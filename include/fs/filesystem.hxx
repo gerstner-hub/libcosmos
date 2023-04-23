@@ -5,6 +5,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <utility>
 
 // cosmos
 #include "cosmos/error/errno.hxx"
@@ -50,6 +51,38 @@ COSMOS_API FileDescriptor open_at(
 		const DirFD dir_fd, const std::string_view path,
 		const OpenMode mode, const OpenFlags flags,
 		const std::optional<FileMode> fmode = {});
+
+/// Safely create a temporary file and return it's file descriptor and path.
+/**
+ * \c _template needs to be a template for the path to use for the temporary
+ * file. It can be an absolute or a relative path. The path determines the
+ * directory where the temporary file will be created in. The template also
+ * needs to contain a basename on which the actual file path will be based.
+ * You can place a pair of "{}" in the basename to mark the position in the
+ * path where a unique random still will be inserted. The last occurence of
+ * "{}" will be used for this. If no such substring is found in the basename
+ * then the unique random still will be added as a suffix to the basename.
+ *
+ * It is an error to use a zero-length basename which will cause an exception
+ * to be thrown.
+ *
+ * The \c flags argument can specify optional additional open flags to be
+ * applied when opening the temporary file. The implementation will implicitly
+ * use OpenMode::READ_WRITE and OpenSettings::CREATE and
+ * OpenSettings::EXCLUSIVE. These should *not* be set in \c flags. The file
+ * will have the permissions ModeT{0600}.
+ *
+ * On success this call returns a pair consisting of the newly opened file
+ * descriptor corresponding to the temporary file, and the expanded filename
+ * under which the temporary file has been created.
+ *
+ * It is the caller's responsibility to correctly close the returned
+ * FileDescriptor and to delete the temporary file (using unlink_file()) once
+ * it is no longer needed. The cosmos::TempFile class takes care of these
+ * tasks, if necessary.
+ **/
+COSMOS_API std::pair<FileDescriptor, std::string> make_tempfile(
+		const std::string_view _template, const OpenFlags flags = OpenFlags{});
 
 /// Sets the process's file creation mask
 /**
