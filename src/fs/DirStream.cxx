@@ -57,7 +57,7 @@ void DirStream::open(const std::string_view path, const FollowSymlinks follow_li
 	}
 
 	try {
-		open(fd);
+		open(fd.raw());
 	} catch (...) {
 		// intentionally ignore error conditions here
 		try {
@@ -71,8 +71,11 @@ void DirStream::open(const DirFD fd) {
 	close();
 
 	auto duplicate = fd.duplicate();
+	open(duplicate.raw());
+}
 
-	m_stream = ::fdopendir(to_integral(duplicate.raw()));
+void DirStream::open(const FileNum fd) {
+	m_stream = ::fdopendir(to_integral(fd));
 
 	if (!m_stream) {
 		cosmos_throw (ApiError());

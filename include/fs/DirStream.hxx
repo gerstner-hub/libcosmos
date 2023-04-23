@@ -151,6 +151,8 @@ public: // functions
 
 protected: // functions
 
+	void open(const FileNum fd);
+
 	void requireOpenStream(const std::string_view context) const {
 		if (!isOpen()) {
 			cosmos_throw (UsageError(std::string(context) + " on unassociated DirStream instance"));
