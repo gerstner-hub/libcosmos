@@ -7,7 +7,7 @@
 
 namespace cosmos {
 
-/// Specialization of the File type for streaming I/O access
+/// Specialization of the File type for streaming I/O access.
 /**
  * Streaming I/O means that a file read/write position is maintained by the
  * operating system and data is exchanged by means of read/write operations
@@ -51,6 +51,6 @@ public: // functions
 	{}
 };
 
-}
+} // end ns
 
 #endif // inc. guard
