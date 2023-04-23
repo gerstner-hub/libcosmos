@@ -388,7 +388,7 @@ COSMOS_API void make_symlink(const std::string_view target, const std::string_vi
 COSMOS_API void make_symlink_at(const std::string_view target, const DirFD dir_fd,
 		const std::string_view path);
 
-/// Returns the target (content) of the symbolic at \c path.
+/// Returns the target (content) of the symbolic link at \c path.
 /**
  * This returns the target path of the symlink present at the given \c path.
  *
@@ -399,6 +399,15 @@ COSMOS_API void make_symlink_at(const std::string_view target, const DirFD dir_f
  * - no entry if \c path does not exist (Errno::NO_ENTRY)
  **/
 COSMOS_API std::string read_symlink(const std::string_view path);
+
+/// Returns the target (content) of the symbolic link \c path relative to \c dir_fd.
+/**
+ * This relates to read_symlink() the same way unlink_file_at() relates to
+ * unlink_file().
+ *
+ * \see unlink_file_at().
+ **/
+COSMOS_API std::string read_symlink_at(const DirFD dir_fd, const std::string_view path);
 
 /// Creates a new (hard) link of the file found in \c old_path at \c new_path.
 /**

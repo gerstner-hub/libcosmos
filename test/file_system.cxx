@@ -406,6 +406,12 @@ class FileSystemTest :
 
 		RUN_STEP("link-content-matches", link_content == linkbase);
 
+		{
+			cosmos::Directory testdir_obj{testdir.string()};
+			auto linkat_content = cosmos::fs::read_symlink_at(testdir_obj.fd(), "alink");
+			RUN_STEP("readlinkat-content-matches", linkat_content == linkbase);
+		}
+
 		cosmos::StreamFile linkfile{
 			linkpath.string(),
 			cosmos::OpenMode{cosmos::OpenMode::READ_ONLY}
@@ -414,7 +420,7 @@ class FileSystemTest :
 		cosmos::FileStatus target_status{targetfile.fd()};
 		cosmos::FileStatus link_status{linkfile.fd()};
 
-		RUN_STEP("linktarget-matches", target_status.isSameFile(link_status));
+		RUN_STEP("link-target-matches", target_status.isSameFile(link_status));
 
 		cosmos::Directory testdir_obj{testdir.string()};
 
@@ -423,7 +429,7 @@ class FileSystemTest :
 		linkfile.open((testdir / "another_link").string(), cosmos::OpenMode{cosmos::OpenMode::READ_ONLY});
 		link_status.updateFrom(linkfile.fd());
 
-		RUN_STEP("linkattarget-matches", target_status.isSameFile(link_status));
+		RUN_STEP("linkat-target-matches", target_status.isSameFile(link_status));
 
 		cosmos::fs::remove_tree(testdir.string());
 	}

@@ -393,32 +393,49 @@ void make_symlink_at(const std::string_view target, const DirFD dir_fd,
 	}
 }
 
-std::string read_symlink(const std::string_view path) {
-	std::string ret;
-	ret.resize(128);
+namespace {
 
-	while (true) {
-		auto res = ::readlink(path.data(), &ret.front(), ret.size());
+	std::string read_symlink(const std::string_view path,
+			const std::string_view call, std::function<int(const char*, char*, size_t)> readlink_func) {
+		std::string ret;
+		ret.resize(128);
 
-		if (res < 0) {
-			cosmos_throw (FileError(path, "readlink()"));
-		}
+		while (true) {
+			auto res = readlink_func(path.data(), &ret.front(), ret.size());
 
-		// NOTE: this returns the size excluding a null terminator,
-		// also doesn't write a null terminator
-		auto len = static_cast<size_t>(res);
+			if (res < 0) {
+				cosmos_throw (FileError(path, call));
+			}
 
-		if (len < ret.size()) {
-			ret.resize(len);
-			return ret;
-		} else {
-			// man page says: if len equals size then truncation
-			// may have occured. Thus use one byte extra to avoid
-			// ambiguity.
-			ret.resize(len+1);
-			continue;
+			// NOTE: this returns the size excluding a null terminator,
+			// also doesn't write a null terminator
+			auto len = static_cast<size_t>(res);
+
+			if (len < ret.size()) {
+				ret.resize(len);
+				return ret;
+			} else {
+				// man page says: if len equals size then truncation
+				// may have occured. Thus use one byte extra to avoid
+				// ambiguity.
+				ret.resize(len+1);
+				continue;
+			}
 		}
 	}
+}
+
+std::string read_symlink(const std::string_view path) {
+	return read_symlink(path, "readlink()", ::readlink);
+}
+
+std::string read_symlink_at(const DirFD dir_fd, const std::string_view path) {
+
+	auto readlink_func = [&](const char *p, char *buf, size_t size) {
+		return ::readlinkat(to_integral(dir_fd.raw()), p, buf, size);
+	};
+
+	return read_symlink(path, "readlinkat()", readlink_func);
 }
 
 void link(const std::string_view old_path, const std::string_view new_path) {
