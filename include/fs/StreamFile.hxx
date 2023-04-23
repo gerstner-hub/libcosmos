@@ -43,6 +43,12 @@ public: // functions
 		File{fd, auto_close},
        		StreamIO{m_fd}
 	{}
+
+	StreamFile(const DirFD dir_fd, const std::string_view path, const OpenMode mode,
+			const OpenFlags flags, const std::optional<FileMode> fmode = {}) :
+		File{dir_fd, path, mode, flags, fmode},
+		StreamIO{m_fd}
+	{}
 };
 
 }
