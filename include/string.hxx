@@ -43,6 +43,13 @@ inline bool is_prefix(const std::string_view s, const std::string_view prefix) {
 	return s.substr(0, prefix.length()) == prefix;
 }
 
+/// Returns whether /\c suffix is a suffix oc \c s
+inline bool is_suffix(const std::string_view s, const std::string_view suffix) {
+	if (s.size() < suffix.size())
+		return false;
+	return s.substr(s.size() - suffix.size()) == suffix;
+}
+
 /// Simple wrapper that creates a string_view from \c s and supporting also nullptr
 /**
  * The std::string_view constructor does not allow a nullptr argument. This
