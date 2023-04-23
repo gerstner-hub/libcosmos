@@ -16,6 +16,7 @@
 #include "cosmos/error/InternalError.hxx"
 #include "cosmos/error/RuntimeError.hxx"
 #include "cosmos/error/UsageError.hxx"
+#include "cosmos/formatting.hxx"
 #include "cosmos/fs/Directory.hxx"
 #include "cosmos/fs/DirIterator.hxx"
 #include "cosmos/fs/DirStream.hxx"
@@ -446,6 +447,24 @@ void linkat_fd(const FileDescriptor fd, const DirFD new_dir,
 
 		cosmos_throw (FileError(new_path, std::string{"linkat(AT_EMPTY_PATH)"}));
 	}
+}
+
+void linkat_proc_fd(const FileDescriptor fd, const DirFD new_dir,
+		const std::string_view new_path) {
+	// ~he exact security reasons why linkat_fd() isn't allowed without
+	// CAP_DAC_READ_SEARCH are a bit unclear. It seems the concern is that
+	// a process get's hold of a file descriptor for which it wouldn't
+	// have permissions to change ownership etc.
+	//
+	// By linking the FD into a directory controlled by the unprivileged
+	// process it would become possible to manipulate the ownership after
+	// all.
+	//
+	// It looks like this variant of linkat() does some checks that
+	// prevent this.
+	linkat(
+			AT_CWD, cosmos::sprintf("/proc/self/fd/%d", to_integral(fd.raw())),
+			new_dir, new_path, FollowSymlinks{true});
 }
 
 } // end ns

@@ -444,12 +444,27 @@ COSMOS_API void linkat(const DirFD old_dir, const std::string_view old_path,
  * Contrary to linkat() this call can give the specified file descriptor a new
  * name at \c new_dir / \c new_path, without specifying a source name. This
  * generally only works for files that have a non-zero link count. This does
- * not work for directory file descriptors. As a special case this *does* work
- * for file descriptors opened with OpenSettings::PATH and for temporary files
- * opened with OpenSettings::TMPFILE but without OpenSettings::EXCLUSIVE (in
- * this case a link count of 0 is accepted).
+ * not work for directory file descriptors.
+ *
+ * As a special case this *does* work for file descriptors opened with
+ * OpenSettings::PATH and for temporary files opened with
+ * OpenSettings::TMPFILE but without OpenSettings::EXCLUSIVE (in this case a
+ * link count of 0 is accepted). Note, however, that this call requires the
+ * CAP_DAC_READ_SEARCH capability, for security reasons.
+ *
+ * An alternative is to use regular linkat() and the /proc file system, see
+ * `man 2 linkat`.
  **/
 COSMOS_API void linkat_fd(const FileDescriptor fd, const DirFD new_dir,
+		const std::string_view new_path);
+
+/// Performs the same as linkat_fd() using linkat() and the /proc file system.
+/**
+ * To avoid the permission issues that linkat_fd() has this variant of the
+ * linkat call uses a workaround based on the /proc file system to achieve the
+ * same result, see `man 2 linkat`.
+ **/
+COSMOS_API void linkat_proc_fd(const FileDescriptor fd, const DirFD new_dir,
 		const std::string_view new_path);
 
 } // end ns

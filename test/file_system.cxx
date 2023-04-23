@@ -243,9 +243,18 @@ class FileSystemTest :
 			cosmos::fs::linkat_fd(tmpfile.fd(), tmp.fd(), "my_tmp_file.txt");
 			RUN_STEP("linked-fd-exists", cosmos::fs::exists_file("/tmp/my_tmp_file.txt"));
 		} else {
-			EXPECT_EXCEPTION("linkat_fd failes with ENOENT due to missing CAP_DAC_READ_SEARCH", 
-					cosmos::fs::linkat_fd(tmpfile.fd(), tmp.fd(), "my_tmp_file.txt"));
+			try {
+				cosmos::fs::linkat_fd(tmpfile.fd(), tmp.fd(), "my_tmp_file.txt");
+			} catch (const cosmos::ApiError &e) {
+				RUN_STEP("linkat_fd denied with ENOENT", e.errnum() == cosmos::Errno::NO_ENTRY);
+			}
+
+			// then let's try with linkat_proc_fd instead
+			cosmos::fs::linkat_proc_fd(tmpfile.fd(), tmp.fd(), "my_tmp_file.txt");
+			RUN_STEP("linked-fd-exists", cosmos::fs::exists_file("/tmp/my_tmp_file.txt"));
 		}
+
+		cosmos::fs::unlink_file("/tmp/my_tmp_file.txt");
 	}
 
 	void testChmod() {
