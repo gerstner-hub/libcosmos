@@ -38,8 +38,9 @@ class FileSystemTest :
 		testMakeTempdir();
 	}
 
-	std::filesystem::path getTestDirPath() {
-		return getTempDir();
+	std::pair<std::filesystem::path, cosmos::TempDir> getTestDir() {
+		auto td = getTempDir();
+		return std::make_pair(std::filesystem::path{td.path()}, std::move(td));
 	}
 
 	void testBasics() {
@@ -70,46 +71,48 @@ class FileSystemTest :
 	void testCreateDir() {
 		START_TEST("create dir");
 
-		auto testdir = getTestDirPath().string();
+		auto [testdir, tmpdir] = getTestDir();
 
-		testdir += "/createdir";
+		testdir /= "createdir";
 
 		START_STEP("creating-testdir");
 
-		cosmos::fs::make_dir(testdir, cosmos::ModeT{0750});
+		auto path = testdir.string();
 
-		EVAL_STEP(cosmos::fs::exists_file(testdir));
+		cosmos::fs::make_dir(path, cosmos::ModeT{0750});
 
-		cosmos::fs::remove_dir(testdir);
+		EVAL_STEP(cosmos::fs::exists_file(path));
 
-		FINISH_STEP(!cosmos::fs::exists_file(testdir));
+		cosmos::fs::remove_dir(path);
+
+		FINISH_STEP(!cosmos::fs::exists_file(path));
 	}
 
 	void testCreateDirAt() {
 		START_TEST("create dir at");
 
-		auto testdir = getTestDirPath().string();
+		auto [testdir, tmpdir] = getTestDir();
 
 		auto subdir = "createdir";
 
 		START_STEP("creating-testdir-at");
 
-		auto testdir_obj = cosmos::Directory{testdir};
+		auto testdir_obj = cosmos::Directory{testdir.string()};
 
 		cosmos::fs::make_dir_at(testdir_obj.fd(), subdir, cosmos::ModeT{0750});
 
-		EVAL_STEP(cosmos::fs::exists_file(testdir + "/" + subdir));
+		EVAL_STEP(cosmos::fs::exists_file((testdir / subdir).string()));
 
 		cosmos::fs::remove_dir_at(testdir_obj.fd(), subdir);
 
-		FINISH_STEP(!cosmos::fs::exists_file(testdir + "/" + subdir));
+		FINISH_STEP(!cosmos::fs::exists_file((testdir / subdir).string()));
 	}
 
 	void testCreateAllDirs() {
 		START_TEST("create all dirs");
 
 		const cosmos::FileMode dirmode{cosmos::ModeT{0750}};
-		auto testdir = getTestDirPath();
+		auto [testdir, tmpdir] = getTestDir();
 
 		auto deepdir = testdir / "deeper" / "path";
 
@@ -133,7 +136,7 @@ class FileSystemTest :
 		EVAL_STEP(cosmos::fs::exists_file(ugly_path));
 		FINISH_STEP(res == cosmos::Errno::NO_ERROR);
 
-		cosmos::fs::remove_tree(testdir.string());
+		tmpdir.close();
 
 		RUN_STEP("testing-rmtree-tmpdir", !cosmos::fs::exists_file(testdir.string()));
 	}
@@ -211,7 +214,7 @@ class FileSystemTest :
 
 	void testLinkAt() {
 		START_TEST("linkat");
-		auto testdir = getTestDirPath();
+		auto [testdir, tmpdir] = getTestDir();
 
 		cosmos::Directory testdir_obj{testdir.string()};
 		std::ofstream f;
@@ -226,8 +229,6 @@ class FileSystemTest :
 		cosmos::FileStatus status2{(testdir / "linkedfile").string()};
 
 		RUN_STEP("linkat-share-inode", status1.inode() == status2.inode());
-
-		cosmos::fs::remove_tree(testdir.string());
 	}
 
 	void testLinkAtFD() {
@@ -261,7 +262,7 @@ class FileSystemTest :
 
 	void testChmod() {
 		START_TEST("chmod");
-		auto testdir = getTestDirPath();
+		auto [testdir, tempdir] = getTestDir();
 
 		auto path = testdir / "modfile";
 
@@ -284,13 +285,11 @@ class FileSystemTest :
 		RUN_STEP("fchmod-works", stat.mode().raw() == cosmos::ModeT{0711});
 
 		modfile.close();
-
-		cosmos::fs::remove_tree(testdir.string());
 	}
 
 	void testChowner() {
 		START_TEST("chown");
-		auto testdir = getTestDirPath();
+		auto [testdir, tempdir] = getTestDir();
 
 		auto path = testdir / "ownfile";
 		cosmos::StreamFile ownfile{
@@ -380,14 +379,12 @@ class FileSystemTest :
 		RUN_STEP("chown-to-self", status.uid() == our_uid);
 
 		ownfile.close();
-
-		cosmos::fs::remove_tree(testdir.string());
 	}
 
 	void testSymlink() {
 		START_TEST("symlink");
 
-		auto testdir = getTestDirPath();
+		auto [testdir, tmpdir] = getTestDir();
 
 		const auto linkbase = "targetfile";
 		auto linktarget = testdir / linkbase;
@@ -432,8 +429,6 @@ class FileSystemTest :
 		link_status.updateFrom(linkfile.fd());
 
 		RUN_STEP("linkat-target-matches", target_status.isSameFile(link_status));
-
-		cosmos::fs::remove_tree(testdir.string());
 	}
 
 	void testMakeTempfile() {

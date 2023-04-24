@@ -14,6 +14,7 @@
 #include "cosmos/formatting.hxx"
 #include "cosmos/fs/DirStream.hxx"
 #include "cosmos/fs/filesystem.hxx"
+#include "cosmos/fs/TempDir.hxx"
 #include "cosmos/proc/ChildCloner.hxx"
 #include "cosmos/proc/process.hxx"
 #include "cosmos/types.hxx"
@@ -148,18 +149,13 @@ protected: // functions
 		return m_good_tests.size() + m_bad_tests.size();
 	}
 
-	std::string getTempDir() const {
+	cosmos::TempDir getTempDir() const {
 		std::string base{m_argv.at(0)};
 		base = base.substr(base.rfind('/') + 1);
-		std::string tmp_dir = cosmos::sprintf("/tmp/%s.XXXXXX", base.c_str());
 
-		// TODO: replace this with a cosmos tmpdir API once available
-		if (::mkdtemp(tmp_dir.data()) == nullptr) {
-			std::cerr << "Failed to create temporary directory\n";
-			throw 1;
-		}
+		cosmos::TempDir ret{std::string{"/tmp/"} + base};
 
-		return tmp_dir;
+		return ret;
 	}
 
 	void setArgv(int argc, const char **argv) {

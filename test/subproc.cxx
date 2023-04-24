@@ -15,6 +15,7 @@
 #include "cosmos/formatting.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/fs/filesystem.hxx"
+#include "cosmos/fs/TempFile.hxx"
 #include "cosmos/io/Pipe.hxx"
 #include "cosmos/io/StreamAdaptor.hxx"
 #include "cosmos/proc/ChildCloner.hxx"
@@ -36,31 +37,25 @@ public:
 
 	~RedirectOutputBase() {
 		try {
-			cosmos::fs::unlink_file(m_tmp_file_path);
-		} catch (const std::exception &ex) {
-			std::cerr << "Failed to remove " << m_tmp_file_path << ": " << ex.what() << std::endl;
+			m_tmp_file.close();
+		} catch (const std::exception &e) {
+			// this is expected, because the InputStreamAdaptor
+			// takes ownership of the FD.
+			//std::cerr << "failed to close tmpfile: " << e.what() << "\n";
 		}
 	}
 
 	cosmos::FileDescriptor getTempFile() {
-		m_tmp_file_path = "/tmp/subproc_test.XXXXXX";
-		// TODO: replace by tempfile facility
-		auto fd = mkostemp(&m_tmp_file_path[0], O_CLOEXEC);
+		m_tmp_file.open("/tmp/subproc_test.{}");
 
-		cosmos::FileDescriptor ret(cosmos::FileNum{fd});
+		std::cout << "Using temporary file: " << m_tmp_file.path() << std::endl;
 
-		if (ret.invalid()) {
-			cosmos_throw (cosmos::ApiError());
-		}
-
-		std::cout << "Using temporary file: " << m_tmp_file_path << std::endl;
-
-		return ret;
+		return m_tmp_file.fd();
 	}
 
 protected:
 
-	std::string m_tmp_file_path;
+	cosmos::TempFile m_tmp_file;
 	const std::string m_cat_path;
 	cosmos::SubProc m_proc;
 };

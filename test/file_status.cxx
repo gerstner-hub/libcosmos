@@ -25,15 +25,9 @@ public:
 			m_mode{cosmos::ModeT{0600}} {
 	}
 
-	~TestFileStatus() {
-		if (!m_tmp_dir.empty()) {
-			cosmos::fs::remove_tree(m_tmp_dir);
-		}
-	}
-
 	void runTests() override {
 		m_tmp_dir = getTempDir();
-		cosmos::fs::change_dir(m_tmp_dir);
+		cosmos::fs::change_dir(m_tmp_dir.path());
 		m_first_file.open("first", cosmos::OpenMode::WRITE_ONLY, m_flags, m_mode);
 		m_second_file.open("second", cosmos::OpenMode::WRITE_ONLY, m_flags, m_mode);
 
@@ -50,6 +44,7 @@ public:
 
 		m_first_file.close();
 		m_second_file.close();
+		m_tmp_dir.close();
 	}
 
 	void checkValidity() {
@@ -83,7 +78,7 @@ public:
 		cosmos::FileStatus status{m_first_file.fd()};
 		RUN_STEP("check-regular", status.type().isRegular());
 
-		status.updateFrom(m_tmp_dir);
+		status.updateFrom(m_tmp_dir.path());
 		RUN_STEP("check-directory", status.type().isDirectory());
 
 		runTool({"ln", "-s", "first", "symlink"});
@@ -267,7 +262,7 @@ protected:
 	const cosmos::FileMode m_mode{cosmos::ModeT{0600}};
 	cosmos::File m_first_file;
 	cosmos::StreamFile m_second_file;
-	std::string m_tmp_dir;
+	cosmos::TempDir m_tmp_dir;
 };
 
 int main(const int argc, const char **argv) {
