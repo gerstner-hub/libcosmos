@@ -35,6 +35,7 @@ class FileSystemTest :
 		testChowner();
 		testSymlink();
 		testMakeTempfile();
+		testMakeTempdir();
 	}
 
 	std::filesystem::path getTestDirPath() {
@@ -448,6 +449,19 @@ class FileSystemTest :
 
 		fd.close();
 		cosmos::fs::unlink_file(path);
+	}
+
+	void testMakeTempdir() {
+		START_TEST("make_tempdir()");
+		const std::string_view _template{"/tmp/some"};
+		auto path = cosmos::fs::make_tempdir(_template);
+
+		std::cout << "make_tempdir turned " << _template << " into " << path << "\n";
+
+		RUN_STEP("tempdir-path-prefix-matches", cosmos::is_prefix(path, _template));
+		RUN_STEP("tempdir-path-is-expanded", path.size() > _template.size());
+
+		cosmos::fs::remove_tree(path);
 	}
 
 protected:

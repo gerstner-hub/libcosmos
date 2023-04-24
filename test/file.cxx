@@ -10,6 +10,7 @@
 #include "cosmos/fs/File.hxx"
 #include "cosmos/fs/filesystem.hxx"
 #include "cosmos/fs/StreamFile.hxx"
+#include "cosmos/fs/TempDir.hxx"
 #include "cosmos/fs/TempFile.hxx"
 #include "cosmos/io/Pipe.hxx"
 
@@ -28,6 +29,7 @@ public:
 		testWriteFile();
 		testPipeStream();
 		testTempFile();
+		testTempDir();
 	}
 
 	void testOpenState() {
@@ -140,6 +142,19 @@ public:
 		}
 
 		RUN_STEP("verify-tempfile-unlinked", !cosmos::fs::exists_file(tmp_path));
+	}
+
+	void testTempDir() {
+		START_TEST("testing temporary dir");
+		std::string tmp_path;
+		{
+			cosmos::TempDir td{"/tmp/somedir"};
+			tmp_path = td.path();
+			std::ofstream os(tmp_path + "/some_file");
+			os << "some data";
+		}
+
+		RUN_STEP("verify-tempdir-removed", !cosmos::fs::exists_file(tmp_path));
 	}
 
 protected:

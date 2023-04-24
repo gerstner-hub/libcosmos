@@ -84,6 +84,24 @@ COSMOS_API FileDescriptor open_at(
 COSMOS_API std::pair<FileDescriptor, std::string> make_tempfile(
 		const std::string_view _template, const OpenFlags flags = OpenFlags{});
 
+/// Safely create a temporary directory and return it's path.
+/**
+ * This is similar to make_tempfile(). \c _template is the relative or
+ * absolute path to use as a template for the to be created directory. The
+ * basename of the path will be expanded with a random string. An empty
+ * basename is not allowed.
+ *
+ * The created directory will receive a mode of 0700.
+ *
+ * The returned string contains the expanded \c _template. It is the caller's
+ * responsibility to remove the directory from the file system again at the
+ * appropriate time.
+ *
+ * \see TempDir for a convenience type that transparently handles removal of
+ * the temporary directory.
+ **/
+COSMOS_API std::string make_tempdir(const std::string_view _template);
+
 /// Sets the process's file creation mask
 /**
  * The file creation mask is a process wide attribute that determines an upper

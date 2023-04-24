@@ -119,6 +119,19 @@ std::pair<FileDescriptor, std::string> make_tempfile(
 	return {FileDescriptor{FileNum{fd}}, path};
 }
 
+std::string make_tempdir(const std::string_view _template) {
+	// there's no way to have the X's in the middle of the basename like
+	// with mkostemps().
+	std::string expanded{_template};
+	expanded += "XXXXXX";
+
+	if (::mkdtemp(expanded.data()) == nullptr) {
+		cosmos_throw (ApiError("mkdtemp()"));
+	}
+
+	return expanded;
+}
+
 FileMode set_umask(const FileMode mode) {
 	auto raw_mode = to_integral(mode.raw());
 
