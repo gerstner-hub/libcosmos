@@ -14,6 +14,14 @@
 #include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/fs/types.hxx"
 
+/**
+ * @file
+ *
+ * File system related system calls. These is the lowest and most generic
+ * level of file system APIs that can be wrapped further in more comfortable
+ * types to use.
+ **/
+
 namespace cosmos::fs {
 
 /// Open a file using specific OpenFlags, potentially creating it first using the given \c fmode.

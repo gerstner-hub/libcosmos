@@ -53,6 +53,19 @@ public: // functions
 	Directory(const Directory&) = delete;
 	Directory& operator=(const Directory&) = delete;
 
+	Directory(Directory &&other) {
+		*this = std::move(other);
+	}
+
+	Directory& operator=(Directory &&other) {
+		m_auto_close = other.m_auto_close;
+		m_fd = other.m_fd;
+
+		other.m_auto_close = AutoCloseFD{true};
+		other.m_fd.reset();
+		return *this;
+	}
+
 	virtual ~Directory();
 
 	/// Open a directory by path without special flags (close-on-exec will be set).
@@ -116,14 +129,20 @@ public: // functions
 
 	DirFD fd() const { return m_fd; }
 
-	// \see fs::unlink_file_at
+	// \see fs::unlink_file_at()
 	inline void unlinkFileAt(const std::string_view path) const;
 
-	// \see fs::make_dir_at
+	// \see fs::make_dir_at()
 	inline void makeDirAt(const std::string_view path, const FileMode mode) const;
 
-	// \see fs::remove_dir_at
+	// \see fs::remove_dir_at()
 	inline void removeDirAt(const std::string_view path) const;
+
+	// \see fs::read_symlink_at()
+	inline std::string readSymlinkAt(const std::string_view path) const;
+
+	// \see fs::make_symlink_at()
+	inline void makeSymlinkAt(const std::string_view target, const std::string_view path) const;
 
 protected: // data
 	
@@ -142,14 +161,20 @@ void Directory::unlinkFileAt(const std::string_view path) const {
 	fs::unlink_file_at(m_fd, path);
 }
 
-// \see make_dir_at
 void Directory::makeDirAt(const std::string_view path, const FileMode mode) const {
 	fs::make_dir_at(m_fd, path, mode);
 }
 
-// \see remove_dir_at
 void Directory::removeDirAt(const std::string_view path) const {
 	fs::remove_dir_at(m_fd, path);
+}
+
+std::string Directory::readSymlinkAt(const std::string_view path) const {
+	return fs::read_symlink_at(m_fd, path);
+}
+
+void Directory::makeSymlinkAt(const std::string_view target, const std::string_view path) const {
+	fs::make_symlink_at(target, m_fd, path);
 }
 
 } // end ns
