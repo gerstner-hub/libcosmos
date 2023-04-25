@@ -176,6 +176,17 @@ protected: // functions
 
 	virtual void runTests() = 0;
 
+	bool onValgrind() const {
+		auto preload = proc::get_env_var("LD_PRELOAD");
+
+		if (!preload)
+			return false;
+
+		// this is only a heuristic, valgrind uses LD_PRELOAD to pull
+		// itself in.
+		return preload->find("valgrind") != preload->npos;
+	}
+
 	// checks that no open file descriptors have leaked.
 	// do this via /proc
 	bool verifyNoFileLeaks() {
@@ -245,7 +256,11 @@ public: // functions
 			runTests();
 			auto ret = finishTest();
 
-			if (ret == 0 && !verifyNoFileLeaks()) {
+			// only run file leak checks if all tests succeeded
+			// and if not on valgrind; valgrind uses various file
+			// descriptors to do its thing, we don't want to
+			// report them.
+			if (ret == 0 && !onValgrind() && !verifyNoFileLeaks()) {
 				ret = 1;
 			}
 
