@@ -133,7 +133,7 @@ class FileSystemTest :
 
 		res = cosmos::fs::make_all_dirs(ugly_path, dirmode);
 
-		EVAL_STEP(cosmos::fs::exists_file(ugly_path));
+		EVAL_STEP(cosmos::fs::exists_file(testdir.string() + "/final_dir"));
 		FINISH_STEP(res == cosmos::Errno::NO_ERROR);
 
 		tmpdir.close();

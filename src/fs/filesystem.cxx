@@ -23,6 +23,7 @@
 #include "cosmos/fs/File.hxx"
 #include "cosmos/fs/FileStatus.hxx"
 #include "cosmos/fs/filesystem.hxx"
+#include "cosmos/fs/path.hxx"
 #include "cosmos/GroupInfo.hxx"
 #include "cosmos/PasswdInfo.hxx"
 #include "cosmos/proc/process.hxx"
@@ -278,6 +279,7 @@ void remove_dir_at(const DirFD dir_fd, const std::string_view path) {
 }
 
 Errno make_all_dirs(const std::string_view path, const FileMode mode) {
+	const auto normpath = normalize_path(path);
 	size_t sep_pos = 0;
 	std::string prefix;
 	Errno ret{Errno::EXISTS};
@@ -286,9 +288,9 @@ Errno make_all_dirs(const std::string_view path, const FileMode mode) {
 		cosmos_throw (UsageError("empty string passed in"));
 	}
 
-	while (sep_pos != path.npos) {
-		sep_pos = path.find('/', sep_pos + 1);
-		prefix = path.substr(0, sep_pos);
+	while (sep_pos != normpath.npos) {
+		sep_pos = normpath.find('/', sep_pos + 1);
+		prefix = normpath.substr(0, sep_pos);
 
 		if (prefix.back() == '/') {
 			// root directory "/" or a trailing or duplicate slash

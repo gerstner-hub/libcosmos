@@ -39,17 +39,13 @@ public: // functions
 	}
 
 	void close() {
-		// TODO: normalize path
 		if (!m_tmp_path.empty()) {
 			fs::remove_tree(m_tmp_path);
 			m_tmp_path.clear();
 		}
 	}
 
-	void create(const std::string_view _template) {
-		close();
-		m_tmp_path = fs::make_tempdir(_template);
-	}
+	void create(const std::string_view _template);
 
 	/// Returns the expanded path to the temporary dir.
 	/**

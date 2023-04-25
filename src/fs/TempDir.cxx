@@ -1,6 +1,7 @@
 // cosmos
 #include "cosmos/error/UsageError.hxx"
 #include "cosmos/fs/TempDir.hxx"
+#include "cosmos/fs/path.hxx"
 #include "cosmos/private/cosmos.hxx"
 
 namespace cosmos {
@@ -11,6 +12,11 @@ TempDir::~TempDir() {
 	} catch (const std::exception &e) {
 		noncritical_error("Failed to close TmpDir", e);
 	}
+}
+
+void TempDir::create(const std::string_view _template) {
+	close();
+	m_tmp_path = fs::make_tempdir(fs::normalize_path(_template));
 }
 
 const std::string& TempDir::path() const {

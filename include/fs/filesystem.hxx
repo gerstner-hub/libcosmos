@@ -264,11 +264,6 @@ COSMOS_API void remove_dir_at(const DirFD dir_fd, const std::string_view path);
  * FileError is thrown. This could mean that some of the paths have been
  * created in the error case, but not the full path.
  *
- * TODO: this does not currently normalize the input path which can lead to
- * unnecessary directories being created like when using path
- * "/some/ugly/../dir", then "/some/ugly" would also be created. This needs a
- * normlization helper.
- *
  * \return Errno::NO_ERROR if the full path (and thus at least the final
  *         directory component) was created, Errno::EXISTS if the directory
  *         was already existing.
