@@ -40,6 +40,7 @@ inline std::string stripped(const std::string_view s) {
 
 /// Returns whether \c prefix is a prefix of \c s
 inline bool is_prefix(const std::string_view s, const std::string_view prefix) {
+	// TODO: in C++20 string_view has a starts_with() member
 	return s.substr(0, prefix.length()) == prefix;
 }
 
@@ -47,6 +48,7 @@ inline bool is_prefix(const std::string_view s, const std::string_view prefix) {
 inline bool is_suffix(const std::string_view s, const std::string_view suffix) {
 	if (s.size() < suffix.size())
 		return false;
+	// TODO: in C++20 string_view has an ends_with() member
 	return s.substr(s.size() - suffix.size()) == suffix;
 }
 
