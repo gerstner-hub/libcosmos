@@ -24,11 +24,11 @@ namespace cosmos {
 class FileDescriptor;
 class SigSet;
 
-/// Represents a POSIX signal number and offers signal related APIs
+/// Represents a POSIX signal number and offers signal related APIs.
 class COSMOS_API Signal {
 public: // functions
 
-	/// Creates a Signal object for the given primitive signal number
+	/// Creates a Signal object for the given primitive signal number.
 	constexpr explicit Signal(const SignalNr sig) : m_sig{sig} {}
 
 	Signal(const Signal &o) { *this = o; }
@@ -38,10 +38,10 @@ public: // functions
 	bool operator==(const Signal &o) const { return m_sig == o.m_sig; }
 	bool operator!=(const Signal &o) const { return !(*this == o); }
 
-	/// Returns the primitive signal number stored in this object
+	/// Returns the primitive signal number stored in this object.
 	SignalNr raw() const { return m_sig; }
 
-	/// Returns a human readable label for the currently stored signal number
+	/// Returns a human readable label for the currently stored signal number.
 	std::string name() const;
 
 protected: // data
@@ -89,7 +89,7 @@ constexpr Signal POLL          = Signal{SignalNr::POLL};
 constexpr Signal POWER         = Signal{SignalNr::POWER};
 constexpr Signal BAD_SYS       = Signal{SignalNr::BAD_SYS};
 
-/// Sends a signal to the caller itself
+/// Sends a signal to the caller itself.
 /**
  * The given signal will be delivered to the calling process or
  * thread itself.
@@ -98,13 +98,13 @@ constexpr Signal BAD_SYS       = Signal{SignalNr::BAD_SYS};
  **/
 COSMOS_API void raise(const Signal s);
 
-/// Sends a signal to another process based on process ID
+/// Sends a signal to another process based on process ID.
 /**
  * \exception Throws an ApiError on error.
  **/
 COSMOS_API void send(const ProcessID proc, const Signal s);
 
-/// Sends a signal to another process based on a pidfd
+/// Sends a signal to another process based on a pidfd.
 /**
  * \param[in] pidfd needs to refer to a valid pidfd type file
  * descriptor. The process represented by it will bet sent the
@@ -114,7 +114,7 @@ COSMOS_API void send(const ProcessID proc, const Signal s);
  **/
 COSMOS_API void send(const FileDescriptor pidfd, const Signal s);
 
-/// Blocks the given set of signals in the current process's signal mask
+/// Blocks the given set of signals in the current process's signal mask.
 /**
  * Blocked signals won't be delivered asynchronously to the process
  * i.e. no asynchronous signal handler will be invoked, also the
@@ -126,25 +126,25 @@ COSMOS_API void send(const FileDescriptor pidfd, const Signal s);
  **/
 COSMOS_API void block(const SigSet &s, std::optional<SigSet *> old = {});
 
-/// Unblocks the given set of signals in the current process's signal mask
+/// Unblocks the given set of signals in the current process's signal mask.
 COSMOS_API void unblock(const SigSet &s, std::optional<SigSet *> old = {});
 
-/// Assigns exactly the given signal mask to the current process
+/// Assigns exactly the given signal mask to the current process.
 COSMOS_API void set_sigmask(const SigSet &s, std::optional<SigSet *> old = {});
 
-/// Restores the default signal handling behaviour for the given signal
+/// Restores the default signal handling behaviour for the given signal.
 inline void restore(const Signal sig) {
 	::signal(to_integral(sig.raw()), SIG_DFL);
 }
 
-/// Returns the currently active signal mask for the calling thread
+/// Returns the currently active signal mask for the calling thread.
 COSMOS_API SigSet get_sigmask();
 
 } // end ns
 
 } // end ns
 
-/// Print a friendly name of the signal to the given output stream
+/// Print a friendly name of the signal to the given output stream.
 COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::Signal sig);
 
 #endif // inc. guard

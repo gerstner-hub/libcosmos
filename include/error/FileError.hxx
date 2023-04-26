@@ -9,7 +9,7 @@
 
 namespace cosmos {
 
-/// Specialized exception type used for file related APIs
+/// Specialized exception type used for file related APIs.
 /**
  * Comapred to ApiError this error type also carries a custom runtime
  * allocated path that refers to the file system location that caused the

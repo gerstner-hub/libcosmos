@@ -9,10 +9,10 @@
 
 namespace cosmos {
 
-/// Creates a unidirectional pipe communication channel
+/// Creates a unidirectional pipe communication channel.
 /**
- * A pipe basically consists of two file descriptors, one for reading and one
- * for writing to. To make use of it, one end needs to be inherited to a child
+ * A pipe consists of two file descriptors, one for reading and one for
+ * writing to. To make use of it, one end needs to be inherited to a child
  * process or otherwise be used e.g. as a wakeup mechanism for select() calls
  * etc.
  *
@@ -32,7 +32,7 @@ class COSMOS_API Pipe {
 
 public: // functions
 
-	/// Creates a pipe with both ends stored in the object
+	/// Creates a pipe with both ends stored in the object.
 	explicit Pipe();
 
 	~Pipe() { closeReadEnd(); closeWriteEnd(); }
@@ -46,7 +46,7 @@ public: // functions
 	bool haveReadEnd() const { return m_read_end.valid(); }
 	bool haveWriteEnd() const { return m_write_end.valid(); }
 
-	/// Return the read end, passing ownership to the caller
+	/// Return the read end, passing ownership to the caller.
 	/**
 	 * the read end descriptor stored in the object will be invalidated
 	 * and not be accessible at a later time anymore.
@@ -57,7 +57,7 @@ public: // functions
 		return ret;
 	}
 
-	/// Return the write end, passing ownership to the caller
+	/// Return the write end, passing ownership to the caller.
 	/**
 	 * \see takeReadEndOwnership()
 	 **/
@@ -67,7 +67,7 @@ public: // functions
 		return ret;
 	}
 
-	/// Maximum number of bytes that can be transmitted over a Pipe as a single message
+	/// Maximum number of bytes that can be transmitted over a Pipe as a single message.
 	/**
 	 * A pipe can maintain messages boundaries i.e. each write is returned
 	 * in the same length on the read end. This is only possible up to a

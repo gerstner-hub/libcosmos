@@ -41,7 +41,7 @@ enum class ClockType : clockid_t {
 	INVALID          = clockid_t{-1}
 };
 
-/// A C++ wrapper around the POSIX struct timespec coupled to a specific CLOCK type
+/// A C++ wrapper around the POSIX struct timespec coupled to a specific CLOCK type.
 template <ClockType CLOCK>
 class TimeSpec :
 		public timespec {
@@ -59,7 +59,7 @@ public:
 		set(ns);
 	}
 
-	/// Deliberately don't initialize the members for performance reasons
+	/// Deliberately don't initialize the members for performance reasons.
 	TimeSpec() {}
 
 	bool isZero() const { return this->tv_sec == 0 && this->tv_nsec == 0; }

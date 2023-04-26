@@ -21,7 +21,7 @@ typedef std::vector<std::string> StringVector;
 typedef std::vector<std::string_view> StringViewVector;
 typedef std::vector<const char*> CStringVector;
 
-/// Strong template type to wrap boolean values in a named type
+/// Strong template type to wrap boolean values in a named type.
 /**
  * This type is intended as a replacement for primitive bool values for
  * constructor and function arguments. The purpose is to increase readability
@@ -58,7 +58,7 @@ protected:
 	bool m_val = def;
 };
 
-/// Helper class to guard arbitrary resources
+/// Helper class to guard arbitrary resources.
 /**
  * For non-heap resources (for which stdlib smart pointers should be used)
  * a specialization of this type can be used which takes a custom cleanup
@@ -97,7 +97,7 @@ protected: // data
 
 } // end ns
 
-/// Output all the elements of a vector as a comma separated list
+/// Output all the elements of a vector as a comma separated list.
 template <typename T>
 inline std::ostream& operator<<(std::ostream &o, const std::vector<T> &sv) {
 	for (auto it = sv.begin(); it != sv.end(); it++) {
@@ -109,7 +109,7 @@ inline std::ostream& operator<<(std::ostream &o, const std::vector<T> &sv) {
 	return o;
 }
 
-/// Output all the elements of a map as a "key:value" newline separated list
+/// Output all the elements of a map as a "key:value" newline separated list.
 template <typename K, typename V>
 inline std::ostream& operator<<(std::ostream &o, const std::map<K,V> &m) {
 	for (auto it: m) {

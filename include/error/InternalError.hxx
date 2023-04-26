@@ -6,7 +6,7 @@
 
 namespace cosmos {
 
-/// Exception type for grave internal errors
+/// Exception type for grave internal errors.
 /**
  * To be used in case e.g. elemental preconditions that are considered a given
  * are not fulfilled.

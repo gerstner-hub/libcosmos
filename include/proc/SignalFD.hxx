@@ -11,7 +11,7 @@
 
 namespace cosmos {
 
-/// A file descriptor for receiving process signals
+/// A file descriptor for receiving process signals.
 /**
  * A SignalFD is used for handling process signals on a file descriptor level.
  * During creation of the file descriptor the signals that the caller is
@@ -51,17 +51,17 @@ public: // functions
 
 	~SignalFD();
 
-	/// Creates a signal FD listening on the given signals
+	/// Creates a signal FD listening on the given signals.
 	explicit SignalFD(const SigSet &mask) {
 		create(mask);
 	}
 
-	/// Creates a signal FD listening on the given list of signals
+	/// Creates a signal FD listening on the given list of signals.
 	explicit SignalFD(const std::initializer_list<Signal> &siglist) {
 		create(SigSet{siglist});
 	}
 
-	/// Creates a signal FD listening on exactly the given signal
+	/// Creates a signal FD listening on exactly the given signal.
 	explicit SignalFD(const Signal s) {
 		create(SigSet{{s}});
 	}
@@ -70,7 +70,7 @@ public: // functions
 	SignalFD(const SignalFD&) = delete;
 	SignalFD& operator=(const SignalFD&) = delete;
 
-	/// Creates a new SignalFD
+	/// Creates a new SignalFD.
 	/**
 	 * if a SignalFD is already open then it will be closed first. If an
 	 * error occurs creating the new SignalFD then an exception is thrown.
@@ -81,14 +81,14 @@ public: // functions
 
 	auto valid() const { return m_fd.valid(); }
 
-	/// Change the signals the file descriptor is listening for
+	/// Change the signals the file descriptor is listening for.
 	/**
 	 * A valid SignalFD must be opened for this to work, otherwise an
 	 * exception is thrown.
 	 **/
 	void adjustMask(const SigSet &mask);
 
-	/// Reads the next event event from the SignalFD
+	/// Reads the next event event from the SignalFD.
 	/**
 	 * This is a blocking operation so you should use an efficient poll
 	 * mechanism like select() to determine whether there is anything to
@@ -99,7 +99,7 @@ public: // functions
 	 **/
 	void readEvent(SigInfo &info);
 
-	/// Returns the FileDescriptor object associated with the SignalFD
+	/// Returns the FileDescriptor object associated with the SignalFD.
 	auto raw() { return m_fd; }
 
 protected: // data

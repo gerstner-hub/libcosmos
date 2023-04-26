@@ -7,7 +7,7 @@
 
 namespace cosmos {
 
-/// A specialized FileDescriptor for directory objects
+/// A specialized FileDescriptor for directory objects.
 /**
  * A file descriptor representing a directory node on the file system. These
  * are needed in a number of situation like using the *at() file system calls
@@ -22,7 +22,7 @@ public: // functions
 		FileDescriptor{fd} {}
 };
 
-/// Special dir file descriptor that refers to the CWD in the *at family of API calls
+/// Special dir file descriptor that refers to the CWD in the *at family of API calls.
 inline constexpr DirFD AT_CWD{FileNum::AT_CWD};
 
 } // end ns

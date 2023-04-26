@@ -18,7 +18,7 @@
 
 namespace cosmos {
 
-/// Different modes to continue a tracee
+/// Different modes to continue a tracee.
 enum class ContinueMode {
 	/// Continues the tracee without special side-effects
 	NORMAL     = PTRACE_CONT,
@@ -28,7 +28,7 @@ enum class ContinueMode {
 	SINGLESTEP = PTRACE_SINGLESTEP
 };
 
-/// Different options which can set for a tracee
+/// Different options which can set for a tracee.
 enum class TraceOpts : intptr_t { /* is a void* in ptrace(2), so we need pointer width */
 	/// When the tracer exits all tracees will be sent SIGKILL
 	EXITKILL       = PTRACE_O_EXITKILL,
@@ -50,7 +50,7 @@ enum class TraceOpts : intptr_t { /* is a void* in ptrace(2), so we need pointer
 
 typedef BitMask<TraceOpts> TraceOptsMask;
 
-/// Different events that can occur in a tracee
+/// Different events that can occur in a tracee.
 enum class TraceEvent {
 	/// vfork or clone with VFORK flag is upcoming
 	VFORK      = PTRACE_EVENT_VFORK,

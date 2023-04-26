@@ -14,7 +14,7 @@
 
 namespace cosmos {
 
-/// A class to represent a pthread condition
+/// A class to represent a pthread condition.
 /**
  * The current implementation only provides the most basic condition
  * operations. Refer to the POSIX man pages for more information.
@@ -39,7 +39,7 @@ class COSMOS_API Condition {
 
 public: // types
 
-	/// strong type to express waitTimed() results
+	/// Strong type to express waitTimed() results.
 	enum class WaitTimedRes {
 		TIMED_OUT,
 		SIGNALED
@@ -47,7 +47,7 @@ public: // types
 
 public: // functions
 
-	/// Create a condition coupled with the given \c lock
+	/// Create a condition coupled with the given \c lock.
 	/**
 	 * The given Mutex will be associated with the Condition for the
 	 * complete lifetime of the object. You need to make sure that \c lock
@@ -62,7 +62,7 @@ public: // functions
 		assert (!destroy_res);
 	}
 
-	/// Wait for the Condition to be signaled
+	/// Wait for the Condition to be signaled.
 	/**
 	 * The associated Mutex must already be locked at entry, otherwise
 	 * undefined behaviour is the result.
@@ -77,7 +77,7 @@ public: // functions
 		}
 	}
 
-	/// Wait for the Condition to be signaled with timeout
+	/// Wait for the Condition to be signaled with timeout.
 	/**
 	 * This is like wait() but waits at most until the given absolute time
 	 * has been reached.
@@ -97,7 +97,7 @@ public: // functions
 		}
 	}
 
-	/// Signal and unblock one waiting thread
+	/// Signal and unblock one waiting thread.
 	/**
 	 * This call will unblock at most one thread waiting for a signal on
 	 * the condition. If multiple threads are waiting for a signal then
@@ -114,7 +114,7 @@ public: // functions
 		}
 	}
 
-	/// Signal and unblock all waiting threads
+	/// Signal and unblock all waiting threads.
 	/**
 	 * All threads currently waiting for a signal on the condition will be
 	 * woken up. Keep in mind that each thread will contend for acquiring
@@ -139,7 +139,7 @@ protected: // data
 	Mutex &m_lock;
 };
 
-/// An aggregate of a Mutex and a Condition coupled together for typical Condition usage
+/// An aggregate of a Mutex and a Condition coupled together for typical Condition usage.
 class ConditionMutex :
 		public Mutex,
 		public Condition {

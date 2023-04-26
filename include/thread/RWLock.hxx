@@ -13,7 +13,7 @@
 
 namespace cosmos {
 
-/// This type represents a pthread read-write lock
+/// This type represents a pthread read-write lock.
 /**
  * A read-write lock can be locked in parallel for reading but only by one
  * thread for writing at the same time. This is helpful if you got data that
@@ -65,7 +65,7 @@ protected: // data
 	mutable pthread_rwlock_t m_prwlock;
 };
 
-/// A lock-guard object that locks an RWLock for reading until it is destroyed
+/// A lock-guard object that locks an RWLock for reading until it is destroyed.
 struct ReadLockGuard :
 		public ResourceGuard<const RWLock&> {
 

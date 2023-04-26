@@ -3,9 +3,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-// C++
-#include <iostream>
-
 // Cosmos
 #include "cosmos/formatting.hxx"
 #include "cosmos/private/cosmos.hxx"

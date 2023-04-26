@@ -11,7 +11,7 @@
 
 namespace cosmos {
 
-/// Base class for libcosmos exceptions
+/// Base class for libcosmos exceptions.
 /**
  * This base class carries the file, line and function contextual information
  * from where it was thrown. Furthermore it stores a dynamically allocated
@@ -39,7 +39,7 @@ public: // functions
 		m_msg = fixed_text;
 	}
 
-	/// Set exception context information
+	/// Set exception context information.
 	/**
 	 * This function is used by the \c cosmos_throw macro to store
 	 * information about the program location where the exception was
@@ -53,7 +53,7 @@ public: // functions
 		return *this;
 	}
 
-	/// Implementation of the std::exception interface
+	/// Implementation of the std::exception interface.
 	/**
 	 * Returns a completely formatted message describing this error
 	 * instance. The returned string is only valid for the lifetime of
@@ -61,12 +61,12 @@ public: // functions
 	 **/
 	const char* what() const throw() override;
 
-	/// Throw the most specialized type of this object in the inheritance hierarchy
+	/// Throw the most specialized type of this object in the inheritance hierarchy.
 	[[ noreturn ]] virtual void raise() = 0;
 
 protected: // functions
 
-	/// Append type specific error information to m_msg
+	/// Append type specific error information to m_msg.
 	/**
 	 * This function is called by the implementation when error specific
 	 * information needs to be appened to the the \c m_msg string.
@@ -80,7 +80,7 @@ protected: // functions
 	 **/
 	virtual void generateMsg() const {};
 
-	/// allows to override error class to allow simpler implementation of derived types
+	/// Allows to override error class to allow simpler implementation of derived types.
 	void setErrorClass(const std::string_view error_class) {
 		m_error_class = error_class;
 	}

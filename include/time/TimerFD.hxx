@@ -51,7 +51,7 @@ public: // types
 
 	using CreateFlags = BitMask<CreateSettings>;
 
-	/// Settings available for starting a TimerFD .
+	/// Settings available for starting a TimerFD.
 	enum class StartSettings : int {
 		/// Interpret the initial (not the interval!) timer setting as an absolute clock time value.
 		ABSTIME       = TFD_TIMER_ABSTIME,
@@ -98,7 +98,7 @@ public: // types
 			return *reinterpret_cast<TimeSpec<CLOCK>*>(&(this->it_interval));
 		}
 
-		/// sets the interval to the same value as the initial time
+		/// Sets the interval to the same value as the initial time.
 		/**
 		 * This only works if relative time is used for the initial
 		 * TimeSpec. The interval TimeSpec will be set to the same
@@ -109,7 +109,7 @@ public: // types
 			interval() = initial();
 		}
 
-		/// sets the interval to zero, thus creating a single-tick timer
+		/// Sets the interval to zero, thus creating a single-tick timer.
 		void resetInterval() {
 			interval().reset();
 		}

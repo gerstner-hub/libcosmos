@@ -146,6 +146,7 @@ public: // functions
 		return limit({flag});
 	}
 
+	/// Sets all bits to zero except the bits in the given mask.
 	BitMask& limit(const BitMask other) {
 		m_flags &= other.raw();
 		return *this;
@@ -282,7 +283,7 @@ public: // functions
 		return ret.reset(val);
 	}
 
-	/// Returns an object containing all the bits found in \c first and \c secopnd.
+	/// Returns an object containing all the bits found in \c first and \c second.
 	friend BitMask operator+(const BitMask &first, const BitMask &second) {
 		BitMask ret{first};
 		return ret.set(second);

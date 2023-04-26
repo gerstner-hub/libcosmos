@@ -6,7 +6,7 @@
 
 namespace cosmos {
 
-/// Exception type for logical usage errors within the application
+/// Exception type for logical usage errors within the application.
 /**
  * This error should be used when the caller of a function has violated
  * logical preconditions and continuing is impossible.

@@ -12,7 +12,7 @@
 
 namespace cosmos {
 
-/// represents a child process created via ChildCloner
+/// Represents a child process created via ChildCloner.
 /**
  * This is a lightweight sub process description returned from
  * ChildCloner::run. It is used to interact with a running sub process:
@@ -35,12 +35,12 @@ class COSMOS_API SubProc {
 
 public: // functions
 
-	/// creates an empty sub process without state
+	/// Creates an empty sub process without state.
 	SubProc() = default;
 
 	~SubProc();
 
-	/// implement move-semantics
+	/// Implements move-semantics.
 	/**
 	 * This type can be moved but not copied. This is because the internal
 	 * state cannot be copied, once the child process has exited all
@@ -54,7 +54,7 @@ public: // functions
 
 	SubProc& operator=(SubProc &&other) noexcept;
 
-	/// Returns whether a child process is still active
+	/// Returns whether a child process is still active.
 	/**
 	 * This can return \c true even if the child process already exited,
 	 * in case the child process's exit status was not yet collected via
@@ -62,23 +62,23 @@ public: // functions
 	 **/
 	auto running() const { return m_child_fd.valid(); }
 
-	/// Performs a blocking wait until the child process exits
+	/// Performs a blocking wait until the child process exits.
 	WaitRes wait();
 
-	/// Wait for sub process exit within a timeout in milliseconds
+	/// Wait for sub process exit within a timeout in milliseconds.
 	/**
 	 * \return The exit status if the child exited. Nothing if the timeout
 	 * occured.
 	 **/
 	std::optional<WaitRes> waitTimed(const std::chrono::milliseconds max);
 
-	/// Send the specified signal to the child process
+	/// Send the specified signal to the child process.
 	void kill(const Signal signal);
 
-	/// Returns the PID of the currently running child process or ProcessID::INVALID
+	/// Returns the PID of the currently running child process or ProcessID::INVALID.
 	ProcessID pid() const { return m_pid; }
 
-	/// Returns a pidfd refering to the currently running child
+	/// Returns a pidfd refering to the currently running child.
 	/**
 	 * This file descriptor can be used for efficiently waiting for child
 	 * exit using poll() or select() APIs, see `man pidfd_open`. This
@@ -94,7 +94,7 @@ protected: // functions
 
 	friend class ChildCloner;
 
-	/// wraps the given process ID and pidfd
+	/// Wraps the given process ID and pidfd.
 	SubProc(const ProcessID pid, const FileNum pidfd) :
 		m_pid{pid}, m_child_fd{pidfd}
 	{}

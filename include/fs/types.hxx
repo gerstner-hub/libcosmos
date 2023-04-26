@@ -16,20 +16,20 @@
 
 namespace cosmos {
 
-/// Strong boolean type to enable following of symlinks in the file system
+/// Strong boolean type to enable following of symlinks in the file system.
 using FollowSymlinks = NamedBool<struct follow_links_t, false>;
 
-/// Strong boolean type for expressing the responsibility to close file descriptors
+/// Strong boolean type for expressing the responsibility to close file descriptors.
 using AutoCloseFD = NamedBool<struct close_file_t, true>;
 
-/// Strong enum type wrapper for the basic open() mode flag
+/// Strong enum type wrapper for the basic open() mode flag.
 enum class OpenMode : int {
 	READ_ONLY  = O_RDONLY,
 	WRITE_ONLY = O_WRONLY,
 	READ_WRITE = O_RDWR
 };
 
-/// Strong enum type wrapper for file descriptor settings on top of the basic OpenMode.
+/// Strong enum type wrapper for file descriptor settings on top of the basic OpenMode..
 enum class OpenSettings : int {
 	/// Writes will always happen at the end of the file.
 	APPEND             = O_APPEND,
@@ -66,10 +66,10 @@ enum class OpenSettings : int {
 	TRUNCATE           = O_TRUNC
 };
 
-/// Collection of OpenSettings used for opening files
+/// Collection of OpenSettings used for opening files.
 typedef BitMask<OpenSettings> OpenFlags;
 
-/// Combined file type and mode bits of a file (as found in st_mode struct stat)
+/// Combined file type and mode bits of a file (as found in st_mode struct stat).
 /**
  * In struct stat the st_mode field contains the file type value in the upper
  * four bits and the file mode bitmask in the lower bits.
@@ -83,13 +83,13 @@ enum class ModeT : mode_t {
 	MODE_MASK = ~static_cast<mode_t>(S_IFMT) /// masks all mode bits
 };
 
-/// support bit masking operations on ModeT for extracing type and mode parts
+/// Support bit masking operations on ModeT for extracing type and mode parts.
 inline ModeT operator&(const ModeT a, const ModeT b) {
 	auto ret = static_cast<mode_t>(a) & static_cast<mode_t>(b);
 	return static_cast<ModeT>(ret);
 }
 
-/// Bitmask values for file mode bits
+/// Bitmask values for file mode bits.
 /**
  * These are the lower (07777) bits of the st_mode field in struct stat.
  *
@@ -114,10 +114,10 @@ enum class FileModeFlags : mode_t {
 	OTHER_ALL   = S_IRWXO
 };
 
-/// BitMask of FileModeFlags (represents the mode bit portion of ModeT)
+/// BitMask of FileModeFlags (represents the mode bit portion of ModeT).
 typedef BitMask<FileModeFlags> FileModeBits;
 
-/// Convenience wrapper around FileT
+/// Convenience wrapper around FileT.
 /**
  * \note You won't need to set the FileType in any API call, you only need to
  * check the FileType reported back from e.g. a stat() system call.
@@ -153,7 +153,6 @@ public: // types
 public:
 	explicit FileType(const FileT raw) : m_raw{raw} {}
 
-	/// Same as getFileT but returns a FileType wrapper instance for it
 	explicit FileType(const ModeT raw) :
 		m_raw{static_cast<FileT>(raw & ModeT::TYPE_MASK)}
 	{}
@@ -168,7 +167,7 @@ public:
 
 	auto raw() const { return m_raw; }
 
-	/// returns a symbolic character representing the type
+	/// Returns a symbolic character representing the type.
 	/**
 	 * This returns a symbolic character like 'd' for directory as known
 	 * from the ls utility and other tools.
@@ -188,19 +187,19 @@ protected: // data
 	FileT m_raw;
 };
 
-/// Represents the mode bits porition of a ModeT
+/// Represents the mode bits portion of a ModeT.
 /**
  * This is wrapper around the primitive ModeT describing the classical UNIX
  * file permissions and mode bits.
  **/
 class COSMOS_API FileMode {
 public:
-	/// Constructs a FileMode from the given bitmask object
+	/// Constructs a FileMode from the given bitmask object.
 	explicit FileMode(const FileModeBits mask) :
 		m_mode{mask}
 	{}
 
-	/// Constructs a FileMode from the given raw input
+	/// Constructs a FileMode from the given raw input.
 	/**
 	 * - can be used to specify a literal: FileMode{ModeT{0751}}
 	 * - or to pass in a mode_t received from a system call (struct stat)
@@ -249,11 +248,11 @@ public:
 				FileModeFlags::OTHER_EXEC});
 	}
 
-	/// Returns the complete bitmask object
+	/// Returns the complete bitmask object.
 	FileModeBits& mask() { return m_mode; }
 	const FileModeBits& mask() const { return m_mode; }
 
-	/// Returns a symbolic string representation of the mode
+	/// Returns a symbolic string representation of the mode.
 	/**
 	 * This returns a string like "r-x---r-x" as known from the `ls`
 	 * utility and similar tools. The type is not part of this. You can
@@ -279,11 +278,11 @@ protected: // data
 
 } // end ns
 
-/// Outputs a friendly version of the FileMode information onto the stream
+/// Outputs a friendly version of the FileMode information onto the stream.
 COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::FileMode mode);
-/// Outputs a symbolic type character onto the stream
+/// Outputs a symbolic type character onto the stream.
 COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::FileType type);
-/// Outputs a friendly versino of the OpenFlags bitmask onto the stream
+/// Outputs a friendly versino of the OpenFlags bitmask onto the stream.
 COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::OpenFlags flags);
 
 #endif // inc. guard

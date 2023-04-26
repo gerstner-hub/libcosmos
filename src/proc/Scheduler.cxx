@@ -3,9 +3,7 @@
 #include "cosmos/error/UsageError.hxx"
 #include "cosmos/private/Scheduler.hxx"
 #include "cosmos/proc/Scheduler.hxx"
-
-// C++
-#include <cstring>
+#include "cosmos/memory.hxx"
 
 // Linux
 #include <sys/syscall.h>
@@ -53,7 +51,7 @@ void SchedulerSettings::fillStruct(sched_attr &attr) const {
 	if (m_policy == SchedulerPolicy::INVALID) {
 		cosmos_throw (UsageError("Tried to fill sched_attr for invalid policy"));
 	}
-	std::memset(&attr, 0, sizeof(attr));
+	zero_object(attr);
 	attr.size = sizeof(attr);
 	attr.sched_policy = static_cast<int>(m_policy);
 }

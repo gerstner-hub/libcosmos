@@ -38,7 +38,7 @@ WaitRes SubProc::wait() {
 
 	m_pid = ProcessID::INVALID;
 
-	if (waitid(static_cast<idtype_t>(P_PIDFD), to_integral(m_child_fd.raw()), &wr, WEXITED) != 0) {
+	if (::waitid(static_cast<idtype_t>(P_PIDFD), to_integral(m_child_fd.raw()), &wr, WEXITED) != 0) {
 		try {
 			m_child_fd.close();
 		} catch(...) {}

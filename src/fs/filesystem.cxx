@@ -533,7 +533,7 @@ void linkat_fd(const FileDescriptor fd, const DirFD new_dir,
 
 void linkat_proc_fd(const FileDescriptor fd, const DirFD new_dir,
 		const std::string_view new_path) {
-	// ~he exact security reasons why linkat_fd() isn't allowed without
+	// the exact security reasons why linkat_fd() isn't allowed without
 	// CAP_DAC_READ_SEARCH are a bit unclear. It seems the concern is that
 	// a process get's hold of a file descriptor for which it wouldn't
 	// have permissions to change ownership etc.

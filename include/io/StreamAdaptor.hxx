@@ -24,10 +24,10 @@
 
 namespace cosmos {
 
-/// GNU libstdc++ proprietary type for wrapping already open file descriptors
+/// GNU libstdc++ proprietary type for wrapping already open file descriptors.
 typedef __gnu_cxx::stdio_filebuf<char> StdioFileBuf;
 
-/// Generic template base class for wrapping existing file descriptors in C++ streams
+/// Generic template base class for wrapping existing file descriptors in C++ streams.
 /**
  * The standardized stream library does not offer an option to wrap an
  * existing file descriptor in a stream object. One would need to implement a
@@ -75,7 +75,7 @@ public: // functions
 			StreamAdaptor<std::istream>{fd, std::ios_base::in}
 	{}
 
-	/// Wrap the read end of a Pipe object
+	/// Wrap the read end of a Pipe object.
 	explicit InputStreamAdaptor(Pipe &p) :
 			InputStreamAdaptor{p.takeReadEndOwnership()}
 	{}
@@ -90,7 +90,7 @@ public: // functions
 			StreamAdaptor<std::ostream>{fd, std::ios_base::out}
 	{}
 
-	/// Wrap the write end of a Pipe object
+	/// Wrap the write end of a Pipe object.
 	explicit OutputStreamAdaptor(Pipe &p) :
 			OutputStreamAdaptor{p.takeWriteEndOwnership()}
 	{}

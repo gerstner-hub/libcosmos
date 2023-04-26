@@ -16,7 +16,7 @@
 
 namespace cosmos {
 
-/// Sub process creation facility
+/// Sub process creation facility.
 /**
  * This type allows to configure and create child processes. This is a rather
  * heavy weight type that can be reused to create multiple child processes.
@@ -39,20 +39,21 @@ namespace cosmos {
  * actions before the child process is replaced by the new target executable.
  *
  * TODO: This class could be splitted further into a Clone-only part and the
- * exec part on top.
+ * exec part on top - or by adding free functions like proc::fork(),
+ * proc::clone(), proc::exec(), proc::wait().
  **/
 class COSMOS_API ChildCloner {
 public: // types
 
-	/// callback function type used in setPostForkCB()
+	/// callback function type used in setPostForkCB().
 	typedef std::function<void (const ChildCloner&)> Callback;
 
 public: // functions
 
-	/// Creates an instance with default settings
+	/// Creates an instance with default settings.
 	ChildCloner() = default;
 
-	/// Creates an instance configured with the provided arguments
+	/// Creates an instance configured with the provided arguments.
 	/**
 	 * This is a convienence constructor for simple execution of child
 	 * processes without special settings. The executable path is taken
@@ -62,14 +63,14 @@ public: // functions
 		setArgsFromView(args);
 	}
 
-	/// Returns whether currently an executable is set
+	/// Returns whether currently an executable is set.
 	bool hasExe() const { return !m_executable.empty(); }
 
-	/// Returns the currently set executable name
+	/// Returns the currently set executable name.
 	auto& getExe() { return m_executable; }
 	const auto& getExe() const { return m_executable; }
 
-	/// Sets the path to the executable and argv0
+	/// Sets the path to the executable and argv0.
 	/**
 	 * The actual executable path and argv0 will always be the
 	 * same. You can change argv0, if necessary via getArgs().
@@ -79,7 +80,7 @@ public: // functions
 		setArgv0();
 	}
 
-	/// Returns the currently configured argument vector
+	/// Returns the currently configured argument vector.
 	/**
 	 * This vector is by convention including the executable name as first
 	 * argument (argv0). You may change this argument using this function
@@ -91,7 +92,7 @@ public: // functions
 	/// \c see getArgs() const
 	StringVector& getArgs() { return m_argv; }
 
-	/// Sets the argument vector to be used including argv0
+	/// Sets the argument vector to be used including argv0.
 	/**
 	 * This also sets a new executable path from sv[0], or clears the
 	 * executable, if \c sv is empty.
@@ -109,7 +110,7 @@ public: // functions
 		setExeFromArgv0();
 	}
 
-	/// Clears any currently set parameters
+	/// Clears any currently set parameters.
 	/**
 	 * Clears all currently set arguments but keeps the executable and
 	 * argv0.
@@ -120,7 +121,7 @@ public: // functions
 		}
 	}
 
-	/// Set an explicit working directory the child process
+	/// Set an explicit working directory the child process.
 	/**
 	 * If \c cwd is empty then the parent process's CWD is inherited to
 	 * the child.
@@ -130,10 +131,10 @@ public: // functions
 	/// Returns the currently set CWD for sub process execution
 	const auto& getCWD() const { return m_cwd; }
 
-	/// Clear a previously configured CWD and inherit it from the parent
+	/// Clear a previously configured CWD and inherit it from the parent.
 	void setInheritCWD() { m_cwd.clear(); }
 
-	/// Sets explicit environment variables for the child process
+	/// Sets explicit environment variables for the child process.
 	/**
 	 * By default the parent process's environment is inherited to the
 	 * child (see also setInheritEnv()).
@@ -145,10 +146,10 @@ public: // functions
 	void setEnv(const StringVector &vars) { m_env = vars; }
 
 	/// Clears any previously set environment variables and let's
-	/// to-be-started child processes inherit the parent's environment
+	/// to-be-started child processes inherit the parent's environment.
 	void setInheritEnv() { m_env.reset(); }
 
-	/// Redirect the child's stderr to the given file descriptor
+	/// Redirect the child's stderr to the given file descriptor.
 	/**
 	 * This only affects yet to be started child processes. The file
 	 * descriptor is expected to have the close-on-exec flag set, the
@@ -161,7 +162,7 @@ public: // functions
 	/// \c see setStderr()
 	void setStdIn(FileDescriptor fd) { m_stdin = fd; }
 
-	/// adds a file descriptor to inherit to the child process
+	/// Adds a file descriptor to inherit to the child process.
 	/**
 	 * Beyond the stdin, stdout and stderr file descriptor additional
 	 * descriptors can be inherited into the child process context. The \c
@@ -192,7 +193,7 @@ public: // functions
 		m_inherit_fds.push_back(fd);
 	}
 
-	/// Restore the default inheritance behaviour for stdin/stderr/stdout
+	/// Restore the default inheritance behaviour for stdin/stderr/stdout.
 	/**
 	 * Any previously set file descriptor overrides will be reset and the
 	 * child process will inherit the parent process's std file
@@ -204,7 +205,7 @@ public: // functions
 		m_stdout.reset();
 	}
 
-	/// Sets scheduler type and settings
+	/// Sets scheduler type and settings.
 	/**
 	 * By default the parent's scheduling settings will be inherited. If
 	 * you want to explicitly change scheduling settings then apply the
@@ -216,7 +217,7 @@ public: // functions
 	/// clear previously set scheduler settings and inherit them from the parent instead
 	void setInheritSchedulerSettings() { m_sched_settings.reset(); }
 
-	/// Sets a callback function to be invoked in the child process context
+	/// Sets a callback function to be invoked in the child process context.
 	/**
 	 * This function will be invoked in the child process after the clone
 	 * happened but before the new program is executed. It can be used to
@@ -232,10 +233,10 @@ public: // functions
 	 **/
 	void setPostForkCB(Callback cb) { m_post_fork_cb = cb; }
 
-	/// removes a previously stored post fork callback
+	/// Removes a previously stored post fork callback.
 	void resetPostForkCB() { m_post_fork_cb = nullptr; }
 
-	/// Clone a new process and execute the currently configured program
+	/// Clone a new process and execute the currently configured program.
 	/**
 	 * All settings made via member functions will come into effect. The
 	 * configured executable will be invoked and passed the configured
@@ -249,19 +250,19 @@ public: // functions
 
 protected: // functions
 
-	/// Performs settings needed after forking i.e. in the child process but before exec()'ing
+	/// Performs settings needed after forking i.e. in the child process but before exec()'ing.
 	void postFork();
 
-	/// restore a default signal mask in child process context
+	/// restore a default signal mask in child process context.
 	void resetSignals();
 
-	/// Redirects the given \p orig file descriptor to \p redirect (used in child context)
+	/// Redirects the given \p orig file descriptor to \p redirect (used in child context).
 	/**
 	 * \param[in] orig The file descriptor that should be replaced by \c redirect
 	 **/
 	void redirectFD(FileDescriptor orig, FileDescriptor redirect);
 
-	/// sets argv0 from the current executable name
+	/// sets argv0 from the current executable name.
 	void setArgv0() {
 		if (m_argv.empty())
 			m_argv.emplace_back(m_executable);
@@ -278,9 +279,9 @@ protected: // functions
 
 protected: // data
 
-	/// path to the child process executable to run
+	/// Path to the child process executable to run
 	std::string m_executable;
-	/// argument vector including argv0 denoting the executable name (which can be different than m_executable
+	/// Argument vector including argv0 denoting the executable name (which can be different than m_executable
 	StringVector m_argv;
 	/// Path to an explicit working directory, if any
 	std::string m_cwd;
@@ -295,7 +296,7 @@ protected: // data
 	FileDescriptor m_stderr;
 	/// File descriptor to use as child's stdin
 	FileDescriptor m_stdin;
-	/// additional file descriptors to inherit to the child process
+	/// Additional file descriptors to inherit to the child process
 	std::vector<FileDescriptor> m_inherit_fds;
 
 	Callback m_post_fork_cb = nullptr;
@@ -305,7 +306,7 @@ protected: // data
 
 } // end ns
 
-/// adds a command line argument to the given ChildCloner instance
+/// Adds a command line argument to the given ChildCloner instance.
 /**
  * If no executable has been configured yet in \c cloner then the first
  * argument added via this operator will set both the executable path and
@@ -321,7 +322,7 @@ inline cosmos::ChildCloner& operator<<(cosmos::ChildCloner &cloner, const std::s
 	return cloner;
 }
 
-/// Outputs a summary of the ChildCloner's configuration
+/// Outputs a summary of the ChildCloner's configuration.
 COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::ChildCloner &);
 
 #endif // inc. guard

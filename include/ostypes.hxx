@@ -23,9 +23,9 @@ namespace cosmos {
 
 enum class ProcessID : pid_t {
 	INVALID = -1,
-	/// in a number of system calls zero refers to the calling thread
+	/// In a number of system calls zero refers to the calling thread.
 	SELF    = 0,
-	/// in fork/clone like system calls zero refers to the child context
+	/// In fork/clone like system calls zero refers to the child context.
 	CHILD   = 0
 };
 
@@ -39,11 +39,11 @@ enum class GroupID : gid_t {
 	ROOT    = 0
 };
 
-/// A unique file number for a file on a block device
+/// A unique file number for a file on a block device.
 enum class Inode : ino_t {
 };
 
-/// A device file identification type (consists of major:minor parts)
+/// A device file identification type (consists of major:minor parts).
 enum class DeviceID : dev_t {
 };
 
@@ -87,13 +87,13 @@ enum class SignalNr : int {
 	BAD_SYS       = SIGSYS,    /// bad system call
 };
 
-/// Primitive file descriptor
+/// Primitive file descriptor.
 enum class FileNum : int {
 	INVALID = -1,
 	STDIN   = STDIN_FILENO,
 	STDOUT  = STDOUT_FILENO,
 	STDERR  = STDERR_FILENO,
-	/// special constant denoting the CWD in the *at family of API calls
+	/// special constant denoting the CWD in the *at family of API calls.
 	AT_CWD  = AT_FDCWD
 };
 

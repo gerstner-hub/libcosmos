@@ -15,7 +15,7 @@
 
 namespace cosmos {
 
-/// Efficient file descriptor I/O event polling
+/// Efficient file descriptor I/O event polling.
 /**
  * This class provides a wrapper around the epoll() Linux specific file
  * descriptor monitoring API. The API operates on a file descriptor of its own
@@ -58,7 +58,7 @@ namespace cosmos {
 class COSMOS_API Poller {
 public: // types
 
-	/// Flags used to declare interest in specific events and options in addFD() and modFD()
+	/// Flags used to declare interest in specific events and options in addFD() and modFD().
 	enum class MonitorSetting : uint32_t {
 		/// Monitor for read() operation becoming possible
 		INPUT          = EPOLLIN,
@@ -78,7 +78,7 @@ public: // types
 
 	typedef BitMask<MonitorSetting> MonitorMask;
 
-	/// Flags found in PollEvent that indicate the events that occured on a file descriptor
+	/// Flags found in PollEvent that indicate the events that occured on a file descriptor.
 	enum class Event : uint32_t {
 		/// \c see MonitorSettings::INPUT
 		INPUT_READY       = EPOLLIN,
@@ -96,12 +96,12 @@ public: // types
 
 	typedef BitMask<Event> EventMask;
 
-	/// A single poll event as returned by wait()
+	/// A single poll event as returned by wait().
 	struct PollEvent : protected epoll_event {
 		friend class Poller;
 	public:
 
-		/// The file descriptor this event refers to
+		/// The file descriptor this event refers to.
 		FileDescriptor fd() const { return FileDescriptor{FileNum{(this->data).fd}}; }
 
 		auto getEvents() const { return EventMask{static_cast<std::underlying_type<Event>::type>(this->events)}; }
@@ -109,10 +109,10 @@ public: // types
 
 public: // functions
 
-	/// Creates a yet invalid Poller instance
+	/// Creates a yet invalid Poller instance.
 	Poller() {}
 
-	/// Creates a Poller instance ready for use
+	/// Creates a Poller instance ready for use.
 	/**
 	 * \see create()
 	 **/
@@ -123,11 +123,11 @@ public: // functions
 	/// Calls close()
 	~Poller();
 
-	/// Avoid copying due to the file descriptor member
+	/// Avoid copying due to the file descriptor member.
 	Poller(const Poller&) = delete;
 	Poller& operator=(const Poller&) = delete;
 
-	/// Actually create the poll file descriptor backing this object
+	/// Actually create the poll file descriptor backing this object.
 	/**
 	 * If the file descriptor already exists this does nothing.
 	 *
@@ -138,7 +138,7 @@ public: // functions
 	 **/
 	void create(size_t max_events = 16);
 
-	/// Closes a previously create()'d poll file descriptor again
+	/// Closes a previously create()'d poll file descriptor again.
 	/**
 	 * Any monitoring that was setup previously will be dropped. A future
 	 * call to create() can reestablish the Poller functionality.
@@ -150,10 +150,10 @@ public: // functions
 	 **/
 	void close();
 
-	/// Returns whether currently a valid poll file descriptor exists
+	/// Returns whether currently a valid poll file descriptor exists.
 	bool valid() const { return m_poll_fd.valid(); }
 
-	/// Start monitoring the given file descriptor using the given settings
+	/// Start monitoring the given file descriptor using the given settings.
 	/**
 	 * If currently no valid poll FD exists then this will throw an
 	 * ApiError exception.
@@ -163,21 +163,21 @@ public: // functions
 	 **/
 	void addFD(const FileDescriptor fd, const MonitorMask mask);
 
-	/// Modify monitoring settings for an already monitored descriptor
+	/// Modify monitoring settings for an already monitored descriptor.
 	/**
 	 * If currently no valid poll FD exists then this will throw an
 	 * ApiError exception.
 	 **/
 	void modFD(const FileDescriptor fd, const MonitorMask mask);
 
-	/// Remove a file descriptor from the set of monitored files
+	/// Remove a file descriptor from the set of monitored files.
 	/**
 	 * If the given file descriptor is not currently monitored then this
 	 * will throw an ApiError.
 	 **/
 	void delFD(const FileDescriptor fd);
 
-	/// Wait for one of the monitored events to be ready
+	/// Wait for one of the monitored events to be ready.
 	/**
 	 * \param[in] timeout An optional timeout to apply after which the
 	 * call will return even if no events are ready. An empty vector is

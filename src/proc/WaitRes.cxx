@@ -1,5 +1,5 @@
 // C++
-#include <iostream>
+#include <ostream>
 
 // cosmos
 #include "cosmos/algs.hxx"

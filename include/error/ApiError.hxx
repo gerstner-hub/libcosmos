@@ -13,7 +13,7 @@
 
 namespace cosmos {
 
-/// Specialized exception type used for when system APIs fail
+/// Specialized exception type used when system APIs fail.
 /**
  * This exception type will store a well known errno code as a member and
  * format a human readable error message from it.

@@ -6,7 +6,7 @@
 
 namespace cosmos {
 
-/// A type to measure elapsed time based on a given clock type
+/// A type to measure elapsed time based on a given clock type.
 template <ClockType CLOCK>
 class StopWatch {
 public: // types
@@ -15,18 +15,18 @@ public: // types
 
 public: // functions
 
-	/// Construct and optionally set an initial mark()
+	/// Construct and optionally set an initial mark().
 	explicit StopWatch(const InitialMark do_mark = InitialMark{}) {
 		if (do_mark)
 			mark();
 	}
 
-	/// Set a new stop mark to compare against
+	/// Set a new stop mark to compare against.
 	void mark() {
 		m_clock.now(m_mark);
 	}
 
-	/// Returns the elapsed milliseconds since the active mark
+	/// Returns the elapsed milliseconds since the active mark.
 	size_t elapsedMs() const {
 		return (m_clock.now() - m_mark).toMilliseconds();
 	}
@@ -35,7 +35,7 @@ public: // functions
 		return static_cast<std::chrono::milliseconds>(m_clock.now() - m_mark);
 	}
 
-	/// Returns the currently set mark (undefined if mark() was never called!)
+	/// Returns the currently set mark (undefined if mark() was never called!).
 	TimeSpec<CLOCK> currentMark() const {
 		return m_mark;
 	}

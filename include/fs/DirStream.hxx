@@ -6,9 +6,6 @@
 #include <optional>
 #include <string_view>
 
-// Linux
-#include <dirent.h>
-
 // cosmos
 #include "cosmos/algs.hxx"
 #include "cosmos/error/ApiError.hxx"
@@ -33,10 +30,10 @@ namespace cosmos {
 class COSMOS_API DirStream {
 public: // functions
 
-	/// Creates an object not associated to a directory
+	/// Creates an object not associated with a directory.
 	DirStream() = default;
 
-	/// Create a DirStream using the given file descriptor
+	/// Create a DirStream using the given file descriptor.
 	/**
 	 * \see open(DirFD fd)
 	 **/
@@ -49,7 +46,7 @@ public: // functions
 		open(fd, subpath);
 	}
 
-	/// Create a DirStream object operating on the directory at the given path location
+	/// Create a DirStream object operating on the directory at the given path location.
 	explicit DirStream(const std::string_view path) {
 		open(path);
 	}
@@ -58,10 +55,10 @@ public: // functions
 	DirStream(const DirStream&) = delete;
 	DirStream& operator=(const DirStream&) = delete;
 
-	/// Closes the underlying directory object, if currently open
+	/// Closes the underlying directory object, if currently open.
 	~DirStream();
 
-	/// Close the currently associated directory
+	/// Close the currently associated directory.
 	/**
 	 * This will disassociate the DirStream object and further attempts to
 	 * iterate over directory contents will fail.
@@ -75,7 +72,7 @@ public: // functions
 	 **/
 	void close();
 
-	/// Associate with the directory represented by the given file descriptor
+	/// Associate with the directory represented by the given file descriptor.
 	/**
 	 * The implementation operates on a duplicate of the given file
 	 * descriptor. You must not modify the file descriptor's state,
@@ -89,17 +86,17 @@ public: // functions
 	/// Open the directory \c subpath relative to \c fd.
 	void open(const DirFD dir_fd, const std::string_view subpath);
 
-	/// Associate with the directory at the given file system path locaton
+	/// Associate with the directory at the given file system path location.
 	/**
 	 * If the object is already associated with another directory then this
 	 * previous associaton will be implicitly close()'d.
 	 **/
 	void open(const std::string_view path, const FollowSymlinks follow_links = FollowSymlinks{false});
 
-	/// Indicates whether currently a directory is associated with this object
+	/// Indicates whether currently a directory is associated with this object.
 	auto isOpen() const { return m_stream != nullptr; }
 
-	/// Return the file descriptor associated with the current DirStream object
+	/// Return the file descriptor associated with the current DirStream object.
 	/**
 	 * The caller must not modify the state of this file descriptor,
 	 * otherwise further attempts to iterate over directory contents will
@@ -108,7 +105,7 @@ public: // functions
 	 **/
 	DirFD fd() const;
 
-	/// Returns the current position in the directory iteration
+	/// Returns the current position in the directory iteration.
 	/**
 	 * The returned value needs to be treated opaque, i.e. no assumptions
 	 * should be made about it. It can merely be used to seek() at a later
@@ -126,7 +123,7 @@ public: // functions
 		return DirEntry::DirPos{ret};
 	}
 
-	/// Adjust the directory iterator to the given position
+	/// Adjust the directory iterator to the given position.
 	/**
 	 * \c pos needs to be previously obtained from tell().
 	 **/
@@ -136,7 +133,7 @@ public: // functions
 		::seekdir(m_stream, to_integral(pos));
 	}
 
-	/// Returns the next entry in the associated directory
+	/// Returns the next entry in the associated directory.
 	/**
 	 * Calls to this function are only allowed if isOpen() returns \c
 	 * true. The validity of the returned object is tied to the lifetime

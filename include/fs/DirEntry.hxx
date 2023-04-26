@@ -15,7 +15,7 @@
 
 namespace cosmos {
 
-/// A single directory entry as returned from DirStream::nextEntry()
+/// A single directory entry as returned from DirStream::nextEntry().
 /**
  * The stored data is only valid as long as the DirStream object it was
  * returned from is valid and as long as DirStream::nextEntry() isn't called
@@ -35,7 +35,7 @@ public: // types
 	 **/
 	enum class DirPos : long {};
 
-	/// Strong enum type expressing the dir entry file type
+	/// Strong enum type expressing the dir entry file type.
 	enum class Type : unsigned char {
 		BLOCK_DEVICE = DT_BLK,
 		CHAR_DEVICE  = DT_CHR,
@@ -49,7 +49,7 @@ public: // types
 
 protected: // functions
 
-	// only allow the Directory type to create this
+	// Only allow the Directory type to create this.
 	explicit DirEntry(const struct dirent *entry)
 		: m_entry{entry}
 	{}
@@ -59,14 +59,14 @@ public: // functions
 
 	auto raw() const { return m_entry; }
 
-	/// Returns the inode of the directory entry
+	/// Returns the inode of the directory entry.
 	/**
 	 * The inode is an opaque unique ID for the file system object on the
 	 * file system it resides on.
 	 **/
 	Inode inode() const { return Inode{m_entry->d_ino}; }
 
-	/// Returns the position of this entry in its associated DirStream object
+	/// Returns the position of this entry in its associated DirStream object.
 	/**
 	 * This is the same as DirStream::tell(), it can be used in
 	 * DirStream::seek() at a later time to return to the original
@@ -74,7 +74,7 @@ public: // functions
 	 **/
 	DirPos dirPos() const { return DirPos{m_entry->d_off}; }
 
-	/// Returns the length of the directory entry name
+	/// Returns the length of the directory entry name.
 	/**
 	 * In pure POSIX the length of the name can only be determined using
 	 * strlen(). This Linux specific information makes it easier and more
@@ -100,7 +100,7 @@ public: // functions
 		return std::strlen(this->name());
 	}
 
-	/// Returns the file type of this directory entry
+	/// Returns the file type of this directory entry.
 	/**
 	 * For increased efficiency the file type of directory entries can be
 	 * delivered directly with the DirStream readdir() data. This is not
@@ -115,7 +115,7 @@ public: // functions
 
 	std::string_view view() const { return std::string_view{m_entry->d_name, nameLength()}; }
 
-	/// Returns whether this entry is a "dot file entry" i.e. "." or ".."
+	/// Returns whether this entry is a "dot file entry" i.e. "." or "..".
 	auto isDotEntry() const {
 		auto name = this->name();
 		if (name[0] != '.')

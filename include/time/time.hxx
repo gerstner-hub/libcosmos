@@ -15,7 +15,7 @@
 
 namespace cosmos::time {
 
-/// Suspends execution of the calling thread for the given number of nanoseconds
+/// Suspends execution of the calling thread for the given number of nanoseconds.
 /**
  * This takes a relative sleep duration. If the call is interrupted and
  * automatic system call restarting is not enabled in libcosmos then

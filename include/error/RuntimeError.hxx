@@ -6,7 +6,7 @@
 
 namespace cosmos {
 
-/// Exception type for generic runtime errors
+/// Exception type for generic runtime errors.
 /**
  * To be used in cases when not an immediate system call failed but other
  * logical conditions are violated that make continuing impossible.

@@ -66,12 +66,12 @@ std::ostream& operator<<(std::ostream& o, const cosmos::FormattedNumber<NUM> &fm
 
 namespace cosmos {
 
-/// base class for HexNum and OctNum format output helpers
+/// Base class for HexNum and OctNum format output helpers.
 template <typename NUM>
 struct FormattedNumber {
 protected: // types
 
-	/// this function is supposed to apply the desired number base to the stream
+	/// This function is supposed to apply the desired number base to the stream.
 	using SetBaseFN = std::function<void(std::ostream&)>;
 
 protected: // functions
@@ -81,7 +81,7 @@ protected: // functions
 
 public: // functions
 
-	/// If we should show a prefix identifier the number's base (e.g. 0x for hex, default: yes)
+	/// If a prefix identifier for the number's base should be shown (e.g. 0x for hex, default: yes).
 	const FormattedNumber& showBase(bool yes_no) { m_show_base = yes_no; return *this; }
 
 	size_t width() const { return m_width; }
@@ -105,9 +105,9 @@ protected: // data
 	bool m_show_base = true;
 };
 
-/// Helper to output a primitive integer as hexadecimal in the style of 0x1234
+/// Helper to output a primitive integer as hexadecimal in the style of 0x1234.
 /**
- * the stream state will be maintained i.e. after the output operation is
+ * The stream state will be maintained i.e. after the output operation is
  * finished the previous/default stream state will be applied
  *
  * Leading zeroes will be added to reach the desired field width.
@@ -137,7 +137,7 @@ struct OctNum :
 	{}
 };
 
-/// This helper makes sure that any integer is turned into a printable integer
+/// This helper makes sure that any integer is turned into a printable integer.
 /**
  * Attempting to output a `char` related type onto an ostream will print its
  * symbolic value as opposed to its numerical representation. To avoid this
@@ -150,7 +150,7 @@ auto to_printable_integer(T num) -> decltype(+num) {
 	return +num;
 }
 
-/// This is a C++ variant of the libc ::sprintf() function
+/// This is a C++ variant of the libc ::sprintf() function.
 /**
  * This function is taking care of the memory management details of sprintf()
  * and returns the fully formatted string as a std::string object.

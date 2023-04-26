@@ -52,7 +52,7 @@ void send(const FileDescriptor pidfd, const Signal s) {
 	// the third siginfo_t argument allows more precise control of the
 	// signal auxiliary data, but the defaults are just like kill(), so
 	// let's use them for now.
-	if (syscall(SYS_pidfd_send_signal, pidfd.raw(), s.raw(), nullptr, 0) != 0) {
+	if (::syscall(SYS_pidfd_send_signal, pidfd.raw(), s.raw(), nullptr, 0) != 0) {
 		cosmos_throw (ApiError());
 	}
 }

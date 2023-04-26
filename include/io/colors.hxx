@@ -23,7 +23,7 @@
 
 namespace cosmos::term {
 
-/// Primitive Colors for ANSI Terminals
+/// Primitive Colors for ANSI Terminals.
 /**
  *  There are 16 different colors when taking bright variants into account.
  *  The colors can be used both for text color and background color.
@@ -41,19 +41,19 @@ enum class TermColor : size_t {
 	WHITE
 };
 
-/// Differentiation between text (front) and background color
+/// Differentiation between text (front) and background color.
 enum class ColorKind {
 	FRONT,
 	BACK
 };
 
-/// Differentiation of normal and bright color intensity
+/// Differentiation of normal and bright color intensity.
 enum class ColorIntensity {
 	NORMAL,
 	BRIGHT
 };
 
-/// Complete color specification for ANSI terminals
+/// Complete color specification for ANSI terminals.
 /**
  *  This type carries a complete color specification:
  *
@@ -151,29 +151,34 @@ protected:
 		m_info(&next), m_on_code(on_code), m_off_code(off_code)
 	{}
 protected:
-	// either a terminal string or a pointer to the next feature to apply
+	// TODO: this way of stacking features is prone to memory corruption
+	// if the used pointers lose validity ... it works for a stack of
+	// temporary objects but in some non-standard use cases errors can
+	// occur.
+	/// either a terminal string or a pointer to the next feature to apply.
 	std::variant<const std::string_view*, const FeatureBase*> m_info;
 	const ANSICode m_on_code;
 	const ANSICode m_off_code;
 };
 
 /// Base class for easy feature TermControl application on ostreams
-class TextEffect : public FeatureBase {
+class TextEffect :
+		public FeatureBase {
 protected:
 	TextEffect(const TermControl feature, const std::string_view &text) :
-		FeatureBase{
-			text,
-			ANSICode{to_integral(feature)},
-			ANSICode{to_integral(get_off_control(feature))}
-		}
+			FeatureBase{
+				text,
+				ANSICode{to_integral(feature)},
+				ANSICode{to_integral(get_off_control(feature))}
+			}
 	{}
 
 	TextEffect(const TermControl feature, const FeatureBase &next) :
-		FeatureBase{
-			next,
-			ANSICode{to_integral(feature)},
-			ANSICode{to_integral(get_off_control(feature))}
-		}
+			FeatureBase{
+				next,
+				ANSICode{to_integral(feature)},
+				ANSICode{to_integral(get_off_control(feature))}
+			}
 	{}
 };
 

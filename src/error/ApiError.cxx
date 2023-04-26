@@ -1,9 +1,5 @@
-// Linux
-#include <errno.h>
-
 // C++
 #include <cstring>
-#include <iostream>
 #include <sstream>
 
 // cosmos

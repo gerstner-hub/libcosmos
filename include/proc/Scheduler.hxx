@@ -16,7 +16,7 @@ namespace cosmos {
 
 struct sched_attr;
 
-/// Available scheduling policies on Linux
+/// Available scheduling policies on Linux.
 enum class SchedulerPolicy : int {
 	FIFO        = SCHED_FIFO,
 	ROUND_ROBIN = SCHED_RR,
@@ -27,7 +27,7 @@ enum class SchedulerPolicy : int {
 	INVALID     = -1
 };
 
-/// Base class for changing process scheduling options
+/// Base class for changing process scheduling options.
 /**
  * Specializations of this type can be used to create child processes with
  * adjusted scheduling settings or to adjust the scheduling settings or
@@ -44,7 +44,7 @@ public: // functions
 
 	SchedulerPolicy policy() const { return m_policy; }
 
-	/// Apply the current scheduler settings to the given process
+	/// Apply the current scheduler settings to the given process.
 	/**
 	 * If the operation fails then an ApiError is thrown.
 	 *
@@ -55,7 +55,7 @@ public: // functions
 
 protected: // functions
 
-	/// Fill the given low level sched_attr struct with the current settings
+	/// Fill the given low level sched_attr struct with the current settings.
 	virtual void fillStruct(struct sched_attr &attr) const = 0;
 
 protected: // data
@@ -63,7 +63,7 @@ protected: // data
 	SchedulerPolicy m_policy = SchedulerPolicy::INVALID;
 };
 
-/// "OTHER" Scheduling Policy Settings
+/// "OTHER" Scheduling Policy Settings.
 class COSMOS_API OtherSchedulerSettings :
 		public SchedulerSettings {
 public: // functions
@@ -76,7 +76,7 @@ public: // functions
 	static constexpr int minNiceValue() { return -20; }
 	static constexpr int maxNiceValue() { return 19; }
 
-	/// Sets the nice priority for the child process
+	/// Sets the nice priority for the child process.
 	/**
 	 * The nice value provides some basic CPU time prioritization for
 	 * processes. It doesn't offer any hard guarantees but provides some
@@ -112,7 +112,7 @@ protected: // data
 	int m_nice_prio = INVALID_NICE_PRIO;
 };
 
-/// Base class for realtime scheduling policies
+/// Base class for realtime scheduling policies.
 /**
  * Realtime scheduling uses priorities between an integer min priority and an
  * integer max priority. These boundaries are determines during runtime but
@@ -148,7 +148,7 @@ protected: // data
 	int m_priority = 0;
 };
 
-/// FIFO Scheduling Policy Settings
+/// FIFO Scheduling Policy Settings.
 /**
  * FIFO realtime scheduling means that a process will only be preempted with
  * another process with higher priority is avilable. If multiple processes
@@ -165,7 +165,7 @@ public: // functions
 	{}
 };
 
-/// Round Robin Scheduling Policy Settings
+/// Round Robin Scheduling Policy Settings.
 /**
  * RR scheduling is similar to FIFO scheduling with the addition that threads
  * sharing the same (highest) priority will participate in a time slicing
@@ -182,7 +182,7 @@ public: // functions
 	{}
 };
 
-/// A variant that can hold any of the specialized SchedulerSettings types
+/// A variant that can hold any of the specialized SchedulerSettings types.
 typedef std::variant<
 		OtherSchedulerSettings,
 		FifoSchedulerSettings,

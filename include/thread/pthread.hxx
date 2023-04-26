@@ -18,13 +18,13 @@
 
 namespace cosmos::pthread {
 
-/// POSIX thread IDs for comparison of different threads objects
+/// POSIX thread IDs for comparison of different threads objects.
 class COSMOS_API ID {
 public: // functions
 
 	explicit ID(pthread_t id) : m_id{id} {}
 
-	/// Compares two thread IDs for equality
+	/// Compares two thread IDs for equality.
 	bool operator==(const ID &other) const;
 	bool operator!=(const ID &other) const {
 		return !(*this == other);
@@ -37,7 +37,7 @@ protected: // data
 	pthread_t m_id;
 };
 
-/// An integer or pointer return value from a pthread
+/// An integer or pointer return value from a pthread.
 /**
  * When a non-detached pthread returns or calls pthread::exit() then it can
  * return an instance of this type which can be collected by another thread in
@@ -45,13 +45,13 @@ protected: // data
  **/
 enum class ExitValue : intptr_t {};
 
-/// An integer or pointer value supplied to a pthread's entry function
+/// An integer or pointer value supplied to a pthread's entry function.
 enum class ThreadArg : intptr_t {};
 
-/// Returns the opaque thread ID object for the calling thread
+/// Returns the opaque thread ID object for the calling thread.
 ID COSMOS_API get_id();
 
-/// Ends execution of the calling thread
+/// Ends execution of the calling thread.
 /**
  * The calling thread will not return. The provided \c val will be available
  * for collection by other threads in the process by performing a join

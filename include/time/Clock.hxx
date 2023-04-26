@@ -26,7 +26,7 @@ public: // functions
 		return ret;
 	}
 
-	/// Returns the resolution/precision of the represented clock
+	/// Returns the resolution/precision of the represented clock.
 	/**
 	 * The returned TimeSpec represents the smallest time unit that can be
 	 * processed / detected by the clock. When calling setTime() then the
@@ -35,7 +35,7 @@ public: // functions
 	 **/
 	TimeSpec<CLOCK> resolution() const;
 
-	/// Changes the current time value of the represented clock
+	/// Changes the current time value of the represented clock.
 	/**
 	 * Elevated permissions are necessary to change most clocks e.g.
 	 * CAP_SYS_TIME to change the RealTimeClock. Not all clocks can be

@@ -6,7 +6,7 @@
 
 namespace cosmos {
 
-/// Specialized ApiError for handling non-blocking operation
+/// Specialized ApiError for handling non-blocking operation.
 /**
  * When using APIs in non-blocking mode then Errno::AGAIN or
  * Errno::WOULD_BLOCK frequently occur when no data is available. To handle

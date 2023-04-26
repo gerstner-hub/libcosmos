@@ -89,7 +89,7 @@ public: // functions
 	void open(const DirFD dir_fd, const std::string_view path, const OpenMode mode,
 			const OpenFlags flags, const std::optional<FileMode> fmode = {});
 
-	/// Takes the already open file descriptor fd and operates on it
+	/// Takes the already open file descriptor fd and operates on it.
 	/**
 	 * The caller is responsible for invalidating \c fd, if desired, and
 	 * that the file descriptor is not used in conflicting ways.

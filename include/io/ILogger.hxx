@@ -11,7 +11,7 @@
 
 namespace cosmos {
 
-/// Abstract interface for a basic logging facility
+/// Abstract interface for a basic logging facility.
 /**
  * Applications can use this interface to log data to arbitrary places. You
  * need to derive from this interface and decide what places these are.
@@ -54,7 +54,7 @@ public: // functions
 
 protected: // types
 
-	/// Internal state for each channel's stream
+	/// Internal state for each channel's stream.
 	struct StreamState {
 		StreamState(const std::string_view p, const term::ColorSpec &c) :
 			prefix{p}, color{c} {}
@@ -95,7 +95,7 @@ protected: // functions
 		return m_null;
 	}
 
-	/// Returns whether the given ostream is associated with a terminal or not
+	/// Returns whether the given ostream is associated with a terminal or not.
 	static bool isTTY(const std::ostream &o);
 
 	void setStreams(

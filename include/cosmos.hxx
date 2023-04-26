@@ -12,7 +12,7 @@ namespace cosmos {
  * global library settings.
  **/
 
-/// Initializes the cosmos library before first use
+/// Initializes the cosmos library before first use.
 /**
  * The initialization of the library is required before any other
  * functionality of libcosmos is accessed. This initialization should occur
@@ -21,14 +21,14 @@ namespace cosmos {
  * executables / libraries.
  *
  * Multiple initializations can be performed but finish() needs to be
- * called the same number of times for cleanup to occur.
+ * called the same number of times for cleanup to trigger.
  **/
 void COSMOS_API init();
 
-/// Undo initialization of init()
+/// Undo initialization of init().
 void COSMOS_API finish();
 
-/// Convenience initialization object
+/// Convenience initialization object.
 /**
  * During the lifetime of this object the cosmos library remains initialized.
  **/
@@ -38,7 +38,7 @@ struct Init {
 	~Init() { finish(); }
 };
 
-/// This controls library upon EINTR returns from certain system calls
+/// This controls library behaviour upon EINTR returns from certain system calls.
 /**
  * In some situations system calls can return prematurely with an EINTR
  * errno set. This can happen when an asynchronous signal is received in the

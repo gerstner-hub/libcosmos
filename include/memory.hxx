@@ -7,7 +7,7 @@
 
 namespace cosmos {
 
-/// Completely overwrites the given object with zeroes
+/// Completely overwrites the given object with zeroes.
 /**
  * This is typically used in C-APIs to get a defined object state.
  **/

@@ -228,7 +228,7 @@ public: // functions
 		return *reinterpret_cast<const RealTime*>(&m_st.st_atim);
 	}
 
-	/// Returns whether the two FileStatus objects refer to the same file
+	/// Returns whether the two FileStatus objects refer to the same file.
 	/**
 	 * This condition is true if both the inodes and the block device IDs
 	 * for both FileStatus objects match. Note that files can be identical

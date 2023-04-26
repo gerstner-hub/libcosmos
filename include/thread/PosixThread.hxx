@@ -159,7 +159,7 @@ public: // functions
 	 **/
 	void detach();
 
-	/// Returns a friendly name for the thread
+	/// Returns a friendly name for the thread.
 	/**
 	 * If joinable() returns \c true then this returns a friendly name for
 	 * the associated thread. Part of this will be the friendly name
@@ -170,7 +170,7 @@ public: // functions
 	 **/
 	const std::string& name() const { return m_name; }
 
-	/// Returns an opaque thread ID object for the thread represented by this object
+	/// Returns an opaque thread ID object for the thread represented by this object.
 	/**
 	 * This call is only allowed if joinable() returns \c true.
 	 *
@@ -183,7 +183,7 @@ public: // functions
 	 **/
 	pthread::ID id() const { return pthread::ID{*m_pthread}; }
 
-	/// Returns whether the caller itself is the associated thread
+	/// Returns whether the caller itself is the associated thread.
 	bool isCallerThread() const {
 		return id() == pthread::get_id();
 	}

@@ -20,7 +20,7 @@ class COSMOS_API PasswdInfo :
 		public InfoBase<struct passwd> {
 public: // functions
 
-	/// Obtains PasswdInfo for the given username \c name
+	/// Obtains PasswdInfo for the given username \c name.
 	/**
 	 * If an error occurs obtaining the entry then an ApiError exception
 	 * is thrown.
@@ -30,7 +30,7 @@ public: // functions
 	 **/
 	explicit PasswdInfo(const std::string_view name);
 
-	/// Obtains PasswdInfo for the given numerical user id \c uid
+	/// Obtains PasswdInfo for the given numerical user id \c uid.
 	/**
 	 * \see PasswdInfo(const std::string_view)
 	 **/
@@ -38,21 +38,21 @@ public: // functions
 
 	const std::string_view name() const { return to_string_view(m_info.pw_name); }
 
-	/// Returns the optional encrypted password
+	/// Returns the optional encrypted password.
 	const std::string_view passwd() const { return to_string_view(m_info.pw_passwd); }
 
 	UserID uid() const { return UserID{m_info.pw_uid}; }
 
-	/// The user's main group ID
+	/// The user's main group ID.
 	GroupID gid() const { return GroupID{m_info.pw_gid}; }
 
-	/// Returns the comment field which is used for different things like a full user name
+	/// Returns the comment field which is used for different things like a full user name.
 	const std::string_view gecos() const { return to_string_view(m_info.pw_gecos); }
 
-	/// Path to the user's home directory
+	/// Path to the user's home directory.
 	const std::string_view homeDir() const { return to_string_view(m_info.pw_dir); }
 
-	/// Optional command interpreter for the user
+	/// Optional command interpreter for the user.
 	const std::string_view shell() const { return to_string_view(m_info.pw_shell); }
 };
 

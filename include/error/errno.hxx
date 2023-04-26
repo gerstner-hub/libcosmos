@@ -13,7 +13,7 @@
 
 namespace cosmos {
 
-/// strong enum type representing errno error constants
+/// Strong enum type representing errno error constants.
 enum class Errno : int { // errnos are distinct positive `int` values says `man errno.h`
 	NO_ERROR              = 0,
 	TOOBIG                = E2BIG,           /// argument list too long
@@ -95,9 +95,11 @@ enum class Errno : int { // errnos are distinct positive `int` values says `man 
 	CROSS_DEVICE          = EXDEV            /// cross-device link
 };
 
-/// wrapper that returns the Errno strongly typed representation of the current \c errno
+/// Wrapper that returns the Errno strongly typed representation of the current \c errno
 inline Errno get_errno() { return Errno{errno}; }
+/// Resets the currently set errno to indicate no error.
 inline void reset_errno() { errno = static_cast<int>(Errno::NO_ERROR); }
+/// Checks whether currently an errno is set.
 inline bool is_errno_set() { return get_errno() != Errno::NO_ERROR; }
 
 } // end ns

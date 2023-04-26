@@ -21,7 +21,7 @@
 
 namespace cosmos {
 
-/// Represents a terminal dimension in characters
+/// Represents a terminal dimension in characters.
 struct TermDimension :
 		winsize {
 
@@ -34,7 +34,7 @@ struct TermDimension :
 	unsigned short rows() const { return ws_row; }
 };
 
-/// Access to Terminal information and ioctls
+/// Access to Terminal information and ioctls.
 /**
  * This simply wraps a FileDescriptor for performing terminal related ioctls
  * on it. It will not take ownership of the file descriptor i.e. it will never
@@ -54,15 +54,15 @@ public:
 		m_fd = fd;
 	}
 
-	/// Returns whether the associated file descriptor is a TTY
+	/// Returns whether the associated file descriptor is a TTY.
 	bool isTTY() const;
 
-	/// Returns the terminal dimension in character width x height
+	/// Returns the terminal dimension in character width x height.
 	TermDimension getSize() const;
-	/// Sets the terminal dimension according to the given values
+	/// Sets the terminal dimension according to the given values.
 	void setSize(const TermDimension dim);
 
-	/// Sends a stream of zero bits for a certain duration
+	/// Sends a stream of zero bits for a certain duration.
 	/**
 	 * If \c ms is zero then the stream will last between 0.25 and 0.50
 	 * seconds. If it is non-zero then the stream will last for an
@@ -71,7 +71,7 @@ public:
 	 **/
 	void sendBreak(const std::chrono::milliseconds ms);
 
-	/// Attempt to make the terminal the controlling terminal of the current process
+	/// Attempt to make the terminal the controlling terminal of the current process.
 	/**
 	 * This only works if the current process is a session leader and does
 	 * not yet have a controlling terminal.
@@ -93,7 +93,7 @@ protected: // data
 	FileDescriptor m_fd;
 };
 
-/// Creates a new pseudo terminal device and returns master/slave file descriptors for it
+/// Creates a new pseudo terminal device and returns master/slave file descriptors for it.
 /**
  * A pseudo terminal is a virtual terminal where the slave end behaves like an
  * actual terminal device and can be passed to applications that expect one.

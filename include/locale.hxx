@@ -24,7 +24,7 @@ namespace cosmos::locale {
  * on so that this poses no problem.
  **/
 
-/// Different Locale Categories that can be configured
+/// Different Locale Categories that can be configured.
 enum class Category : int {
 	ALL            = LC_ALL,       /// all aspects of the locale
 	COLLATE        = LC_COLLATE,   /// comparison of strings
@@ -43,19 +43,19 @@ enum class Category : int {
 #endif
 };
 
-/// returns a string describing the currently active locale setting for the given category
+/// Returns a string describing the currently active locale setting for the given category.
 COSMOS_API std::string get(Category category);
 
-/// set the given locale category to the given value
+/// Set the given locale category to the given value.
 /**
- * this may throw an ApiError if the request cannot be honored.
+ * This may throw an ApiError if the request cannot be honored.
  **/
 COSMOS_API void set(Category category, const std::string_view val);
 
-/// set the given locale category to its default value ("C" or "POSIX")
+/// Set the given locale category to its default value ("C" or "POSIX").
 COSMOS_API void set_to_default(Category category);
 
-/// set the given locale category according to present environment variables
+/// Set the given locale category according to present environment variables.
 /**
  * This function call will inspect the environment variables and set the given
  * locale category accordingly (`setlocale(cat, "")`.

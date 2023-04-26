@@ -16,7 +16,7 @@ namespace cosmos {
 // fwd. decl.
 class Condition;
 
-/// A class to represent a pthread mutex
+/// A class to represent a pthread mutex.
 /**
  * Only the most basic operations are implemented by now. For more details
  * about the semantics refer to `man pthread_mutex_init` and `man
@@ -29,7 +29,7 @@ class COSMOS_API Mutex {
 
 public: // functions
 
-	/// Create a non-recursive Mutex
+	/// Create a non-recursive Mutex.
 	/**
 	 * Other mutex types are not currently provided.
 	 *
@@ -70,13 +70,12 @@ protected: // data
 	friend class Condition;
 };
 
-/// A mutex guard object that locks a Mutex for the lifetime of the guard object
+/// A mutex guard object that locks a Mutex for the lifetime of the guard object.
 struct MutexGuard :
 		public ResourceGuard<const Mutex&> {
 
 	explicit MutexGuard(const Mutex &m) :
-		ResourceGuard(m, [](const Mutex &_m) { _m.unlock(); })
-	{
+			ResourceGuard(m, [](const Mutex &_m) { _m.unlock(); }) {
 		m.lock();
 	}
 };
@@ -86,8 +85,7 @@ struct MutexReverseGuard :
 		public ResourceGuard<const Mutex&> {
 
 	explicit MutexReverseGuard(const Mutex &m) :
-		ResourceGuard(m, [](const Mutex &_m) { _m.lock(); })
-	{
+			ResourceGuard(m, [](const Mutex &_m) { _m.lock(); }) {
 		m.unlock();
 	}
 };
