@@ -6,10 +6,11 @@
 #include <unistd.h>
 
 // C++
-#include <sstream>
 #include <string>
 
 // cosmos
+#include "cosmos/GroupInfo.hxx"
+#include "cosmos/PasswdInfo.hxx"
 #include "cosmos/algs.hxx"
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/error/FileError.hxx"
@@ -17,16 +18,15 @@
 #include "cosmos/error/RuntimeError.hxx"
 #include "cosmos/error/UsageError.hxx"
 #include "cosmos/formatting.hxx"
-#include "cosmos/fs/Directory.hxx"
 #include "cosmos/fs/DirIterator.hxx"
 #include "cosmos/fs/DirStream.hxx"
+#include "cosmos/fs/Directory.hxx"
 #include "cosmos/fs/File.hxx"
 #include "cosmos/fs/FileStatus.hxx"
 #include "cosmos/fs/filesystem.hxx"
 #include "cosmos/fs/path.hxx"
-#include "cosmos/GroupInfo.hxx"
-#include "cosmos/PasswdInfo.hxx"
 #include "cosmos/proc/process.hxx"
+#include "cosmos/string.hxx"
 
 namespace cosmos::fs {
 
@@ -238,12 +238,9 @@ std::optional<std::string> which(const std::string_view exec_base) noexcept {
 	if (!pathvar)
 		return {};
 
-	// TODO: replace this with some string split helper
-	std::istringstream ss;
-	ss.str(std::string{*pathvar});
-	std::string dir;
+	const auto paths = split(*pathvar, ":");
 
-	while (!std::getline(ss, dir, ':').eof()) {
+	for (const auto &dir: paths) {
 		auto path = dir + "/" + std::string{exec_base};
 
 		if (checkExecutable(path)) {
