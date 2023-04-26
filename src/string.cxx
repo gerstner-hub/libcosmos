@@ -41,4 +41,60 @@ void strip(std::string &s) {
 		s.pop_back();
 }
 
+template <typename CHAR>
+std::vector<std::basic_string<CHAR>> split(
+		const std::basic_string_view<CHAR> str,
+		const std::basic_string_view<CHAR> sep,
+		const SplitFlags flags) {
+
+	using String = std::basic_string<CHAR>;
+	std::vector<String> parts;
+
+	// index of current start of token
+	size_t pos1;
+	// index of current end of token
+	size_t pos2 = 0;
+
+	while(true) {
+		String token;
+
+		pos1 = pos2;
+
+		if (!flags[SplitOpts::KEEP_EMPTY]) {
+			while (str.substr(pos1, sep.size()) == sep)
+				pos1 += sep.size();
+		}
+
+		pos2 = str.find(sep, pos1);
+
+		auto token_len = pos2 - pos1;
+
+		if (token_len) {
+			token = str.substr(pos1, token_len);
+
+			if (flags[SplitOpts::STRIP_PARTS]) {
+				strip(token);
+			}
+		}
+
+		if (!token.empty() || flags[SplitOpts::KEEP_EMPTY]) {
+			parts.push_back(token);
+		}
+
+		if (pos2 == str.npos)
+			break;
+
+		pos2 += sep.size();
+	}
+
+	return parts;
+}
+
+/* explicit instantiations for outlined template functions */
+
+template COSMOS_API std::vector<std::basic_string<char>> split(
+		const std::basic_string_view<char> str,
+		const std::basic_string_view<char> sep,
+		const SplitFlags flags);
+
 } // end ns
