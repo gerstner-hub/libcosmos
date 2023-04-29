@@ -11,6 +11,50 @@
 
 namespace cosmos {
 
+/*
+ * NOTE:
+ *
+ * It would be nice adding the possibility for a function call backtrace to
+ * the exception class. There are a bunch of obstacles to this, though:
+ * 
+ * There exists a kind of base mechanism present in Glibc and GCC/Clang:
+ *
+ * - using backtrace() and backtrace_symbols() from <execinfo.h>
+ * - using abi::__cxa_demangle from <cxxabi.h>
+ *
+ * The limitations of this are:
+ *
+ * - no line number / source file information
+ * - symbolic names are only available if all objects file are compiled with
+ *   `-rexport` and -fvisibility=default. Even then static function names
+ *   cannot be resolved.
+ *
+ * There exists libunwind: is it is readily available and offers symbolic
+ * names even without changing the compilation and linking process. It does
+ * not offer symbol demangling though which needs to come from cxxabi.h
+ * instead. Also it comes with a file descriptor leak, because it creates a
+ * pipe pair that is never cleaned up. Also it does not offer line number of
+ * source file information.
+ *
+ * There are lesser known libraries like libbacktrace or backward-cpp, both of
+ * them are rather big and not readily available, also not very actively
+ * maintained (?). 
+ *
+ * Further "hacks" to get additional debug information would be calling
+ * external tools like `addr2line` or `gdb`.
+ *
+ * Another problem is that adding only the option to have a backtrace can
+ * considerably increase the exception object size. A std::vector<std::string>
+ * would add 24 bytes to the object size. A single std::string is similarly
+ * sized. It could be heap-allocated which would reduce the overhead for
+ * non-use to 8 bytes but then we have to manage the pointer e.g. when
+ * copying, a shared_ptr would add 16 bytes of overhead.
+ *
+ * Overall to implement this feature maybe implementing parts of it on foot
+ * using existing code snippets from libbacktrace & friends could be
+ * investiaged. Currently the problems seem not worth the gain.
+ */
+
 /// Base class for libcosmos exceptions.
 /**
  * This base class carries the file, line and function contextual information
