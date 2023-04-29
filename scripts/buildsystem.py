@@ -9,8 +9,7 @@ def sequencify(arg):
         if isinstance(arg, _type):
             return arg
 
-    # return a tuple by default
-    return (arg,)
+    return [arg,]
 
 def gatherSources(self, suffixes, path='.', recursive=True):
     """Recursively walks through the given path (by default the current
@@ -28,6 +27,10 @@ def gatherSources(self, suffixes, path='.', recursive=True):
     sources = []
     for root, _, files in os.walk(srcdir):
         for file in files:
+            if file.startswith("_"):
+                # skip leading underscores, these are headers included based
+                # on #ifdef checks
+                continue
             for suffix in suffixes:
                 if file.endswith(suffix):
                     break
@@ -83,8 +86,18 @@ def configureRunForLib(self, name):
         paths.append(libdir)
     self['ENV']['LD_LIBRARY_PATH'] = ':'.join(paths)
 
+def existsPackage(self, seq):
+    """This helper checks whether the given package exists according to the
+    pkg-config utility."""
+
+    packages = sequencify(seq)
+
+    res = subprocess.call(["pkg-config", "--exists"] + packages)
+
+    return res == 0
+
 def configureForPackage(self, seq):
-    """This helpers adds flags obtained from the pkg-config utility for the
+    """This helper adds flags obtained from the pkg-config utility for the
     given system package."""
 
     rootenv = self['rootenv']
@@ -108,6 +121,7 @@ def enhanceEnv(env):
     env.AddMethod(configureForLib, "ConfigureForLib")
     env.AddMethod(configureRunForLib, "ConfigureRunForLib")
     env.AddMethod(configureForPackage, "ConfigureForPackage")
+    env.AddMethod(existsPackage, "ExistsPackage")
     env.AddMethod(existsLib, "ExistsLib")
 
 def initSCons(project, rtti=True):
