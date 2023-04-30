@@ -9,6 +9,7 @@
 #include <sys/wait.h>
 
 // cosmos
+#include "cosmos/BitMask.hxx"
 #include "cosmos/proc/Signal.hxx"
 #include "cosmos/proc/ptrace.hxx"
 
@@ -24,6 +25,22 @@ enum class ExitStatus : int {
 	SUCCESS = 0
 };
 
+/// Different child process wait options used in the proc::wait() family of calls.
+enum class WaitOpts : int {
+	/// Wait for child processes that have terminated.
+	WAIT_FOR_EXITED    = WEXITED,
+	/// Wait for child processes that have been stopped due to being signaled.
+	WAIT_FOR_STOPPED   = WSTOPPED,
+	/// Wait for (previously stopped) child processes that have been continued via SIGCONT.
+	WAIT_FOR_CONTINUED = WCONTINUED,
+	/// If no matching child processes are available don't block but return nothing.
+	NO_HANG            = WNOHANG,
+	/// Don't remove the info from the kernel, a later wait call can be used to retrieve the same information.
+	LEAVE_INFO         = WNOWAIT
+};
+
+using WaitFlags = BitMask<WaitOpts>;
+
 /// Represents the result from a waitid() call.
 /**
  * An instance of this type is returned from SubProc::wait().
@@ -38,6 +55,9 @@ public: // functions
 
 	/// Returns whether the child exited.
 	bool exited() const { return si_code == CLD_EXITED; }
+
+	/// Returns whether the child continued after a stop signal.
+	bool continued() const { return si_code == CLD_CONTINUED; }
 
 	/// Returns whether the child was terminated by a signal.
 	bool signaled() const { return si_code == CLD_KILLED || si_code == CLD_DUMPED; }
@@ -88,7 +108,11 @@ public: // functions
 		return exited() && exitStatus() == ExitStatus::SUCCESS;
 	}
 
-	void reset() { si_status = 0; }
+	ProcessID pid() const { return ProcessID{si_pid}; }
+
+	void reset() { si_status = 0; si_pid = 0; }
+
+	siginfo_t* raw() { return this; }
 };
 
 } // end ns

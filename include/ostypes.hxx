@@ -29,6 +29,11 @@ enum class ProcessID : pid_t {
 	CHILD   = 0
 };
 
+enum class ProcessGroupID : pid_t {
+	INVALID = -1,
+	SELF = 0
+};
+
 enum class UserID : uid_t {
 	INVALID = static_cast<uid_t>(-1),
 	ROOT    = 0

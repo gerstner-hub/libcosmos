@@ -1,9 +1,12 @@
 // C++
 #include <iostream>
 #include <sstream>
+#include <set>
 
 // cosmos
 #include "cosmos/proc/process.hxx"
+#include "cosmos/proc/Signal.hxx"
+#include "cosmos/proc/SignalFD.hxx"
 
 // Test
 #include "TestBase.hxx"
@@ -14,6 +17,7 @@ class ProcessTest :
 	void runTests() override {
 		testProperties();
 		testEnv();
+		testForkWait();
 	};
 
 	void testProperties() {
@@ -73,6 +77,82 @@ class ProcessTest :
 		new_path = cosmos::proc::get_env_var("PATH");
 
 		RUN_STEP("PATH-is-cleared", new_path == std::nullopt);
+	}
+
+	void waitForTermSig() {
+		cosmos::SignalFD fd{cosmos::signal::TERMINATE};
+		cosmos::SignalFD::SigInfo info;
+		fd.readEvent(info);
+		cosmos::proc::exit(cosmos::ExitStatus{0});
+	}
+
+	void testForkWait() {
+		START_TEST("fork/wait tests");
+
+		if (auto child = cosmos::proc::fork(); child) {
+			auto res = cosmos::proc::wait(*child);
+			RUN_STEP("simple-child-exit", res->exitStatus() == cosmos::ExitStatus{10});
+		} else {
+			cosmos::proc::exit(cosmos::ExitStatus{10});
+		}
+
+		// block this for the next child process to avoid races
+		cosmos::signal::block(cosmos::SigSet{cosmos::signal::TERMINATE});
+
+		if (auto child = cosmos::proc::fork(); child) {
+			auto res = cosmos::proc::wait(*child,
+					cosmos::WaitFlags{
+						cosmos::WaitOpts::WAIT_FOR_EXITED,
+						cosmos::WaitOpts::NO_HANG});
+			RUN_STEP("wait-no-hang-works", !res);
+
+			cosmos::signal::send(*child, cosmos::signal::TERMINATE);
+			res = cosmos::proc::wait(*child);
+			RUN_STEP("term-wait-works", res->exited() && res->exitStatus() == cosmos::ExitStatus{0});
+		} else {
+			waitForTermSig();
+		}
+
+		if (auto child = cosmos::proc::fork(); child) {
+			cosmos::signal::send(*child, cosmos::signal::STOP);
+			auto res = cosmos::proc::wait(*child,
+					cosmos::WaitFlags{
+						cosmos::WaitOpts::WAIT_FOR_EXITED,
+						cosmos::WaitOpts::WAIT_FOR_STOPPED});
+
+			RUN_STEP("wait-for-stop-works", res->stopped());
+
+			cosmos::signal::send(*child, cosmos::signal::CONT);
+			res = cosmos::proc::wait(*child,
+					cosmos::WaitFlags{
+						cosmos::WaitOpts::WAIT_FOR_EXITED,
+						cosmos::WaitOpts::WAIT_FOR_CONTINUED});
+
+			RUN_STEP("wait-for-continue-works", res->continued());
+
+			cosmos::signal::send(*child, cosmos::signal::TERMINATE);
+			res = cosmos::proc::wait(*child);
+			RUN_STEP("term-after-stop/cont-works", res->exited() && res->exitStatus() == cosmos::ExitStatus{0});
+
+		} else {
+			waitForTermSig();
+		}
+
+		std::set<cosmos::ProcessID> childs;
+
+		for (size_t i = 0; i < 2; i++) {
+			if (auto child = cosmos::proc::fork(); child) {
+				childs.insert(*child);
+			} else {
+				cosmos::proc::exit(cosmos::ExitStatus{0});
+			}
+		}
+
+		for (size_t i = 0; i < 2; i++) {
+			auto res = cosmos::proc::wait();
+
+			RUN_STEP("wait-for-any-child-works", res->exited() && childs.find(res->pid()) != childs.end());
+		}
 	}
 };
 

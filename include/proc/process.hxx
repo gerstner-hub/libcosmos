@@ -47,6 +47,9 @@ COSMOS_API GroupID get_real_group_id();
  **/
 COSMOS_API GroupID get_effective_group_id();
 
+/// Returns the process group ID of the caller.
+COSMOS_API ProcessGroupID get_own_process_group();
+
 /// Creates a new session with the current process as leader.
 /**
  * The session will also receive a new process group of which the
@@ -59,6 +62,48 @@ COSMOS_API GroupID get_effective_group_id();
  * The new session will not yet have a controlling terminal.
  **/
 COSMOS_API ProcessID create_new_session();
+
+/// Fork the current process to create a child process.
+/**
+ * This creates a copy of the current process to act as a child process. The
+ * call will return std::nullopt in the child process context and the process
+ * ID of the new child process in the parent context.
+ *
+ * The parent is responsible for waiting on the child process to collect its
+ * exit status and free its resources using proc::wait(). An exception to this
+ * is if the calling process actively ignores the signal::CHILD signal. In
+ * this case wait() can be used to wait for the child processes to terminate
+ * but no exit status will be returned, but an Errno::NO_CHILD will be thrown
+ * instead.
+ **/
+COSMOS_API std::optional<ProcessID> fork();
+
+/// Wait on the child process identified by \c pid.
+/**
+ * A child process previously created via fork() or other means can be waited
+ * on using this call.
+ *
+ * The given \c flags influence the state changes of the child process that
+ * will be waited for. By default a blocking wait for child process exit is
+ * performed.
+ **/
+COSMOS_API std::optional<WaitRes> wait(const ProcessID pid, const WaitFlags flags = WaitFlags{WaitOpts::WAIT_FOR_EXITED});
+
+/// Wait for any process from the given process group.
+/**
+ * This is just like wait(const ProcessID, const WaitFlags) only that is waits
+ * not for a specific child process but for any of the given process group. If
+ * pgid == ProcessGroupID::SELF then this waits for any process for the
+ * caller's process group.
+ **/
+COSMOS_API std::optional<WaitRes> wait(const ProcessGroupID pgid, const WaitFlags flags = WaitFlags{WaitOpts::WAIT_FOR_EXITED});
+
+/// Wait for any child process of the calling process.
+/**
+ * This is just like wait(const ProcessID, const WaitFlags) only that it waits
+ * for any kind of child process, not any specific child process.
+ **/
+COSMOS_API std::optional<WaitRes> wait(const WaitFlags flags = WaitFlags{WaitOpts::WAIT_FOR_EXITED});
 
 /// Immediately terminate the calling process.
 /**
