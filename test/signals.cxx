@@ -17,6 +17,7 @@ class SignalTest :
 
 	void runTests() override {
 		testSets();
+		testSigmask();
 	}
 
 	void testSets() {
