@@ -41,7 +41,7 @@ ProcessID create_new_session() {
 	auto res = ProcessID{::setsid()};
 
 	if (res == ProcessID::INVALID) {
-		cosmos_throw (ApiError());
+		cosmos_throw (ApiError("setsid()"));
 	}
 
 	return res;
@@ -66,7 +66,7 @@ void set_env_var(const std::string_view name, const std::string_view val, const 
 	const auto res = ::setenv(name.data(), val.data(), overwrite ? 1 : 0);
 
 	if (res != 0) {
-		cosmos_throw (ApiError());
+		cosmos_throw (ApiError("setenv()"));
 	}
 }
 
@@ -74,7 +74,7 @@ void clear_env_var(const std::string_view name) {
 	const auto res = ::unsetenv(name.data());
 
 	if (res != 0) {
-		cosmos_throw (ApiError());
+		cosmos_throw (ApiError("unsetenv()"));
 	}
 }
 
