@@ -137,6 +137,16 @@ inline void restore(const Signal sig) {
 	::signal(to_integral(sig.raw()), SIG_DFL);
 }
 
+/// Ignore signal delivery for the given signal.
+/**
+ * Ignoring a signal can make sense for the Signal::CHILD signal in which case
+ * child processes will not become zombies even if the parent does not wait on
+ * them. \c see proc::wait().
+ **/
+inline void ignore(const Signal sig) {
+	::signal(to_integral(sig.raw()), SIG_IGN);
+}
+
 /// Returns the currently active signal mask for the calling thread.
 COSMOS_API SigSet get_sigmask();
 

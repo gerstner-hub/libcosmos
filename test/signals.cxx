@@ -18,6 +18,7 @@ class SignalTest :
 	void runTests() override {
 		testSets();
 		testSigmask();
+		testIgnore();
 	}
 
 	void testSets() {
@@ -67,6 +68,18 @@ class SignalTest :
 
 		RUN_STEP("received-sig-correct", info.signal() == sigint);
 		std::cout << "received " << info.signal() << " from " << info.senderPID() << std::endl;
+	}
+
+	void testIgnore() {
+		START_TEST("ignore signal");
+
+		SigSet set;
+		set.set(signal::TERMINATE);
+		signal::unblock(set);
+		signal::ignore(signal::TERMINATE);
+		signal::raise(signal::TERMINATE);
+
+		RUN_STEP("did-not-terminate", true);
 	}
 };
 
