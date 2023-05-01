@@ -55,31 +55,6 @@ namespace {
 		std::cerr << "[" << proc::get_own_pid() << "]" << context << ": " << error << std::endl;
 	}
 
-	// execute program and inherit parent's environment
-	void exec(CStringVector &v) {
-		if (v.empty()) {
-			cosmos_throw (InternalError("called with empty argument vector"));
-		}
-
-		::execvp (v[0], const_cast<char**>(v.data()));
-
-		cosmos_throw (ApiError("execvp failed"));
-	}
-
-	// execute program and use override environment
-	void exec(CStringVector &v, CStringVector &e) {
-		if (v.empty()) {
-			cosmos_throw (InternalError("called with empty argument vector"));
-		} else if(e.empty()) {
-			// needs to contain at least a terminating nullptr
-			cosmos_throw (InternalError("called with empty environment vector"));
-		}
-
-		::execvpe (v[0], const_cast<char**>(v.data()), const_cast<char**>(e.data()));
-
-		cosmos_throw (ApiError("execvpe failed"));
-	}
-
 	// for clone(3) there is no glibc wrapper yet so we need to wrap it ourselves
 	pid_t clone3(struct clone_args &args) {
 		return syscall(SYS_clone3, &args, sizeof(args));
@@ -131,16 +106,16 @@ SubProc ChildCloner::run() {
 		auto argv = setup_argv(m_argv);
 
 		if (!m_env) {
-			exec(argv);
+			proc::exec(argv[0], &argv);
 		} else {
 			auto envp = setup_env(m_env.value());
-			exec(argv, envp);
+			proc::exec(argv[0], &argv, &envp);
 		}
 	} catch (const CosmosError &ce) {
 		print_child_error("post fork/exec", ce.what());
 		// use something else than "1" which might help debugging this
 		// situation a bit.
-		::_exit(3);
+		proc::exit(ExitStatus{3});
 	}
 
 	// should never be reached
