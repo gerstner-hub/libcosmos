@@ -7,6 +7,8 @@
 #include "cosmos/proc/process.hxx"
 #include "cosmos/proc/Signal.hxx"
 #include "cosmos/proc/SignalFD.hxx"
+#include "cosmos/fs/Directory.hxx"
+#include "cosmos/fs/File.hxx"
 
 // Test
 #include "TestBase.hxx"
@@ -18,6 +20,7 @@ class ProcessTest :
 		testProperties();
 		testEnv();
 		testForkWait();
+		testExec();
 	};
 
 	void testProperties() {
@@ -152,6 +155,39 @@ class ProcessTest :
 			auto res = cosmos::proc::wait();
 
 			RUN_STEP("wait-for-any-child-works", res->exited() && childs.find(res->pid()) != childs.end());
+		}
+	}
+
+	void testExec() {
+		START_TEST("exec() tests");
+
+		if (auto child = cosmos::proc::fork(); child) {
+			auto res = cosmos::proc::wait(*child);
+
+			RUN_STEP("exec-false-works", res->exited() && res->exitStatus() == cosmos::ExitStatus{1});
+		} else {
+			cosmos::proc::exec("/bin/false");
+			cosmos::proc::exit(cosmos::ExitStatus{10});
+		}
+
+		if (auto child = cosmos::proc::fork(); child) {
+			auto res = cosmos::proc::wait(*child);
+
+			RUN_STEP("exec_at-true-works", res->exited() && res->exitStatus() == cosmos::ExitStatus{0});
+		} else {
+			cosmos::Directory bin{"/bin"};
+			cosmos::proc::exec_at(bin.fd(), "true");
+			cosmos::proc::exit(cosmos::ExitStatus{10});
+		}
+
+		if (auto child = cosmos::proc::fork(); child) {
+			auto res = cosmos::proc::wait(*child);
+
+			RUN_STEP("fexec-true-works", res->exited() && res->exitStatus() == cosmos::ExitStatus{0});
+		} else {
+			cosmos::File true_file{"/bin/true", cosmos::OpenMode::READ_ONLY};
+			cosmos::proc::fexec(true_file.fd());
+			cosmos::proc::exit(cosmos::ExitStatus{10});
 		}
 	}
 };

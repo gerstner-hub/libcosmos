@@ -9,6 +9,7 @@
 #include <string_view>
 
 // cosmos
+#include "cosmos/fs/DirFD.hxx"
 #include "cosmos/ostypes.hxx"
 #include "cosmos/proc/WaitRes.hxx"
 #include "cosmos/types.hxx"
@@ -104,6 +105,83 @@ COSMOS_API std::optional<WaitRes> wait(const ProcessGroupID pgid, const WaitFlag
  * for any kind of child process, not any specific child process.
  **/
 COSMOS_API std::optional<WaitRes> wait(const WaitFlags flags = WaitFlags{WaitOpts::WAIT_FOR_EXITED});
+
+/// Replace the current process by executing the program found in \c path.
+/**
+ * The given \c path specifies the new executable to run. \c args represents
+ * the list of arguments passed to the new program. \c args[0] by convention
+ * should contain the filename associated with the executed program. It can
+ * differ from \c path e.g. to trigger different personalities in programs. If
+ * \c args is not provided then \c path will be passed as \c argv[0]
+ * implicitly.
+ *
+ * If \c path is a basename and does not contain a slash character then a
+ * lookup in the PATH environment variable will be made to find a suitable
+ * program.
+ *
+ * \c env can be an array of environment variables to make up the new
+ * process's environment variable block. By default the current environment
+ * will be passed on.
+ *
+ * Both \c args and \c env need to have a nullptr terminator element at the
+ * end. If is missing then a UsageError is thrown.
+ *
+ * As a result of this call the calling process will be completely replaced by
+ * the new program. Only file descriptors not marked close-on-exec will be
+ * inherited to the new program. The ProcessID of the caller will remain the
+ * same.
+ **/
+COSMOS_API void exec(const std::string_view path,
+		const CStringVector *args = nullptr, const CStringVector *env = nullptr);
+
+/// Variant of exec(const std::string_view, const CStringVector*, const CStringVector*) that takes StringViewVector.
+/**
+ * This performs a conversion of the given StringViewVector(s) to
+ * CStringVectors. Therefore the call requires some dynamic memory allocation
+ * and copying of pointer values. \c args and \c env do not need to contain a
+ * terminating nullptr at the end.
+ **/
+COSMOS_API void exec(const std::string_view path,
+		const StringViewVector &args, const StringViewVector *env = nullptr);
+
+/// Variant of exec() that takes StringVector.
+/**
+ * \see exec(const std::string_view, const StringViewVector&, const StringViewVector*).
+ **/
+COSMOS_API void exec(const std::string_view path,
+		const StringVector &args, const StringVector *env = nullptr);
+
+/// Variant of exec() that looks up a program relative to \c dir_fd.
+/**
+ * If \c path is an absolute path then \c dir_fd is ignored and the call
+ * behaves just like exec(), except for the \c follow_symlinks setting.
+ *
+ * Otherwise \c path is looked up relative to \c dir_fd, possibly relative to
+ * the current working directory if \c dir_fd is set to cosmos::AT_CWD.
+ *
+ * If \c follow_symlinks is unset and the resulting path is a symbolic link
+ * then the execution fails with an ApiError and Errno::LINK_LOOP.
+ **/
+COSMOS_API void exec_at(const DirFD dir_fd, const std::string_view path,
+		const CStringVector *args = nullptr, const CStringVector *env = nullptr,
+		const FollowSymlinks follow_symlinks = FollowSymlinks{false});
+
+/// Variant of exec() that executes the program refered to by the given file descriptor.
+/**
+ * This behaves just like exec(), except that a program is not looked up by
+ * path but the already open file descriptor \c fd is used. Also file
+ * descriptors opened using OpenSettings::PATH are supported.
+ *
+ * There is a caveat, if \c fd refers to a text file naming a script
+ * interpreter via a shebang line. If \c fd has the close-on-exec flag set,
+ * which is the natural thing to do, then the interpreter cannot access the
+ * text file, because it is already closed. This will cause an ApiError with
+ * Errno::NO_ENTRY. It also means that fixing this by not using the
+ * close-on-exec flag will cause the file descriptor leaking into the new
+ * process.
+ **/
+COSMOS_API void fexec(const FileDescriptor fd,
+		const CStringVector *args = nullptr, const CStringVector *env = nullptr);
 
 /// Immediately terminate the calling process.
 /**
