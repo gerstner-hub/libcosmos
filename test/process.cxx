@@ -4,6 +4,7 @@
 #include <set>
 
 // cosmos
+#include "cosmos/proc/clone.hxx"
 #include "cosmos/proc/process.hxx"
 #include "cosmos/proc/Signal.hxx"
 #include "cosmos/proc/SignalFD.hxx"
@@ -21,6 +22,7 @@ class ProcessTest :
 		testEnv();
 		testForkWait();
 		testExec();
+		testClone();
 	};
 
 	void testProperties() {
@@ -188,6 +190,33 @@ class ProcessTest :
 			cosmos::File true_file{"/bin/true", cosmos::OpenMode::READ_ONLY};
 			cosmos::proc::fexec(true_file.fd());
 			cosmos::proc::exit(cosmos::ExitStatus{10});
+		}
+	}
+
+	void testClone() {
+		START_TEST("clone() tests");
+
+		/*
+		 * just make a simple test with a pid-fd, if one of the
+		 * settings works then the rest is mostly the kernel's job and
+		 * the likeliness that we break something in the lib is low.
+		 */
+
+		cosmos::CloneArgs args;
+		cosmos::FileNum child_fd;
+		args.setFlags(cosmos::CloneFlags{cosmos::CloneSettings::PIDFD});
+		args.setPidFD(&child_fd);
+		constexpr auto STATUS = cosmos::ExitStatus{20};
+
+		if (auto child = cosmos::proc::clone(args); child) {
+			cosmos::FileDescriptor pid_fd{child_fd};
+			cosmos::WaitRes wr;
+			auto res = ::waitid(P_PIDFD, to_integral(pid_fd.raw()), wr.raw(), WEXITED);
+			RUN_STEP("waitid-on-pidfd-works", res == 0);
+			RUN_STEP("wait-res-exit-status-matches", wr.exitStatus() == STATUS);
+			pid_fd.close();
+		} else {
+			cosmos::proc::exit(STATUS);
 		}
 	}
 };
