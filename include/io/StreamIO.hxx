@@ -66,6 +66,14 @@ public: // functions
 			m_stream_fd{fd}
 	{}
 
+	StreamIO(const StreamIO&) = delete;
+	StreamIO& operator=(const StreamIO&) = delete;
+
+	StreamIO& operator=(StreamIO &&) {
+		// the coupling to the file descriptor needs to stay the same
+		return *this;
+	}
+
 	/// Read up to \p length bytes from the file into \p buf.
 	/**
 	 * An attempt is made to read data from the underlying file object and
