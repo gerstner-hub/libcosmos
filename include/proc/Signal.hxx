@@ -12,6 +12,7 @@
 // cosmos
 #include "cosmos/algs.hxx"
 #include "cosmos/ostypes.hxx"
+#include "cosmos/proc/PidFD.hxx"
 
 /**
  * @file
@@ -112,7 +113,7 @@ COSMOS_API void send(const ProcessID proc, const Signal s);
  *
  * \exception Throws an ApiError on error.
  **/
-COSMOS_API void send(const FileDescriptor pidfd, const Signal s);
+COSMOS_API void send(const PidFD pidfd, const Signal s);
 
 /// Blocks the given set of signals in the current process's signal mask.
 /**

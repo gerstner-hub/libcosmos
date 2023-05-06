@@ -11,7 +11,7 @@
 // Linux
 #include <signal.h>
 #include <string.h>
-#include <sys/syscall.h>
+#include <sys/pidfd.h>
 
 namespace cosmos {
 
@@ -46,13 +46,13 @@ void send(const ProcessID proc, const Signal s) {
 	}
 }
 
-void send(const FileDescriptor pidfd, const Signal s) {
+void send(const PidFD pidfd, const Signal s) {
 	// there's no glibc wrapper for this yet
 	//
 	// the third siginfo_t argument allows more precise control of the
 	// signal auxiliary data, but the defaults are just like kill(), so
 	// let's use them for now.
-	if (::syscall(SYS_pidfd_send_signal, pidfd.raw(), s.raw(), nullptr, 0) != 0) {
+	if (pidfd_send_signal(to_integral(pidfd.raw()), to_integral(s.raw()), nullptr, 0) != 0) {
 		cosmos_throw (ApiError());
 	}
 }

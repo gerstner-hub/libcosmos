@@ -120,6 +120,10 @@ std::optional<WaitRes> wait(const WaitFlags flags) {
 	return wait(P_ALL, 0, flags);
 }
 
+std::optional<WaitRes> wait(const PidFD fd, const WaitFlags flags) {
+	return wait(P_PIDFD, to_integral(fd.raw()), flags);
+}
+
 void exec(const std::string_view path, const CStringVector *args, const CStringVector *env) {
 
 	exec_wrapper(::execvpe, path, args, env);

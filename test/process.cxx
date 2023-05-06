@@ -203,13 +203,12 @@ class ProcessTest :
 		 */
 
 		cosmos::CloneArgs args;
-		cosmos::FileNum child_fd;
+		cosmos::PidFD pid_fd;
 		args.setFlags(cosmos::CloneFlags{cosmos::CloneSettings::PIDFD});
-		args.setPidFD(&child_fd);
+		args.setPidFD(pid_fd);
 		constexpr auto STATUS = cosmos::ExitStatus{20};
 
 		if (auto child = cosmos::proc::clone(args); child) {
-			cosmos::FileDescriptor pid_fd{child_fd};
 			cosmos::WaitRes wr;
 			auto res = ::waitid(P_PIDFD, to_integral(pid_fd.raw()), wr.raw(), WEXITED);
 			RUN_STEP("waitid-on-pidfd-works", res == 0);

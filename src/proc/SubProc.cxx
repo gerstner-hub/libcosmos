@@ -24,7 +24,7 @@ SubProc::~SubProc() {
 }
 
 void SubProc::kill(const Signal s) {
-	signal::send(m_child_fd, s);
+	signal::send(PidFD{m_child_fd.raw()}, s);
 }
 
 // seems also not part of userspace headers yet

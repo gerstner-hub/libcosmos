@@ -8,7 +8,7 @@
 // cosmos
 #include "cosmos/algs.hxx"
 #include "cosmos/BitMask.hxx"
-#include "cosmos/fs/FileDescriptor.hxx"
+#include "cosmos/proc/PidFD.hxx"
 #include "cosmos/proc/Signal.hxx"
 
 /**
@@ -74,8 +74,8 @@ struct COSMOS_API CloneArgs :
 		this->flags = p_flags.raw();
 	}
 
-	void setPidFD(FileNum *fd) {
-		this->pidfd = reinterpret_cast<uint64_t>(fd);
+	void setPidFD(PidFD &fd) {
+		this->pidfd = reinterpret_cast<uint64_t>(&fd.m_fd);
 	}
 
 	void setChildTID(ProcessID *pid) {

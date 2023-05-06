@@ -11,6 +11,7 @@
 // cosmos
 #include "cosmos/fs/DirFD.hxx"
 #include "cosmos/ostypes.hxx"
+#include "cosmos/proc/PidFD.hxx"
 #include "cosmos/proc/WaitRes.hxx"
 #include "cosmos/types.hxx"
 
@@ -105,6 +106,16 @@ COSMOS_API std::optional<WaitRes> wait(const ProcessGroupID pgid, const WaitFlag
  * for any kind of child process, not any specific child process.
  **/
 COSMOS_API std::optional<WaitRes> wait(const WaitFlags flags = WaitFlags{WaitOpts::WAIT_FOR_EXITED});
+
+/// Wait for the process refered to by the given pidfd.
+/**
+ * This is just like wait(const ProcessID, const WaitFlags) only that it waits
+ * for the process refered to by the given pidfd.
+ *
+ * The process represented by \c fd needs to be a child process of the calling
+ * process, otherwise an ApiError with Errno::CHILD is thrown.
+ **/
+COSMOS_API std::optional<WaitRes> wait(const PidFD fd, const WaitFlags flags = WaitFlags{WaitOpts::WAIT_FOR_EXITED});
 
 /// Replace the current process by executing the program found in \c path.
 /**
