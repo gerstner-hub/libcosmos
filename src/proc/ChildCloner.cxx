@@ -1,8 +1,6 @@
 // Linux
-#include <linux/sched.h> // sched headers are needed for clone()
 #include <sched.h>
 #include <sys/resource.h>
-#include <sys/syscall.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -17,6 +15,7 @@
 #include "cosmos/formatting.hxx"
 #include "cosmos/fs/filesystem.hxx"
 #include "cosmos/private/Scheduler.hxx"
+#include "cosmos/proc/clone.hxx"
 #include "cosmos/proc/ChildCloner.hxx"
 #include "cosmos/proc/process.hxx"
 #include "cosmos/proc/SigSet.hxx"
@@ -55,11 +54,6 @@ namespace {
 		std::cerr << "[" << proc::get_own_pid() << "]" << context << ": " << error << std::endl;
 	}
 
-	// for clone(3) there is no glibc wrapper yet so we need to wrap it ourselves
-	pid_t clone3(struct clone_args &args) {
-		return syscall(SYS_clone3, &args, sizeof(args));
-	}
-
 } // end anon ns
 
 SubProc ChildCloner::run() {
@@ -82,23 +76,22 @@ SubProc ChildCloner::run() {
 	// that employ this system call. clone2() is annoying to use because
 	// it doesn't have fork() semantics though ... maybe we can sit this
 	// out until Valgrind gets supports for clone3().
-	FileNum pidfd{FileNum::INVALID};
-	struct clone_args clone_args{};
-	// this takes the pointer to the pidfd, as a 64 but unsigned integer
-	clone_args.pidfd = reinterpret_cast<uint64_t>(&pidfd);
-	clone_args.exit_signal = SIGCHLD;
-	clone_args.flags = CLONE_CLEAR_SIGHAND | CLONE_PIDFD;
-	ProcessID pid;
+	//
+	// Another alternative would be using regular fork() and create a
+	// PidFD from the child PID. As long as no one is collecting the child
+	// status via any of the wait() functions this would also be race
+	// free.
+	PidFD pidfd;
+	CloneArgs clone_args;
+	clone_args.setPidFD(pidfd);
+	clone_args.setFlags(CloneFlags{CloneSettings::CLEAR_SIGHAND, CloneSettings::PIDFD});
 
-	switch ((pid = ProcessID{clone3(clone_args)})) {
-	default: // parent process with child pid
-		return SubProc{pid, pidfd};
-	case ProcessID::INVALID: // an error occured
-		cosmos_throw (ApiError());
-	case ProcessID::CHILD: // the child process
-		// let's do something!
-		break;
+	if (auto pid = proc::clone(clone_args); pid != std::nullopt) {
+		// parent process with child pid
+		return SubProc{*pid, pidfd};
 	}
+
+	// the child process -- let's do something!
 
 	try {
 		postFork();

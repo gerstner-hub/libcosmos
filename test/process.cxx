@@ -209,10 +209,9 @@ class ProcessTest :
 		constexpr auto STATUS = cosmos::ExitStatus{20};
 
 		if (auto child = cosmos::proc::clone(args); child) {
-			cosmos::WaitRes wr;
-			auto res = ::waitid(P_PIDFD, to_integral(pid_fd.raw()), wr.raw(), WEXITED);
-			RUN_STEP("waitid-on-pidfd-works", res == 0);
-			RUN_STEP("wait-res-exit-status-matches", wr.exitStatus() == STATUS);
+			auto wr = cosmos::proc::wait(pid_fd);
+			RUN_STEP("waitid-on-pidfd-works", wr != std::nullopt && wr->exited());
+			RUN_STEP("wait-res-exit-status-matches", wr->exitStatus() == STATUS);
 			pid_fd.close();
 		} else {
 			cosmos::proc::exit(STATUS);

@@ -37,10 +37,6 @@ namespace cosmos {
  *
  * For advance usage a post fork callback can be installed that performs
  * actions before the child process is replaced by the new target executable.
- *
- * TODO: This class could be splitted further into a Clone-only part and the
- * exec part on top - or by adding free functions like proc::fork(),
- * proc::clone(), proc::exec(), proc::wait().
  **/
 class COSMOS_API ChildCloner {
 public: // types

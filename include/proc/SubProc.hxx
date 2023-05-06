@@ -6,7 +6,7 @@
 #include <optional>
 
 // cosmos
-#include "cosmos/fs/FileDescriptor.hxx"
+#include "cosmos/proc/PidFD.hxx"
 #include "cosmos/proc/WaitRes.hxx"
 #include "cosmos/ostypes.hxx"
 
@@ -88,14 +88,14 @@ public: // functions
 	 * The ownership of the file descriptor stays with the SubProc
 	 * implementation. Never close this descriptor.
 	 **/
-	FileDescriptor pidFD() const { return m_child_fd; }
+	PidFD pidFD() const { return m_child_fd; }
 
 protected: // functions
 
 	friend class ChildCloner;
 
 	/// Wraps the given process ID and pidfd.
-	SubProc(const ProcessID pid, const FileNum pidfd) :
+	SubProc(const ProcessID pid, const PidFD pidfd) :
 		m_pid{pid}, m_child_fd{pidfd}
 	{}
 
@@ -105,7 +105,7 @@ protected: // data
 	ProcessID m_pid = ProcessID::INVALID;
 
 	/// Pidfd refering to the active child, if any
-	FileDescriptor m_child_fd;
+	PidFD m_child_fd;
 };
 
 } // end ns
