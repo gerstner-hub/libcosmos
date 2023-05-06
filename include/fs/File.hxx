@@ -62,6 +62,20 @@ public: // functions
 	File(const File&) = delete;
 	File& operator=(const File&) = delete;
 
+	File(File &&other) {
+		*this = std::move(other);
+	}
+
+	File& operator=(File &&other) {
+		m_auto_close = other.m_auto_close;
+		m_fd = other.m_fd;
+
+		other.m_fd.reset();
+		other.m_auto_close = AutoCloseFD{};
+
+		return *this;
+	}
+
 	virtual ~File();
 
 	/// \see File(const std::string_view, const OpenMode).
