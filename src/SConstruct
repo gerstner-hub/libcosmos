@@ -12,9 +12,19 @@ libenv.Append(CPPPATH=public_includes)
 
 libcosmos_srcs = env.GatherSources(suffixes=[".cxx"])
 
+# the SONAME and SHLIBVERSION are the knobs to tune for ABI versioning, but
+# libcosmos currently doesn't really have a concept for that.
+#
+# For packaging you can consider using an SONAME matching the exact library
+# release version resulting in a new ABI for each release. This at least
+# avoids inconsistencies, but breaks application that aren't rebuild against
+# the new lib version.
+
 libcosmos = libenv.SharedLibrary(
     "cosmos",
-    libcosmos_srcs
+    libcosmos_srcs,
+    SHLIBVERSION="0.1.0",
+    SONAME="libcosmos.so.0"
 )
 
 env.RegisterLibConfig('libcosmos', libcosmos, {
