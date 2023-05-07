@@ -4,12 +4,15 @@
 #include <set>
 
 // cosmos
-#include "cosmos/proc/clone.hxx"
-#include "cosmos/proc/process.hxx"
-#include "cosmos/proc/Signal.hxx"
-#include "cosmos/proc/SignalFD.hxx"
 #include "cosmos/fs/Directory.hxx"
 #include "cosmos/fs/File.hxx"
+#include "cosmos/fs/FileStatus.hxx"
+#include "cosmos/io/EventFile.hxx"
+#include "cosmos/proc/clone.hxx"
+#include "cosmos/proc/ProcessFile.hxx"
+#include "cosmos/proc/process.hxx"
+#include "cosmos/proc/SignalFD.hxx"
+#include "cosmos/proc/Signal.hxx"
 
 // Test
 #include "TestBase.hxx"
@@ -23,6 +26,7 @@ class ProcessTest :
 		testForkWait();
 		testExec();
 		testClone();
+		testPidFD();
 	};
 
 	void testProperties() {
@@ -36,7 +40,7 @@ class ProcessTest :
 		// we don't expect to run set-gid
 		RUN_STEP("not-setgid", cosmos::proc::get_real_group_id() == cosmos::proc::get_effective_group_id());
 	}
-	
+
 	void testEnv() {
 		START_TEST("environment variables");
 
@@ -215,6 +219,50 @@ class ProcessTest :
 			pid_fd.close();
 		} else {
 			cosmos::proc::exit(STATUS);
+		}
+	}
+
+	void testPidFD() {
+		START_TEST("pidfd tests");
+		cosmos::EventFile ef{cosmos::EventFile::Counter{0}, cosmos::EventFile::Flags{}};
+		cosmos::CloneArgs args;
+		cosmos::PidFD pid_fd;
+		args.setFlags(cosmos::CloneFlags{cosmos::CloneSettings::PIDFD});
+		args.setPidFD(pid_fd);
+
+		if (auto child = cosmos::proc::clone(args); child) {
+			cosmos::ProcessFile pf{pid_fd};
+
+			auto counter = ef.wait();
+			auto fstab_num = static_cast<cosmos::FileNum>(counter);
+			auto fstab = pf.dupFD(fstab_num);
+
+			cosmos::FileStatus fstab1_stat{fstab};
+			fstab.close();
+			cosmos::FileStatus fstab2_stat{"/etc/fstab"};
+
+			RUN_STEP("received-fd-is-for-fstab", fstab1_stat.isSameFile(fstab2_stat));
+
+			pf.sendSignal(cosmos::signal::USR1);
+
+			auto res = pf.wait();
+
+			RUN_STEP("child-exited-due-to-signal", res->signaled() && res->termSignal() == cosmos::signal::USR1);
+		} else {
+			cosmos::File fstab{"/etc/fstab", cosmos::OpenMode::READ_ONLY};;
+			// communicate the file descriptor number as event
+			// counter, a bit hacky, but works
+			ef.signal(static_cast<cosmos::EventFile::Counter>(fstab.fd().raw()));
+
+			cosmos::SignalFD fd{cosmos::signal::USR1};
+			cosmos::SignalFD::SigInfo info;
+			fd.readEvent(info);
+			fstab.close();
+
+			// we're not blocking the signal, thus the default
+			// action should occur, and this exit() will never
+			// execute
+			cosmos::proc::exit(cosmos::ExitStatus{5});
 		}
 	}
 };
