@@ -8,7 +8,7 @@ libenv.Append(CCFLAGS="-fvisibility=hidden")
 libenv.Append(CCFLAGS="-DCOSMOS_EXPORT")
 libenv.Append(LINKFLAGS="-pthread")
 libenv.Append(CPPPATH=["."])
-libenv.Append(CPPPATH = public_includes)
+libenv.Append(CPPPATH=public_includes)
 
 libcosmos_srcs = env.GatherSources(suffixes=[".cxx"])
 

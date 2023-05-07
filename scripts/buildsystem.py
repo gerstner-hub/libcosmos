@@ -55,7 +55,10 @@ def registerLibConfig(self, name, node, flags, config={}):
 
     libs = flags.setdefault("LIBS", [])
     libs.append(name)
-    flags["LIBPATH"] = [Dir(".").abspath]
+    libdir = Dir(".").abspath
+    flags["LIBPATH"] = [libdir]
+    if self["use_rpath"]:
+        flags["RPATH"] = [libdir]
     rootenv['libs'][name] = node
     rootenv['libflags'][name] = flags
     rootenv['libconfigs'][name] = config
@@ -134,9 +137,16 @@ def initSCons(project, rtti=True):
     This allows separate projects to work together.
     """
 
+    def evalBool(arg):
+        return arg.lower() in ["1", "true", "yes"]
+
     # some basic cross compilation support using GCC
     gcc_prefix = ARGUMENTS.get("gcc-prefix", None)
-    use_clang = ARGUMENTS.get("use-clang", "0").lower() in ["1", "true", "yes"]
+    use_clang = evalBool(ARGUMENTS.get("use-clang", "0"))
+    # Whether we should add an rpath entry during linking executables to
+    # automatically find shared libraries. This eases running executables
+    # directly from the build tree, not so great for an install tree though.
+    use_rpath = evalBool(ARGUMENTS.get("use-rpath", "1"))
 
     env_options = {
             "ENV": {
@@ -174,6 +184,7 @@ def initSCons(project, rtti=True):
     env['rootenv'] = env
     env['libflags'] = {}
     env['project'] = project
+    env['use_rpath'] = use_rpath
     env.Append(CXXFLAGS = ["-std=c++17"])
     if "CXXFLAGS" in os.environ:
         # add user specified flags
