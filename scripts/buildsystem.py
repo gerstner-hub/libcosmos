@@ -140,6 +140,24 @@ def initSCons(project, rtti=True):
     def evalBool(arg):
         return arg.lower() in ["1", "true", "yes"]
 
+    def getBuildroot():
+        # support parallel (default) buildroots for certain different configurations
+        if use_clang:
+            flavour = "clang"
+        else:
+            flavour = None
+
+        defbuildroot = "build"
+
+        if flavour:
+            defbuildroot += f".{flavour}"
+        return ARGUMENTS.get("buildroot", defbuildroot)
+
+    def getInstroot():
+        definstroot = "install"
+
+        return ARGUMENTS.get("instroot", definstroot)
+
     # some basic cross compilation support using GCC
     gcc_prefix = ARGUMENTS.get("gcc-prefix", None)
     use_clang = evalBool(ARGUMENTS.get("use-clang", "0"))
@@ -226,21 +244,12 @@ def initSCons(project, rtti=True):
 
     env.Append(CCFLAGS = [f"-W{warning}" for warning in warnings])
 
-    buildroot_base = "build"
-    # support parallel buildroots for certain different configurations
-    flavour = None
-
-    if use_clang:
-        flavour = "clang"
-
-    if flavour:
-        buildroot_base += f".{flavour}"
-
-    buildroot = Dir(buildroot_base).srcnode().abspath + "/"
+    buildroot = Dir(getBuildroot()).srcnode().abspath + "/"
 
     env.VariantDir(buildroot, ".", duplicate=False)
 
     env['buildroot'] = buildroot
+    env['instroot'] = getInstroot()
     env['libs'] = dict()
     env['bins'] = dict()
     env['pkgs'] = dict()

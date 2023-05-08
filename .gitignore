@@ -1,6 +1,8 @@
 .scons*
 build
 build.*
+install
+install.*
 .tags
 *.swp
 *.swo
