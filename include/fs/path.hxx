@@ -5,6 +5,9 @@
 #include <string>
 #include <string_view>
 
+// cosmos
+#include "cosmos/dso_export.h"
+
 /**
  * @file
  *

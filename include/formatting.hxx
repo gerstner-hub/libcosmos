@@ -13,6 +13,7 @@
 // cosmos
 #include "cosmos/algs.hxx"
 #include "cosmos/compiler.hxx"
+#include "cosmos/dso_export.h"
 #include "cosmos/ostypes.hxx"
 
 /**

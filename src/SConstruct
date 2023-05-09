@@ -2,8 +2,6 @@ Import('env')
 
 libenv = env.Clone()
 public_includes = Dir(".").srcnode().abspath + "/../include"
-# automatically include the export header to reduce noise in headers
-libenv.Append(CCFLAGS = ["-include",  "cosmos/dso_export.h"])
 libenv.Append(LINKFLAGS="-pthread")
 libenv.Append(CPPPATH=["."])
 libenv.Append(CPPPATH=public_includes)
@@ -36,7 +34,6 @@ else:
     )
 
 env.RegisterLibConfig('libcosmos', libcosmos, {
-    "CCFLAGS": ["-DCOSMOS_API="],
     "CPPPATH": [public_includes],
     "LINKFLAGS": ["-pthread"]
 })

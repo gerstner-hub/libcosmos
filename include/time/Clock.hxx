@@ -2,6 +2,7 @@
 #define COSMOS_CLOCK_HXX
 
 // cosmos
+#include "cosmos/dso_export.h"
 #include "cosmos/time/types.hxx"
 #include "cosmos/types.hxx"
 

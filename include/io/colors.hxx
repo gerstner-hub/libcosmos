@@ -8,6 +8,7 @@
 
 // cosmos
 #include "cosmos/algs.hxx"
+#include "cosmos/dso_export.h"
 
 /**
  * @file
