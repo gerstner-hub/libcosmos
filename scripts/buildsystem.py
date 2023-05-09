@@ -2,6 +2,7 @@ from SCons.Script import *
 import os
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 def sequencify(arg):
@@ -203,6 +204,12 @@ def initSCons(project, rtti=True):
     env['libflags'] = {}
     env['project'] = project
     env['use_rpath'] = use_rpath
+    env['libtype'] = ARGUMENTS.get("libtype", "shared")
+
+    if env['libtype'] not in ("shared", "static"):
+        print(f"Invalid libtype {env['libtype']}: use 'shared' or 'static'", file=sys.stderr)
+        sys.exit(1)
+
     env.Append(CXXFLAGS = ["-std=c++17"])
     if "CXXFLAGS" in os.environ:
         # add user specified flags
