@@ -5,13 +5,13 @@
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/formatting.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
+#include "cosmos/proc/pidfd.h"
 #include "cosmos/proc/Signal.hxx"
 #include "cosmos/proc/SigSet.hxx"
 
 // Linux
 #include <signal.h>
 #include <string.h>
-#include <sys/pidfd.h>
 
 namespace cosmos {
 
@@ -52,7 +52,7 @@ void send(const PidFD pidfd, const Signal s) {
 	// the third siginfo_t argument allows more precise control of the
 	// signal auxiliary data, but the defaults are just like kill(), so
 	// let's use them for now.
-	if (pidfd_send_signal(to_integral(pidfd.raw()), to_integral(s.raw()), nullptr, 0) != 0) {
+	if (::pidfd_send_signal(to_integral(pidfd.raw()), to_integral(s.raw()), nullptr, 0) != 0) {
 		cosmos_throw (ApiError());
 	}
 }

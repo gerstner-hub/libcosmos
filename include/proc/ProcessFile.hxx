@@ -1,14 +1,12 @@
 #ifndef COSMOS_PROCESSFILE_HXX
 #define COSMOS_PROCESSFILE_HXX
 
-// Linux
-#include <sys/pidfd.h>
-
 // C++
 #include <optional>
 
 // cosmos
 #include "cosmos/BitMask.hxx"
+#include "cosmos/proc/pidfd.h"
 #include "cosmos/proc/PidFD.hxx"
 #include "cosmos/proc/process.hxx"
 #include "cosmos/proc/Signal.hxx"
