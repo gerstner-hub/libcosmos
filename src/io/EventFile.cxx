@@ -13,18 +13,14 @@ EventFile::EventFile(const Counter initval, const Flags flags) {
 		cosmos_throw (ApiError("eventfd()"));
 	}
 
-	m_file.open(FileDescriptor{FileNum{fd}}, AutoCloseFD{true});
-}
-
-void EventFile::close() {
-	m_file.close();
+	this->open(FileDescriptor{FileNum{fd}}, AutoCloseFD{true});
 }
 
 EventFile::Counter EventFile::wait() {
 	Counter ret;
 	// I don't believe short reads are possible with eventfds, so use
 	// regular read() instead of readAll().
-	const auto bytes = m_file.read(&ret, sizeof(Counter));
+	const auto bytes = this->read(&ret, sizeof(Counter));
 
 	if (bytes != sizeof(ret)) {
 		cosmos_throw (RuntimeError("short eventfd read?!"));
@@ -34,7 +30,7 @@ EventFile::Counter EventFile::wait() {
 }
 
 void EventFile::signal(const Counter increment) {
-	const auto bytes = m_file.write(&increment, sizeof(increment));
+	const auto bytes = this->write(&increment, sizeof(increment));
 
 	if (bytes != sizeof(increment)) {
 		cosmos_throw (RuntimeError("short eventfd write?!"));

@@ -7,9 +7,9 @@
 // cosmos
 #include "cosmos/error/CosmosError.hxx"
 #include "cosmos/fs/Directory.hxx"
+#include "cosmos/fs/FDFile.hxx"
 #include "cosmos/fs/File.hxx"
 #include "cosmos/fs/filesystem.hxx"
-#include "cosmos/fs/StreamFile.hxx"
 #include "cosmos/fs/TempDir.hxx"
 #include "cosmos/fs/TempFile.hxx"
 #include "cosmos/io/Pipe.hxx"
@@ -74,7 +74,7 @@ public:
 	void testReadFile() {
 		START_TEST("Test reading files");
 
-		cosmos::StreamFile sf;
+		cosmos::File sf;
 		START_STEP("Opening /etc/hosts");
 		sf.open("/etc/hosts", cosmos::OpenMode::READ_ONLY);
 
@@ -93,7 +93,7 @@ public:
 	void testWriteFile() {
 		START_TEST("Test writing files");
 
-		cosmos::StreamFile sf;
+		cosmos::File sf;
 		START_STEP("Writing hosts data to tmpfile");
 		sf.open("/tmp", cosmos::OpenMode::READ_WRITE, cosmos::OpenFlags({cosmos::OpenSettings::TMPFILE}), cosmos::ModeT{0700});
 		sf.writeAll(m_hosts_content.data(), m_hosts_content.size());
@@ -112,8 +112,8 @@ public:
 	void testPipeStream() {
 		START_TEST("stream data over pipe");
 		cosmos::Pipe pipe;
-		cosmos::StreamFile reader{pipe.readEnd(), cosmos::AutoCloseFD{false}};
-		cosmos::StreamFile writer{pipe.writeEnd(), cosmos::AutoCloseFD{false}};
+		cosmos::FDFile reader{pipe.readEnd(), cosmos::AutoCloseFD{false}};
+		cosmos::FDFile writer{pipe.writeEnd(), cosmos::AutoCloseFD{false}};
 
 		const std::string_view message{"going over the pipe"};
 		writer.writeAll(message);

@@ -23,34 +23,34 @@ class TimerFdTest :
 		START_TEST("validity");
 		TimerFD tfd;
 
-		RUN_STEP("default-not-valid", !tfd.valid());
+		RUN_STEP("default-not-valid", !tfd.isOpen());
 
 		tfd = TimerFD{TimerFD::defaults};
 
-		RUN_STEP("defsettings-valid", tfd.valid());
+		RUN_STEP("defsettings-valid", tfd.isOpen());
 
 		tfd.close();
 
-		RUN_STEP("invalid-after-close", !tfd.valid());
+		RUN_STEP("invalid-after-close", !tfd.isOpen());
 
 		tfd = TimerFD{TimerFD::CreateFlags{TimerFD::CreateSettings::NONBLOCK}};
 
-		RUN_STEP("custom-settings-valid", tfd.valid());
+		RUN_STEP("custom-settings-valid", tfd.isOpen());
 
 		tfd.close();
 
 		tfd.create();
 
-		RUN_STEP("create-valid", tfd.valid());
+		RUN_STEP("create-valid", tfd.isOpen());
 
 		tfd.create();
 
-		RUN_STEP("double-create-valid", tfd.valid());
+		RUN_STEP("double-create-valid", tfd.isOpen());
 
 		tfd.close();
 		tfd.close();
 
-		RUN_STEP("double-close-invalid", !tfd.valid());
+		RUN_STEP("double-close-invalid", !tfd.isOpen());
 	}
 
 	void testTicks() {

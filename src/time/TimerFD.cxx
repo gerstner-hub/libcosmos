@@ -11,24 +11,11 @@
 namespace cosmos {
 
 template <ClockType CLOCK>
-TimerFD<CLOCK>::~TimerFD() {
-	if (valid()) {
-		try {
-			close();
-		} catch (const std::exception &ex) {
-			noncritical_error(
-				sprintf("%s: failed to close()", __FUNCTION__),
-				ex);
-		}
-	}
-}
-
-template <ClockType CLOCK>
 void TimerFD<CLOCK>::create(const TimerFD::CreateFlags flags) {
 	close();
 
 	if (auto fd = timerfd_create(to_integral(CLOCK), flags.raw()); FileNum{fd} != FileNum::INVALID) {
-		m_fd = FileDescriptor{FileNum{fd}};
+		this->open(FileDescriptor{FileNum{fd}}, AutoCloseFD{true});
 		return;
 	}
 
@@ -63,7 +50,7 @@ template <ClockType CLOCK>
 uint64_t TimerFD<CLOCK>::wait() {
 	uint64_t ret;
 
-	const auto bytes = m_io.read(reinterpret_cast<void*>(&ret), sizeof(ret));
+	const auto bytes = this->read(reinterpret_cast<void*>(&ret), sizeof(ret));
 
 	// from the man page I deduce that short reads should not be possible
 	// (reads with less than 8 bytes return EINVAL)

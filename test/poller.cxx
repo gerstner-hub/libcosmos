@@ -2,9 +2,9 @@
 #include <iostream>
 
 // cosmos
+#include "cosmos/fs/FDFile.hxx"
 #include "cosmos/io/Poller.hxx"
 #include "cosmos/io/Pipe.hxx"
-#include "cosmos/fs/StreamFile.hxx"
 
 // Test
 #include "TestBase.hxx"
@@ -49,7 +49,7 @@ class PollerTest :
 
 		RUN_STEP("verify-no-spurious-event", ready.empty());
 
-		cosmos::StreamFile pipe_write{pp.writeEnd(), cosmos::AutoCloseFD{false}};
+		cosmos::FDFile pipe_write{pp.writeEnd(), cosmos::AutoCloseFD{false}};
 
 		pipe_write.write("test", 4);
 

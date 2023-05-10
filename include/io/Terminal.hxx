@@ -9,7 +9,7 @@
 #include <utility>
 
 // Cosmos
-#include "cosmos/fs/File.hxx"
+#include "cosmos/fs/FileBase.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
 
 /**
@@ -44,9 +44,9 @@ class COSMOS_API Terminal {
 public:
 	Terminal() {}
 	explicit Terminal(FileDescriptor fd) : m_fd(fd) {}
-	explicit Terminal(const File &f) : m_fd(f.fd()) {}
+	explicit Terminal(const FileBase &f) : m_fd(f.fd()) {}
 
-	void setFD(const File &f) {
+	void setFD(const FileBase &f) {
 		m_fd = f.fd();
 	}
 

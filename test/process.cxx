@@ -5,8 +5,8 @@
 
 // cosmos
 #include "cosmos/fs/Directory.hxx"
-#include "cosmos/fs/File.hxx"
 #include "cosmos/fs/FileStatus.hxx"
+#include "cosmos/fs/File.hxx"
 #include "cosmos/io/EventFile.hxx"
 #include "cosmos/proc/clone.hxx"
 #include "cosmos/proc/ProcessFile.hxx"

@@ -31,9 +31,8 @@ namespace cosmos {
  * only meant as an access wrapper, not as a permanent representation of the
  * backed file.
  *
- * This type holds a reference to a FileDescriptor object since it is mainly
- * intended to be used in the aggregate type StreamFile to couple File open
- * logic with stream based access.
+ * StreamIO has a fixed coupling to the assigned file descriptor. It is
+ * designed to be used as a mixin class.
  **/
 class COSMOS_API StreamIO {
 public: // types
@@ -61,7 +60,7 @@ public: // types
 	};
 
 public: // functions
-
+	
 	explicit StreamIO(FileDescriptor &fd) :
 			m_stream_fd{fd}
 	{}
@@ -70,7 +69,8 @@ public: // functions
 	StreamIO& operator=(const StreamIO&) = delete;
 
 	StreamIO& operator=(StreamIO &&) {
-		// the coupling to the file descriptor needs to stay the same
+		// simply do nothing, the fixed coupling to the FD remains and
+		// should reflect the new object state.
 		return *this;
 	}
 

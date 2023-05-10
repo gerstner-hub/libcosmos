@@ -1,30 +1,28 @@
-#ifndef COSMOS_FILE_HXX
-#define COSMOS_FILE_HXX
+#ifndef COSMOS_NAMEDFILE_HXX
+#define COSMOS_NAMEDFILE_HXX
 
 // C++
 #include <optional>
 #include <string_view>
 
 // cosmos
+#include "cosmos/fs/FileBase.hxx"
 #include "cosmos/fs/DirFD.hxx"
-#include "cosmos/fs/FileDescriptor.hxx"
-#include "cosmos/fs/types.hxx"
-#include "cosmos/ostypes.hxx"
-#include "cosmos/types.hxx"
 
 namespace cosmos {
 
-/// Representation of open file objects.
+/// File objects that are opened by pathname.
 /**
- * On the level of this type mainly the means to open a file are provided
- * (usually by path name or by using an existing file descriptor). Some
- * operations on file descriptor level are implemented here as well.
+ * On the level of this type the means to open a file by pathname are
+ * provided. This also allows to create new files depending on the used
+ * OpenFlags. As a special case opening file by name relative to an existing
+ * DirFD is possible.
  *
- * There is no actual interface to deal with the file content. See e.g.
- * StreamFile for a specialization of this class that implements streaming
- * I/O.
+ * This is the typical File type to use when there are no special
+ * circumstances.
  **/
-class COSMOS_API File {
+class COSMOS_API File :
+		public FileBase {
 public: // functions
 
 	File() = default;
@@ -53,31 +51,6 @@ public: // functions
 		open(dir_fd, path, mode, flags, fmode);
 	}
 
-	/// Wrap the given file descriptor applying the specified auto-close behaviour.
-	File(const FileDescriptor fd, const AutoCloseFD auto_close) {
-		open(fd, auto_close);
-	}
-
-	// Prevent copying due to the file descriptor ownership.
-	File(const File&) = delete;
-	File& operator=(const File&) = delete;
-
-	File(File &&other) {
-		*this = std::move(other);
-	}
-
-	File& operator=(File &&other) {
-		m_auto_close = other.m_auto_close;
-		m_fd = other.m_fd;
-
-		other.m_fd.reset();
-		other.m_auto_close = AutoCloseFD{};
-
-		return *this;
-	}
-
-	virtual ~File();
-
 	/// \see File(const std::string_view, const OpenMode).
 	void open(const std::string_view path, const OpenMode mode) {
 		return open(path, mode, OpenFlags{OpenSettings::CLOEXEC});
@@ -102,52 +75,6 @@ public: // functions
 	 **/
 	void open(const DirFD dir_fd, const std::string_view path, const OpenMode mode,
 			const OpenFlags flags, const std::optional<FileMode> fmode = {});
-
-	/// Takes the already open file descriptor fd and operates on it.
-	/**
-	 * The caller is responsible for invalidating \c fd, if desired, and
-	 * that the file descriptor is not used in conflicting ways.
-	 *
-	 * The parameter \c auto_close determines whether the File object will
-	 * take ownership of the file descriptor, or not. If so then the file
-	 * descriptor is closed on OS level if deemed necessary by the
-	 * implementation.
-	 **/
-	void open(const FileDescriptor fd, const AutoCloseFD auto_close) {
-		m_fd = fd;
-		m_auto_close = auto_close;
-	}
-
-	/// Close the current file object.
-	/**
-	 * If currently no file is open then this does nothing. If currently
-	 * an external FileDescriptor is wrapped and auto-close is not set
-	 * then only the object's state will be invalidated. Otherwise the
-	 * referenced file descriptor will also be closed on OS-level.
-	 **/
-	void close() {
-		if (!isOpen())
-			return;
-
-		if (m_auto_close) {
-			m_fd.close();
-		} else {
-			m_fd.reset();
-		}
-
-		m_auto_close = AutoCloseFD{true};
-	}
-
-	/// Returns whether currently a FileDescriptor is opened.
-	bool isOpen() const { return m_fd.valid(); }
-
-	/// Allows access to the underlying fd with const semantics.
-	FileDescriptor fd() const { return m_fd; }
-
-protected: // data
-
-	AutoCloseFD m_auto_close;
-	FileDescriptor m_fd;
 };
 
 } // end ns

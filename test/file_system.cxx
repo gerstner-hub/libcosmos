@@ -10,7 +10,7 @@
 #include "cosmos/fs/Directory.hxx"
 #include "cosmos/fs/filesystem.hxx"
 #include "cosmos/fs/FileStatus.hxx"
-#include "cosmos/fs/StreamFile.hxx"
+#include "cosmos/fs/File.hxx"
 #include "cosmos/proc/ChildCloner.hxx"
 #include "cosmos/proc/process.hxx"
 #include "cosmos/PasswdInfo.hxx"
@@ -234,7 +234,7 @@ class FileSystemTest :
 	void testLinkAtFD() {
 		START_TEST("linkat_fd");
 		cosmos::Directory tmp{"/tmp"};
-		cosmos::StreamFile tmpfile{
+		cosmos::File tmpfile{
 			tmp.fd(),
 			".",
 			cosmos::OpenMode{cosmos::OpenMode::WRITE_ONLY},
@@ -266,7 +266,7 @@ class FileSystemTest :
 
 		auto path = testdir / "modfile";
 
-		cosmos::StreamFile modfile{
+		cosmos::File modfile{
 			path.string(),
 			cosmos::OpenMode{cosmos::OpenMode::WRITE_ONLY},
 			cosmos::OpenFlags{cosmos::OpenSettings::CREATE},
@@ -292,7 +292,7 @@ class FileSystemTest :
 		auto [testdir, tempdir] = getTestDir();
 
 		auto path = testdir / "ownfile";
-		cosmos::StreamFile ownfile{
+		cosmos::File ownfile{
 			path.string(),
 			cosmos::OpenMode{cosmos::OpenMode::WRITE_ONLY},
 			cosmos::OpenFlags{cosmos::OpenSettings::CREATE},
@@ -389,7 +389,7 @@ class FileSystemTest :
 		const auto linkbase = "targetfile";
 		auto linktarget = testdir / linkbase;
 
-		cosmos::StreamFile targetfile{
+		cosmos::File targetfile{
 			linktarget.string(),
 			cosmos::OpenMode{cosmos::OpenMode::WRITE_ONLY},
 			cosmos::OpenFlags{cosmos::OpenSettings::CREATE},
@@ -411,7 +411,7 @@ class FileSystemTest :
 			RUN_STEP("readlinkat-content-matches", linkat_content == linkbase);
 		}
 
-		cosmos::StreamFile linkfile{
+		cosmos::File linkfile{
 			linkpath.string(),
 			cosmos::OpenMode{cosmos::OpenMode::READ_ONLY}
 		};

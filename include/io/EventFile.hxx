@@ -6,7 +6,7 @@
 
 // cosmos
 #include "cosmos/BitMask.hxx"
-#include "cosmos/fs/StreamFile.hxx"
+#include "cosmos/fs/FDFile.hxx"
 
 namespace cosmos {
 
@@ -39,7 +39,8 @@ namespace cosmos {
  * wait for the file descriptor to become readable of writable. Reading
  * corresponds to wait() and writing corresponds to signal().
  **/
-class COSMOS_API EventFile {
+class COSMOS_API EventFile :
+		protected FDFile {
 public: // types
 
 	/// Strong counter type used with the event fd.
@@ -57,23 +58,9 @@ public: // functions
 
 	explicit EventFile(const Counter initval = Counter{0}, const Flags flags = Flags{Settings::CLOSE_ON_EXEC});
 
-	EventFile(const EventFile &) = delete;
-	EventFile& operator=(const EventFile&) = delete;
-
-	EventFile(EventFile &&other) {
-		*this = std::move(other);
-	}
-
-	EventFile& operator=(EventFile &&other) {
-		m_file = std::move(other.m_file);
-		return *this;
-	}
-
-	void close();
-
-	bool isOpen() {
-		return m_file.isOpen();
-	}
+	using FDFile::close;
+	using FileBase::fd;
+	using FileBase::isOpen;
 
 	/// Wait for the counter to become non-zero.
 	/**
@@ -97,24 +84,6 @@ public: // functions
 	 * Settings::SEMAPHORE is active.
 	 **/
 	void signal(const Counter increment = Counter{1});
-
-	/// Direct access to the underlying file descriptor e.g. for use with Poller.
-	FileDescriptor fd() const {
-		return m_file.fd();
-	}
-
-	/// Provides direct access to the StreamFile API of the eventfd.
-	/**
-	 * The caller shouldn't close the return file, it should only be used
-	 * for I/O purposes.
-	 **/
-	StreamFile& streamFile() {
-		return m_file;
-	}
-
-protected: // data
-
-	StreamFile m_file;
 };
 
 } // end ns

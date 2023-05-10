@@ -6,8 +6,7 @@
 
 // cosmos
 #include "cosmos/BitMask.hxx"
-#include "cosmos/fs/FileDescriptor.hxx"
-#include "cosmos/io/StreamIO.hxx"
+#include "cosmos/fs/FDFile.hxx"
 #include "cosmos/time/Clock.hxx"
 
 namespace cosmos {
@@ -35,7 +34,8 @@ namespace cosmos {
  * different clocks.
  **/
 template <ClockType CLOCK>
-class TimerFD {
+class TimerFD :
+		protected FDFile {
 	// this is not copy/assignable
 	TimerFD(const TimerFD&) = delete;
 	TimerFD& operator=(const TimerFD&) = delete;
@@ -122,11 +122,10 @@ public: // types
 public:
 
 	/// Creates an empty (invalid) timer fd.
-	TimerFD() : m_io{m_fd}
-	{}
+	TimerFD() = default;
 
 	/// Creates a timer fd with the given flags ready for operation.
-	explicit TimerFD(const CreateFlags flags) : m_io{m_fd} {
+	explicit TimerFD(const CreateFlags flags) {
 		create(flags);
 	}
 
@@ -134,37 +133,28 @@ public:
 	/**
 	 * Default flags most notably include the CLOEXEC creation flag.
 	 **/
-	explicit TimerFD(const CreateT) : m_io{m_fd} {
+	explicit TimerFD(const CreateT) {
 		create();
 	}
 
-	TimerFD(TimerFD &&other) : m_io{m_fd} {
+	TimerFD(TimerFD &&other) {
 		*this = std::move(other);
 	}
 
 	TimerFD& operator=(TimerFD &&other) {
-		m_fd = other.m_fd;
-		other.m_fd.reset();
+		static_cast<FDFile&>(*this) = std::move(other);
 		return *this;
 	}
 
-	/// Calls close() on the FD, if not yet closed.
-	~TimerFD();
-
-	/// Whether a valid timer fd is currently present.
-	/**
-	 * If the timer is not valid i.e. create() wasn't called yet, then any
-	 * operations exception create() and close() will fail on the object.
-	 **/
-	bool valid() {
-		return m_fd.valid();
-	}
+	using FDFile::close;
+	using FileBase::fd;
+	using FileBase::isOpen;
 
 	/// Creates a new timer fd using the given flags.
 	/**
 	 * After this function call the timer will be ready for operation. 
 	 *
-	 * If there already is a valid timer fd (i.e. valid() == \c true) then
+	 * If there already is a valid timer fd (i.e. isOpen() == \c true) then
 	 * close() will be called first.
 	 *
 	 * This call can cause an ApiError to be thrown e.g. if the maximum
@@ -181,11 +171,11 @@ public:
 	 * file descriptor exist (dup'ed) then this will only happen after all
 	 * copies are closed.
 	 *
-	 * If valid() returns \c false then close() returns without doing
+	 * If isOpen() returns \c false then close() returns without doing
 	 * anything.
 	 **/
-	void close() {
-		m_fd.close();
+	void close() override {
+		FDFile::close();
 	}
 
 	/// Arm the timer using the given settings and flags.
@@ -236,17 +226,6 @@ public:
 	void disarm() {
 		setTime(TimerSpec{});
 	}
-
-	/// Returns the const raw file descriptor for the TimerFD.
-	/**
-	 * The ownership of the file descriptor belongs to the TimerFD class.
-	 * It shall only be closed by TimerFD itself.
-	 **/
-	auto fd() const { return m_fd; }
-protected: // data
-
-	FileDescriptor m_fd;
-	StreamIO m_io;
 };
 
 using RealTimeTimerFD  = TimerFD<ClockType::REALTIME>;

@@ -3,13 +3,13 @@
 
 // cosmos
 #include "cosmos/fs/filesystem.hxx"
-#include "cosmos/fs/StreamFile.hxx"
+#include "cosmos/fs/FileBase.hxx"
 
 namespace cosmos {
 
-/// Specialization of StreamFile for managing temporary files.
+/// Specialization of FileBase for managing temporary files.
 /**
- * Create a named temporary file in a template path and manages the lifetime
+ * Creates a named temporary file in a template path and manages the lifetime
  * of the resulting file descriptor and of the file on file system level.
  *
  * Upon close() both the file descriptor will be closed and the file on disk
@@ -19,7 +19,7 @@ namespace cosmos {
  * _template path.
  **/
 class COSMOS_API TempFile :
-		public StreamFile {
+		public FileBase {
 public: // functions
 	
 	TempFile() = default;
@@ -30,13 +30,19 @@ public: // functions
 
 	~TempFile();
 
-	// Prevent copying due to the path deletion responsibility.
-	TempFile(const TempFile&) = delete;
-	TempFile& operator=(const TempFile&) = delete;
+	TempFile& operator=(TempFile &&other) {
+		m_tmp_path = other.m_tmp_path;
+		other.m_tmp_path.clear();
 
-	void close() {
+		FileBase::operator=(std::move(other));
+		return *this;
+	}
+
+	// Prevent copying due to the path deletion responsibility.
+
+	void close() override {
 		try {
-			StreamFile::close();
+			FileBase::close();
 		} catch(...) {
 			unlinkPath();
 			throw;
@@ -49,7 +55,7 @@ public: // functions
 		close();
 
 		auto [fd, path] = fs::make_tempfile(_template, flags);
-		StreamFile::open(fd, AutoCloseFD{true});
+		m_fd = fd;
 		m_tmp_path = path;
 	}
 

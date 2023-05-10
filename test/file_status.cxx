@@ -9,10 +9,9 @@
 #include "cosmos/fs/Directory.hxx"
 #include "cosmos/fs/DirIterator.hxx"
 #include "cosmos/fs/DirStream.hxx"
-#include "cosmos/fs/File.hxx"
 #include "cosmos/fs/FileStatus.hxx"
 #include "cosmos/fs/filesystem.hxx"
-#include "cosmos/fs/StreamFile.hxx"
+#include "cosmos/fs/File.hxx"
 
 // Test
 #include "TestBase.hxx"
@@ -261,7 +260,7 @@ protected:
 	const cosmos::OpenFlags m_flags{cosmos::OpenSettings::CREATE};
 	const cosmos::FileMode m_mode{cosmos::ModeT{0600}};
 	cosmos::File m_first_file;
-	cosmos::StreamFile m_second_file;
+	cosmos::File m_second_file;
 	cosmos::TempDir m_tmp_dir;
 };
 

@@ -3,7 +3,7 @@
 
 // cosmos
 #include "cosmos/fs/FileDescriptor.hxx"
-#include "cosmos/fs/StreamFile.hxx"
+#include "cosmos/fs/File.hxx"
 
 // Test
 #include "TestBase.hxx"
@@ -44,7 +44,7 @@ public:
 
 		RUN_STEP("set-cloxec", new_fd.getFlags()[Flags::CLOEXEC] == false);
 
-		cosmos::StreamFile sf{m_argv[0], cosmos::OpenMode::READ_ONLY};
+		cosmos::File sf{m_argv[0], cosmos::OpenMode::READ_ONLY};
 		auto sf_fd = sf.fd();
 		// syncing a read-only FD is allowed in Linux
 		DOES_NOT_THROW("sync-on-ro-fd", sf_fd.sync());
@@ -62,7 +62,7 @@ public:
 
 	void testStatusFlags() {
 		START_TEST("Testing status flag retrieval/setting");
-		cosmos::StreamFile sf{
+		cosmos::File sf{
 			".",
 				cosmos::OpenMode::WRITE_ONLY,
 				cosmos::OpenFlags{cosmos::OpenSettings::TMPFILE},
