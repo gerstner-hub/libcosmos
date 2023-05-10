@@ -145,6 +145,8 @@ def initSCons(project, rtti=True):
         # support parallel (default) buildroots for certain different configurations
         if use_clang:
             flavour = "clang"
+        elif gcc_prefix:
+            flavour = f"{gcc_prefix}"
         else:
             flavour = None
 
@@ -159,9 +161,18 @@ def initSCons(project, rtti=True):
 
         return ARGUMENTS.get("instroot", definstroot)
 
-    # some basic cross compilation support using GCC
-    gcc_prefix = ARGUMENTS.get("gcc-prefix", None)
-    use_clang = evalBool(ARGUMENTS.get("use-clang", "0"))
+    compiler = ARGUMENTS.get("compiler", "")
+    if compiler.endswith("-gcc") or compiler.endswith("-g++"):
+        # some basic cross compilation support using GCC
+        gcc_prefix = compiler[:-4]
+    else:
+        gcc_prefix = None
+    use_clang = compiler in ("clang", "clang++")
+
+    if compiler and not (gcc_prefix or use_clang):
+        print(f"Unrecognized compiler '{compiler}': use `clang` or `some-arch-gcc`", file=sys.stderr)
+        sys.exit(1)
+
     # Whether we should add an rpath entry during linking executables to
     # automatically find shared libraries. This eases running executables
     # directly from the build tree, not so great for an install tree though.
