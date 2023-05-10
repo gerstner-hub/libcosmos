@@ -1,0 +1,78 @@
+#ifndef COSMOS_MEMFILE_HXX
+#define COSMOS_MEMFILE_HXX
+
+// Linux
+#include <sys/mman.h>
+
+// C++
+#include <string_view>
+
+// cosmos
+#include "cosmos/BitMask.hxx"
+#include "cosmos/dso_export.h"
+#include "cosmos/fs/FileBase.hxx"
+
+namespace cosmos {
+
+/// A file only backed by memory, not by an actual file system.
+/**
+ * This type can create memory backed files that are not visible in the file
+ * system. As a speciality this type of file allows adding seals via
+ * FileDescriptor::addSeals().
+ *
+ * Files created by this type are always opened in OpenMode::READ_WRITE.
+ **/
+class COSMOS_API MemFile :
+		public FileBase {
+public: // types
+
+	/// Available open settings for the MemFile type
+	enum class OpenSettings : unsigned int {
+		CLOEXEC       = MFD_CLOEXEC,       /// Apply close-on-exec semantics
+		ALLOW_SEALING = MFD_ALLOW_SEALING, /// Allow MemFD file sealing operations.
+		HUGETLB       = MFD_HUGETLB       /// Create the file in the HugeTLB file system.
+	};
+
+	/// Collection of OpenSettings used when creating the MemFile type.
+	using OpenFlags = BitMask<OpenSettings>;
+
+	/// PageSize specification if OpenSettings::HUGETLB is set.
+	enum class HugePageSize : unsigned int {
+		// the values are the log-2 bit positions of the corresponding page sizes
+		DEFAULT       = 0,
+		HUGE_2MB      = 21,
+		HUGE_8MB      = 23,
+		HUGE_16MB     = 24,
+		HUGE_32MB     = 25,
+		HUGE_256MB    = 28,
+		HUGE_512MB    = 29,
+		HUGE_1GB      = 30,
+		HUGE_2GB      = 31,
+		HUGE_16GB     = 34
+	};
+
+public: // functions
+
+	MemFile() = default;
+
+	/// \c see create().
+	explicit MemFile(const std::string_view name,
+			const OpenFlags flags = OpenFlags{OpenSettings::CLOEXEC},
+			const HugePageSize tlb_ps = HugePageSize::DEFAULT) {
+		create(name, flags, tlb_ps);
+	}
+
+	/// Create a new MemFile using the given settings.
+	/**
+	 * Create a new memory file using the given flags and optional page
+	 * size. The \c name is only for debugging purposes and is used as an
+	 * identifier in the /proc file system.
+	 **/
+	void create(const std::string_view name,
+			const OpenFlags flags = OpenFlags{OpenSettings::CLOEXEC},
+			const HugePageSize tlb_ps = HugePageSize::DEFAULT);
+};
+
+} // end ns
+
+#endif // inc. guard

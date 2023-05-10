@@ -40,6 +40,18 @@ public: // types
 	/// Collection of OpenSettings used for opening files.
 	typedef BitMask<Flags> DescFlags;
 
+	/// Flags used in addSeals().
+	enum class SealOpts : unsigned int {
+		SEAL         = F_SEAL_SEAL,         /// Locks the seal set itself, further changes will be disallowed.
+		SHRINK       = F_SEAL_SHRINK,       /// Disallow shrinking the file in any way.
+		GROW         = F_SEAL_GROW,         /// Disallow growing the file in any way.
+		WRITE        = F_SEAL_WRITE,        /// Disallow changing the file contents (shrink/grow is still allowed).
+		FUTURE_WRITE = F_SEAL_FUTURE_WRITE  /// Like WRITE but allow existing shared writable mappings to write.
+	};
+
+	/// Collection SealOpts for applying seals in addSeals().
+	using SealFlags = BitMask<SealOpts>;
+
 public: // functions
 
 	explicit constexpr FileDescriptor(FileNum fd = FileNum::INVALID) :
@@ -161,6 +173,18 @@ public: // functions
 	 * database files etc.).
 	 **/
 	void dataSync();
+
+	/// Add a seal for memory file descriptors.
+	/**
+	 * This is only supported for file descriptors refering to a "memfd"
+	 * as it is created by MemFile. It allows to restrict what operations
+	 * can be performed on the file in the future (this affects all open
+	 * file descriptions refering to the file).
+	 **/
+	void addSeals(const SealFlags flags);
+
+	/// Get the currently set SealFlags for the file descriptor.
+	SealFlags getSeals() const;
 
 	/// Returns the primitive file descriptor contained in the object.
 	FileNum raw() const { return m_fd; }

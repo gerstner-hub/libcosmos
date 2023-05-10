@@ -12,7 +12,9 @@
 #include "cosmos/fs/filesystem.hxx"
 #include "cosmos/fs/TempDir.hxx"
 #include "cosmos/fs/TempFile.hxx"
+#include "cosmos/io/MemFile.hxx"
 #include "cosmos/io/Pipe.hxx"
+#include "cosmos/io/SecretFile.hxx"
 
 // Test
 #include "TestBase.hxx"
@@ -30,6 +32,8 @@ public:
 		testPipeStream();
 		testTempFile();
 		testTempDir();
+		testMemFile();
+		testSecretFile();
 	}
 
 	void testOpenState() {
@@ -155,6 +159,41 @@ public:
 		}
 
 		RUN_STEP("verify-tempdir-removed", !cosmos::fs::exists_file(tmp_path));
+	}
+
+	void testMemFile() {
+		START_TEST("testing memory file");
+		cosmos::MemFile mf{"test-mf"};
+
+		mf.write("test");
+		mf.seekFromStart(0);
+
+		std::string content;
+		mf.readAll(content, 4);
+
+		RUN_STEP("content-retrieved-matches", content == "test");
+	}
+
+	void testSecretFile() {
+		START_TEST("testing secret file");
+		try {
+			cosmos::SecretFile sf{cosmos::CloseOnExec{true}};
+
+			sf.write("test");
+			sf.seekFromStart(0);
+
+			std::string content;
+			sf.readAll(content, 4);
+
+			RUN_STEP("content-retrieved-matches", content == "test");
+		} catch (const cosmos::ApiError &e) {
+			if (e.errnum() == cosmos::Errno::NO_SYS) {
+				// not available on this kernel
+				return;
+			}
+
+			throw;
+		}
 	}
 
 protected:

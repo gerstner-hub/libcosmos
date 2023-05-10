@@ -1,6 +1,5 @@
 // POSIX
 #include <unistd.h>
-#include <fcntl.h>
 
 // C++
 #include <string>
@@ -34,7 +33,7 @@ void FileDescriptor::duplicate(const FileDescriptor new_fd, const CloseOnExec cl
 }
 
 FileDescriptor FileDescriptor::duplicate(const CloseOnExec cloexec) const {
-	const auto fd = fcntl(to_integral(m_fd), cloexec ? F_DUPFD_CLOEXEC : F_DUPFD);
+	const auto fd = ::fcntl(to_integral(m_fd), cloexec ? F_DUPFD_CLOEXEC : F_DUPFD);
 
 	if (fd == -1) {
 		cosmos_throw (ApiError("failed to duplicate file descriptor (F_DUPFD)"));
@@ -44,7 +43,7 @@ FileDescriptor FileDescriptor::duplicate(const CloseOnExec cloexec) const {
 }
 
 FileDescriptor::DescFlags FileDescriptor::getFlags() const {
-	const auto flags = fcntl(to_integral(m_fd), F_GETFD);
+	const auto flags = ::fcntl(to_integral(m_fd), F_GETFD);
 
 	if (flags == -1) {
 		cosmos_throw (ApiError("failed to get flags (F_GETFD)"));
@@ -54,7 +53,7 @@ FileDescriptor::DescFlags FileDescriptor::getFlags() const {
 }
 
 void FileDescriptor::setFlags(const DescFlags flags) {
-	auto res = fcntl(to_integral(m_fd), F_SETFD, flags.raw());
+	auto res = ::fcntl(to_integral(m_fd), F_SETFD, flags.raw());
 
 	if (res != 0) {
 		cosmos_throw (ApiError("failed to set flags (F_SETFD)"));
@@ -62,7 +61,7 @@ void FileDescriptor::setFlags(const DescFlags flags) {
 }
 
 std::tuple<OpenMode, OpenFlags> FileDescriptor::getStatusFlags() const {
-	auto flags = fcntl(to_integral(m_fd), F_GETFL);
+	auto flags = ::fcntl(to_integral(m_fd), F_GETFL);
 
 	if (flags == -1) {
 		cosmos_throw (ApiError("failed to get status flags (F_GETFL)"));
@@ -76,7 +75,7 @@ std::tuple<OpenMode, OpenFlags> FileDescriptor::getStatusFlags() const {
 
 void FileDescriptor::setStatusFlags(const OpenFlags flags) {
 	
-	auto res = fcntl(to_integral(m_fd), F_SETFL, flags.raw());
+	auto res = ::fcntl(to_integral(m_fd), F_SETFL, flags.raw());
 
 	if (res == -1) {
 		cosmos_throw (ApiError("failed to set status flags (F_SETFL)"));
@@ -113,6 +112,24 @@ void FileDescriptor::sync() {
 
 void FileDescriptor::dataSync() {
 	sync_helper(*this, fdatasync);
+}
+
+void FileDescriptor::addSeals(const SealFlags flags) {
+	auto res = ::fcntl(to_integral(m_fd), F_ADD_SEALS, flags.raw());
+
+	if (res != 0) {
+		cosmos_throw (ApiError("failed to add file seals"));
+	}
+}
+
+FileDescriptor::SealFlags FileDescriptor::getSeals() const {
+	auto res = ::fcntl(to_integral(m_fd), F_GET_SEALS);
+
+	if (res == -1) {
+		cosmos_throw (ApiError("failed to get file seals"));
+	}
+
+	return SealFlags{static_cast<SealOpts>(res)};
 }
 
 FileDescriptor stdout(FileNum::STDOUT);
