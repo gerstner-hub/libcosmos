@@ -530,6 +530,25 @@ COSMOS_API void linkat_fd(const FileDescriptor fd, const DirFD new_dir,
 COSMOS_API void linkat_proc_fd(const FileDescriptor fd, const DirFD new_dir,
 		const std::string_view new_path);
 
+/// Changes the file size of the file referred to by \c fd to \c length bytes.
+/**
+ * If \c length is smaller than the current file size, then the extra data
+ * stored in the file is lost. If \c length is larger than the current file
+ * size, then the extra data reads as zero bytes.
+ *
+ * This operation requires the file to be opened for writing. A successful
+ * operation causes the inode of the file to be updated.
+ **/
+COSMOS_API void truncate(const FileDescriptor fd, off_t length);
+
+/// Changes the file size of the file found at the given \c path to \c length bytes.
+/**
+ * Behaves just like truncate(const FileDescriptor, off_t), with the
+ * difference that the operation is performed on the given path. The file must
+ * be writable.
+ **/
+COSMOS_API void truncate(const std::string_view path, off_t length);
+
 } // end ns
 
 #endif // inc. guard

@@ -11,6 +11,7 @@
 #include "cosmos/fs/filesystem.hxx"
 #include "cosmos/fs/FileStatus.hxx"
 #include "cosmos/fs/File.hxx"
+#include "cosmos/fs/TempFile.hxx"
 #include "cosmos/proc/ChildCloner.hxx"
 #include "cosmos/proc/process.hxx"
 #include "cosmos/PasswdInfo.hxx"
@@ -36,6 +37,7 @@ class FileSystemTest :
 		testSymlink();
 		testMakeTempfile();
 		testMakeTempdir();
+		testTruncate();
 	}
 
 	std::pair<std::filesystem::path, cosmos::TempDir> getTestDir() {
@@ -457,6 +459,22 @@ class FileSystemTest :
 		RUN_STEP("tempdir-path-is-expanded", path.size() > _template.size());
 
 		cosmos::fs::remove_tree(path);
+	}
+
+	void testTruncate() {
+		START_TEST("truncate()");
+
+		cosmos::TempFile tf{"/tmp/truncate_test"};
+
+		cosmos::fs::truncate(tf.fd(), 1000);
+		cosmos::FileStatus fs{tf.fd()};
+
+		RUN_STEP("truncate-size-matches", fs.size() == 1000);
+
+		cosmos::fs::truncate(tf.path(), 2000);
+		fs.updateFrom(tf.fd());
+
+		RUN_STEP("truncate-by-path-size-matches", fs.size() == 2000);
 	}
 
 protected:

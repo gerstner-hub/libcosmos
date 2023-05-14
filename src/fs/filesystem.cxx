@@ -546,4 +546,16 @@ void linkat_proc_fd(const FileDescriptor fd, const DirFD new_dir,
 			new_dir, new_path, FollowSymlinks{true});
 }
 
+void truncate(const FileDescriptor fd, off_t length) {
+	if (::ftruncate(to_integral(fd.raw()), length) != 0) {
+		cosmos_throw (ApiError("ftruncate()"));
+	}
+}
+
+void truncate(const std::string_view path, off_t length) {
+	if (::truncate(path.data(), length) != 0) {
+		cosmos_throw (ApiError("truncate()"));
+	}
+}
+
 } // end ns
