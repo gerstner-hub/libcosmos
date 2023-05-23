@@ -161,6 +161,23 @@ def initSCons(project, rtti=True):
 
         return ARGUMENTS.get("instroot", definstroot)
 
+    def getLibBaseDir():
+
+        ret = "lib"
+
+        # trying to determine whether the compiler we use uses /lib64 lib dirs
+        # or only /lib
+        for line in subprocess.check_output([env["CC"], "-print-search-dirs"]).splitlines():
+            line = line.decode()
+            if not line.startswith("libraries:"):
+                continue
+
+            if line.find("/lib64/") != -1:
+                ret = "lib64"
+                break
+
+        return ret
+
     compiler = ARGUMENTS.get("compiler", "")
     if compiler.endswith("-gcc") or compiler.endswith("-g++"):
         # some basic cross compilation support using GCC
@@ -268,6 +285,7 @@ def initSCons(project, rtti=True):
 
     env['buildroot'] = buildroot
     env['instroot'] = getInstroot()
+    env['lib_base_dir'] = getLibBaseDir()
     env['libs'] = dict()
     env['bins'] = dict()
     env['pkgs'] = dict()

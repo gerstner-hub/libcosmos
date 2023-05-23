@@ -33,7 +33,7 @@ if env['project'] == "libcosmos":
             node = env.Install(target, src)
             env.Alias("install", node)
 
-    node = env.InstallVersionedLib(os.path.join(instroot, "lib"), env["libs"]["libcosmos"])
+    node = env.InstallVersionedLib(os.path.join(instroot, env['lib_base_dir']), env["libs"]["libcosmos"])
     env.Alias("install", node)
 
     # TODO: we could also install a pkg-config libcosmos.pc file that explains
