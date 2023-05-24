@@ -251,9 +251,9 @@ def initSCons(project, rtti=True):
         env.Append(CXXFLAGS = sanitizers)
         env.Append(LIBS = ["asan", "ubsan"])
 
-    if ARGUMENTS.get('debug', 0):
+    if evalBool(ARGUMENTS.get('debug', "0")):
         env.Append(CXXFLAGS = ["-O0"])
-    elif ARGUMENTS.get('optforsize', 0):
+    elif evalBool(ARGUMENTS.get('optforsize', "0")):
         env.Append(CXXFLAGS = ["-Os"])
     else:
         env.Append(CXXFLAGS = ["-O2"])
