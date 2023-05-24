@@ -26,20 +26,20 @@ namespace cosmos::locale {
 
 /// Different Locale Categories that can be configured.
 enum class Category : int {
-	ALL            = LC_ALL,       /// all aspects of the locale
-	COLLATE        = LC_COLLATE,   /// comparison of strings
-	CTYPE          = LC_CTYPE,     /// character classification (e.g. alphanumeric, numeric, ...)
-	MESSAGES       = LC_MESSAGES,  /// natural language messages
-	MONETARY       = LC_MONETARY,  /// formatting of monetary values
-	NUMERIC        = LC_NUMERIC,   /// non-monetary numeric values
-	TIME           = LC_TIME       /// formatting of date and time values
+	ALL            = LC_ALL,       ///< all aspects of the locale
+	COLLATE        = LC_COLLATE,   ///< comparison of strings
+	CTYPE          = LC_CTYPE,     ///< character classification (e.g. alphanumeric, numeric, ...)
+	MESSAGES       = LC_MESSAGES,  ///< natural language messages
+	MONETARY       = LC_MONETARY,  ///< formatting of monetary values
+	NUMERIC        = LC_NUMERIC,   ///< non-monetary numeric values
+	TIME           = LC_TIME       ///< formatting of date and time values
 #ifdef LC_ADDRESS /* the following are GNU extensions */
-	,ADDRESS       = LC_ADDRESS,        /// formatting of addresses and geography related items
-	IDENTIFICATION = LC_IDENTIFICATION, /// metadata about a locale
-	MEASUREMENT    = LC_MEASUREMENT,    /// measurement settings (e.g. metric vs. US)
-	NAME           = LC_NAME,           /// salutations for persons
-	PAPER          = LC_PAPER,          /// standard paper size
-	TELEPHONE      = LC_TELEPHONE       /// formats for telephone services
+	,ADDRESS       = LC_ADDRESS,        ///< formatting of addresses and geography related items
+	IDENTIFICATION = LC_IDENTIFICATION, ///< metadata about a locale
+	MEASUREMENT    = LC_MEASUREMENT,    ///< measurement settings (e.g. metric vs. US)
+	NAME           = LC_NAME,           ///< salutations for persons
+	PAPER          = LC_PAPER,          ///< standard paper size
+	TELEPHONE      = LC_TELEPHONE       ///< formats for telephone services
 #endif
 };
 

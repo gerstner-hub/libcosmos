@@ -5,6 +5,12 @@
 #include <cstring>
 #include <type_traits>
 
+/**
+ * @file
+ *
+ * Helper functions for dealing with raw memory.
+ **/
+
 namespace cosmos {
 
 /// Completely overwrites the given object with zeroes.

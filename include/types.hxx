@@ -17,8 +17,11 @@ namespace cosmos {
  * Some general convenience types used across libcosmos
  **/
 
+/// A vector of std::string
 typedef std::vector<std::string> StringVector;
+/// A vector of std::string_view
 typedef std::vector<std::string_view> StringViewVector;
+/// A vector of plain `const char*`
 typedef std::vector<const char*> CStringVector;
 
 /// Strong template type to wrap boolean values in a named type.

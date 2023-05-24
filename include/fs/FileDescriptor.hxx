@@ -18,7 +18,7 @@ namespace cosmos {
 /// Strong boolean to indicate CloseOnExec behaviour on file descriptors.
 using CloseOnExec = NamedBool<struct cloexec_t, true>;
 
-/// Thin Wrapper around OS File Descriptors.
+/// Thin Wrapper around OS file descriptors.
 /**
  * This type carries a primitive file descriptor and provides various
  * operations to perform on it. This is mostly kept on a generic level without
@@ -42,11 +42,11 @@ public: // types
 
 	/// Flags used in addSeals().
 	enum class SealOpts : unsigned int {
-		SEAL         = F_SEAL_SEAL,         /// Locks the seal set itself, further changes will be disallowed.
-		SHRINK       = F_SEAL_SHRINK,       /// Disallow shrinking the file in any way.
-		GROW         = F_SEAL_GROW,         /// Disallow growing the file in any way.
-		WRITE        = F_SEAL_WRITE,        /// Disallow changing the file contents (shrink/grow is still allowed).
-		FUTURE_WRITE = F_SEAL_FUTURE_WRITE  /// Like WRITE but allow existing shared writable mappings to write.
+		SEAL         = F_SEAL_SEAL,         ///< Locks the seal set itself, further changes will be disallowed.
+		SHRINK       = F_SEAL_SHRINK,       ///< Disallow shrinking the file in any way.
+		GROW         = F_SEAL_GROW,         ///< Disallow growing the file in any way.
+		WRITE        = F_SEAL_WRITE,        ///< Disallow changing the file contents (shrink/grow is still allowed).
+		FUTURE_WRITE = F_SEAL_FUTURE_WRITE  ///< Like WRITE but allow existing shared writable mappings to write.
 	};
 
 	/// Collection SealOpts for applying seals in addSeals().

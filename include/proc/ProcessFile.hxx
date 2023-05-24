@@ -24,7 +24,7 @@ class COSMOS_API ProcessFile {
 public: // types
 
 	enum class OpenSettings : unsigned int {
-		NONBLOCK = PIDFD_NONBLOCK /// open the file descriptor in non-blocking mode - proc::wait() will never block.
+		NONBLOCK = PIDFD_NONBLOCK ///< open the file descriptor in non-blocking mode - proc::wait() will never block.
 	};
 
 	using OpenFlags = BitMask<OpenSettings>;

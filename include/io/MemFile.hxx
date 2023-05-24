@@ -28,9 +28,9 @@ public: // types
 
 	/// Available open settings for the MemFile type
 	enum class OpenSettings : unsigned int {
-		CLOEXEC       = MFD_CLOEXEC,       /// Apply close-on-exec semantics
-		ALLOW_SEALING = MFD_ALLOW_SEALING, /// Allow MemFD file sealing operations.
-		HUGETLB       = MFD_HUGETLB       /// Create the file in the HugeTLB file system.
+		CLOEXEC       = MFD_CLOEXEC,       ///< Apply close-on-exec semantics
+		ALLOW_SEALING = MFD_ALLOW_SEALING, ///< Allow MemFD file sealing operations.
+		HUGETLB       = MFD_HUGETLB        ///< Create the file in the HugeTLB file system.
 	};
 
 	/// Collection of OpenSettings used when creating the MemFile type.

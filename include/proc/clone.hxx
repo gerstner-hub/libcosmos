@@ -23,33 +23,33 @@
 namespace cosmos {
 
 enum class CloneSettings : uint64_t {
-	CHILD_CLEARTID = CLONE_CHILD_CLEARTID,  /// Clear the child_tid CloneArgs member in child's memory when the child exits, used by threading libraries.
-	CHILD_SETTID   = CLONE_CHILD_SETTID,    /// Store the child's thread ID in the child_tid CloneArgs member in child's memory before the child runs.
-	CLEAR_SIGHAND  = CLONE_CLEAR_SIGHAND,   /// Reset all signal handling dispositions to their defaults in the child.
-	DETACHED       = CLONE_DETACHED,        /// Historical, should not be used.
-	SHARE_FILES    = CLONE_FILES,           /// Share the file descriptor table between parent and child.
-	SHARE_FS       = CLONE_FS,              /// Parent and child share file system information like CWD, the root (/) directory and the umask.
-	INTO_CGROUP    = CLONE_INTO_CGROUP,     /// Place the child into a different version 2 cgroup, according to the cgroup field file descriptor in CloneArgs.
-	SHARE_IO       = CLONE_IO,              /// Share the I/O context between parent and child. This affects I/O scheduling, processes that share their context are treated as one.
-	NEW_CGROUP     = CLONE_NEWCGROUP,       /// Create the child in a new cgroup namespace (requires CAP_SYS_ADMIN).
-	NEW_IPC        = CLONE_NEWIPC,          /// Create the child in a new IPC namespace (requires CAP_SYS_ADMIN).
-	NEW_NET        = CLONE_NEWNET,          /// Create the child in a new network namespace (requires CAP_SYS_ADMIN).
-	NEW_MOUNT      = CLONE_NEWNS,           /// Create the child in a new mount namespace (requires CAP_SYS_ADMIN).
+	CHILD_CLEARTID = CLONE_CHILD_CLEARTID,  ///< Clear the child_tid CloneArgs member in child's memory when the child exits, used by threading libraries.
+	CHILD_SETTID   = CLONE_CHILD_SETTID,    ///< Store the child's thread ID in the child_tid CloneArgs member in child's memory before the child runs.
+	CLEAR_SIGHAND  = CLONE_CLEAR_SIGHAND,   ///< Reset all signal handling dispositions to their defaults in the child.
+	DETACHED       = CLONE_DETACHED,        ///< Historical, should not be used.
+	SHARE_FILES    = CLONE_FILES,           ///< Share the file descriptor table between parent and child.
+	SHARE_FS       = CLONE_FS,              ///< Parent and child share file system information like CWD, the root (/) directory and the umask.
+	INTO_CGROUP    = CLONE_INTO_CGROUP,     ///< Place the child into a different version 2 cgroup, according to the cgroup field file descriptor in CloneArgs.
+	SHARE_IO       = CLONE_IO,              ///< Share the I/O context between parent and child. This affects I/O scheduling, processes that share their context are treated as one.
+	NEW_CGROUP     = CLONE_NEWCGROUP,       ///< Create the child in a new cgroup namespace (requires CAP_SYS_ADMIN).
+	NEW_IPC        = CLONE_NEWIPC,          ///< Create the child in a new IPC namespace (requires CAP_SYS_ADMIN).
+	NEW_NET        = CLONE_NEWNET,          ///< Create the child in a new network namespace (requires CAP_SYS_ADMIN).
+	NEW_MOUNT      = CLONE_NEWNS,           ///< Create the child in a new mount namespace (requires CAP_SYS_ADMIN).
 	NEW_NS         = CLONE_NEWNS,           // just a synonym using the old compatiblity name
-	NEW_PID        = CLONE_NEWPID,          /// Create the child in a new PID namespace (requires CAP_SYS_ADMIN).
-	NEW_USER       = CLONE_NEWUSER,         /// Create the child in a new user namespace.
-	NEW_UTS        = CLONE_NEWUTS,          /// Create the child in a new UTS namespace (requires CAP_SYS_ADMIN).
-	SHARE_PARENT   = CLONE_PARENT,          /// Make the caller's parent also the child's parent.
-	PARENT_SETTID  = CLONE_PARENT_SETTID,   /// Store the child's thread ID  in the parent_tid CloneArgs member in parent's memory.
-	PIDFD          = CLONE_PIDFD,           /// Allocate a PIDFD file descriptor for the child and store it at the location pointed to by the pidfd CloneArgs member.
-	PTRACE         = CLONE_PTRACE,          /// If the current process is being traced then the child will also be traced.
-	SETTLS         = CLONE_SETTLS,          /// The TLS descriptor is set to the tls member of CloneArgs (architecture dependent meaning).
-	SIGHAND        = CLONE_SIGHAND,         /// Parent and child share the same table of signal handlers. Signal masks and list of pending signals are still distinct.
-	SHARE_SYSVSEM  = CLONE_SYSVSEM,         /// Parent and child share a single list of semaphore adjustment values.
-	THREAD         = CLONE_THREAD,          /// The child shares the same thread group as the parent. Thread groups are used to implement thread semantics.
-	UNTRACED       = CLONE_UNTRACED,        /// A tracing process cannot force CLONE_PTRACE on the child.
-	VFORK          = CLONE_VFORK,           /// The calling process is suspended until the child calls execve() or _exit(), see vfork(); should not be used.
-	SHARE_VM       = CLONE_VM               /// Parent and child share the same address space and thus observe the same memory writes and mappings/unmappings.
+	NEW_PID        = CLONE_NEWPID,          ///< Create the child in a new PID namespace (requires CAP_SYS_ADMIN).
+	NEW_USER       = CLONE_NEWUSER,         ///< Create the child in a new user namespace.
+	NEW_UTS        = CLONE_NEWUTS,          ///< Create the child in a new UTS namespace (requires CAP_SYS_ADMIN).
+	SHARE_PARENT   = CLONE_PARENT,          ///< Make the caller's parent also the child's parent.
+	PARENT_SETTID  = CLONE_PARENT_SETTID,   ///< Store the child's thread ID  in the parent_tid CloneArgs member in parent's memory.
+	PIDFD          = CLONE_PIDFD,           ///< Allocate a PIDFD file descriptor for the child and store it at the location pointed to by the pidfd CloneArgs member.
+	PTRACE         = CLONE_PTRACE,          ///< If the current process is being traced then the child will also be traced.
+	SETTLS         = CLONE_SETTLS,          ///< The TLS descriptor is set to the tls member of CloneArgs (architecture dependent meaning).
+	SIGHAND        = CLONE_SIGHAND,         ///< Parent and child share the same table of signal handlers. Signal masks and list of pending signals are still distinct.
+	SHARE_SYSVSEM  = CLONE_SYSVSEM,         ///< Parent and child share a single list of semaphore adjustment values.
+	THREAD         = CLONE_THREAD,          ///< The child shares the same thread group as the parent. Thread groups are used to implement thread semantics.
+	UNTRACED       = CLONE_UNTRACED,        ///< A tracing process cannot force CLONE_PTRACE on the child.
+	VFORK          = CLONE_VFORK,           ///< The calling process is suspended until the child calls execve() or _exit(), see vfork(); should not be used.
+	SHARE_VM       = CLONE_VM               ///< Parent and child share the same address space and thus observe the same memory writes and mappings/unmappings.
 };
 
 using CloneFlags = BitMask<CloneSettings>;

@@ -39,9 +39,9 @@ public: // types
 
 	/// Different methods for changing the file read/write position.
 	enum class SeekType : int {
-		SET = SEEK_SET, /// Set a new absolute position.
-		CUR = SEEK_CUR, /// Set a position relative to the current one.
-		END = SEEK_END, /// Set a position relative to the end of the file.
+		SET = SEEK_SET, ///< Set a new absolute position.
+		CUR = SEEK_CUR, ///< Set a position relative to the current one.
+		END = SEEK_END, ///< Set a position relative to the end of the file.
 		/// Seek to a non-hole position.
 		/**
 		 * For files with holes in them this seeks the next position

@@ -151,7 +151,7 @@ auto to_printable_integer(T num) -> decltype(+num) {
 	return +num;
 }
 
-/// This is a C++ variant of the libc ::sprintf() function.
+/// This is a C++ variant of the libc `sprintf()` function.
 /**
  * This function is taking care of the memory management details of sprintf()
  * and returns the fully formatted string as a std::string object.

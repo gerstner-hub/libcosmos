@@ -118,7 +118,7 @@ COSMOS_API std::string make_tempdir(const std::string_view _template);
  * directories created via mkdir(). Even if more open permissions are
  * specified in these system calls, the bits will be switched off if they are
  * also present in the process's umask. The file permission bits are
- * calculated as (<mode> & ~umask) i.e. bits that are set in the umask will be
+ * calculated as (`<mode> & ~umask`) i.e. bits that are set in the umask will be
  * set to zero during file creation.
  *
  * Since this is a process wide attribute it will affect all threads in the
@@ -136,7 +136,7 @@ COSMOS_API std::string make_tempdir(const std::string_view _template);
  * domain sockets. It is *not* used by SYSV IPC objects.
  *
  * \return The umask that was previously in effect. To only read the current
- * process's umask you need to read the proc file system in /proc/<pid>/status
+ * process's umask you need to read the proc file system in `/proc/<pid>/status`
  * (umask is available there since Linux 4.7).
  **/
 COSMOS_API FileMode set_umask(const FileMode mode);

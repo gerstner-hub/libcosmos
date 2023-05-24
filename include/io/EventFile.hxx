@@ -47,9 +47,9 @@ public: // types
 	enum class Counter : uint64_t {};
 
 	enum class Settings : int {
-		CLOSE_ON_EXEC = EFD_CLOEXEC,  /// Create the eventfd with the close-on-exec flag set.
-		NONBLOCK      = EFD_NONBLOCK, /// Sets the nonblocking flag upon creation, saving a separate fcntl() call.
-		SEMAPHORE     = EFD_SEMAPHORE /// Use semaphore like semantics.
+		CLOSE_ON_EXEC = EFD_CLOEXEC,  ///< Create the eventfd with the close-on-exec flag set.
+		NONBLOCK      = EFD_NONBLOCK, ///< Sets the nonblocking flag upon creation, saving a separate fcntl() call.
+		SEMAPHORE     = EFD_SEMAPHORE ///< Use semaphore like semantics.
 	};
 
 	using Flags = BitMask<Settings>;

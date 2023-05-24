@@ -14,6 +14,12 @@
 #include "cosmos/dso_export.h"
 #include "cosmos/types.hxx"
 
+/**
+ * @file
+ *
+ * Basic types used in file system APIs.
+ **/
+
 namespace cosmos {
 
 /// Strong boolean type to enable following of symlinks in the file system.
@@ -79,8 +85,8 @@ typedef BitMask<OpenSettings> OpenFlags;
  **/
 enum class ModeT : mode_t {
 	NONE      = 0,
-	TYPE_MASK = S_IFMT, /// masks all type bits
-	MODE_MASK = ~static_cast<mode_t>(S_IFMT) /// masks all mode bits
+	TYPE_MASK = S_IFMT, ///< masks all type bits
+	MODE_MASK = ~static_cast<mode_t>(S_IFMT) ///< masks all mode bits
 };
 
 /// Support bit masking operations on ModeT for extracing type and mode parts.
