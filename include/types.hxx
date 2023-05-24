@@ -18,11 +18,11 @@ namespace cosmos {
  **/
 
 /// A vector of std::string
-typedef std::vector<std::string> StringVector;
+using StringVector     = std::vector<std::string>;
 /// A vector of std::string_view
-typedef std::vector<std::string_view> StringViewVector;
+using StringViewVector = std::vector<std::string_view>;
 /// A vector of plain `const char*`
-typedef std::vector<const char*> CStringVector;
+using CStringVector    = std::vector<const char*>;
 
 /// Strong template type to wrap boolean values in a named type.
 /**

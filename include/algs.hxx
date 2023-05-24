@@ -17,7 +17,7 @@ namespace cosmos {
  **/
 
 template<typename T>
-struct Identity { typedef T type; };
+struct Identity { using type = T; };
 
 template<typename T>
 using IdentityT = typename Identity<T>::type;

@@ -25,7 +25,7 @@
 namespace cosmos {
 
 /// GNU libstdc++ proprietary type for wrapping already open file descriptors.
-typedef __gnu_cxx::stdio_filebuf<char> StdioFileBuf;
+using StdioFileBuf = __gnu_cxx::stdio_filebuf<char>;
 
 /// Generic template base class for wrapping existing file descriptors in C++ streams.
 /**

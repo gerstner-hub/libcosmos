@@ -73,7 +73,7 @@ enum class OpenSettings : int {
 };
 
 /// Collection of OpenSettings used for opening files.
-typedef BitMask<OpenSettings> OpenFlags;
+using OpenFlags = BitMask<OpenSettings>;
 
 /// Combined file type and mode bits of a file (as found in st_mode struct stat).
 /**
@@ -121,7 +121,7 @@ enum class FileModeFlags : mode_t {
 };
 
 /// BitMask of FileModeFlags (represents the mode bit portion of ModeT).
-typedef BitMask<FileModeFlags> FileModeBits;
+using FileModeBits = BitMask<FileModeFlags>;
 
 /// Convenience wrapper around FileT.
 /**

@@ -184,10 +184,10 @@ public: // functions
 };
 
 /// A variant that can hold any of the specialized SchedulerSettings types.
-typedef std::variant<
+using SchedulerSettingsVariant = std::variant<
 		OtherSchedulerSettings,
 		FifoSchedulerSettings,
-		RoundRobinSchedulerSettings> SchedulerSettingsVariant;
+		RoundRobinSchedulerSettings>;
 
 } // end ns
 

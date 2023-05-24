@@ -38,7 +38,7 @@ public: // types
 	};
 
 	/// Collection of OpenSettings used for opening files.
-	typedef BitMask<Flags> DescFlags;
+	using DescFlags = BitMask<Flags>;
 
 	/// Flags used in addSeals().
 	enum class SealOpts : unsigned int {

@@ -76,7 +76,7 @@ public: // types
 		STAY_AWAKE     = EPOLLWAKEUP
 	};
 
-	typedef BitMask<MonitorSetting> MonitorMask;
+	using MonitorMask = BitMask<MonitorSetting>;
 
 	/// Flags found in PollEvent that indicate the events that occured on a file descriptor.
 	enum class Event : uint32_t {
@@ -94,7 +94,7 @@ public: // types
 		HANGUP_OCCURED    = EPOLLHUP
 	};
 
-	typedef BitMask<Event> EventMask;
+	using EventMask = BitMask<Event>;
 
 	/// A single poll event as returned by wait().
 	struct PollEvent : protected epoll_event {

@@ -48,7 +48,7 @@ enum class TraceOpts : intptr_t { /* is a void* in ptrace(2), so we need pointer
 	TRACESYSGOOD   = PTRACE_O_TRACESYSGOOD
 };
 
-typedef BitMask<TraceOpts> TraceOptsMask;
+using TraceOptsMask = BitMask<TraceOpts>;
 
 /// Different events that can occur in a tracee.
 enum class TraceEvent {

@@ -170,15 +170,15 @@ protected: // functions
 	static constexpr long NANOSECOND_BASE{1000 * 1000 * 1000};
 };
 
-typedef TimeSpec<ClockType::ATOMIC_REALTIME>  AtomicRealTime;
-typedef TimeSpec<ClockType::BOOTTIME>         BootTime;
-typedef TimeSpec<ClockType::MONOTONIC_COARSE> CoarseMonotonicTime;
-typedef TimeSpec<ClockType::MONOTONIC>        MonotonicTime;
-typedef TimeSpec<ClockType::MONOTONIC_RAW>    RawMonotonicTime;
-typedef TimeSpec<ClockType::PROCESS_CPUTIME>  ProcessCpuTime;
-typedef TimeSpec<ClockType::REALTIME_COARSE>  CoarseRealTime;
-typedef TimeSpec<ClockType::REALTIME>         RealTime;
-typedef TimeSpec<ClockType::THREAD_CPUTIME>   ThreadCpuTime;
+using AtomicRealTime      = TimeSpec<ClockType::ATOMIC_REALTIME>;
+using BootTime            = TimeSpec<ClockType::BOOTTIME>;
+using CoarseMonotonicTime = TimeSpec<ClockType::MONOTONIC_COARSE>;
+using MonotonicTime       = TimeSpec<ClockType::MONOTONIC>;
+using RawMonotonicTime    = TimeSpec<ClockType::MONOTONIC_RAW>;
+using ProcessCpuTime      = TimeSpec<ClockType::PROCESS_CPUTIME>;
+using CoarseRealTime      = TimeSpec<ClockType::REALTIME_COARSE>;
+using RealTime            = TimeSpec<ClockType::REALTIME>;
+using ThreadCpuTime       = TimeSpec<ClockType::THREAD_CPUTIME>;
 
 } // end ns
 
