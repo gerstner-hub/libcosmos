@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['seal_0',['SEAL',['../classcosmos_1_1FileDescriptor.html#a9b50bd4433ffbed961c441fa0bf133c2a62ee3d37aeba4f97428b2b323ff59586',1,'cosmos::FileDescriptor']]],
+  ['search_1',['SEARCH',['../errno_8hxx.html#a5c1aef3a972b5a9a3bb6b3df1aa01939a0f544d682c3a664870f025f48c4b04b5',1,'cosmos']]],
+  ['segv_2',['SEGV',['../ostypes_8hxx.html#aed04aa4104b74886098b88363dfd7374a26b66c8b40deb496af24c4fec6e4506b',1,'cosmos']]],
+  ['self_3',['SELF',['../ostypes_8hxx.html#a4c274565c8010d58379ba7ac3d6e0d9aabe5470eb0ca5e3845ed08a1b358a5fb9',1,'cosmos']]],
+  ['semaphore_4',['SEMAPHORE',['../classcosmos_1_1EventFile.html#a389c995596793c00a069d7a73a4856bcaf673a93eec71430df3ca77436f2b2253',1,'cosmos::EventFile']]],
+  ['set_5',['SET',['../classcosmos_1_1StreamIO.html#abe628dcaa1ad453113327817b38f9531a8c52684db8f49511e9b44471716bf164',1,'cosmos::StreamIO']]],
+  ['settls_6',['SETTLS',['../clone_8hxx.html#a24e8127e0f6373d3dff58e4c48af7302a1ee5a7596c04294a377bde08237a5be8',1,'cosmos']]],
+  ['share_5ffiles_7',['SHARE_FILES',['../clone_8hxx.html#a24e8127e0f6373d3dff58e4c48af7302a8381006451076292d6708feef52460fe',1,'cosmos']]],
+  ['share_5ffs_8',['SHARE_FS',['../clone_8hxx.html#a24e8127e0f6373d3dff58e4c48af7302ac999d25ae1d89241ac298924b5ab5275',1,'cosmos']]],
+  ['share_5fio_9',['SHARE_IO',['../clone_8hxx.html#a24e8127e0f6373d3dff58e4c48af7302af35c3f0c407b9846cdae1715cb4edfcd',1,'cosmos']]],
+  ['share_5fparent_10',['SHARE_PARENT',['../clone_8hxx.html#a24e8127e0f6373d3dff58e4c48af7302a846bd28e8d96ffb18ad17a2d322ceb47',1,'cosmos']]],
+  ['share_5fsysvsem_11',['SHARE_SYSVSEM',['../clone_8hxx.html#a24e8127e0f6373d3dff58e4c48af7302a31fcfa546ed1534afd8c232e53cb8a6b',1,'cosmos']]],
+  ['share_5fvm_12',['SHARE_VM',['../clone_8hxx.html#a24e8127e0f6373d3dff58e4c48af7302a461d84b494ad0557d49a95a3dbe0d7e6',1,'cosmos']]],
+  ['shrink_13',['SHRINK',['../classcosmos_1_1FileDescriptor.html#a9b50bd4433ffbed961c441fa0bf133c2a7505f647dc2c54b8fb665d1a7c34c5aa',1,'cosmos::FileDescriptor']]],
+  ['sighand_14',['SIGHAND',['../clone_8hxx.html#a24e8127e0f6373d3dff58e4c48af7302aa68bd0436c48179565dedef308e7b164',1,'cosmos']]],
+  ['singlestep_15',['SINGLESTEP',['../ptrace_8hxx.html#a0f9eb9171013e7034e279e46f4d7620daeeccd61f1d9dbe457038a5f3d2a53f62',1,'cosmos']]],
+  ['socket_5fhangup_16',['SOCKET_HANGUP',['../classcosmos_1_1Poller.html#a2f7dba073c0a7b430a320a05ee4176b9af589587430d826cfd6d53574a71ea4b8',1,'cosmos::Poller::SOCKET_HANGUP()'],['../classcosmos_1_1Poller.html#a9d02eb3cad2ffe756c5fba5419f2c189af589587430d826cfd6d53574a71ea4b8',1,'cosmos::Poller::SOCKET_HANGUP()']]],
+  ['stack_5ffault_17',['STACK_FAULT',['../ostypes_8hxx.html#aed04aa4104b74886098b88363dfd7374aa3abd0c93e7736f64c2e9c9364ebe429',1,'cosmos']]],
+  ['stay_5fawake_18',['STAY_AWAKE',['../classcosmos_1_1Poller.html#a9d02eb3cad2ffe756c5fba5419f2c189ae9c5167a67224b68f099f19165c71a4c',1,'cosmos::Poller']]],
+  ['stop_19',['STOP',['../ostypes_8hxx.html#aed04aa4104b74886098b88363dfd7374a615a46af313786fc4e349f34118be111',1,'STOP()cosmos'],['../ptrace_8hxx.html#a916a6c2cfe246dd9661be9ca1aec3ae2a615a46af313786fc4e349f34118be111',1,'STOP()cosmos']]],
+  ['strip_5fparts_20',['STRIP_PARTS',['../string_8hxx.html#a33866a645c0f3721f61a263051a1d400af3639cb6ab797158569e6ed5f286a317',1,'cosmos']]],
+  ['sync_21',['SYNC',['../fs_2types_8hxx.html#ae4490b0f309570ad5d819800d828e298a274ccef15a21e829d03293a6fd1974f3',1,'cosmos']]],
+  ['syscall_22',['SYSCALL',['../ptrace_8hxx.html#a0f9eb9171013e7034e279e46f4d7620da45f1e61f22cb04eb7a6a39016b56db9b',1,'cosmos']]]
+];

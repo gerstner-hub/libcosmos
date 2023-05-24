@@ -1,0 +1,22 @@
+var searchData=
+[
+  ['cancel_5fon_5fset_0',['CANCEL_ON_SET',['../classcosmos_1_1TimerFD.html#a37b8fcd4b06561d4e996b873a27f51c5a185188b541014269147adafb8dc546fd',1,'cosmos::TimerFD']]],
+  ['canceled_1',['CANCELED',['../errno_8hxx.html#a5c1aef3a972b5a9a3bb6b3df1aa01939ad4539bffb6062bdcbd7e7cc1b1228926',1,'cosmos']]],
+  ['child_2',['CHILD',['../ostypes_8hxx.html#a4c274565c8010d58379ba7ac3d6e0d9aae168bc64857ebc16cd1ece91aad8b626',1,'CHILD()cosmos'],['../ostypes_8hxx.html#aed04aa4104b74886098b88363dfd7374ae168bc64857ebc16cd1ece91aad8b626',1,'CHILD()cosmos']]],
+  ['child_5fcleartid_3',['CHILD_CLEARTID',['../clone_8hxx.html#a24e8127e0f6373d3dff58e4c48af7302a10e78422e94fb45efad82eeda9f8b098',1,'cosmos']]],
+  ['child_5fsettid_4',['CHILD_SETTID',['../clone_8hxx.html#a24e8127e0f6373d3dff58e4c48af7302a01b960db885f70dd47014ecf4b071545',1,'cosmos']]],
+  ['clear_5fsighand_5',['CLEAR_SIGHAND',['../clone_8hxx.html#a24e8127e0f6373d3dff58e4c48af7302a6569809246346b80497e2b0800230219',1,'cosmos']]],
+  ['cloexec_6',['CLOEXEC',['../classcosmos_1_1MemFile.html#a81057abc1e89bb2231260ca5f1b3b436a009eaa7119fb4c83c5e487874d7e2218',1,'cosmos::MemFile::CLOEXEC()'],['../fs_2types_8hxx.html#ae4490b0f309570ad5d819800d828e298a009eaa7119fb4c83c5e487874d7e2218',1,'CLOEXEC()cosmos'],['../classcosmos_1_1TimerFD.html#abec45180e0787380a3aca4dbf2e7d70aa009eaa7119fb4c83c5e487874d7e2218',1,'cosmos::TimerFD::CLOEXEC()']]],
+  ['clone_7',['CLONE',['../ptrace_8hxx.html#a916a6c2cfe246dd9661be9ca1aec3ae2aa6ddc0995d7b58e0302675f581845cce',1,'cosmos']]],
+  ['close_5fon_5fexec_8',['CLOSE_ON_EXEC',['../classcosmos_1_1EventFile.html#a389c995596793c00a069d7a73a4856bcac4015b8e5a633aafc1ddc3d1c53b7600',1,'cosmos::EventFile']]],
+  ['collate_9',['COLLATE',['../locale_8hxx.html#a584ab315dfbac0aa38b626a69554d1c1adcb8f1b0c17da8a5a259440bcbe46c92',1,'cosmos::locale']]],
+  ['conn_5faborted_10',['CONN_ABORTED',['../errno_8hxx.html#a5c1aef3a972b5a9a3bb6b3df1aa01939ad23acaa6848ad78ab2747271e1d9ace3',1,'cosmos']]],
+  ['conn_5frefused_11',['CONN_REFUSED',['../errno_8hxx.html#a5c1aef3a972b5a9a3bb6b3df1aa01939a6bca3717a1b7dd29e41db579761997f8',1,'cosmos']]],
+  ['conn_5freset_12',['CONN_RESET',['../errno_8hxx.html#a5c1aef3a972b5a9a3bb6b3df1aa01939ad321734c29f77639def8d5667074cc4b',1,'cosmos']]],
+  ['cont_13',['CONT',['../ostypes_8hxx.html#aed04aa4104b74886098b88363dfd7374a53f6b3ace3aa40916de167636293ac80',1,'cosmos']]],
+  ['cpu_5fexceeded_14',['CPU_EXCEEDED',['../ostypes_8hxx.html#aed04aa4104b74886098b88363dfd7374ad08beff6b2ae777eda9f67a9c22df76f',1,'cosmos']]],
+  ['create_15',['CREATE',['../fs_2types_8hxx.html#ae4490b0f309570ad5d819800d828e298a294ce20cdefa29be3be0735cb62e715d',1,'cosmos']]],
+  ['cross_5fdevice_16',['CROSS_DEVICE',['../errno_8hxx.html#a5c1aef3a972b5a9a3bb6b3df1aa01939aebafe45ad6db43d6fd4f1be975aeeda9',1,'cosmos']]],
+  ['ctype_17',['CTYPE',['../locale_8hxx.html#a584ab315dfbac0aa38b626a69554d1c1a270599022f08a3b5ca45a63f16327872',1,'cosmos::locale']]],
+  ['cur_18',['CUR',['../classcosmos_1_1StreamIO.html#abe628dcaa1ad453113327817b38f9531af32924c53f864144ab34d1f7c12a0d4a',1,'cosmos::StreamIO']]]
+];
