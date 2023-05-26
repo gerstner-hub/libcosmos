@@ -24,6 +24,10 @@ public: // functions
 		open(fd, auto_close);
 	}
 
+	FDFile(FDFile &&other) {
+		*this = std::move(other);
+	}
+
 	FDFile& operator=(FDFile &&other) {
 		m_auto_close = other.m_auto_close;
 		other.m_auto_close = AutoCloseFD{true};
