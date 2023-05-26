@@ -6,7 +6,7 @@
 #include <string_view>
 
 // cosmos
-#include "cosmos/fs/FileBase.hxx"
+#include "cosmos/fs/FDFile.hxx"
 #include "cosmos/fs/DirFD.hxx"
 
 namespace cosmos {
@@ -22,7 +22,7 @@ namespace cosmos {
  * circumstances.
  **/
 class COSMOS_API File :
-		public FileBase {
+		public FDFile {
 public: // functions
 
 	File() = default;
@@ -50,6 +50,13 @@ public: // functions
 			const OpenFlags flags, const std::optional<FileMode> fmode = {}) {
 		open(dir_fd, path, mode, flags, fmode);
 	}
+
+	/// Wrap the given file descriptor applying the specified auto-close behaviour.
+	File(const FileDescriptor fd, const AutoCloseFD auto_close) :
+		FDFile{fd, auto_close}
+	{}
+
+	using FDFile::open;
 
 	/// \see File(const std::string_view, const OpenMode).
 	void open(const std::string_view path, const OpenMode mode) {
