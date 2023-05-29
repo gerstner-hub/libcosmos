@@ -239,9 +239,6 @@ def initSCons(project, rtti=True):
         sys.exit(1)
 
     env.Append(CXXFLAGS = ["-std=c++17"])
-    if "CXXFLAGS" in os.environ:
-        # add user specified flags
-        env.MergeFlags(os.environ["CXXFLAGS"])
     env.Append(CCFLAGS = ["-g", "-flto=auto"])
     env.Append(LINKFLAGS = ["-Wl,--as-needed", "-flto=auto"])
 
@@ -278,6 +275,14 @@ def initSCons(project, rtti=True):
         ])
 
     env.Append(CCFLAGS = [f"-W{warning}" for warning in warnings])
+
+    if "CXXFLAGS" in os.environ:
+        # add user specified flags
+        env.Append(CXXFLAGS = [os.environ["CXXFLAGS"]])
+
+    if "CFLAGS" in os.environ:
+        # add user specified flags
+        env.Append(CCFLAGS = [os.environ["CFLAGS"]])
 
     buildroot = Dir(getBuildroot()).srcnode().abspath + "/"
 
