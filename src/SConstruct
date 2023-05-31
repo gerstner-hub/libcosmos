@@ -37,3 +37,5 @@ env.RegisterLibConfig('libcosmos', libcosmos, {
     "CPPPATH": [public_includes],
     "LINKFLAGS": ["-pthread"]
 })
+
+Return('env')

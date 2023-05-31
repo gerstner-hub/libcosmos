@@ -60,9 +60,11 @@ def registerLibConfig(self, name, node, flags, config={}):
     flags["LIBPATH"] = [libdir]
     if self["use_rpath"]:
         flags["RPATH"] = [libdir]
-    rootenv['libs'][name] = node
-    rootenv['libflags'][name] = flags
-    rootenv['libconfigs'][name] = config
+
+    for env in (rootenv, self):
+        env['libs'][name] = node
+        env['libflags'][name] = flags
+        env['libconfigs'][name] = config
 
 def existsLib(self, name):
     return name in self['libs']

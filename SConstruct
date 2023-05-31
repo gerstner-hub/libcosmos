@@ -15,7 +15,7 @@ except Exception:
         from buildsystem import initSCons
     env = initSCons("libcosmos")
 
-SConscript(env['buildroot'] + 'src/SConstruct')
+env = SConscript(env['buildroot'] + 'src/SConstruct')
 
 is_main_project = env['project'] == "libcosmos"
 
