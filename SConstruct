@@ -16,26 +16,20 @@ except Exception:
     env = initSCons("libcosmos")
 
 SConscript(env['buildroot'] + 'src/SConstruct')
-if env['project'] == "libcosmos":
+
+is_main_project = env['project'] == "libcosmos"
+
+if is_main_project:
     SConscript(env['buildroot'] + 'test/SConstruct')
     SConscript(env['buildroot'] + 'doc/SConstruct')
     Default(env['libs']['libcosmos'])
 
-    instroot = env['instroot']
+instroot = env['instroot']
+node = env.InstallVersionedLib(os.path.join(instroot, env['lib_base_dir']), env["libs"]["libcosmos"])
+env.Alias("install", node)
 
-    for root, _, files in os.walk("include"):
-        for fil in files:
-            src = os.path.join(root, fil)
-            parts = root.split(os.path.sep)
-            parts.insert(1, "cosmos")
-            parts.insert(0, instroot)
-            target = os.path.sep.join(parts)
-            node = env.Install(target, src)
-            env.Alias("install", node)
+env.InstallHeaders("cosmos")
 
-    node = env.InstallVersionedLib(os.path.join(instroot, env['lib_base_dir']), env["libs"]["libcosmos"])
-    env.Alias("install", node)
-
-    # TODO: we could also install a pkg-config libcosmos.pc file that explains
-    # some things about libcosmos. But currently there's nothing beyond
-    # -lcosmos that is really needed.
+# TODO: we could also install a pkg-config libcosmos.pc file that explains
+# some things about libcosmos. But currently there's nothing beyond
+# -lcosmos that is really needed.

@@ -119,6 +119,18 @@ def configureForPackage(self, seq):
 
         self.MergeFlags(flags)
 
+def installHeaders(self, subdir):
+    instroot = self['instroot']
+    for root, _, files in os.walk("include"):
+        for fil in files:
+            src = os.path.join(root, fil)
+            parts = root.split(os.path.sep)
+            parts.insert(1, subdir)
+            parts.insert(0, instroot)
+            target = os.path.sep.join(parts)
+            node = self.Install(target, src)
+            self.Alias("install", node)
+
 def enhanceEnv(env):
     env.AddMethod(gatherSources, "GatherSources")
     env.AddMethod(registerLibConfig, "RegisterLibConfig")
@@ -127,6 +139,7 @@ def enhanceEnv(env):
     env.AddMethod(configureForPackage, "ConfigureForPackage")
     env.AddMethod(existsPackage, "ExistsPackage")
     env.AddMethod(existsLib, "ExistsLib")
+    env.AddMethod(installHeaders, "InstallHeaders")
 
 def initSCons(project, rtti=True):
     """Initializes a generic C++ oriented SCons build environment.
