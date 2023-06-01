@@ -122,14 +122,18 @@ def configureForPackage(self, seq):
         self.MergeFlags(flags)
 
 def installHeaders(self, subdir):
+    incdir = self.Dir('include').srcnode().abspath
     instroot = self['instroot']
-    for root, _, files in os.walk("include"):
+    for root, _, files in os.walk(incdir):
+        parts = root.split(os.path.sep)
+        while parts.pop(0) != "include":
+            pass
+
+        parts = [instroot, "include", subdir] + parts
+        target = os.path.sep.join(parts)
+
         for fil in files:
             src = os.path.join(root, fil)
-            parts = root.split(os.path.sep)
-            parts.insert(1, subdir)
-            parts.insert(0, instroot)
-            target = os.path.sep.join(parts)
             node = self.Install(target, src)
             self.Alias("install", node)
 
@@ -174,7 +178,13 @@ def initSCons(project, rtti=True):
     def getInstroot():
         definstroot = "install"
 
-        return ARGUMENTS.get("instroot", definstroot)
+        ret = ARGUMENTS.get("instroot", definstroot)
+
+        if ret.startswith('/'):
+            return ret
+
+        # relative to the src root
+        return f"#{ret}"
 
     def getLibBaseDir():
 
