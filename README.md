@@ -74,7 +74,10 @@ Building against libcosmos
 
 Since *libcosmos* has no additional dependencies you can simply build and link
 against it using the `-lcosmos` linker switch, assuming that the *libcosmos*
-library is found in the linker's search path.
+library is found in the linker's search path. The installation tree also
+contains a simple pkg-config configuration file. If installed correctly, or
+using the `PKG_CONFIG_PATH` environment variable you can use `pkg-config
+--cflags --libs libcosmos` for building against *libcosmos*.
 
 Headers are placed in a `cosmos` sub directory. The path to this directory
 needs to be in the compiler's include paths. `#include` directives should

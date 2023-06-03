@@ -316,6 +316,7 @@ def initSCons(project, rtti=True):
     env['buildroot'] = buildroot
     env['instroot'] = getInstroot()
     env['lib_base_dir'] = getLibBaseDir()
+    env['pkg_config_dir'] = getLibBaseDir() + "/pkgconfig"
     env['libs'] = dict()
     env['bins'] = dict()
     env['pkgs'] = dict()

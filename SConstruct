@@ -28,8 +28,7 @@ instroot = env['instroot']
 node = env.InstallVersionedLib(os.path.join(instroot, env['lib_base_dir']), env["libs"]["libcosmos"])
 env.Alias("install", node)
 
-env.InstallHeaders("cosmos")
+node = env.Install(Path(instroot) / env['pkg_config_dir'], "data/libcosmos.pc")
+env.Alias("install", node)
 
-# TODO: we could also install a pkg-config libcosmos.pc file that explains
-# some things about libcosmos. But currently there's nothing beyond
-# -lcosmos that is really needed.
+env.InstallHeaders("cosmos")
