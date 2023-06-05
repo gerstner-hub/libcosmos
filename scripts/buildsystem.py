@@ -54,12 +54,14 @@ def registerLibConfig(self, name, node, flags, config={}):
     project being able to successfully build and link against it."""
     rootenv = self['rootenv']
 
-    libs = flags.setdefault("LIBS", [])
-    libs.append(name)
-    libdir = Dir(".").abspath
-    flags["LIBPATH"] = [libdir]
-    if self["use_rpath"]:
-        flags["RPATH"] = [libdir]
+    if self['libtype'] == "shared":
+        libs = flags.setdefault("LIBS", [])
+        libs.append(name)
+        libdir = Dir(".").abspath
+        flags["LIBPATH"] = [libdir]
+
+        if self["use_rpath"]:
+            flags["RPATH"] = [libdir]
 
     for env in (rootenv, self):
         env['libs'][name] = node
@@ -69,19 +71,24 @@ def registerLibConfig(self, name, node, flags, config={}):
 def existsLib(self, name):
     return name in self['libs']
 
-def configureForLib(self, name):
+def configureForLib(self, name, sources):
     """This helper adds flags and other requirements to the environment to
     make it possible to build against the given library name."""
 
     libflags = self['libflags'][name]
     self.Append(**libflags)
     config = self['libconfigs'][name]
+
+    if self['libtype'] == "static":
+        # for static linking, link the archive like an object file
+        sources.append(self['libs'][name])
+
     for pkg in config.get('pkgs', []):
         self.ConfigureForPackage(pkg)
 
 def configureRunForLib(self, name):
     """This helper adjust the runtime environment of the environment so that
-    the given library is found for execuring e.g. test programs."""
+    the given library is found for executing e.g. test programs."""
     lib = self['libs'][name]
     full_path = File(lib)[0].abspath
     libdir = str(Path(full_path).parent)
