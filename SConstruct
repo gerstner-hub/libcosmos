@@ -25,10 +25,15 @@ if is_main_project:
     Default(env['libs']['libcosmos'])
 
 instroot = env['instroot']
-node = env.InstallVersionedLib(os.path.join(instroot, env['lib_base_dir']), env["libs"]["libcosmos"])
-env.Alias("install", node)
 
-node = env.Install(Path(instroot) / env['pkg_config_dir'], "data/libcosmos.pc")
-env.Alias("install", node)
+install_dev_files = env['install_dev_files']
 
-env.InstallHeaders("cosmos")
+if install_dev_files or env['libtype'] == "shared":
+    node = env.InstallVersionedLib(os.path.join(instroot, env['lib_base_dir']), env["libs"]["libcosmos"])
+    env.Alias("install", node)
+
+if install_dev_files:
+    node = env.Install(Path(instroot) / env['pkg_config_dir'], "data/libcosmos.pc")
+    env.Alias("install", node)
+
+    env.InstallHeaders("cosmos")

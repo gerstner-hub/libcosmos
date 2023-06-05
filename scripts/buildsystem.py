@@ -321,6 +321,10 @@ def initSCons(project, rtti=True):
     env['bins'] = dict()
     env['pkgs'] = dict()
     env['libconfigs'] = dict()
+    # whether development artifacts like headers or static libraries should be
+    # installed for the 'install' target. turn this off for pure application
+    # projects.
+    env['install_dev_files'] = True
 
     enhanceEnv(env)
 
