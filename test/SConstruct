@@ -4,7 +4,8 @@ import os
 tests = env.GatherSources(suffixes=[".cxx"], recursive=False)
 
 test_env = env.Clone()
-test_env.ConfigureForLib('libcosmos')
+sources = []
+test_env.ConfigureForLib('libcosmos', sources)
 run_env = test_env.Clone()
 run_env.ConfigureRunForLib('libcosmos')
 
@@ -12,7 +13,7 @@ for test in tests:
     label = '.'.join(test.split('.')[:-1])
     test_prog_out = f"test_{label}"
 
-    test_bin = test_env.Program(test_prog_out, [test])
+    test_bin = test_env.Program(test_prog_out, [test] + sources)
 
     env.Alias("cosmos_tests", test_prog_out)
 
@@ -26,7 +27,7 @@ for test in tests:
     env.Alias("run_cosmos_tests", run_test_key)
 
 # extra dependencies
-coproc = test_env.Program("coproc", ["helpers/coproc.cxx"])
+coproc = test_env.Program("coproc", ["helpers/coproc.cxx"] + sources)
 env.Requires("run_cosmos_test_subproc", coproc)
 
 env.Alias("tests", "cosmos_tests")
