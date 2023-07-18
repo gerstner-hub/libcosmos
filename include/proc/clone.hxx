@@ -1,6 +1,9 @@
 #ifndef COSMOS_CLONE_HXX
 #define COSMOS_CLONE_HXX
 
+// C
+#include <stdint.h>
+
 // Linux
 #include <linux/sched.h> // sched headers are needed for clone()
 #include <sched.h>
