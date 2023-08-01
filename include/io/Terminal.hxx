@@ -7,6 +7,7 @@
 // C++
 #include <chrono>
 #include <utility>
+#include <optional>
 
 // Cosmos
 #include "cosmos/fs/FileBase.hxx"
@@ -105,12 +106,16 @@ protected: // data
  *
  * See openpty(2) and pty(7) man pages for more information.
  *
+ * \param[in] initial_size if provided then this will be the initial PTY
+ *            dimension registered by the kernel. See Terminal::setSize().
+ *
  * \return a pair of the master and slave file descriptor belonging to the new
  *         PTY. The caller is responsible for managing the lifetime of the
  *         returned file descriptors (i.e. closing them at the appropriate
  *         time). On error an ApiError exception is thrown.
  **/
-COSMOS_API std::pair<cosmos::FileDescriptor, cosmos::FileDescriptor> openPTY();
+COSMOS_API std::pair<cosmos::FileDescriptor, cosmos::FileDescriptor> openPTY(
+		const std::optional<TermDimension> initial_size = {});
 
 } // end ns
 

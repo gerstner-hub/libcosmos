@@ -60,15 +60,17 @@ void Terminal::makeControllingTerminal(bool force) {
 	}
 }
 
-std::pair<FileDescriptor, FileDescriptor> openPTY() {
+std::pair<FileDescriptor, FileDescriptor> openPTY(const std::optional<TermDimension> initial_size) {
 	int master, slave;
 
 	// the name parameter is unsafe since there is no standardized
 	// dimension limit.
 	// the other parameters are for setting initial TTY properties and
-	// terminal sizes.
+	// terminal size.
 
-	if (::openpty(&master, &slave, nullptr, nullptr, nullptr) < 0) {
+	const struct winsize *size = initial_size ? &(*initial_size) : nullptr;
+
+	if (::openpty(&master, &slave, nullptr, nullptr, size) < 0) {
 		cosmos_throw (ApiError("openpty failed"));
 	}
 
