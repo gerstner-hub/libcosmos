@@ -133,6 +133,23 @@ std::string make_tempdir(const std::string_view _template) {
 	return expanded;
 }
 
+void make_fifo(const std::string_view path, const FileMode mode) {
+	auto res = ::mkfifo(path.data(), to_integral(mode.raw()));
+
+	if (res != 0) {
+		cosmos_throw (FileError(path, "mkfifo()"));
+	}
+}
+
+void make_fifo_at(const DirFD dir_fd, const std::string_view path,
+		const FileMode mode) {
+	auto res = ::mkfifoat(to_integral(dir_fd.raw()), path.data(), to_integral(mode.raw()));
+
+	if (res != 0) {
+		cosmos_throw (FileError(path, "mkfifoat()"));
+	}
+}
+
 FileMode set_umask(const FileMode mode) {
 	auto raw_mode = to_integral(mode.raw());
 

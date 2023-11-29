@@ -110,6 +110,38 @@ COSMOS_API std::pair<FileDescriptor, std::string> make_tempfile(
  **/
 COSMOS_API std::string make_tempdir(const std::string_view _template);
 
+/// Creates a named pipe at the given file system location.
+/**
+ * A named pipe is identical to a cosmos::Pipe, only that is has a visible
+ * name in the file system. Unrelated processes can exchange data via the pipe
+ * this way.
+ *
+ * The file system entry carries the usual UNIX permissions that will be
+ * initialized by combinding \c mode with the calling process's umask.
+ *
+ * Opening named pipes will block both for reading and writing as long as no
+ * communication partner exists. When opening a named pipe in non-blocking
+ * mode will succeed for OpenMode::READ_ONLY even if no writer is present yet.
+ * For OpenMode::WRITE_ONLY an error Errno::NXIO is returned in the
+ * non-blocking case. As a special case on Linux when opening the pipe with
+ * OpenMode::READ_WRITE will succeed regardless of blocking or non-blocking
+ * mode. This allows to open the pipe for writing while there are no readers
+ * available.
+ **/
+COSMOS_API void make_fifo(const std::string_view path, const FileMode mode);
+
+/// Creates a named pipe relative to the given directory descriptor.
+/**
+ * This behaves like make_fifo with the usual _at semantics:
+ *
+ * - if \c path is absolute then \c dir_fd is ignored.
+ * - if \c path is relative then it is interpreted relative to \c dir_fd.
+ * - if \c path is relative and \c dir_fd has the special value cosmos::AT_CWD
+ *   then it is interpreted relative to the current working directory.
+ **/
+COSMOS_API void make_fifo_at(const DirFD dir_fd, const std::string_view path,
+		const FileMode mode);
+
 /// Sets the process's file creation mask.
 /**
  * The file creation mask is a process wide attribute that determines an upper

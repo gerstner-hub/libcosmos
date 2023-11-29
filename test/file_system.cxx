@@ -38,6 +38,7 @@ class FileSystemTest :
 		testMakeTempfile();
 		testMakeTempdir();
 		testTruncate();
+		testMakeFIFO();
 	}
 
 	std::pair<std::filesystem::path, cosmos::TempDir> getTestDir() {
@@ -475,6 +476,33 @@ class FileSystemTest :
 		fs.updateFrom(tf.fd());
 
 		RUN_STEP("truncate-by-path-size-matches", fs.size() == 2000);
+	}
+
+	void testMakeFIFO() {
+		START_TEST("mkfifo()");
+
+		auto path = cosmos::fs::make_tempdir("/tmp/fifodir");
+		auto dir = cosmos::Directory{path};
+		const cosmos::FileMode fifo_mode{cosmos::ModeT{0600}};
+		const cosmos::FileMode fifo_at_mode{cosmos::ModeT{0640}};
+		cosmos::fs::make_fifo(path + "/mkfifo", fifo_mode);
+		cosmos::fs::make_fifo_at(dir.fd(), "mkfifo.at", fifo_at_mode);
+
+		RUN_STEP("fifos-created", true);
+
+		const cosmos::FileStatus fifo_status{path + "/mkfifo"};
+		const cosmos::FileStatus fifo_at_status{path + "/mkfifo.at"};
+
+		RUN_STEP("fifos-stat'ed", true);
+
+		EVAL_STEP(fifo_status.type().isFIFO());
+		EVAL_STEP(fifo_at_status.type().isFIFO());
+		EVAL_STEP(fifo_status.mode() == fifo_mode);
+		EVAL_STEP(fifo_at_status.mode() == fifo_at_mode);
+
+		dir.close();
+
+		cosmos::fs::remove_tree(path);
 	}
 
 protected:
