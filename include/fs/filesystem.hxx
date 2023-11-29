@@ -214,7 +214,7 @@ COSMOS_API std::string get_working_dir();
  * unmodified if this is the case.
  *
  * If the program cannot be found or is not accessible then {} is returned.
- * This fucntion does not throw exceptions, on error {} is returned.
+ * This function does not throw exceptions, on error {} is returned.
  **/
 COSMOS_API std::optional<std::string> which(const std::string_view exec_base) noexcept;
 
