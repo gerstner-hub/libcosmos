@@ -127,6 +127,10 @@ COSMOS_API std::string make_tempdir(const std::string_view _template);
  * OpenMode::READ_WRITE will succeed regardless of blocking or non-blocking
  * mode. This allows to open the pipe for writing while there are no readers
  * available.
+ *
+ * The underlying system call for this is `mknod()` which will never follow
+ * symlinks or reuse existing files. Instead an error is thrown if the path
+ * already exists in any form.
  **/
 COSMOS_API void make_fifo(const std::string_view path, const FileMode mode);
 
