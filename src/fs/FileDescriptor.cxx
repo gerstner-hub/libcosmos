@@ -132,6 +132,26 @@ FileDescriptor::SealFlags FileDescriptor::getSeals() const {
 	return SealFlags{static_cast<SealOpts>(res)};
 }
 
+int FileDescriptor::getPipeSize() const {
+	auto res = ::fcntl(to_integral(m_fd), F_GETPIPE_SZ);
+
+	if (res == -1) {
+		cosmos_throw (ApiError("failed to get pipe buffer size"));
+	}
+
+	return res;
+}
+
+int FileDescriptor::setPipeSize(const int new_size) {
+	auto res = ::fcntl(to_integral(m_fd), F_SETPIPE_SZ, new_size);
+
+	if (res == -1) {
+		cosmos_throw (ApiError("failed to set pipe buffer size"));
+	}
+
+	return res;
+}
+
 FileDescriptor stdout(FileNum::STDOUT);
 FileDescriptor stderr(FileNum::STDERR);
 FileDescriptor stdin(FileNum::STDIN);

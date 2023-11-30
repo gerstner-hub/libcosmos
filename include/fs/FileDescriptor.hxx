@@ -186,6 +186,17 @@ public: // functions
 	/// Get the currently set SealFlags for the file descriptor.
 	SealFlags getSeals() const;
 
+	/// For pipe file descriptors return the size of the pipe buffer in the kernel.
+	int getPipeSize() const;
+
+	/// For pipe file descriptors this sets a new size for the pipe buffer in the kernel.
+	/**
+	 * The kernel can choose a larger size if it deems this necessary.
+	 * /proc/sys/fs/pipe-max-size defines a maximum pipe buffer size for
+	 * the system. The actually used size will be returned from this call.
+	 **/
+	int setPipeSize(const int new_size);
+
 	/// Returns the primitive file descriptor contained in the object.
 	FileNum raw() const { return m_fd; }
 
