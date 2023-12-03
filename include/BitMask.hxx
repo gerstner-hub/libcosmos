@@ -230,6 +230,10 @@ public: // functions
 		return true;
 	}
 
+	bool allOf(const BitMask other) const {
+		return (m_flags & other.m_flags) == other.m_flags;
+	}
+
 	/// Returns whether any of the given values is set.
 	bool anyOf(const std::initializer_list<ENUM> &flags) const {
 		for (auto val: flags) {
