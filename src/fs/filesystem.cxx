@@ -354,7 +354,7 @@ namespace {
 				}
 				case Type::DIRECTORY:
 				dircase: {
-					// get down recursively 
+					// get down recursively
 					DirStream subdir{dir_fd, name};
 					remove_tree(subdir);
 					dir.removeDirAt(name);

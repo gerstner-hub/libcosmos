@@ -104,7 +104,7 @@ public: // functions
 		m_fd = fd;
 		m_auto_close = auto_close;
 	}
-	
+
 	bool isOpen() const { return m_fd.valid(); }
 
 	/// Close the current dir object.
@@ -145,7 +145,7 @@ public: // functions
 	inline void makeSymlinkAt(const std::string_view target, const std::string_view path) const;
 
 protected: // data
-	
+
 	AutoCloseFD m_auto_close;
 	DirFD m_fd;
 };

@@ -15,9 +15,9 @@ namespace cosmos {
  **/
 class COSMOS_API TempDir {
 public: // functions
-	
+
 	TempDir() = default;
-	
+
 	explicit TempDir(const std::string_view _template) {
 		create(_template);
 	}

@@ -30,7 +30,7 @@ namespace cosmos {
  *   the value 1 is returned and the counter is decremented by one.
  * - the signal() function adds a value to the counter, thereby potentially
  *   waking up any current waiters.
- * 
+ *
  * If the counter would overflow due to signal() then the signal() call either
  * blocks until the counter is decremented by another thread or it returns an
  * error if the eventfd is in non-blocking mode (\see Settings::NONBLOCK).

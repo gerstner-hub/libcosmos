@@ -35,7 +35,7 @@ std::string normalize_path(const std::string_view path) {
 			if (component == "..") {
 				// don't remove the root directory
 				if (ret.size() > 1) {
-					ret.erase(ret.rfind('/'));			
+					ret.erase(ret.rfind('/'));
 				}
 				slashes++;
 			// references to the CWD are simply ignored

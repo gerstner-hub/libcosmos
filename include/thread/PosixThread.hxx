@@ -64,7 +64,7 @@ public: // types
 	using Entry = std::function<void (void)>;
 
 public: // functions
-	
+
 	/// Creates an empty thread object.
 	/**
 	 * This will simply create an empty thread object without invoking any
@@ -189,7 +189,7 @@ public: // functions
 	}
 
 protected: // functions
-	
+
 	std::string buildName(const std::string_view name, size_t nr) const;
 
 	void assertJoinConditions();
@@ -197,7 +197,7 @@ protected: // functions
 	void reset();
 
 protected: // data
-	
+
 	/// POSIX thread handle
 	std::optional<pthread_t> m_pthread;
 

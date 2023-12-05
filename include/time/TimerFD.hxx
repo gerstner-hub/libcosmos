@@ -152,7 +152,7 @@ public:
 
 	/// Creates a new timer fd using the given flags.
 	/**
-	 * After this function call the timer will be ready for operation. 
+	 * After this function call the timer will be ready for operation.
 	 *
 	 * If there already is a valid timer fd (i.e. isOpen() == \c true) then
 	 * close() will be called first.

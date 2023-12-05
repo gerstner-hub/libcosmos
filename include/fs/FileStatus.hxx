@@ -254,7 +254,7 @@ public: // functions
 	}
 
 protected: // functions
-	
+
 	void throwBadType(const std::string_view context) const;
 
 protected: // data

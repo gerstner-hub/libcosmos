@@ -48,7 +48,7 @@ FileDescriptor::DescFlags FileDescriptor::getFlags() const {
 	if (flags == -1) {
 		cosmos_throw (ApiError("failed to get flags (F_GETFD)"));
 	}
-	
+
 	return DescFlags{flags};
 }
 
@@ -74,7 +74,7 @@ std::tuple<OpenMode, OpenFlags> FileDescriptor::getStatusFlags() const {
 }
 
 void FileDescriptor::setStatusFlags(const OpenFlags flags) {
-	
+
 	auto res = ::fcntl(to_integral(m_fd), F_SETFL, flags.raw());
 
 	if (res == -1) {

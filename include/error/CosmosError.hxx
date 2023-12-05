@@ -17,7 +17,7 @@ namespace cosmos {
  *
  * It would be nice adding the possibility for a function call backtrace to
  * the exception class. There are a bunch of obstacles to this, though:
- * 
+ *
  * There exists a kind of base mechanism present in Glibc and GCC/Clang:
  *
  * - using backtrace() and backtrace_symbols() from <execinfo.h>
@@ -39,7 +39,7 @@ namespace cosmos {
  *
  * There are lesser known libraries like libbacktrace or backward-cpp, both of
  * them are rather big and not readily available, also not very actively
- * maintained (?). 
+ * maintained (?).
  *
  * Further "hacks" to get additional debug information would be calling
  * external tools like `addr2line` or `gdb`.

@@ -16,7 +16,7 @@ namespace cosmos {
 class COSMOS_API FDFile :
 		public FileBase {
 public: // functions
-	
+
 	FDFile() = default;
 
 	/// Wrap the given file descriptor applying the specified auto-close behaviour.

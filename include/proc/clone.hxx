@@ -60,7 +60,7 @@ using CloneFlags = BitMask<CloneSettings>;
 /// Argument struct for proc::clone().
 struct COSMOS_API CloneArgs :
 		::clone_args {
-	
+
 	CloneArgs() {
 		clear();
 	}
@@ -72,7 +72,7 @@ struct COSMOS_API CloneArgs :
 	 * default.
 	 **/
 	void clear();
-	
+
 	void setFlags(const CloneFlags p_flags) {
 		this->flags = p_flags.raw();
 	}

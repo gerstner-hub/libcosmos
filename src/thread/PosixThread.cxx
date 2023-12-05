@@ -54,7 +54,7 @@ namespace {
 	void* thread_entry(void *par) {
 
 		Context ctx = fetch_context(par);
-			
+
 		if (std::holds_alternative<PosixThread::PosixEntry>(ctx.entry)) {
 			auto entry = std::get<PosixThread::PosixEntry>(ctx.entry);
 			auto ret = entry(ctx.arg);
@@ -84,7 +84,7 @@ namespace {
 
 PosixThread::PosixThread(PosixEntry entry, pthread::ThreadArg arg, const std::string_view name) :
 		m_name{buildName(name, ++num_threads)} {
-	
+
 	pthread_t thread;
 	create_thread(thread, new Context{entry, arg});
 	m_pthread = thread;

@@ -21,9 +21,9 @@ namespace cosmos {
 class COSMOS_API TempFile :
 		public FileBase {
 public: // functions
-	
+
 	TempFile() = default;
-	
+
 	explicit TempFile(const std::string_view _template, const OpenFlags flags = OpenFlags{}) {
 		open(_template, flags);
 	}
@@ -67,7 +67,7 @@ public: // functions
 	const std::string& path() const;
 
 protected: // functions
-	
+
 	void unlinkPath() {
 		if (!m_tmp_path.empty()) {
 			try {

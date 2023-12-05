@@ -60,7 +60,7 @@ public: // types
 	};
 
 public: // functions
-	
+
 	explicit StreamIO(FileDescriptor &fd) :
 			m_stream_fd{fd}
 	{}

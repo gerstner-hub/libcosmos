@@ -35,7 +35,7 @@ const StringViewVector GroupInfo::members() const {
 	if (!valid()) {
 		cosmos_throw (UsageError{"cannot get members of invalid GroupInfo"});
 	}
-	
+
 	StringViewVector ret;
 
 	for (char **member = m_info.gr_mem; *member != nullptr; member++) {

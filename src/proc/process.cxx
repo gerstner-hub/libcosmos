@@ -161,7 +161,7 @@ void exec(const std::string_view path,
 void exec_at(const DirFD dir_fd, const std::string_view path,
 		const CStringVector *args, const CStringVector *env,
 		const FollowSymlinks follow_symlinks) {
-	
+
 	auto exec_at_wrapper = [dir_fd, follow_symlinks](
 			const char *pathname, char * const argv[], char * const envp[]) -> int {
 		return ::execveat(
