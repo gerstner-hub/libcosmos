@@ -9,6 +9,7 @@
 #include "cosmos/fs/Directory.hxx"
 #include "cosmos/fs/FDFile.hxx"
 #include "cosmos/fs/File.hxx"
+#include "cosmos/fs/FileStatus.hxx"
 #include "cosmos/fs/filesystem.hxx"
 #include "cosmos/fs/TempDir.hxx"
 #include "cosmos/fs/TempFile.hxx"
@@ -28,6 +29,7 @@ public:
 		testOpen();
 		testOpenAt();
 		testReadFile();
+		testVectorReadFile();
 		testWriteFile();
 		testPipeStream();
 		testTempFile();
@@ -92,6 +94,46 @@ public:
 
 		std::cout << m_hosts_content << std::endl;
 		FINISH_STEP(true);
+	}
+
+	void testVectorReadFile() {
+		START_TEST("Test reading files using IOVector");
+
+		// TODO: make this const once we fixed the const IOVector
+		// problem
+		std::string header{"some header data"};
+		std::string body{"some body data"};
+
+		cosmos::File sf;
+		START_STEP("writing two-part test data to tmpfile");
+		sf.open("/tmp", cosmos::OpenMode::READ_WRITE, cosmos::OpenFlags({cosmos::OpenSettings::TMPFILE}), cosmos::ModeT{0700});
+		cosmos::IOVector iovec;
+		iovec.push_back(cosmos::IOVectorEntry{header.data(), header.size()});
+		iovec.push_back(cosmos::IOVectorEntry{body.data(), body.size()});
+
+		sf.writeAll(iovec);
+
+		for (const auto &entry: iovec) {
+			RUN_STEP("verify write vector empty", entry.empty());
+		}
+
+		const cosmos::FileStatus fs{sf.fd()};
+
+		RUN_STEP("verify file size", fs.size() == static_cast<off_t>(header.size() + body.size()));
+
+		sf.seekFromStart(0);
+
+		std::string header2, body2;
+		header2.resize(header.size());
+		body2.resize(body.size());
+
+		iovec.clear();
+		iovec.push_back(cosmos::IOVectorEntry{header2.data(), header2.size()});
+		iovec.push_back(cosmos::IOVectorEntry{body2.data(), body2.size()});
+
+		sf.readAll(iovec);
+
+		RUN_STEP("verify read-back data", header2 == header && body2 == body);
 	}
 
 	void testWriteFile() {

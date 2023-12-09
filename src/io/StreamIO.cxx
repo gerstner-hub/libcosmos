@@ -67,6 +67,43 @@ void StreamIO::writeAll(const void *buf, size_t length) {
 	}
 }
 
+bool StreamIO::read(IOVector &iovec) {
+	while (true) {
+		const auto res = ::readv(
+				to_integral(m_stream_fd.raw()), iovec.raw(), iovec.size());
+
+		if (res < 0) {
+			// transparent restart
+			if (auto_restart_syscalls && get_errno() == Errno::INTERRUPTED)
+				continue;
+			else if (in_list(get_errno(), {Errno::AGAIN, Errno::WOULD_BLOCK}))
+				cosmos_throw (WouldBlock("reading to vector from file"));
+
+			cosmos_throw (ApiError("reading from file"));
+		}
+
+		return iovec.update(static_cast<size_t>(res));
+	}
+}
+
+bool StreamIO::write(IOVector &iovec) {
+	while (true) {
+		auto res = ::writev(to_integral(m_stream_fd.raw()), iovec.raw(), iovec.size());
+
+		if (res < 0) {
+			// transparent restart
+			if (auto_restart_syscalls && get_errno() == Errno::INTERRUPTED)
+				continue;
+			else if (in_list(get_errno(), {Errno::AGAIN, Errno::WOULD_BLOCK}))
+				cosmos_throw (WouldBlock("writing vector to file"));
+
+			cosmos_throw (ApiError("writing vector to file"));
+		}
+
+		return iovec.update(static_cast<size_t>(res));
+	}
+}
+
 off_t StreamIO::seek(const SeekType type, off_t off) {
 	const auto res = ::lseek(to_integral(m_stream_fd.raw()), off, to_integral(type));
 
@@ -75,6 +112,37 @@ off_t StreamIO::seek(const SeekType type, off_t off) {
 	}
 
 	return res;
+}
+
+bool IOVector::update(size_t processed_bytes) {
+	// there's two approaches to update an io vector after partial
+	// read/write operations:
+	// a) removing completely processed entry from the begin of the
+	//    vector and update partially processed ones
+	// b) only updating pointer and length information but keeping
+	//    the entry in the vector.
+	// For b) the erase operation on the front of the vector is
+	// somewhat expensive. For a) the re-entry into the kernel is
+	// somewhat expensive, since the first entries processed will
+	// potentially be empty. For b) the advantage is that even a
+	// fixed size std::array would be possible to use.
+	// Currently we follow b).
+	bool vec_finished = true;
+
+	for (auto &entry: *this) {
+		processed_bytes -= entry.update(processed_bytes);
+
+		if (!entry.empty()) {
+			vec_finished = false;
+			break;
+		}
+	}
+
+	if (processed_bytes != 0) {
+		cosmos_throw (RuntimeError("inconsistency while updating IOVector"));
+	}
+
+	return vec_finished;
 }
 
 } // end ns

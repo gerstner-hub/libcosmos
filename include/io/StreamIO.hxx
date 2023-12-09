@@ -10,12 +10,13 @@
 
 // cosmos
 #include "cosmos/fs/FileDescriptor.hxx"
+#include "cosmos/io/types.hxx"
 
 namespace cosmos {
 
 /// Wrapper around file descriptors for streaming I/O access.
 /**
- * Streaming I/O means that a file read/write position is maintained by the
+ * Streaming I/O means that a file's read/write position is maintained by the
  * operating system and data is exchanged by means of read/write operations
  * that transfer data from the current process to the file and vice versa.
  *
@@ -27,12 +28,15 @@ namespace cosmos {
  * special I/O semantics for the respective file type when using it with this
  * wrapper.
  *
+ * Beyond read and write operations this type also offers seek operations. Not
+ * all file types are seekable though and the operation can fail.
+ *
  * This type will not take ownership of the provided file descriptor. It is
  * only meant as an access wrapper, not as a permanent representation of the
  * backed file.
  *
- * StreamIO has a fixed coupling to the assigned file descriptor. It is
- * designed to be used as a mixin class.
+ * StreamIO has a fixed coupling to the assigned file descriptor. It can be
+ * used as a mixin class or as a base class.
  **/
 class COSMOS_API StreamIO {
 public: // types
@@ -143,6 +147,63 @@ public: // functions
 	/// string_view wrapper around writeAll(const void*, size_t).
 	void writeAll(const std::string_view data) {
 		return writeAll(data.data(), data.size());
+	}
+
+	/// Read data from file into a vector of data regions.
+	/**
+	 * The \c iovec specifies memory regions into which data from the file
+	 * should be written. The data will be filled sequentially starting
+	 * from the first memory region.
+	 *
+	 * Partial reads can occur, thus on return the length and base fields
+	 * of each vector entry will be updated to reflect this. The return
+	 * value is a flag indicating whether the complete vector has been
+	 * filled, or whether a partial read occured.
+	 *
+	 * These vector I/O operations are useful when structured binary of
+	 * fixed size is transferred e.g. in network protocols for the
+	 * different header layers. This way the individual headers can be
+	 * kept in distinct places while only a single system call is
+	 * necessary to transfer them.
+	 **/
+	bool read(IOVector &iovec);
+
+	/// Write data to file from a vector of data regions.
+	/**
+	 * The \c iovec specifies memory regions whoose data will be written
+	 * to the file. The data will be written sequentially starting from
+	 * the first memory region.
+	 *
+	 * Partial writes can occur, thus on return the length and base fields
+	 * of each vector entry will be updated to reflect this. The return
+	 * value is a flag indicating whether the complete vector has been
+	 * written out, or whether a partial write occured.
+	 **/
+	bool write(IOVector &iovec);
+
+	/// Read into *all* data regions specified in \c iovec.
+	/**
+	 * This is just like read(IOVector&) but it takes care of partial
+	 * reads and continues until all data of the IOVector has been filled
+	 * or an error occurs. On return the complete vector has been filled.
+	 **/
+	void readAll(IOVector &iovec) {
+		while (!read(iovec)) {
+			;
+		}
+	}
+
+	/// Write *all* data regions specified in \c iovec.
+	/**
+	 * This is just like write(const IOVector&) but it takes care of
+	 * partial writes and continues until all data of the IOVector has
+	 * been written out or an error occurs. On return the complete vector
+	 * has been written.
+	 **/
+	void writeAll(IOVector &iovec) {
+		while (!write(iovec)) {
+			;
+		}
 	}
 
 	/// Seek to the given offset based on the given offset \p type.
