@@ -8,18 +8,28 @@
 
 namespace cosmos {
 
+namespace {
+
+void handleIOError(const std::string_view operation) {
+	// transparent restart, if configured
+	if (const auto error = get_errno(); auto_restart_syscalls && error == Errno::INTERRUPTED)
+		return;
+	else if (in_list(error, {Errno::AGAIN, Errno::WOULD_BLOCK}))
+		cosmos_throw (WouldBlock(operation));
+
+	cosmos_throw (ApiError(operation));
+
+}
+
+} // end anons ns
+
 size_t StreamIO::read(void *buf, size_t length) {
 	while (true) {
 		auto res = ::read(to_integral(m_stream_fd.raw()), buf, length);
 
 		if (res < 0) {
-			// transparent restart
-			if (auto_restart_syscalls && get_errno() == Errno::INTERRUPTED)
-				continue;
-			else if (in_list(get_errno(), {Errno::AGAIN, Errno::WOULD_BLOCK}))
-				cosmos_throw (WouldBlock("reading from file"));
-
-			cosmos_throw (ApiError("reading from file"));
+			handleIOError("reading from file");
+			continue;
 		}
 
 		return static_cast<size_t>(res);
@@ -44,13 +54,8 @@ size_t StreamIO::write(const void *buf, size_t length) {
 		auto res = ::write(to_integral(m_stream_fd.raw()), buf, length);
 
 		if (res < 0) {
-			// transparent restart
-			if (auto_restart_syscalls && get_errno() == Errno::INTERRUPTED)
-				continue;
-			else if (in_list(get_errno(), {Errno::AGAIN, Errno::WOULD_BLOCK}))
-				cosmos_throw (WouldBlock("writing to file"));
-
-			cosmos_throw (ApiError("writing to file"));
+			handleIOError("writing to file");
+			continue;
 		}
 
 		return static_cast<size_t>(res);
@@ -73,13 +78,8 @@ bool StreamIO::read(IOVector &iovec) {
 				to_integral(m_stream_fd.raw()), iovec.raw(), iovec.size());
 
 		if (res < 0) {
-			// transparent restart
-			if (auto_restart_syscalls && get_errno() == Errno::INTERRUPTED)
-				continue;
-			else if (in_list(get_errno(), {Errno::AGAIN, Errno::WOULD_BLOCK}))
-				cosmos_throw (WouldBlock("reading to vector from file"));
-
-			cosmos_throw (ApiError("reading from file"));
+			handleIOError("reading to vector from file");
+			continue;
 		}
 
 		return iovec.update(static_cast<size_t>(res));
@@ -91,13 +91,8 @@ bool StreamIO::write(IOVector &iovec) {
 		auto res = ::writev(to_integral(m_stream_fd.raw()), iovec.raw(), iovec.size());
 
 		if (res < 0) {
-			// transparent restart
-			if (auto_restart_syscalls && get_errno() == Errno::INTERRUPTED)
-				continue;
-			else if (in_list(get_errno(), {Errno::AGAIN, Errno::WOULD_BLOCK}))
-				cosmos_throw (WouldBlock("writing vector to file"));
-
-			cosmos_throw (ApiError("writing vector to file"));
+			handleIOError("writing vector to file");
+			continue;
 		}
 
 		return iovec.update(static_cast<size_t>(res));
