@@ -17,7 +17,7 @@ size_t StreamIO::read(void *buf, size_t length) {
 			if (auto_restart_syscalls && get_errno() == Errno::INTERRUPTED)
 				continue;
 			else if (in_list(get_errno(), {Errno::AGAIN, Errno::WOULD_BLOCK}))
-				cosmos_throw (WouldBlock("writing to file"));
+				cosmos_throw (WouldBlock("reading from file"));
 
 			cosmos_throw (ApiError("reading from file"));
 		}
