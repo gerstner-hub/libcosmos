@@ -10,7 +10,7 @@
 
 // cosmos
 #include "cosmos/fs/FileDescriptor.hxx"
-#include "cosmos/io/types.hxx"
+#include "cosmos/io/iovector.hxx"
 
 namespace cosmos {
 
