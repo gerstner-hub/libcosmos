@@ -99,22 +99,23 @@ public:
 	void testVectorReadFile() {
 		START_TEST("Test reading files using IOVector");
 
-		// TODO: make this const once we fixed the const IOVector
-		// problem
-		std::string header{"some header data"};
-		std::string body{"some body data"};
+		const std::string header{"some header data"};
+		const std::string body{"some body data"};
 
 		cosmos::File sf;
 		START_STEP("writing two-part test data to tmpfile");
 		sf.open("/tmp", cosmos::OpenMode::READ_WRITE, cosmos::OpenFlags({cosmos::OpenSettings::TMPFILE}), cosmos::ModeT{0700});
-		cosmos::IOVector iovec;
-		iovec.push_back(cosmos::IOVectorEntry{header.data(), header.size()});
-		iovec.push_back(cosmos::IOVectorEntry{body.data(), body.size()});
 
-		sf.writeAll(iovec);
+		{
+			cosmos::WriteIOVector iovec;
+			iovec.push_back(cosmos::OutputMemoryRegion{header});
+			iovec.push_back(cosmos::OutputMemoryRegion{body});
 
-		for (const auto &entry: iovec) {
-			RUN_STEP("verify write vector empty", entry.empty());
+			sf.writeAll(iovec);
+
+			for (const auto &entry: iovec) {
+				RUN_STEP("verify write vector finished", entry.finished());
+			}
 		}
 
 		const cosmos::FileStatus fs{sf.fd()};
@@ -127,11 +128,13 @@ public:
 		header2.resize(header.size());
 		body2.resize(body.size());
 
-		iovec.clear();
-		iovec.push_back(cosmos::IOVectorEntry{header2.data(), header2.size()});
-		iovec.push_back(cosmos::IOVectorEntry{body2.data(), body2.size()});
+		{
+			cosmos::ReadIOVector iovec;
+			iovec.push_back(cosmos::InputMemoryRegion{header2});
+			iovec.push_back(cosmos::InputMemoryRegion{body2});
 
-		sf.readAll(iovec);
+			sf.readAll(iovec);
+		}
 
 		RUN_STEP("verify read-back data", header2 == header && body2 == body);
 	}

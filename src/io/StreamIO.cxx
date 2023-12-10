@@ -72,7 +72,7 @@ void StreamIO::writeAll(const void *buf, size_t length) {
 	}
 }
 
-bool StreamIO::read(IOVector &iovec) {
+bool StreamIO::read(ReadIOVector &iovec) {
 	while (true) {
 		const auto res = ::readv(
 				to_integral(m_stream_fd.raw()), iovec.raw(), iovec.size());
@@ -86,7 +86,7 @@ bool StreamIO::read(IOVector &iovec) {
 	}
 }
 
-bool StreamIO::write(IOVector &iovec) {
+bool StreamIO::write(WriteIOVector &iovec) {
 	while (true) {
 		auto res = ::writev(to_integral(m_stream_fd.raw()), iovec.raw(), iovec.size());
 
@@ -109,7 +109,8 @@ off_t StreamIO::seek(const SeekType type, off_t off) {
 	return res;
 }
 
-bool IOVector::update(size_t processed_bytes) {
+template <typename MEMORY_REGION>
+bool IOVector<MEMORY_REGION>::update(size_t processed_bytes) {
 	// there's two approaches to update an io vector after partial
 	// read/write operations:
 	// a) removing completely processed entry from the begin of the
@@ -119,15 +120,15 @@ bool IOVector::update(size_t processed_bytes) {
 	// For b) the erase operation on the front of the vector is
 	// somewhat expensive. For a) the re-entry into the kernel is
 	// somewhat expensive, since the first entries processed will
-	// potentially be empty. For b) the advantage is that even a
-	// fixed size std::array would be possible to use.
-	// Currently we follow b).
+	// potentially be finished already. For b) the advantage is that even
+	// a fixed size std::array would be possible to use.  Currently we
+	// follow b).
 	bool vec_finished = true;
 
 	for (auto &entry: *this) {
 		processed_bytes -= entry.update(processed_bytes);
 
-		if (!entry.empty()) {
+		if (!entry.finished()) {
 			vec_finished = false;
 			break;
 		}

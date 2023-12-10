@@ -166,7 +166,7 @@ public: // functions
 	 * kept in distinct places while only a single system call is
 	 * necessary to transfer them.
 	 **/
-	bool read(IOVector &iovec);
+	bool read(ReadIOVector &iovec);
 
 	/// Write data to file from a vector of data regions.
 	/**
@@ -179,7 +179,7 @@ public: // functions
 	 * value is a flag indicating whether the complete vector has been
 	 * written out, or whether a partial write occured.
 	 **/
-	bool write(IOVector &iovec);
+	bool write(WriteIOVector &iovec);
 
 	/// Read into *all* data regions specified in \c iovec.
 	/**
@@ -187,7 +187,7 @@ public: // functions
 	 * reads and continues until all data of the IOVector has been filled
 	 * or an error occurs. On return the complete vector has been filled.
 	 **/
-	void readAll(IOVector &iovec) {
+	void readAll(ReadIOVector &iovec) {
 		while (!read(iovec)) {
 			;
 		}
@@ -200,7 +200,7 @@ public: // functions
 	 * been written out or an error occurs. On return the complete vector
 	 * has been written.
 	 **/
-	void writeAll(IOVector &iovec) {
+	void writeAll(WriteIOVector &iovec) {
 		while (!write(iovec)) {
 			;
 		}
