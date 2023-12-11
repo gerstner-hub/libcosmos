@@ -1,0 +1,48 @@
+#ifndef COSMOS_TCP_CONNECTION_HXX
+#define COSMOS_TCP_CONNECTION_HXX
+
+// cosmos
+#include "cosmos/net/IPSocket.hxx"
+#include "cosmos/net/TCPOptions.hxx"
+#include "cosmos/net/types.hxx"
+
+namespace cosmos {
+
+/// Template for an active IPv4 and IPv6 based TCP connection.
+/**
+ * Use cosmos::TCP4Connection for the IPv4 variant and cosmos::TCP6Connection
+ * for the IPv6 variant.
+ *
+ * Instances of this type are typically obtained from
+ * TCPClientSocket::connect() or TCPListenSocket::accept(). A connection can
+ * also be created from an existing file descriptor that has been obtained by
+ * other means.
+ **/
+template <SocketFamily family>
+class TCPConnectionT :
+		public IPSocketT<family> {
+public: // functions
+
+	explicit TCPConnectionT(FileDescriptor fd, const AutoCloseFD auto_close = AutoCloseFD{true}) :
+			IPSocketT<family>{fd, auto_close} {
+	}
+
+	auto tcpOptions() {
+		return TCPOptions{this->m_fd};
+	}
+
+	auto tcpOptions() const {
+		return TCPOptions{this->m_fd};
+	}
+
+	using Socket::receive;
+	using Socket::send;
+	using Socket::shutdown;
+};
+
+using TCP4Connection = TCPConnectionT<SocketFamily::INET>;
+using TCP6Connection = TCPConnectionT<SocketFamily::INET6>;
+
+} // end ns
+
+#endif // inc. guard
