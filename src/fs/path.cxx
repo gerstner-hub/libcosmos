@@ -8,6 +8,7 @@
 // cosmos
 #include "cosmos/error/FileError.hxx"
 #include "cosmos/fs/filesystem.hxx"
+#include "cosmos/limits.hxx"
 #include "cosmos/fs/path.hxx"
 #include "cosmos/string.hxx"
 
@@ -64,7 +65,7 @@ std::string canonicalize_path(const std::string_view path) {
 	// implementing this on foot is non-trivial so rely on realpath() for
 	// the time being.
 	std::string ret;
-	ret.resize(PATH_MAX);
+	ret.resize(max::PATH);
 	if (::realpath(path.data(), ret.data()) == nullptr) {
 		cosmos_throw (FileError(path, "realpath()"));
 	}
