@@ -43,6 +43,13 @@ namespace cosmos {
  * implementation only reports the actual number of bytes used for a path.
  * When communicating with applications that follow a different notion here,
  * it can happen that you won't be able to communicate with them.
+ *
+ * \warning File system based sockets are restricted by the permissions of the
+ * directory they're placed in, as well by the socket's file mode. Only if a
+ * process has write access to the socket, may it connect to it.
+ * Sockets living in the abstract namespace, however, have no kernel side
+ * permission checking. Any process in the system may connect to them. Thus
+ * applications have to check UnixOptions::credentials() for access control.
  **/
 class COSMOS_API UnixAddress :
 		public SocketAddress {
