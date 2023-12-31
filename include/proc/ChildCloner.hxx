@@ -11,7 +11,7 @@
 #include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/proc/Scheduler.hxx"
 #include "cosmos/proc/SubProc.hxx"
-#include "cosmos/types.hxx"
+#include "cosmos/string.hxx"
 
 namespace cosmos {
 

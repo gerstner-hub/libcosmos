@@ -1,9 +1,9 @@
 // cosmos
-#include "cosmos/algs.hxx"
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/formatting.hxx"
 #include "cosmos/io/MemFile.hxx"
 #include "cosmos/private/cosmos.hxx"
+#include "cosmos/utils.hxx"
 
 namespace cosmos {
 

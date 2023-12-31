@@ -14,16 +14,6 @@
 
 namespace cosmos {
 
-/// Represents an exit status code from a child process.
-/**
- * The valid range of exit statuses is 0 .. 255 (the 8 lower bits of the
- * si_status field in WaitRes).
- **/
-enum class ExitStatus : int {
-	INVALID = -1,
-	SUCCESS = 0
-};
-
 /// Different child process wait options used in the proc::wait() family of calls.
 enum class WaitFlag : int {
 	/// Wait for child processes that have terminated.

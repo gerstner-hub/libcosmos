@@ -10,10 +10,12 @@
 #include <type_traits>
 
 // cosmos
-#include "cosmos/algs.hxx"
 #include "cosmos/compiler.hxx"
 #include "cosmos/dso_export.h"
-#include "cosmos/ostypes.hxx"
+#include "cosmos/fs/types.hxx"
+#include "cosmos/proc/types.hxx"
+#include "cosmos/types.hxx"
+#include "cosmos/utils.hxx"
 
 /**
  * @file

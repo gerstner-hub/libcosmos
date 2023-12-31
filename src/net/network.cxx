@@ -1,8 +1,8 @@
 // cosmos
-#include "cosmos/algs.hxx"
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/net/UnixConnection.hxx"
 #include "cosmos/net/network.hxx"
+#include "cosmos/utils.hxx"
 
 namespace cosmos::net {
 

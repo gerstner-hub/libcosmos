@@ -3,7 +3,7 @@
 #include "cosmos/error/RuntimeError.hxx"
 #include "cosmos/net/SocketOptions.hxx"
 #include "cosmos/private/sockopts.hxx"
-#include "cosmos/types.hxx"
+#include "cosmos/utils.hxx"
 
 namespace cosmos {
 

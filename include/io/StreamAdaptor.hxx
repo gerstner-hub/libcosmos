@@ -1,12 +1,11 @@
 #pragma once
 
 // Cosmos
-#include "cosmos/algs.hxx"
 #include "cosmos/compiler.hxx"
 #include "cosmos/error/UsageError.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/io/Pipe.hxx"
-#include "cosmos/types.hxx"
+#include "cosmos/utils.hxx"
 
 // C++
 #include <iostream>

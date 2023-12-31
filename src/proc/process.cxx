@@ -7,12 +7,12 @@
 #include <functional>
 
 // Cosmos
-#include "cosmos/algs.hxx"
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/error/UsageError.hxx"
+#include "cosmos/proc/SigSet.hxx"
 #include "cosmos/proc/pidfd.h"
 #include "cosmos/proc/process.hxx"
-#include "cosmos/proc/SigSet.hxx"
+#include "cosmos/utils.hxx"
 
 namespace cosmos::proc {
 

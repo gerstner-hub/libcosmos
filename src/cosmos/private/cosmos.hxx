@@ -6,7 +6,7 @@
 #include <string_view>
 
 // cosmos
-#include "cosmos/types.hxx"
+#include "cosmos/utils.hxx"
 
 namespace cosmos {
 

@@ -7,10 +7,10 @@
 #include <string_view>
 
 // cosmos
-#include "cosmos/algs.hxx"
 #include "cosmos/dso_export.h"
 #include "cosmos/net/SocketAddress.hxx"
-#include "cosmos/types.hxx"
+#include "cosmos/utils.hxx"
+#include "cosmos/utils.hxx"
 
 namespace cosmos {
 

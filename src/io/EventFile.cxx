@@ -1,8 +1,8 @@
 // cosmos
-#include "cosmos/algs.hxx"
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/error/RuntimeError.hxx"
 #include "cosmos/io/EventFile.hxx"
+#include "cosmos/utils.hxx"
 
 namespace cosmos {
 

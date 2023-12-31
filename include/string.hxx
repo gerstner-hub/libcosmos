@@ -13,6 +13,13 @@
 
 namespace cosmos {
 
+/// A vector of std::string
+using StringVector     = std::vector<std::string>;
+/// A vector of std::string_view
+using StringViewVector = std::vector<std::string_view>;
+/// A vector of plain `const char*`
+using CStringVector    = std::vector<const char*>;
+
 /**
  * @file
  *

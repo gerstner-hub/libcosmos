@@ -8,10 +8,10 @@
 #include <sched.h>
 
 // cosmos
-#include "cosmos/algs.hxx"
 #include "cosmos/BitMask.hxx"
 #include "cosmos/proc/PidFD.hxx"
 #include "cosmos/proc/Signal.hxx"
+#include "cosmos/utils.hxx"
 
 /**
  * @file

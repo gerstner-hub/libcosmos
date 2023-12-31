@@ -2,11 +2,11 @@
 #include <type_traits>
 
 // Cosmos
-#include "cosmos/algs.hxx"
 #include "cosmos/dso_export.h"
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/private/cosmos.hxx"
 #include "cosmos/time/Clock.hxx"
+#include "cosmos/utils.hxx"
 
 namespace cosmos {
 

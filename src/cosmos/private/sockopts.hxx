@@ -1,11 +1,11 @@
 #pragma once
 
 // cosmos
-#include "cosmos/algs.hxx"
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/error/RangeError.hxx"
 #include "cosmos/error/RuntimeError.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
+#include "cosmos/utils.hxx"
 
 namespace cosmos {
 

@@ -8,17 +8,17 @@
 
 // cosmos
 #include "cosmos/cosmos.hxx"
-#include "cosmos/error/UsageError.hxx"
 #include "cosmos/error/RuntimeError.hxx"
+#include "cosmos/error/UsageError.hxx"
 #include "cosmos/formatting.hxx"
 #include "cosmos/fs/DirStream.hxx"
-#include "cosmos/fs/filesystem.hxx"
 #include "cosmos/fs/TempDir.hxx"
+#include "cosmos/fs/filesystem.hxx"
+#include "cosmos/io/StdLogger.hxx"
+#include "cosmos/io/colors.hxx"
 #include "cosmos/proc/ChildCloner.hxx"
 #include "cosmos/proc/process.hxx"
-#include "cosmos/types.hxx"
-#include "cosmos/io/colors.hxx"
-#include "cosmos/io/StdLogger.hxx"
+#include "cosmos/utils.hxx"
 
 #define START_TEST(name) TestMarkGuard g{*this, name}
 #define START_STEP(text) startStep(text)

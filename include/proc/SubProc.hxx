@@ -7,7 +7,7 @@
 // cosmos
 #include "cosmos/proc/PidFD.hxx"
 #include "cosmos/proc/WaitRes.hxx"
-#include "cosmos/ostypes.hxx"
+#include "cosmos/types.hxx"
 
 namespace cosmos {
 

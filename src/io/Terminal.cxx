@@ -7,9 +7,9 @@
 #include <unistd.h>
 
 // cosmos
-#include "cosmos/algs.hxx"
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/io/Terminal.hxx"
+#include "cosmos/utils.hxx"
 
 namespace cosmos {
 

@@ -1,8 +1,8 @@
 // cosmos
-#include "cosmos/algs.hxx"
 #include "cosmos/error/UsageError.hxx"
 #include "cosmos/GroupInfo.hxx"
 #include "cosmos/private/InfoBase.hxx"
+#include "cosmos/utils.hxx"
 
 namespace cosmos {
 

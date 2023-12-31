@@ -6,10 +6,10 @@
 #include <string_view>
 
 // cosmos
-#include "cosmos/algs.hxx"
 #include "cosmos/dso_export.h"
-#include "cosmos/net/byte_order.hxx"
 #include "cosmos/net/SocketAddress.hxx"
+#include "cosmos/net/byte_order.hxx"
+#include "cosmos/utils.hxx"
 
 namespace cosmos {
 

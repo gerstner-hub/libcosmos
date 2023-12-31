@@ -2,8 +2,8 @@
 #include <ostream>
 
 // cosmos
-#include "cosmos/algs.hxx"
 #include "cosmos/proc/WaitRes.hxx"
+#include "cosmos/utils.hxx"
 
 std::ostream& operator<<(std::ostream &o, const cosmos::ExitStatus status) {
 	/// this could be annotated with a special character so that it is

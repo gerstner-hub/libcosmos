@@ -10,7 +10,7 @@
 
 // cosmos
 #include "cosmos/dso_export.h"
-#include "cosmos/ostypes.hxx"
+#include "cosmos/fs/types.hxx"
 
 namespace cosmos {
 

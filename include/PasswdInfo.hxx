@@ -4,9 +4,9 @@
 #include <pwd.h>
 
 // cosmos
-#include "cosmos/ostypes.hxx"
-#include "cosmos/string.hxx"
 #include "cosmos/InfoBase.hxx"
+#include "cosmos/string.hxx"
+#include "cosmos/types.hxx"
 
 namespace cosmos {
 

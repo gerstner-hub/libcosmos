@@ -12,6 +12,7 @@
 #include "cosmos/fs/DirFD.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/fs/types.hxx"
+#include "cosmos/types.hxx"
 
 /**
  * @file

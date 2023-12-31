@@ -5,9 +5,9 @@
 #include <utility>
 
 // cosmos
-#include "cosmos/algs.hxx"
 #include "cosmos/dso_export.h"
 #include "cosmos/net/SockOptBase.hxx"
+#include "cosmos/utils.hxx"
 
 namespace cosmos {
 

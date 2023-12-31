@@ -9,8 +9,7 @@
 // cosmos
 #include "cosmos/BitMask.hxx"
 #include "cosmos/fs/types.hxx"
-#include "cosmos/ostypes.hxx"
-#include "cosmos/types.hxx"
+#include "cosmos/utils.hxx"
 
 namespace cosmos {
 

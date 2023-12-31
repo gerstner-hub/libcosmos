@@ -3,8 +3,7 @@
 #include <cassert>
 
 // cosmos
-#include "cosmos/algs.hxx"
-#include "cosmos/types.hxx"
+#include "cosmos/utils.hxx"
 
 // Test
 #include "TestBase.hxx"

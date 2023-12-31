@@ -8,7 +8,7 @@
 
 // cosmos
 #include "cosmos/error/ApiError.hxx"
-#include "cosmos/types.hxx"
+#include "cosmos/utils.hxx"
 
 namespace cosmos {
 

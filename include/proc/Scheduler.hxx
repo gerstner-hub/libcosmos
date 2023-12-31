@@ -8,7 +8,7 @@
 
 // Cosmos
 #include "cosmos/dso_export.h"
-#include "cosmos/ostypes.hxx"
+#include "cosmos/proc/types.hxx"
 
 namespace cosmos {
 

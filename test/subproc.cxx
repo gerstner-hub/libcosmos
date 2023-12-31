@@ -22,7 +22,7 @@
 #include "cosmos/proc/process.hxx"
 #include "cosmos/proc/SubProc.hxx"
 #include "cosmos/string.hxx"
-#include "cosmos/types.hxx"
+#include "cosmos/utils.hxx"
 
 // Test
 #include "TestBase.hxx"

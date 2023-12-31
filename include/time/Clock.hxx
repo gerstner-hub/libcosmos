@@ -3,7 +3,7 @@
 // cosmos
 #include "cosmos/dso_export.h"
 #include "cosmos/time/types.hxx"
-#include "cosmos/types.hxx"
+#include "cosmos/utils.hxx"
 
 namespace cosmos {
 

@@ -1,7 +1,7 @@
 // cosmos
-#include "cosmos/algs.hxx"
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/locale.hxx"
+#include "cosmos/utils.hxx"
 
 namespace cosmos::locale {
 

@@ -13,6 +13,7 @@
 #include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/fs/types.hxx"
 #include "cosmos/time/types.hxx"
+#include "cosmos/types.hxx"
 
 namespace cosmos {
 

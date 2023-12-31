@@ -8,7 +8,6 @@
 // cosmos
 #include "cosmos/error/CosmosError.hxx"
 #include "cosmos/error/errno.hxx"
-#include "cosmos/ostypes.hxx"
 
 namespace cosmos {
 

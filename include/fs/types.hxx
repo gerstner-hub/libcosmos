@@ -3,6 +3,7 @@
 // Linux
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 // C++
 #include <iosfwd>
@@ -11,7 +12,7 @@
 // cosmos
 #include "cosmos/BitMask.hxx"
 #include "cosmos/dso_export.h"
-#include "cosmos/types.hxx"
+#include "cosmos/utils.hxx"
 
 /**
  * @file
@@ -26,6 +27,24 @@ using FollowSymlinks = NamedBool<struct follow_links_t, false>;
 
 /// Strong boolean type for expressing the responsibility to close file descriptors.
 using AutoCloseFD = NamedBool<struct close_file_t, true>;
+
+/// Primitive file descriptor.
+enum class FileNum : int {
+	INVALID = -1,
+	STDIN   = STDIN_FILENO,
+	STDOUT  = STDOUT_FILENO,
+	STDERR  = STDERR_FILENO,
+	/// special constant denoting the CWD in the *at family of API calls.
+	AT_CWD  = AT_FDCWD
+};
+
+/// A unique file number for a file on a block device.
+enum class Inode : ino_t {
+};
+
+/// A device file identification type (consists of major:minor parts).
+enum class DeviceID : dev_t {
+};
 
 /// Strong enum type wrapper for the basic open() mode flag.
 enum class OpenMode : int {

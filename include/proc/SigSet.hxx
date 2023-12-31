@@ -4,8 +4,8 @@
 #include <signal.h>
 
 // cosmos
-#include "cosmos/algs.hxx"
 #include "cosmos/proc/Signal.hxx"
+#include "cosmos/utils.hxx"
 
 namespace cosmos {
 

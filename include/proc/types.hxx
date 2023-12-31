@@ -1,24 +1,10 @@
 #pragma once
 
 // Linux
-#include <fcntl.h>
 #include <signal.h>
-#include <sys/types.h>
 #include <unistd.h>
 
 namespace cosmos {
-
-/**
- * @file
- *
- * This header contains low level OS interface types shared between multiple
- * libcosmos classes.
- **/
-
-/*
- * these are not part of the SubProc class, lest we end up in mutual
- * dependencies between Signal and SubProc headers.
- */
 
 enum class ProcessID : pid_t {
 	INVALID = -1,
@@ -33,22 +19,14 @@ enum class ProcessGroupID : pid_t {
 	SELF = 0
 };
 
-enum class UserID : uid_t {
-	INVALID = static_cast<uid_t>(-1),
-	ROOT    = 0
-};
-
-enum class GroupID : gid_t {
-	INVALID = static_cast<gid_t>(-1),
-	ROOT    = 0
-};
-
-/// A unique file number for a file on a block device.
-enum class Inode : ino_t {
-};
-
-/// A device file identification type (consists of major:minor parts).
-enum class DeviceID : dev_t {
+/// Represents an exit status code from a child process.
+/**
+ * The valid range of exit statuses is 0 .. 255 (the 8 lower bits of the
+ * si_status field in WaitRes).
+ **/
+enum class ExitStatus : int {
+	INVALID = -1,
+	SUCCESS = 0
 };
 
 /// A primitive signal nr specification.
@@ -89,16 +67,6 @@ enum class SignalNr : int {
 	POLL          = IO_EVENT,  ///< pollable event, synonym for IO
 	POWER         = SIGPWR,    ///< power failure
 	BAD_SYS       = SIGSYS,    ///< bad system call
-};
-
-/// Primitive file descriptor.
-enum class FileNum : int {
-	INVALID = -1,
-	STDIN   = STDIN_FILENO,
-	STDOUT  = STDOUT_FILENO,
-	STDERR  = STDERR_FILENO,
-	/// special constant denoting the CWD in the *at family of API calls.
-	AT_CWD  = AT_FDCWD
 };
 
 } // end ns

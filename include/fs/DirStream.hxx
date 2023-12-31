@@ -6,12 +6,12 @@
 #include <string_view>
 
 // cosmos
-#include "cosmos/algs.hxx"
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/error/UsageError.hxx"
 #include "cosmos/fs/DirEntry.hxx"
 #include "cosmos/fs/DirFD.hxx"
 #include "cosmos/fs/filesystem.hxx"
+#include "cosmos/utils.hxx"
 
 namespace cosmos {
 

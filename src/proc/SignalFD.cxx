@@ -5,12 +5,12 @@
 #include <iostream>
 
 // cosmos
-#include "cosmos/algs.hxx"
 #include "cosmos/private/cosmos.hxx"
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/error/UsageError.hxx"
 #include "cosmos/error/RuntimeError.hxx"
 #include "cosmos/proc/SignalFD.hxx"
+#include "cosmos/utils.hxx"
 
 namespace cosmos {
 

@@ -11,7 +11,6 @@
 // cosmos
 #include "cosmos/GroupInfo.hxx"
 #include "cosmos/PasswdInfo.hxx"
-#include "cosmos/algs.hxx"
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/error/FileError.hxx"
 #include "cosmos/error/InternalError.hxx"
@@ -27,6 +26,7 @@
 #include "cosmos/fs/path.hxx"
 #include "cosmos/proc/process.hxx"
 #include "cosmos/string.hxx"
+#include "cosmos/utils.hxx"
 
 namespace cosmos::fs {
 

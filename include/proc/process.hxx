@@ -9,9 +9,10 @@
 
 // cosmos
 #include "cosmos/fs/DirFD.hxx"
-#include "cosmos/ostypes.hxx"
 #include "cosmos/proc/PidFD.hxx"
 #include "cosmos/proc/WaitRes.hxx"
+#include "cosmos/proc/types.hxx"
+#include "cosmos/string.hxx"
 #include "cosmos/types.hxx"
 
 /**

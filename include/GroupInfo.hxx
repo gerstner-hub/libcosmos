@@ -8,9 +8,9 @@
 
 // cosmos
 #include "cosmos/InfoBase.hxx"
-#include "cosmos/ostypes.hxx"
 #include "cosmos/string.hxx"
 #include "cosmos/types.hxx"
+#include "cosmos/utils.hxx"
 
 namespace cosmos {
 

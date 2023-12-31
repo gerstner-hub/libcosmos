@@ -9,9 +9,9 @@
 #include <signal.h>
 
 // cosmos
-#include "cosmos/algs.hxx"
-#include "cosmos/ostypes.hxx"
+#include "cosmos/proc/types.hxx"
 #include "cosmos/proc/PidFD.hxx"
+#include "cosmos/utils.hxx"
 
 /**
  * @file

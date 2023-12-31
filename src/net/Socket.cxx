@@ -1,8 +1,9 @@
-#include "cosmos/algs.hxx"
+// cosmos
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/error/RuntimeError.hxx"
 #include "cosmos/net/Socket.hxx"
 #include "cosmos/net/SocketAddress.hxx"
+#include "cosmos/utils.hxx"
 
 namespace cosmos {
 

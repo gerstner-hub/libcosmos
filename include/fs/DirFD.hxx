@@ -1,7 +1,7 @@
 #pragma once
 
 // cosmos
-#include "cosmos/ostypes.hxx"
+#include "cosmos/fs/types.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
 
 namespace cosmos {
