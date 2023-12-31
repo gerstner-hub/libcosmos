@@ -129,7 +129,7 @@ FileDescriptor::SealFlags FileDescriptor::getSeals() const {
 		cosmos_throw (ApiError("failed to get file seals"));
 	}
 
-	return SealFlags{static_cast<SealOpts>(res)};
+	return SealFlags{static_cast<SealFlag>(res)};
 }
 
 int FileDescriptor::getPipeSize() const {

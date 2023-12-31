@@ -20,7 +20,7 @@ class TestFileStatus :
 		public cosmos::TestBase {
 public:
 	explicit TestFileStatus() :
-			m_flags{cosmos::OpenSettings::CREATE},
+			m_flags{cosmos::OpenFlag::CREATE},
 			m_mode{cosmos::ModeT{0600}} {
 	}
 
@@ -257,7 +257,7 @@ public:
 	}
 
 protected:
-	const cosmos::OpenFlags m_flags{cosmos::OpenSettings::CREATE};
+	const cosmos::OpenFlags m_flags{cosmos::OpenFlag::CREATE};
 	const cosmos::FileMode m_mode{cosmos::ModeT{0600}};
 	cosmos::File m_first_file;
 	cosmos::File m_second_file;

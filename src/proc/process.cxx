@@ -64,7 +64,7 @@ namespace {
 			cosmos_throw (ApiError("wait()"));
 		}
 
-		if (flags[WaitOpts::NO_HANG] && ret.raw()->si_pid == 0) {
+		if (flags[WaitFlag::NO_HANG] && ret.raw()->si_pid == 0) {
 			return {};
 		}
 

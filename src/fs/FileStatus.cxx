@@ -112,26 +112,26 @@ std::ostream& operator<<(std::ostream &o, const cosmos::FileType type) {
 }
 
 std::ostream& operator<<(std::ostream &o, const cosmos::OpenFlags flags) {
-	using Settings = cosmos::OpenSettings;
+	using Flag = cosmos::OpenFlag;
 	bool first = true;
 
 	for (const auto &pair: {
-			std::make_pair(Settings::APPEND,    "APPEND"),
-			              {Settings::ASYNC,     "ASYNC"},
-				      {Settings::CLOEXEC,   "CLOEXEC"},
-				      {Settings::CREATE,    "CREATE"},
-				      {Settings::DIRECT,    "DIRECT"},
-				      {Settings::DIRECTORY, "DIRECTORY"},
-				      {Settings::DSYNC,     "DSYNC"},
-				      {Settings::EXCLUSIVE, "EXCLUSIVE"},
-				      {Settings::NOATIME,   "NOATIME"},
-				      {Settings::NO_CONTROLLING_TTY, "NO_CONTROLLING_TTY"},
-				      {Settings::NOFOLLOW,  "NOFOLLOW"},
-				      {Settings::NONBLOCK,  "NONBLOCK"},
-				      {Settings::PATH,      "PATH"},
-				      {Settings::SYNC,      "SYNC"},
-				      {Settings::TMPFILE,   "TMPFILE"},
-				      {Settings::TRUNCATE,  "TRUNCATE"}
+			std::make_pair(Flag::APPEND,    "APPEND"),
+			              {Flag::ASYNC,     "ASYNC"},
+				      {Flag::CLOEXEC,   "CLOEXEC"},
+				      {Flag::CREATE,    "CREATE"},
+				      {Flag::DIRECT,    "DIRECT"},
+				      {Flag::DIRECTORY, "DIRECTORY"},
+				      {Flag::DSYNC,     "DSYNC"},
+				      {Flag::EXCLUSIVE, "EXCLUSIVE"},
+				      {Flag::NOATIME,   "NOATIME"},
+				      {Flag::NO_CONTROLLING_TTY, "NO_CONTROLLING_TTY"},
+				      {Flag::NOFOLLOW,  "NOFOLLOW"},
+				      {Flag::NONBLOCK,  "NONBLOCK"},
+				      {Flag::PATH,      "PATH"},
+				      {Flag::SYNC,      "SYNC"},
+				      {Flag::TMPFILE,   "TMPFILE"},
+				      {Flag::TRUNCATE,  "TRUNCATE"}
 	}) {
 		auto [flag, label] = pair;
 

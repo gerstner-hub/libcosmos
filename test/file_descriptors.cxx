@@ -12,7 +12,7 @@ class FDTest :
 		public cosmos::TestBase {
 public:
 
-	using Flags = cosmos::FileDescriptor::Flags;
+	using Flag = cosmos::FileDescriptor::DescFlag;
 
 	void runTests() override {
 		testStdinFD();
@@ -29,7 +29,7 @@ public:
 		RUN_STEP("is-stdin-valid", m_stdin_fd.valid());
 		RUN_STEP("raw-matches-stdin", m_stdin_fd.raw() == cosmos::FileNum::STDIN);
 		RUN_STEP("comparison-works", m_stdin_fd == cosmos::FileDescriptor{cosmos::FileNum::STDIN});
-		RUN_STEP("cloexec-off", m_stdin_fd.getFlags()[Flags::CLOEXEC] != true);
+		RUN_STEP("cloexec-off", m_stdin_fd.getFlags()[Flag::CLOEXEC] != true);
 	}
 
 	void testDup() {
@@ -38,11 +38,11 @@ public:
 
 		m_stdin_fd.duplicate(new_fd);
 
-		RUN_STEP("dup-is-cloxec", new_fd.getFlags()[Flags::CLOEXEC] == true);
+		RUN_STEP("dup-is-cloxec", new_fd.getFlags()[Flag::CLOEXEC] == true);
 
 		new_fd.setCloseOnExec(false);
 
-		RUN_STEP("set-cloxec", new_fd.getFlags()[Flags::CLOEXEC] == false);
+		RUN_STEP("set-cloxec", new_fd.getFlags()[Flag::CLOEXEC] == false);
 
 		cosmos::File sf{m_argv[0], cosmos::OpenMode::READ_ONLY};
 		auto sf_fd = sf.fd();
@@ -65,7 +65,7 @@ public:
 		cosmos::File sf{
 			".",
 				cosmos::OpenMode::WRITE_ONLY,
-				cosmos::OpenFlags{cosmos::OpenSettings::TMPFILE},
+				cosmos::OpenFlags{cosmos::OpenFlag::TMPFILE},
 				cosmos::FileMode{cosmos::ModeT{0700}}};
 
 		auto fd = sf.fd();
@@ -73,17 +73,17 @@ public:
 		auto [mode, flags] = fd.getStatusFlags();
 
 		RUN_STEP("mode-matches", mode == cosmos::OpenMode::WRITE_ONLY);
-		RUN_STEP("flags-have-tmpfile", flags[cosmos::OpenSettings::TMPFILE]);
-		RUN_STEP("flags-no-nonblock", !flags[cosmos::OpenSettings::NONBLOCK]);
+		RUN_STEP("flags-have-tmpfile", flags[cosmos::OpenFlag::TMPFILE]);
+		RUN_STEP("flags-no-nonblock", !flags[cosmos::OpenFlag::NONBLOCK]);
 
-		flags.set(cosmos::OpenSettings::NONBLOCK);
+		flags.set(cosmos::OpenFlag::NONBLOCK);
 
 		fd.setStatusFlags(flags);
 
 		auto [mode2, flags2] = fd.getStatusFlags();
 
 		RUN_STEP("mode-still-matches", mode == mode2);
-		RUN_STEP("flags-have-nonblock", flags[cosmos::OpenSettings::NONBLOCK]);
+		RUN_STEP("flags-have-nonblock", flags[cosmos::OpenFlag::NONBLOCK]);
 
 	}
 protected: // data

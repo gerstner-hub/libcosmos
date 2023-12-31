@@ -33,15 +33,15 @@ class COSMOS_API FileDescriptor {
 public: // types
 
 	/// Configurable per file-descriptors flags.
-	enum class Flags : int {
+	enum class DescFlag : int {
 		CLOEXEC = FD_CLOEXEC
 	};
 
-	/// Collection of OpenSettings used for opening files.
-	using DescFlags = BitMask<Flags>;
+	/// Collection of OpenFlag used for opening files.
+	using DescFlags = BitMask<DescFlag>;
 
 	/// Flags used in addSeals().
-	enum class SealOpts : unsigned int {
+	enum class SealFlag : unsigned int {
 		SEAL         = F_SEAL_SEAL,         ///< Locks the seal set itself, further changes will be disallowed.
 		SHRINK       = F_SEAL_SHRINK,       ///< Disallow shrinking the file in any way.
 		GROW         = F_SEAL_GROW,         ///< Disallow growing the file in any way.
@@ -49,8 +49,8 @@ public: // types
 		FUTURE_WRITE = F_SEAL_FUTURE_WRITE  ///< Like WRITE but allow existing shared writable mappings to write.
 	};
 
-	/// Collection SealOpts for applying seals in addSeals().
-	using SealFlags = BitMask<SealOpts>;
+	/// Collection flags for applying seals in addSeals().
+	using SealFlags = BitMask<SealFlag>;
 
 public: // functions
 
@@ -124,7 +124,7 @@ public: // functions
 
 	/// convenience wrapper around setFlags to change CLOEXEC setting
 	void setCloseOnExec(bool on_off) {
-		setFlags(on_off ? DescFlags{Flags::CLOEXEC} : DescFlags{0});
+		setFlags(on_off ? DescFlags{DescFlag::CLOEXEC} : DescFlags{0});
 	}
 
 	/// Retrieve the file's OpenMode and current OpenFlags.
@@ -133,7 +133,7 @@ public: // functions
 	/// Change certain file descriptor status flags.
 	/**
 	 * The basic file OpenMode cannot be changed for an open file
-	 * descriptor. From OpenSettings only the flags APPEND, ASYNC, DIRECT,
+	 * descriptor. From OpenFlags only the flags APPEND, ASYNC, DIRECT,
 	 * NOATIME and NONBLOCK can be changed afterwards.
 	 **/
 	void setStatusFlags(const OpenFlags flags);

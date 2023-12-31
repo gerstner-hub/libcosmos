@@ -41,25 +41,25 @@ class TimerFD :
 	TimerFD& operator=(const TimerFD&) = delete;
 public: // types
 
-	/// Settings provided at TimerFD creation time.
-	enum class CreateSettings : int {
+	/// Flags provided at TimerFD creation time.
+	enum class CreateFlag : int {
 		/// Create a non-blocking file descriptor.
 		NONBLOCK = TFD_NONBLOCK,
 		/// Sets the close-on-exec flag upon creation.
 		CLOEXEC  = TFD_CLOEXEC
 	};
 
-	using CreateFlags = BitMask<CreateSettings>;
+	using CreateFlags = BitMask<CreateFlag>;
 
-	/// Settings available for starting a TimerFD.
-	enum class StartSettings : int {
+	/// Flags available for starting a TimerFD.
+	enum class StartFlag : int {
 		/// Interpret the initial (not the interval!) timer setting as an absolute clock time value.
 		ABSTIME       = TFD_TIMER_ABSTIME,
 		/// For RealTime based clocks report discontinous clock changes via Errno::CANCELED.
 		CANCEL_ON_SET = TFD_TIMER_CANCEL_ON_SET
 	};
 
-	using StartFlags = BitMask<StartSettings>;
+	using StartFlags = BitMask<StartFlag>;
 
 	/// Combined start time and repeat interval for a TimerFD setting.
 	struct TimerSpec :
@@ -75,7 +75,7 @@ public: // types
 		/**
 		 * By default this specifies the relative tick time measured
 		 * relative to the current clock value. If
-		 * StartSettings::ABSTIME is specified then this is an
+		 * StartFlag::ABSTIME is specified then this is an
 		 * absolute clock timestamp when the timer is to tick.
 		 *
 		 * If this is all zero then the timer will be disarmed, no
@@ -162,7 +162,7 @@ public:
 	 * or flags are invalid or permission is denied (for the special
 	 * _ALARM clocks).
 	 **/
-	void create(const CreateFlags flags = CreateFlags{CreateSettings::CLOEXEC});
+	void create(const CreateFlags flags = CreateFlags{CreateFlag::CLOEXEC});
 
 	/// Closes the timer fd.
 	/**
@@ -189,7 +189,7 @@ public:
 	/// Returns the current timer settings from the kernel.
 	/**
 	 * Note that this function *always* returns a relative timer in
-	 * TimerSpec.initial(), even if StartSettings::ABSTIME was used to set
+	 * TimerSpec.initial(), even if StartFlag::ABSTIME was used to set
 	 * it.
 	 *
 	 * If the timer is currently disarmed then all zero values are
@@ -203,7 +203,7 @@ public:
 	 *
 	 * If no timer tick occured yet then this will block the caller until
 	 * a timer tick or an error occurs (e.g. ApiError with
-	 * Errno::CANCELED, if StartSettings::CANCEL_ON_SET is active).
+	 * Errno::CANCELED, if StartFlag::CANCEL_ON_SET is active).
 	 *
 	 * If one or more timer ticks already occured then this call will not
 	 * block and returns the number of ticks that happened.

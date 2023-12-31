@@ -52,7 +52,7 @@ COSMOS_API FileDescriptor open(
  * - if \c path is a relative path and \c dir_fd is a valid directory file
  *   descriptor, then the path is looked up relative to \c dir_fd. \c dir_fd
  *   needs to be opened with OpenMode::READ_ONLY or with
- *   OpenSettings::PATH. The special DirFD value cosmos::AT_CWD can be
+ *   OpenFlag::PATH. The special DirFD value cosmos::AT_CWD can be
  *   used to open files relative to the current working directory.
  **/
 COSMOS_API FileDescriptor open_at(
@@ -76,8 +76,8 @@ COSMOS_API FileDescriptor open_at(
  *
  * The \c flags argument can specify optional additional open flags to be
  * applied when opening the temporary file. The implementation will implicitly
- * use OpenMode::READ_WRITE and OpenSettings::CREATE and
- * OpenSettings::EXCLUSIVE. These should *not* be set in \c flags. The file
+ * use OpenMode::READ_WRITE and OpenFlag::CREATE and
+ * OpenFlag::EXCLUSIVE. These should *not* be set in \c flags. The file
  * will have the permissions ModeT{0600}.
  *
  * On success this call returns a pair consisting of the newly opened file
@@ -326,7 +326,7 @@ COSMOS_API void remove_tree(const std::string_view path);
  * the given path. Symlinks will be followed.
  *
  * To change the mode of symlinks use change_owner_nofollow(). To avoid symlinks
- * use File::open() with OpenSettings::NOFOLLOW. Obtain a FileStatus() for the
+ * use File::open() with OpenFlag::NOFOLLOW. Obtain a FileStatus() for the
  * open FileDescriptor and then use change_mode(FileDescriptor, FileMode)
  * if the file isn't a symlink.
  *
@@ -546,8 +546,8 @@ COSMOS_API void linkat(const DirFD old_dir, const std::string_view old_path,
  * not work for directory file descriptors.
  *
  * As a special case this *does* work for file descriptors opened with
- * OpenSettings::PATH and for temporary files opened with
- * OpenSettings::TMPFILE but without OpenSettings::EXCLUSIVE (in this case a
+ * OpenFlag::PATH and for temporary files opened with
+ * OpenFlag::TMPFILE but without OpenFlag::EXCLUSIVE (in this case a
  * link count of 0 is accepted). Note, however, that this call requires the
  * CAP_DAC_READ_SEARCH capability, for security reasons.
  *

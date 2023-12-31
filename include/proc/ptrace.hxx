@@ -28,8 +28,8 @@ enum class ContinueMode {
 	SINGLESTEP = PTRACE_SINGLESTEP
 };
 
-/// Different options which can set for a tracee.
-enum class TraceOpts : intptr_t { /* is a void* in ptrace(2), so we need pointer width */
+/// Different options which can be set for a tracee.
+enum class TraceFlag : intptr_t { /* is a void* in ptrace(2), so we need pointer width */
 	/// When the tracer exits all tracees will be sent SIGKILL
 	EXITKILL       = PTRACE_O_EXITKILL,
 	/// Stop on clone(2) and trace the newly cloned process
@@ -48,7 +48,7 @@ enum class TraceOpts : intptr_t { /* is a void* in ptrace(2), so we need pointer
 	TRACESYSGOOD   = PTRACE_O_TRACESYSGOOD
 };
 
-using TraceOptsMask = BitMask<TraceOpts>;
+using TraceFlags = BitMask<TraceFlag>;
 
 /// Different events that can occur in a tracee.
 enum class TraceEvent {

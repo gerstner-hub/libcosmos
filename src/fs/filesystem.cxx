@@ -34,7 +34,7 @@ FileDescriptor open(
 		const std::string_view path, const OpenMode mode,
 		const OpenFlags flags, const std::optional<FileMode> fmode) {
 
-	if (flags.anyOf({OpenSettings::CREATE, OpenSettings::TMPFILE}) && !fmode) {
+	if (flags.anyOf({OpenFlag::CREATE, OpenFlag::TMPFILE}) && !fmode) {
 		cosmos_throw (UsageError("the given open flags require an fmode argument"));
 	}
 
@@ -56,7 +56,7 @@ FileDescriptor open_at(
 		const std::optional<FileMode> fmode) {
 	int raw_flags = flags.raw() | to_integral(mode);
 
-	if (flags.anyOf({OpenSettings::CREATE, OpenSettings::TMPFILE}) && !fmode) {
+	if (flags.anyOf({OpenFlag::CREATE, OpenFlag::TMPFILE}) && !fmode) {
 		cosmos_throw (UsageError("the given open flags require an fmode argument"));
 	}
 

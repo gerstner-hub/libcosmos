@@ -36,7 +36,7 @@ enum class OpenMode : int {
 };
 
 /// Strong enum type wrapper for file descriptor settings on top of the basic OpenMode..
-enum class OpenSettings : int {
+enum class OpenFlag : int {
 	/// Writes will always happen at the end of the file.
 	APPEND             = O_APPEND,
 	/// Enable signal driven I/O for certain file types.
@@ -72,8 +72,8 @@ enum class OpenSettings : int {
 	TRUNCATE           = O_TRUNC
 };
 
-/// Collection of OpenSettings used for opening files.
-using OpenFlags = BitMask<OpenSettings>;
+/// Collection of OpenFlag used for opening files.
+using OpenFlags = BitMask<OpenFlag>;
 
 /// Combined file type and mode bits of a file (as found in st_mode struct stat).
 /**
@@ -102,7 +102,7 @@ inline ModeT operator&(const ModeT a, const ModeT b) {
  * These make up the classical UNIX user/group/other permission bits plus the
  * three special bits for set-uid, set-gid and sticky bit.
  **/
-enum class FileModeFlags : mode_t {
+enum class FileModeBit : mode_t {
 	SETUID      = S_ISUID, // set user-id bit
 	SETGID      = S_ISGID, // set group-id bit
 	STICKY      = S_ISVTX, // only has a meaning for directory, typically set on /tmp
@@ -120,8 +120,8 @@ enum class FileModeFlags : mode_t {
 	OTHER_ALL   = S_IRWXO
 };
 
-/// BitMask of FileModeFlags (represents the mode bit portion of ModeT).
-using FileModeBits = BitMask<FileModeFlags>;
+/// BitMask of FileModeBit (represents the mode bit portion of ModeT).
+using FileModeBits = BitMask<FileModeBit>;
 
 /// Convenience wrapper around FileT.
 /**
@@ -214,44 +214,44 @@ public:
 	 * of octal literals.
 	 **/
 	FileMode(const ModeT raw = ModeT::NONE) :
-		m_mode{static_cast<FileModeFlags>(raw & ModeT::MODE_MASK)}
+		m_mode{static_cast<FileModeBit>(raw & ModeT::MODE_MASK)}
 	{}
 
-	bool isSetUID() const { return m_mode[FileModeFlags::SETUID]; }
-	bool isSetGID() const { return m_mode[FileModeFlags::SETGID]; }
-	bool isSticky() const { return m_mode[FileModeFlags::STICKY]; }
+	bool isSetUID() const { return m_mode[FileModeBit::SETUID]; }
+	bool isSetGID() const { return m_mode[FileModeBit::SETGID]; }
+	bool isSticky() const { return m_mode[FileModeBit::STICKY]; }
 
-	bool canOwnerRead()  const { return m_mode[FileModeFlags::OWNER_READ]; }
-	bool canOwnerWrite() const { return m_mode[FileModeFlags::OWNER_WRITE]; }
-	bool canOwnerExec()  const { return m_mode[FileModeFlags::OWNER_EXEC]; }
+	bool canOwnerRead()  const { return m_mode[FileModeBit::OWNER_READ]; }
+	bool canOwnerWrite() const { return m_mode[FileModeBit::OWNER_WRITE]; }
+	bool canOwnerExec()  const { return m_mode[FileModeBit::OWNER_EXEC]; }
 
-	bool canGroupRead()  const { return m_mode[FileModeFlags::GROUP_READ]; }
-	bool canGroupWrite() const { return m_mode[FileModeFlags::GROUP_WRITE]; }
-	bool canGroupExec()  const { return m_mode[FileModeFlags::GROUP_EXEC]; }
+	bool canGroupRead()  const { return m_mode[FileModeBit::GROUP_READ]; }
+	bool canGroupWrite() const { return m_mode[FileModeBit::GROUP_WRITE]; }
+	bool canGroupExec()  const { return m_mode[FileModeBit::GROUP_EXEC]; }
 
-	bool canOthersRead()  const { return m_mode[FileModeFlags::OTHER_READ]; }
-	bool canOthersWrite() const { return m_mode[FileModeFlags::OTHER_WRITE]; }
-	bool canOthersExec()  const { return m_mode[FileModeFlags::OTHER_EXEC]; }
+	bool canOthersRead()  const { return m_mode[FileModeBit::OTHER_READ]; }
+	bool canOthersWrite() const { return m_mode[FileModeBit::OTHER_WRITE]; }
+	bool canOthersExec()  const { return m_mode[FileModeBit::OTHER_EXEC]; }
 
 	bool canAnyRead() const {
 		return m_mode.anyOf({
-				FileModeFlags::OWNER_READ,
-				FileModeFlags::GROUP_READ,
-				FileModeFlags::OTHER_READ});
+				FileModeBit::OWNER_READ,
+				FileModeBit::GROUP_READ,
+				FileModeBit::OTHER_READ});
 	}
 
 	bool canAnyWrite() const {
 		return m_mode.anyOf({
-				FileModeFlags::OWNER_WRITE,
-				FileModeFlags::GROUP_WRITE,
-				FileModeFlags::OTHER_WRITE});
+				FileModeBit::OWNER_WRITE,
+				FileModeBit::GROUP_WRITE,
+				FileModeBit::OTHER_WRITE});
 	}
 
 	bool canAnyExec() const {
 		return m_mode.anyOf({
-				FileModeFlags::OWNER_EXEC,
-				FileModeFlags::GROUP_EXEC,
-				FileModeFlags::OTHER_EXEC});
+				FileModeBit::OWNER_EXEC,
+				FileModeBit::GROUP_EXEC,
+				FileModeBit::OTHER_EXEC});
 	}
 
 	/// Returns the complete bitmask object.

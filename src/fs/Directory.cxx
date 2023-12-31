@@ -19,14 +19,14 @@ Directory::~Directory() {
 void Directory::open(const std::string_view path, const OpenMode mode, OpenFlags flags) {
 
 	m_auto_close = AutoCloseFD{true};
-	flags.set(OpenSettings::DIRECTORY);
+	flags.set(OpenFlag::DIRECTORY);
 	auto fd = fs::open(path, mode, flags, {});
 	m_fd = DirFD{fd.raw()};
 }
 
 void Directory::open(const DirFD dir_fd, const std::string_view path, const OpenMode mode, OpenFlags flags) {
 	m_auto_close = AutoCloseFD{true};
-	flags.set(OpenSettings::DIRECTORY);
+	flags.set(OpenFlag::DIRECTORY);
 
 	auto fd = fs::open_at(dir_fd, path, mode, flags, {});
 	m_fd = DirFD{fd.raw()};

@@ -80,20 +80,20 @@ inline bool printable(CH ch) {
 }
 
 /// Bitmask for algorithm settings of the split() function.
-enum class SplitOpts {
+enum class SplitFlag {
 	/// Strip each extracted part using strip().
 	STRIP_PARTS = 0x1,
 	/// When multiple subsequent separators occur, keep empty parts in the result.
 	KEEP_EMPTY  = 0x2
 };
 
-using SplitFlags = BitMask<SplitOpts>;
+using SplitFlags = BitMask<SplitFlag>;
 
 /// Split a string at separator boundaries.
 /**
  * The input string \c str will be split up at every occurence of the \c sep
  * substring. The resulting parts are returned as a vector. By default
- * subsequent occurences of \c sep are ignored. If SplitOpts::KEEP_EMPTY is
+ * subsequent occurences of \c sep are ignored. If SplitFlag::KEEP_EMPTY is
  * set in \c flags then empty elements will be returned for these occurences
  * instead.
  **/

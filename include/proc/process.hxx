@@ -89,7 +89,7 @@ COSMOS_API std::optional<ProcessID> fork();
  * will be waited for. By default a blocking wait for child process exit is
  * performed.
  **/
-COSMOS_API std::optional<WaitRes> wait(const ProcessID pid, const WaitFlags flags = WaitFlags{WaitOpts::WAIT_FOR_EXITED});
+COSMOS_API std::optional<WaitRes> wait(const ProcessID pid, const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED});
 
 /// Wait for any process from the given process group.
 /**
@@ -98,14 +98,14 @@ COSMOS_API std::optional<WaitRes> wait(const ProcessID pid, const WaitFlags flag
  * pgid == ProcessGroupID::SELF then this waits for any process for the
  * caller's process group.
  **/
-COSMOS_API std::optional<WaitRes> wait(const ProcessGroupID pgid, const WaitFlags flags = WaitFlags{WaitOpts::WAIT_FOR_EXITED});
+COSMOS_API std::optional<WaitRes> wait(const ProcessGroupID pgid, const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED});
 
 /// Wait for any child process of the calling process.
 /**
  * This is just like wait(const ProcessID, const WaitFlags) only that it waits
  * for any kind of child process, not any specific child process.
  **/
-COSMOS_API std::optional<WaitRes> wait(const WaitFlags flags = WaitFlags{WaitOpts::WAIT_FOR_EXITED});
+COSMOS_API std::optional<WaitRes> wait(const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED});
 
 /// Wait for the process refered to by the given pidfd.
 /**
@@ -115,7 +115,7 @@ COSMOS_API std::optional<WaitRes> wait(const WaitFlags flags = WaitFlags{WaitOpt
  * The process represented by \c fd needs to be a child process of the calling
  * process, otherwise an ApiError with Errno::CHILD is thrown.
  **/
-COSMOS_API std::optional<WaitRes> wait(const PidFD fd, const WaitFlags flags = WaitFlags{WaitOpts::WAIT_FOR_EXITED});
+COSMOS_API std::optional<WaitRes> wait(const PidFD fd, const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED});
 
 /// Replace the current process by executing the program found in \c path.
 /**
@@ -181,7 +181,7 @@ COSMOS_API void exec_at(const DirFD dir_fd, const std::string_view path,
 /**
  * This behaves just like exec(), except that a program is not looked up by
  * path but the already open file descriptor \c fd is used. Also file
- * descriptors opened using OpenSettings::PATH are supported.
+ * descriptors opened using OpenFlag::PATH are supported.
  *
  * There is a caveat, if \c fd refers to a text file naming a script
  * interpreter via a shebang line. If \c fd has the close-on-exec flag set,

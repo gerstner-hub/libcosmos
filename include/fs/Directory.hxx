@@ -29,7 +29,7 @@ public: // functions
 
 	/// Open a directory by path without special flags (close-on-exec will be set).
 	explicit Directory(const std::string_view path, const OpenMode mode = OpenMode::READ_ONLY) :
-			Directory{path, mode, OpenFlags{OpenSettings::CLOEXEC}} {}
+			Directory{path, mode, OpenFlags{OpenFlag::CLOEXEC}} {}
 
 	/// Open a directory by path using the given mode and flags.
 	/**
@@ -41,7 +41,7 @@ public: // functions
 
 	/// Open a directory by path relative to \c dir_fd using the given mode and default flags.
 	Directory(const DirFD dir_fd, const std::string_view path, const OpenMode mode = OpenMode::READ_ONLY) :
-			Directory{dir_fd, path, mode, OpenFlags{OpenSettings::CLOEXEC}} {}
+			Directory{dir_fd, path, mode, OpenFlags{OpenFlag::CLOEXEC}} {}
 
 	/// Open a directory by path relative to \c dir_fd using the given mode and flags.
 	Directory(const DirFD dir_fd, const std::string_view path, const OpenMode mode,
@@ -70,12 +70,12 @@ public: // functions
 
 	/// Open a directory by path without special flags (close-on-exec will be set).
 	void open(const std::string_view path, const OpenMode mode = OpenMode::READ_ONLY) {
-		return open(path, mode, OpenFlags{OpenSettings::CLOEXEC});
+		return open(path, mode, OpenFlags{OpenFlag::CLOEXEC});
 	}
 
 	/// Open a directory by path using the given mode and flags.
 	/**
-	 * The OpenSettings::DIRECTORY flag will implicitly be set in \c
+	 * The OpenFlag::DIRECTORY flag will implicitly be set in \c
 	 * flags, since this is required to ensure that the resulting file
 	 * descriptor will refer to a directory.
 	 **/
@@ -83,7 +83,7 @@ public: // functions
 
 	/// Open a directory by path relative to \c dir_fd using the given mode and default flags.
 	void open(const DirFD dir_fd, const std::string_view path, const OpenMode mode) {
-		open(dir_fd, path, mode, OpenFlags{OpenSettings::CLOEXEC});
+		open(dir_fd, path, mode, OpenFlags{OpenFlag::CLOEXEC});
 	}
 
 	/// Open a directory by path relative to \c dir_fd using the given mode and flags.

@@ -33,7 +33,7 @@ class TimerFdTest :
 
 		RUN_STEP("invalid-after-close", !tfd.isOpen());
 
-		tfd = TimerFD{TimerFD::CreateFlags{TimerFD::CreateSettings::NONBLOCK}};
+		tfd = TimerFD{TimerFD::CreateFlags{TimerFD::CreateFlag::NONBLOCK}};
 
 		RUN_STEP("custom-settings-valid", tfd.isOpen());
 
@@ -69,7 +69,7 @@ class TimerFdTest :
 		RUN_STEP("wait-for-initial-ticks", ticks == 1);
 
 		cosmos::Poller poller{16};
-		poller.addFD(tfd.fd(), cosmos::Poller::MonitorMask{cosmos::Poller::MonitorSetting::INPUT});
+		poller.addFD(tfd.fd(), cosmos::Poller::MonitorFlags{cosmos::Poller::MonitorFlag::INPUT});
 
 		auto events = poller.wait(std::chrono::milliseconds{5000});
 
@@ -88,7 +88,7 @@ class TimerFdTest :
 		poller.delFD(tfd.fd());
 		tfd.close();
 		tfd.create();
-		poller.addFD(tfd.fd(), cosmos::Poller::MonitorMask{cosmos::Poller::MonitorSetting::INPUT});
+		poller.addFD(tfd.fd(), cosmos::Poller::MonitorFlags{cosmos::Poller::MonitorFlag::INPUT});
 
 		tfd.setTime(ts);
 		tfd.disarm();

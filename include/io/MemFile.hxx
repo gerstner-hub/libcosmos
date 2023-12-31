@@ -27,16 +27,16 @@ class COSMOS_API MemFile :
 public: // types
 
 	/// Available open settings for the MemFile type
-	enum class OpenSettings : unsigned int {
+	enum class OpenFlag : unsigned int {
 		CLOEXEC       = MFD_CLOEXEC,       ///< Apply close-on-exec semantics
 		ALLOW_SEALING = MFD_ALLOW_SEALING, ///< Allow MemFD file sealing operations.
 		HUGETLB       = MFD_HUGETLB        ///< Create the file in the HugeTLB file system.
 	};
 
-	/// Collection of OpenSettings used when creating the MemFile type.
-	using OpenFlags = BitMask<OpenSettings>;
+	/// Collection of flags used when creating the MemFile type.
+	using OpenFlags = BitMask<OpenFlag>;
 
-	/// PageSize specification if OpenSettings::HUGETLB is set.
+	/// PageSize specification if OpenFlag::HUGETLB is set.
 	enum class HugePageSize : unsigned int {
 		// the values are the log-2 bit positions of the corresponding page sizes
 		DEFAULT       = 0,
@@ -57,7 +57,7 @@ public: // functions
 
 	/// \c see create().
 	explicit MemFile(const std::string_view name,
-			const OpenFlags flags = OpenFlags{OpenSettings::CLOEXEC},
+			const OpenFlags flags = OpenFlags{OpenFlag::CLOEXEC},
 			const HugePageSize tlb_ps = HugePageSize::DEFAULT) {
 		create(name, flags, tlb_ps);
 	}
@@ -69,7 +69,7 @@ public: // functions
 	 * identifier in the /proc file system.
 	 **/
 	void create(const std::string_view name,
-			const OpenFlags flags = OpenFlags{OpenSettings::CLOEXEC},
+			const OpenFlags flags = OpenFlags{OpenFlag::CLOEXEC},
 			const HugePageSize tlb_ps = HugePageSize::DEFAULT);
 };
 

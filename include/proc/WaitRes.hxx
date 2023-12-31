@@ -26,7 +26,7 @@ enum class ExitStatus : int {
 };
 
 /// Different child process wait options used in the proc::wait() family of calls.
-enum class WaitOpts : int {
+enum class WaitFlag : int {
 	/// Wait for child processes that have terminated.
 	WAIT_FOR_EXITED    = WEXITED,
 	/// Wait for child processes that have been stopped due to being signaled.
@@ -39,7 +39,7 @@ enum class WaitOpts : int {
 	LEAVE_INFO         = WNOWAIT
 };
 
-using WaitFlags = BitMask<WaitOpts>;
+using WaitFlags = BitMask<WaitFlag>;
 
 /// Represents the result from a waitid() call.
 /**
@@ -93,7 +93,7 @@ public: // functions
 
 	/// Checks whether the given trace event occured.
 	/**
-	 * These events only occur if the corresponding TraceOpts have been
+	 * These events only occur if the corresponding TraceFlags have been
 	 * set on the tracee
 	 **/
 	bool checkEvent(const TraceEvent event) {

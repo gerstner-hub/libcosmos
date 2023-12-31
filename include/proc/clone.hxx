@@ -25,7 +25,7 @@
 
 namespace cosmos {
 
-enum class CloneSettings : uint64_t {
+enum class CloneFlag : uint64_t {
 	CHILD_CLEARTID = CLONE_CHILD_CLEARTID,  ///< Clear the child_tid CloneArgs member in child's memory when the child exits, used by threading libraries.
 	CHILD_SETTID   = CLONE_CHILD_SETTID,    ///< Store the child's thread ID in the child_tid CloneArgs member in child's memory before the child runs.
 	CLEAR_SIGHAND  = CLONE_CLEAR_SIGHAND,   ///< Reset all signal handling dispositions to their defaults in the child.
@@ -55,7 +55,7 @@ enum class CloneSettings : uint64_t {
 	SHARE_VM       = CLONE_VM               ///< Parent and child share the same address space and thus observe the same memory writes and mappings/unmappings.
 };
 
-using CloneFlags = BitMask<CloneSettings>;
+using CloneFlags = BitMask<CloneFlag>;
 
 /// Argument struct for proc::clone().
 struct COSMOS_API CloneArgs :
@@ -102,7 +102,7 @@ struct COSMOS_API CloneArgs :
 
 	/// Sets the pointer to the lowest byte of the stack area.
 	/**
-	 * If CloneSettings::SHARE_VM is specified then this value *must* be
+	 * If CloneFlag::SHARE_VM is specified then this value *must* be
 	 * provided, otherwise the parent's stack is reused for the child if
 	 * this is set to 0.
 	 **/
@@ -129,7 +129,7 @@ struct COSMOS_API CloneArgs :
 
 	/// Sets the cgroup2 file descriptor of which the child should become a member.
 	/**
-	 * \see CloneSettings::INTO_CGROUP.
+	 * \see CloneFlag::INTO_CGROUP.
 	 **/
 	void setCGroup(const FileDescriptor fd) {
 		this->cgroup = static_cast<uint64_t>(fd.raw());
@@ -144,14 +144,14 @@ namespace proc {
  * over the child properties. Among other it allows to create lightweight
  * threads or new namespaces for containerization.
  *
- * \see CloneArgs and CloneSettings for the detailed settings that are
+ * \see CloneArgs and CloneFlag for the detailed settings that are
  * available.
  *
  * Due to the clone call's complexity and the low level nature of this call
  * libcosmos does not impose additional restrictions or add safety nets.
  * This means you need to take care of the lifetime of any file descriptors
  * that are returned from this call, like of the PID FD when using
- * CloneSettings::PIDFD.
+ * CloneFlag::PIDFD.
  *
  * \note This uses the clone3() system call which is currently not fully
  * integrated in glibc or in tools like Valgrind.

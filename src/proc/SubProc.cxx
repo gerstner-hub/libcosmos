@@ -35,7 +35,7 @@ WaitRes SubProc::wait() {
 std::optional<WaitRes> SubProc::waitTimed(const std::chrono::milliseconds max) {
 	Poller poller(8);
 
-	poller.addFD(m_child_fd, Poller::MonitorMask{Poller::MonitorSetting::INPUT});
+	poller.addFD(m_child_fd, Poller::MonitorFlags{Poller::MonitorFlag::INPUT});
 
 	if (poller.wait(max).empty()) {
 		return std::nullopt;

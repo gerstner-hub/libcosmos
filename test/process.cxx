@@ -111,8 +111,8 @@ class ProcessTest :
 		if (auto child = cosmos::proc::fork(); child) {
 			auto res = cosmos::proc::wait(*child,
 					cosmos::WaitFlags{
-						cosmos::WaitOpts::WAIT_FOR_EXITED,
-						cosmos::WaitOpts::NO_HANG});
+						cosmos::WaitFlag::WAIT_FOR_EXITED,
+						cosmos::WaitFlag::NO_HANG});
 			RUN_STEP("wait-no-hang-works", !res);
 
 			cosmos::signal::send(*child, cosmos::signal::TERMINATE);
@@ -126,16 +126,16 @@ class ProcessTest :
 			cosmos::signal::send(*child, cosmos::signal::STOP);
 			auto res = cosmos::proc::wait(*child,
 					cosmos::WaitFlags{
-						cosmos::WaitOpts::WAIT_FOR_EXITED,
-						cosmos::WaitOpts::WAIT_FOR_STOPPED});
+						cosmos::WaitFlag::WAIT_FOR_EXITED,
+						cosmos::WaitFlag::WAIT_FOR_STOPPED});
 
 			RUN_STEP("wait-for-stop-works", res->stopped());
 
 			cosmos::signal::send(*child, cosmos::signal::CONT);
 			res = cosmos::proc::wait(*child,
 					cosmos::WaitFlags{
-						cosmos::WaitOpts::WAIT_FOR_EXITED,
-						cosmos::WaitOpts::WAIT_FOR_CONTINUED});
+						cosmos::WaitFlag::WAIT_FOR_EXITED,
+						cosmos::WaitFlag::WAIT_FOR_CONTINUED});
 
 			RUN_STEP("wait-for-continue-works", res->continued());
 
@@ -208,7 +208,7 @@ class ProcessTest :
 
 		cosmos::CloneArgs args;
 		cosmos::PidFD pid_fd;
-		args.setFlags(cosmos::CloneFlags{cosmos::CloneSettings::PIDFD});
+		args.setFlags(cosmos::CloneFlags{cosmos::CloneFlag::PIDFD});
 		args.setPidFD(pid_fd);
 		constexpr auto STATUS = cosmos::ExitStatus{20};
 
@@ -227,7 +227,7 @@ class ProcessTest :
 		cosmos::EventFile ef{cosmos::EventFile::Counter{0}, cosmos::EventFile::Flags{}};
 		cosmos::CloneArgs args;
 		cosmos::PidFD pid_fd;
-		args.setFlags(cosmos::CloneFlags{cosmos::CloneSettings::PIDFD});
+		args.setFlags(cosmos::CloneFlags{cosmos::CloneFlag::PIDFD});
 		args.setPidFD(pid_fd);
 
 		if (auto child = cosmos::proc::clone(args); child) {

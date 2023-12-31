@@ -23,11 +23,11 @@ namespace cosmos {
 class COSMOS_API ProcessFile {
 public: // types
 
-	enum class OpenSettings : unsigned int {
+	enum class OpenFlag : unsigned int {
 		NONBLOCK = PIDFD_NONBLOCK ///< open the file descriptor in non-blocking mode - proc::wait() will never block.
 	};
 
-	using OpenFlags = BitMask<OpenSettings>;
+	using OpenFlags = BitMask<OpenFlag>;
 
 public: // functions
 
@@ -117,7 +117,7 @@ public: // functions
 	/**
 	 * \see proc::wait(const PidFD, const WaitFlags).
 	 **/
-	std::optional<WaitRes> wait(const WaitFlags flags = WaitFlags{WaitOpts::WAIT_FOR_EXITED}) {
+	std::optional<WaitRes> wait(const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED}) {
 		return proc::wait(m_fd, flags);
 	}
 

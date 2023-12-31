@@ -155,7 +155,7 @@ enum class MessageFlag : int {
 	DONT_ROUTE = MSG_DONTROUTE,
 	/// Use non-blocking semantics for the I/O call.
 	/**
-	 * This is similar to setting OpenSettings::NONBLOCK on the file
+	 * This is similar to setting OpenFlag::NONBLOCK on the file
 	 * descriptor, but only affects a single I/O call as opposed to all
 	 * calls refering to the same open file description.
 	 **/

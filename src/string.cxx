@@ -60,7 +60,7 @@ std::vector<std::basic_string<CHAR>> split(
 
 		pos1 = pos2;
 
-		if (!flags[SplitOpts::KEEP_EMPTY]) {
+		if (!flags[SplitFlag::KEEP_EMPTY]) {
 			while (str.substr(pos1, sep.size()) == sep)
 				pos1 += sep.size();
 		}
@@ -72,12 +72,12 @@ std::vector<std::basic_string<CHAR>> split(
 		if (token_len) {
 			token = str.substr(pos1, token_len);
 
-			if (flags[SplitOpts::STRIP_PARTS]) {
+			if (flags[SplitFlag::STRIP_PARTS]) {
 				strip(token);
 			}
 		}
 
-		if (!token.empty() || flags[SplitOpts::KEEP_EMPTY]) {
+		if (!token.empty() || flags[SplitFlag::KEEP_EMPTY]) {
 			parts.push_back(token);
 		}
 
