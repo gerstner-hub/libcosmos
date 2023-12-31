@@ -12,6 +12,8 @@ std::ostream& operator<<(std::ostream &o, const cosmos::ExitStatus status) {
 	switch (status) {
 		case cosmos::ExitStatus::INVALID: o << " (INVALID)"; break;
 		case cosmos::ExitStatus::SUCCESS: o << " (SUCCESS)"; break;
+		case cosmos::ExitStatus::FAILURE: o << " (FAILURE)"; break;
+		default: o << " (other)"; break;
 	}
 	return o;
 }

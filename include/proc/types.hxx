@@ -2,6 +2,7 @@
 
 // Linux
 #include <signal.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 namespace cosmos {
@@ -26,7 +27,8 @@ enum class ProcessGroupID : pid_t {
  **/
 enum class ExitStatus : int {
 	INVALID = -1,
-	SUCCESS = 0
+	SUCCESS = EXIT_SUCCESS,
+	FAILURE = EXIT_FAILURE,
 };
 
 /// A primitive signal nr specification.
