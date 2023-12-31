@@ -1,5 +1,4 @@
-#ifndef COSMOS_PROCESSFILE_HXX
-#define COSMOS_PROCESSFILE_HXX
+#pragma once
 
 // C++
 #include <optional>
@@ -127,5 +126,3 @@ protected: // data
 };
 
 } // end ns
-
-#endif // inc. guard

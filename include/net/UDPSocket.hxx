@@ -1,5 +1,4 @@
-#ifndef COSMOS_UDP_SOCKET_HXX
-#define COSMOS_UDP_SOCKET_HXX
+#pragma once
 
 // C++
 #include <optional>
@@ -105,5 +104,3 @@ using UDP4Socket = UDPSocketT<SocketFamily::INET>;
 using UDP6Socket = UDPSocketT<SocketFamily::INET6>;
 
 } // end ns
-
-#endif // inc. guard

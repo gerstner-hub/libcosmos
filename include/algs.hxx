@@ -1,5 +1,4 @@
-#ifndef COSMOS_ALGS_HXX
-#define COSMOS_ALGS_HXX
+#pragma once
 
 // C++
 #include <cstddef>
@@ -78,5 +77,3 @@ bool variant_holds_value(const VARIANT &var) {
 }
 
 } // end ns
-
-#endif // inc. guard

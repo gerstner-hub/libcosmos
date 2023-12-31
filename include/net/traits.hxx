@@ -1,5 +1,4 @@
-#ifndef COSMOS_NET_TRAITS_HXX
-#define COSMOS_NET_TRAITS_HXX
+#pragma once
 
 // cosmos
 #include "cosmos/net/types.hxx"
@@ -37,5 +36,3 @@ struct FamilyTraits<SocketFamily::INET6> {
 };
 
 }; // end ns
-
-#endif // inc. guard

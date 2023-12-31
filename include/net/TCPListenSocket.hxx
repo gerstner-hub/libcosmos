@@ -1,5 +1,4 @@
-#ifndef COSMOS_TCP_LISTEN_SOCKET_HXX
-#define COSMOS_TCP_LISTEN_SOCKET_HXX
+#pragma once
 
 // cosmos
 #include "cosmos/net/ListenSocket.hxx"
@@ -71,5 +70,3 @@ using TCP4ListenSocket = TCPListenSocketT<SocketFamily::INET>;
 using TCP6ListenSocket = TCPListenSocketT<SocketFamily::INET6>;
 
 } // end ns
-
-#endif // inc. guard

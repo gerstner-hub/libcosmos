@@ -1,5 +1,4 @@
-#ifndef COSMOS_TERMINAL_HXX
-#define COSMOS_TERMINAL_HXX
+#pragma once
 
 // POSIX
 #include <sys/ioctl.h>
@@ -118,5 +117,3 @@ COSMOS_API std::pair<cosmos::FileDescriptor, cosmos::FileDescriptor> openPTY(
 		const std::optional<TermDimension> initial_size = {});
 
 } // end ns
-
-#endif // inc. guard

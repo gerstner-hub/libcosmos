@@ -1,5 +1,4 @@
-#ifndef COSMOS_APIERROR_HXX
-#define COSMOS_APIERROR_HXX
+#pragma once
 
 // C++
 #include <iosfwd>
@@ -51,5 +50,3 @@ protected: // data
 } // end ns
 
 COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::Errno err);
-
-#endif // inc. guard

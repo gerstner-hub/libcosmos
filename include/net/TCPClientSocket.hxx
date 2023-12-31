@@ -1,5 +1,4 @@
-#ifndef COSMOS_TCP_CLIENT_SOCKET_HXX
-#define COSMOS_TCP_CLIENT_SOCKET_HXX
+#pragma once
 
 // cosmos
 #include "cosmos/net/IPAddress.hxx"
@@ -87,5 +86,3 @@ using TCP4ClientSocket = TCPClientSocketT<SocketFamily::INET>;
 using TCP6ClientSocket = TCPClientSocketT<SocketFamily::INET6>;
 
 } // end ns
-
-#endif // inc. guard

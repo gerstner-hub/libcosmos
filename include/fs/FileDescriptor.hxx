@@ -1,5 +1,4 @@
-#ifndef COSMOS_FILEDESCRIPTOR_HXX
-#define COSMOS_FILEDESCRIPTOR_HXX
+#pragma once
 
 // C++
 #include <tuple>
@@ -222,5 +221,3 @@ extern COSMOS_API FileDescriptor stderr;
 extern COSMOS_API FileDescriptor stdin;
 
 } // end ns
-
-#endif // inc. guard

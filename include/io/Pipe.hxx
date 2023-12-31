@@ -1,5 +1,4 @@
-#ifndef COSMOS_PIPE_HXX
-#define COSMOS_PIPE_HXX
+#pragma once
 
 // Linux
 #include <unistd.h>
@@ -90,5 +89,3 @@ protected: // data
 };
 
 } // end ns
-
-#endif // inc. guard

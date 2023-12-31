@@ -1,5 +1,4 @@
-#ifndef COSMOS_SECRETMEMFILE_HXX
-#define COSMOS_SECRETMEMFILE_HXX
+#pragma once
 
 // cosmos
 #include "cosmos/dso_export.h"
@@ -15,5 +14,3 @@ protected: // data
 };
 
 } // end ns
-
-#endif // inc. guard

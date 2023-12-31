@@ -1,5 +1,4 @@
-#ifndef COSMOS_PRIVATE_COSMOS_HXX
-#define COSMOS_PRIVATE_COSMOS_HXX
+#pragma once
 
 // C++
 #include <exception>
@@ -60,5 +59,3 @@ void noncritical_error(
 		const std::exception &ex);
 
 } // end ns
-
-#endif // inc. guard

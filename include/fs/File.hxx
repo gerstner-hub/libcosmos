@@ -1,5 +1,4 @@
-#ifndef COSMOS_NAMEDFILE_HXX
-#define COSMOS_NAMEDFILE_HXX
+#pragma once
 
 // C++
 #include <optional>
@@ -85,5 +84,3 @@ public: // functions
 };
 
 } // end ns
-
-#endif // inc. guard

@@ -1,5 +1,4 @@
-#ifndef COSMOS_GROUPINFO_HXX
-#define COSMOS_GROUPINFO_HXX
+#pragma once
 
 // Linux
 #include "grp.h"
@@ -44,5 +43,3 @@ public: // functions
 };
 
 } // end ns
-
-#endif // inc. guard

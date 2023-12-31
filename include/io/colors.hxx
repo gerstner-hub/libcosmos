@@ -1,5 +1,4 @@
-#ifndef COSMOS_COLORS_HXX
-#define COSMOS_COLORS_HXX
+#pragma once
 
 // C++
 #include <iosfwd>
@@ -296,5 +295,3 @@ typedef TextOnColorT<TermColor::WHITE, ColorIntensity::BRIGHT> OnBrightWhite;
 COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::term::ColorSpec &fc);
 COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::term::TermControl p);
 COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::term::FeatureBase &fb);
-
-#endif // inc. guard

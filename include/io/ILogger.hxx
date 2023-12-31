@@ -1,5 +1,4 @@
-#ifndef COSMOS_ILOGGER_HXX
-#define COSMOS_ILOGGER_HXX
+#pragma once
 
 // C++
 #include <iosfwd>
@@ -119,5 +118,3 @@ protected: // data
 };
 
 } // end ns
-
-#endif // inc. guard

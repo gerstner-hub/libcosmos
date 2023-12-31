@@ -1,5 +1,4 @@
-#ifndef COSMOS_CLOCK_HXX
-#define COSMOS_CLOCK_HXX
+#pragma once
 
 // cosmos
 #include "cosmos/dso_export.h"
@@ -83,5 +82,3 @@ extern template class COSMOS_API Clock<ClockType::REALTIME_COARSE>;
 extern template class COSMOS_API Clock<ClockType::THREAD_CPUTIME>;
 
 } // end ns
-
-#endif // inc. guard

@@ -1,5 +1,4 @@
-#ifndef COSMOS_TCP_OPTIONS_HXX
-#define COSMOS_TCP_OPTIONS_HXX
+#pragma once
 
 // C++
 #include <chrono>
@@ -248,5 +247,3 @@ protected: // functions
 };
 
 }; // end ns
-
-#endif // inc. guard

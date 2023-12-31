@@ -1,5 +1,4 @@
-#ifndef COSMOS_SIGSET_HXX
-#define COSMOS_SIGSET_HXX
+#pragma once
 
 // Linux
 #include <signal.h>
@@ -57,5 +56,3 @@ protected: // data
 };
 
 } // end ns
-
-#endif // inc. guard

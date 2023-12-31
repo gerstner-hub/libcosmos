@@ -1,5 +1,4 @@
-#ifndef COSMOS_WOULDBLOCK_HXX
-#define COSMOS_WOULDBLOCK_HXX
+#pragma once
 
 // cosmos
 #include "cosmos/error/ApiError.hxx"
@@ -25,5 +24,3 @@ public:
 };
 
 } // end ns
-
-#endif // inc. guard

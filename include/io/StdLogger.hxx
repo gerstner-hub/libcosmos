@@ -1,5 +1,4 @@
-#ifndef COSMOS_STDLOGGER_HXX
-#define COSMOS_STDLOGGER_HXX
+#pragma once
 
 // cosmos
 #include "cosmos/dso_export.h"
@@ -20,5 +19,3 @@ public:
 };
 
 } // end ns
-
-#endif // inc. guard

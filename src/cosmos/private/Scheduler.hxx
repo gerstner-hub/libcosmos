@@ -1,5 +1,4 @@
-#ifndef COSMOS_PRIVATE_SCHEDULER_HXX
-#define COSMOS_PRIVATE_SCHEDULER_HXX
+#pragma once
 
 // C
 #include <stdint.h>
@@ -27,5 +26,3 @@ struct sched_attr {
 };
 
 } // end ns
-
-#endif // inc. guard

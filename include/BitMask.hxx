@@ -1,5 +1,4 @@
-#ifndef COSMOS_ENUMBITSET_HXX
-#define COSMOS_ENUMBITSET_HXX
+#pragma once
 
 // C++
 #include <initializer_list>
@@ -305,5 +304,3 @@ protected: // data
 };
 
 } // end ns
-
-#endif // inc. guard

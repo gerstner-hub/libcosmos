@@ -1,5 +1,4 @@
-#ifndef COSMOS_PRIVATE_SOCKOPTS_HXX
-#define COSMOS_PRIVATE_SOCKOPTS_HXX
+#pragma once
 
 // cosmos
 #include "cosmos/algs.hxx"
@@ -128,5 +127,3 @@ namespace {
 
 } // end anon ns
 } // end ns
-
-#endif // inc. guard

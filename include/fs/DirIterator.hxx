@@ -1,5 +1,4 @@
-#ifndef COSMOS_DIRITERATOR_HXX
-#define COSMOS_DIRITERATOR_HXX
+#pragma once
 
 // cosmos
 #include "cosmos/fs/DirStream.hxx"
@@ -54,5 +53,3 @@ inline DirIterator end(DirStream &dir) {
 }
 
 } // end ns
-
-#endif // inc. guard

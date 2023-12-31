@@ -1,5 +1,4 @@
-#ifndef COSMOS_UNIX_CLIENT_SOCKET_HXX
-#define COSMOS_UNIX_CLIENT_SOCKET_HXX
+#pragma once
 
 // cosmos
 #include "cosmos/net/UnixConnection.hxx"
@@ -98,5 +97,3 @@ public: // functions
 };
 
 } // end ns
-
-#endif // inc. guard

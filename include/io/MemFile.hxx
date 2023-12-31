@@ -1,5 +1,4 @@
-#ifndef COSMOS_MEMFILE_HXX
-#define COSMOS_MEMFILE_HXX
+#pragma once
 
 // Linux
 #include <sys/mman.h>
@@ -74,5 +73,3 @@ public: // functions
 };
 
 } // end ns
-
-#endif // inc. guard

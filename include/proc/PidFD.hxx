@@ -1,5 +1,4 @@
-#ifndef COSMOS_PIDFD_HXX
-#define COSMOS_PIDFD_HXX
+#pragma once
 
 // cosmos
 #include "cosmos/fs/FileDescriptor.hxx"
@@ -46,5 +45,3 @@ protected: // data
 };
 
 } // end ns
-
-#endif // inc. guard

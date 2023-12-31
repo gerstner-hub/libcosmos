@@ -1,5 +1,4 @@
-#ifndef COSMOS_SOCKET_ERROR_HXX
-#define COSMOS_SOCKET_ERROR_HXX
+#pragma once
 
 // C++
 #include <cstdint>
@@ -46,5 +45,3 @@ protected: // data
 };
 
 } // end ns
-
-#endif // inc. guard

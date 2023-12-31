@@ -1,5 +1,4 @@
-#ifndef COSMOS_FILEBASE_HXX
-#define COSMOS_FILEBASE_HXX
+#pragma once
 
 // cosmos
 #include "cosmos/fs/FileDescriptor.hxx"
@@ -80,5 +79,3 @@ protected: // data
 };
 
 } // end ns
-
-#endif // inc. guard

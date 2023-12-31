@@ -1,5 +1,4 @@
-#ifndef COSMOS_STREAMIO_HXX
-#define COSMOS_STREAMIO_HXX
+#pragma once
 
 // Linux
 #include <unistd.h>
@@ -222,5 +221,3 @@ protected: // data
 };
 
 } // end ns
-
-#endif // inc. guard

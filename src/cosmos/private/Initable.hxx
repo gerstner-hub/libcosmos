@@ -1,5 +1,4 @@
-#ifndef COSMOS_PRIV_INIT_HXX
-#define COSMOS_PRIV_INIT_HXX
+#pragma once
 
 // cosmos
 #include "cosmos/cosmos.hxx"
@@ -50,5 +49,3 @@ private: // data
 };
 
 } // end ns
-
-#endif // inc. guard

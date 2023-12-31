@@ -1,5 +1,4 @@
-#ifndef COSMOS_FILE_TYPES_HXX
-#define COSMOS_FILE_TYPES_HXX
+#pragma once
 
 // Linux
 #include <fcntl.h>
@@ -290,5 +289,3 @@ COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::FileMode mode
 COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::FileType type);
 /// Outputs a friendly versino of the OpenFlags bitmask onto the stream.
 COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::OpenFlags flags);
-
-#endif // inc. guard

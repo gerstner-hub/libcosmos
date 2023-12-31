@@ -1,5 +1,4 @@
-#ifndef COSMOS_SIGNAL_HXX
-#define COSMOS_SIGNAL_HXX
+#pragma once
 
 // C++
 #include <iosfwd>
@@ -157,5 +156,3 @@ COSMOS_API SigSet get_sigmask();
 
 /// Print a friendly name of the signal to the given output stream.
 COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::Signal sig);
-
-#endif // inc. guard

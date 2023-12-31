@@ -1,5 +1,4 @@
-#ifndef COSMOS_FORMATTING_HXX
-#define COSMOS_FORMATTING_HXX
+#pragma once
 
 // C++
 #include <iomanip>
@@ -161,5 +160,3 @@ auto to_printable_integer(T num) -> decltype(+num) {
 COSMOS_API std::string sprintf(const char *fmt, ...) COSMOS_FORMAT_PRINTF(1, 2);
 
 } // end ns cosmos
-
-#endif // inc. guard

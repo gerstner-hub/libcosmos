@@ -1,5 +1,4 @@
-#ifndef COSMOS_DIRSTREAM_HXX
-#define COSMOS_DIRSTREAM_HXX
+#pragma once
 
 // C++
 #include <exception>
@@ -165,5 +164,3 @@ protected: // data
 
 // make DirIterator available for range based for loops
 #include "cosmos/fs/DirIterator.hxx"
-
-#endif // inc. guard

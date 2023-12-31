@@ -1,5 +1,4 @@
-#ifndef COSMOS_ERRNO_HXX
-#define COSMOS_ERRNO_HXX
+#pragma once
 
 // C
 #include <errno.h>
@@ -103,5 +102,3 @@ inline void reset_errno() { errno = static_cast<int>(Errno::NO_ERROR); }
 inline bool is_errno_set() { return get_errno() != Errno::NO_ERROR; }
 
 } // end ns
-
-#endif // inc. guard

@@ -1,5 +1,4 @@
-#ifndef COSMOS_TIME_HXX
-#define COSMOS_TIME_HXX
+#pragma once
 
 // C++
 #include <chrono>
@@ -44,5 +43,3 @@ inline void sleep(std::chrono::milliseconds ms) {
 }
 
 } // end ns
-
-#endif // inc. guard

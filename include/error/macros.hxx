@@ -1,5 +1,4 @@
-#ifndef COSMOS_ERRORS_MACROS_HXX
-#define COSMOS_ERRORS_MACROS_HXX
+#pragma once
 
 // cosmos
 #include "cosmos/compiler.hxx"
@@ -29,5 +28,3 @@
  * be added to silence these warnings.
  **/
 #define COSMOS_ERROR_IMPL [[ noreturn ]] void raise() override { throw *this; }
-
-#endif // inc. guard

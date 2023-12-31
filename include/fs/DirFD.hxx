@@ -1,5 +1,4 @@
-#ifndef COSMOS_DIRFD_HXX
-#define COSMOS_DIRFD_HXX
+#pragma once
 
 // cosmos
 #include "cosmos/ostypes.hxx"
@@ -26,5 +25,3 @@ public: // functions
 inline constexpr DirFD AT_CWD{FileNum::AT_CWD};
 
 } // end ns
-
-#endif // inc. guard

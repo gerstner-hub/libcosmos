@@ -1,5 +1,4 @@
-#ifndef COSMOS_NET_NETWORK_HXX
-#define COSMOS_NET_NETWORK_HXX
+#pragma once
 
 // C++
 #include <utility>
@@ -18,5 +17,3 @@ COSMOS_API std::pair<UnixConnection, UnixConnection> create_seqpacket_socket_pai
 COSMOS_API std::pair<UnixDatagramSocket, UnixDatagramSocket> create_dgram_socket_pair();
 
 } // end ns
-
-#endif // inc. guard

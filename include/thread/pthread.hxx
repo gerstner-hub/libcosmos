@@ -1,5 +1,4 @@
-#ifndef COSMOS_PTHREAD_HXX
-#define COSMOS_PTHREAD_HXX
+#pragma once
 
 // POSIX
 #include <pthread.h>
@@ -64,5 +63,3 @@ ID COSMOS_API get_id();
 [[ noreturn ]] COSMOS_API void exit(const ExitValue val = ExitValue{0});
 
 } // end ns
-
-#endif // inc. guard

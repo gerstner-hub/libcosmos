@@ -1,5 +1,4 @@
-#ifndef COSMOS_CLONE_HXX
-#define COSMOS_CLONE_HXX
+#pragma once
 
 // C
 #include <stdint.h>
@@ -165,5 +164,3 @@ COSMOS_API std::optional<ProcessID> clone(const CloneArgs &args);
 } // end ns proc
 
 } // end ns
-
-#endif // inc. guard

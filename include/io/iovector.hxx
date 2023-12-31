@@ -1,5 +1,4 @@
-#ifndef COSMOS_IO_TYPES_HXX
-#define COSMOS_IO_TYPES_HXX
+#pragma once
 
 // Linux
 #include <sys/uio.h>
@@ -168,5 +167,3 @@ using ReadIOVector = IOVector<InputMemoryRegion>;
 using WriteIOVector = IOVector<OutputMemoryRegion>;
 
 } // end ns
-
-#endif // inc. guard

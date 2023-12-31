@@ -1,5 +1,4 @@
-#ifndef COSMOS_SCHEDULER_HXX
-#define COSMOS_SCHEDULER_HXX
+#pragma once
 
 // Linux
 #include <sched.h>
@@ -190,5 +189,3 @@ using SchedulerSettingsVariant = std::variant<
 		RoundRobinSchedulerSettings>;
 
 } // end ns
-
-#endif // inc. guard

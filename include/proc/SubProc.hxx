@@ -1,5 +1,4 @@
-#ifndef COSMOS_SUBPROC_HXX
-#define COSMOS_SUBPROC_HXX
+#pragma once
 
 // C++
 #include <chrono>
@@ -109,5 +108,3 @@ protected: // data
 };
 
 } // end ns
-
-#endif // inc. guard

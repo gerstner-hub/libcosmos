@@ -1,5 +1,4 @@
-#ifndef COSMOS_INFOBASE_HXX
-#define COSMOS_INFOBASE_HXX
+#pragma once
 
 // C++
 #include <functional>
@@ -42,5 +41,3 @@ protected: // data
 };
 
 } // end ns
-
-#endif // inc. guard

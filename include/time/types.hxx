@@ -1,5 +1,4 @@
-#ifndef COSMOS_TIME_TYPES_HXX
-#define COSMOS_TIME_TYPES_HXX
+#pragma once
 
 // Linux
 #include <time.h>
@@ -181,5 +180,3 @@ using RealTime            = TimeSpec<ClockType::REALTIME>;
 using ThreadCpuTime       = TimeSpec<ClockType::THREAD_CPUTIME>;
 
 } // end ns
-
-#endif // inc. guard

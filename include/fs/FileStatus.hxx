@@ -1,5 +1,4 @@
-#ifndef COSMOS_FILESTATUS_HXX
-#define COSMOS_FILESTATUS_HXX
+#pragma once
 
 // Linux
 #include <sys/stat.h>
@@ -263,5 +262,3 @@ protected: // data
 };
 
 } // end ns
-
-#endif // inc. guard

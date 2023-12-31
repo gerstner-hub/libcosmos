@@ -1,5 +1,4 @@
-#ifndef COSMOS_MEMORY_HXX
-#define COSMOS_MEMORY_HXX
+#pragma once
 
 // C++
 #include <cstring>
@@ -25,5 +24,3 @@ void zero_object(T &obj) {
 }
 
 } // end ns
-
-#endif // inc. guard

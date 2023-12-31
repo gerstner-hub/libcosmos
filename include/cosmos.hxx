@@ -1,5 +1,4 @@
-#ifndef COSMOS_COSMOS_HXX
-#define COSMOS_COSMOS_HXX
+#pragma once
 
 #include "cosmos/dso_export.h"
 
@@ -68,6 +67,4 @@ struct Init {
 void COSMOS_API set_restart_syscall_on_interrupt(const bool auto_restart);
 
 } // end ns
-
-#endif // inc. guard
 

@@ -1,5 +1,4 @@
-#ifndef COSMOS_COSMOSERROR_HXX
-#define COSMOS_COSMOSERROR_HXX
+#pragma once
 
 // C++
 #include <exception>
@@ -144,5 +143,3 @@ protected: // data
 };
 
 } // end ns
-
-#endif // inc. guard

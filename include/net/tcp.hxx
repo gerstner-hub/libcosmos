@@ -1,5 +1,4 @@
-#ifndef COSMOS_TCP_HXX
-#define COSMOS_TCP_HXX
+#pragma once
 
 // Linux
 #include <netinet/tcp.h>
@@ -13,5 +12,3 @@ struct TCPInfo :
 };
 
 }; // end ns
-
-#endif // inc. guard

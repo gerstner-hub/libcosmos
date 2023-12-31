@@ -1,5 +1,4 @@
-#ifndef COSMOS_STOPWATCH_HXX
-#define COSMOS_STOPWATCH_HXX
+#pragma once
 
 // cosmos
 #include "cosmos/time/Clock.hxx"
@@ -56,5 +55,3 @@ using RealTimeStopWatch        = StopWatch<ClockType::REALTIME>;
 using ThreadStopWatch          = StopWatch<ClockType::THREAD_CPUTIME>;
 
 } // end ns
-
-#endif // inc. guard

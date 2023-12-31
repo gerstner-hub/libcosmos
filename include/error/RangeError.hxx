@@ -1,5 +1,4 @@
-#ifndef COSMOS_RANGEERROR_HXX
-#define COSMOS_RANGEERROR_HXX
+#pragma once
 
 // cosmos
 #include "cosmos/error/ApiError.hxx"
@@ -30,5 +29,3 @@ protected: // data
 };
 
 } // end ns
-
-#endif // inc. guard

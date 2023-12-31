@@ -1,5 +1,4 @@
-#ifndef COSMOS_IOFILE_HXX
-#define COSMOS_IOFILE_HXX
+#pragma once
 
 // cosmos
 #include "cosmos/fs/FileBase.hxx"
@@ -76,5 +75,3 @@ protected: // data
 };
 
 } // end ns
-
-#endif // inc. guard

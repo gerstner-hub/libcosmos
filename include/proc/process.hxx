@@ -1,5 +1,4 @@
-#ifndef COSMOS_PROCESS_HXX
-#define COSMOS_PROCESS_HXX
+#pragma once
 
 // Linux
 #include <signal.h>
@@ -260,5 +259,3 @@ struct PidInfo {
 extern COSMOS_API PidInfo cached_pids;
 
 }; // end ns
-
-#endif // inc. guard

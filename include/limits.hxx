@@ -1,5 +1,4 @@
-#ifndef COSMOS_LIMITS_HXX
-#define COSMOS_LIMITS_HXX
+#pragma once
 
 // C++
 #include <cstddef>
@@ -35,5 +34,3 @@ constexpr size_t NAME = NAME_MAX;
 }
 
 }
-
-#endif // inc. guard

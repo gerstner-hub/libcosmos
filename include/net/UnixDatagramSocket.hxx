@@ -1,5 +1,4 @@
-#ifndef COSMOS_UNIX_DATAGRAM_SOCKET_HXX
-#define COSMOS_UNIX_DATAGRAM_SOCKET_HXX
+#pragma once
 
 // C++
 #include <optional>
@@ -84,5 +83,3 @@ public:
 };
 
 } // end ns
-
-#endif // inc. guard

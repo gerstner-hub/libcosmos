@@ -1,5 +1,4 @@
-#ifndef COSMOS_SIGNALFD_HXX
-#define COSMOS_SIGNALFD_HXX
+#pragma once
 
 // Linux
 #include <sys/signalfd.h>
@@ -108,5 +107,3 @@ protected: // data
 };
 
 } // end ns
-
-#endif // inc. guard

@@ -1,5 +1,4 @@
-#ifndef COSMOS_EVENTFILE_HXX
-#define COSMOS_EVENTFILE_HXX
+#pragma once
 
 // Linux
 #include <sys/eventfd.h>
@@ -87,5 +86,3 @@ public: // functions
 };
 
 } // end ns
-
-#endif // inc. guard

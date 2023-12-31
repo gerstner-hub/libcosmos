@@ -1,5 +1,4 @@
-#ifndef COSMOS_PATH_HXX
-#define COSMOS_PATH_HXX
+#pragma once
 
 // C++
 #include <string>
@@ -34,5 +33,3 @@ COSMOS_API std::string normalize_path(const std::string_view path);
 COSMOS_API std::string canonicalize_path(const std::string_view path);
 
 } // end ns
-
-#endif // inc. guard

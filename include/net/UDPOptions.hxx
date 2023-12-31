@@ -1,5 +1,4 @@
-#ifndef COSMOS_UDP_OPTIONS_HXX
-#define COSMOS_UDP_OPTIONS_HXX
+#pragma once
 
 // Linux
 #include <netinet/udp.h>
@@ -83,5 +82,3 @@ protected: // functions
 };
 
 }; // end ns
-
-#endif // inc. guard

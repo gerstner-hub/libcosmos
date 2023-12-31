@@ -1,5 +1,4 @@
-#ifndef COSMOS_TYPES_HXX
-#define COSMOS_TYPES_HXX
+#pragma once
 
 // C++
 #include <functional>
@@ -121,5 +120,3 @@ inline std::ostream& operator<<(std::ostream &o, const std::map<K,V> &m) {
 
 	return o;
 }
-
-#endif // inc. guard

@@ -1,5 +1,4 @@
-#ifndef COSMOS_UNIX_LISTEN_SOCKET_HXX
-#define COSMOS_UNIX_LISTEN_SOCKET_HXX
+#pragma once
 
 // cosmos
 #include "cosmos/net/ListenSocket.hxx"
@@ -66,5 +65,3 @@ public: // functions
 };
 
 } // end ns
-
-#endif // inc. guard

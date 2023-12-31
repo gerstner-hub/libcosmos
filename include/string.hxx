@@ -1,5 +1,4 @@
-#ifndef COSMOS_STRING_HXX
-#define COSMOS_STRING_HXX
+#pragma once
 
 // C++
 #include <cctype>
@@ -112,5 +111,3 @@ inline std::vector<std::string> split(
 }
 
 } // end ns
-
-#endif // inc. guard

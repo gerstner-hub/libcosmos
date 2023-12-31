@@ -1,5 +1,4 @@
-#ifndef COSMOS_THREAD_HXX
-#define COSMOS_THREAD_HXX
+#pragma once
 
 // cosmos
 #include "cosmos/dso_export.h"
@@ -25,5 +24,3 @@ ProcessID COSMOS_API get_tid();
 bool COSMOS_API is_main_thread();
 
 } // end ns
-
-#endif // inc. guard

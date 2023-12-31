@@ -1,5 +1,4 @@
-#ifndef COSMOS_DIRECTORY_HXX
-#define COSMOS_DIRECTORY_HXX
+#pragma once
 
 // cosmos
 #include "cosmos/fs/types.hxx"
@@ -178,5 +177,3 @@ void Directory::makeSymlinkAt(const std::string_view target, const std::string_v
 }
 
 } // end ns
-
-#endif // inc. guard

@@ -1,5 +1,4 @@
-#ifndef COSMOS_CHILDCLONER_HXX
-#define COSMOS_CHILDCLONER_HXX
+#pragma once
 
 // C++
 #include <functional>
@@ -320,5 +319,3 @@ inline cosmos::ChildCloner& operator<<(cosmos::ChildCloner &cloner, const std::s
 
 /// Outputs a summary of the ChildCloner's configuration.
 COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::ChildCloner &);
-
-#endif // inc. guard

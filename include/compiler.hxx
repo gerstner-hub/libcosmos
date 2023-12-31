@@ -1,5 +1,4 @@
-#ifndef COSMOS_COMPILER_HXX
-#define COSMOS_COMPILER_HXX
+#pragma once
 
 /**
  * @file
@@ -33,5 +32,3 @@
 #else
 #define COSMOS_FORMAT_PRINTF(format_index, first_Vararg_index)
 #endif
-
-#endif // inc. guard

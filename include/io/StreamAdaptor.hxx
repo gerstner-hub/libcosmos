@@ -1,5 +1,4 @@
-#ifndef COSMOS_STREAMADAPTOR_HXX
-#define COSMOS_STREAMADAPTOR_HXX
+#pragma once
 
 // Cosmos
 #include "cosmos/algs.hxx"
@@ -117,5 +116,3 @@ public: // functions
 };
 
 } // end ns
-
-#endif // inc. guard

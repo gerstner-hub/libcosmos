@@ -1,5 +1,4 @@
-#ifndef COSMOS_FILEERROR_HXX
-#define COSMOS_FILEERROR_HXX
+#pragma once
 
 // C++
 #include <string>
@@ -37,5 +36,3 @@ protected: // data
 };
 
 } // end ns
-
-#endif // inc. guard

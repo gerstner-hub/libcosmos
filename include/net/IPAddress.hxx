@@ -1,5 +1,4 @@
-#ifndef COSMOS_IPADDRESS_HXX
-#define COSMOS_IPADDRESS_HXX
+#pragma once
 
 // C++
 #include <cstring>
@@ -221,5 +220,3 @@ protected: // data
 };
 
 } // end ns
-
-#endif // inc. guard

@@ -1,5 +1,4 @@
-#ifndef COSMOS_PASSWDINFO_HXX
-#define COSMOS_PASSWDINFO_HXX
+#pragma once
 
 // Linux
 #include <pwd.h>
@@ -57,5 +56,3 @@ public: // functions
 };
 
 } // end ns
-
-#endif // inc. guard

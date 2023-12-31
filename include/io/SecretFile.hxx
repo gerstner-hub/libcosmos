@@ -1,5 +1,4 @@
-#ifndef COSMOS_SECRETFILE_HXX
-#define COSMOS_SECRETFILE_HXX
+#pragma once
 
 // cosmos
 #include "cosmos/dso_export.h"
@@ -35,5 +34,3 @@ public: // functions
 };
 
 } // end ns
-
-#endif // inc. guard

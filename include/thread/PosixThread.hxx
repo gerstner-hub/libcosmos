@@ -1,5 +1,4 @@
-#ifndef COSMOS_POSIXTHREAD_HXX
-#define COSMOS_POSIXTHREAD_HXX
+#pragma once
 
 // C++
 #include <functional>
@@ -206,5 +205,3 @@ protected: // data
 };
 
 } // end ns
-
-#endif // inc. guard

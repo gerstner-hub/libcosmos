@@ -1,5 +1,4 @@
-#ifndef COSMOS_MUTEX_HXX
-#define COSMOS_MUTEX_HXX
+#pragma once
 
 // POSIX
 #include <pthread.h>
@@ -91,5 +90,3 @@ struct MutexReverseGuard :
 };
 
 } // end ns
-
-#endif // inc. guard

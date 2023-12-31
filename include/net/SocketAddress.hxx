@@ -1,5 +1,4 @@
-#ifndef COSMOS_SOCKET_ADDRESS_HXX
-#define COSMOS_SOCKET_ADDRESS_HXX
+#pragma once
 
 // C++
 #include <cstring>
@@ -88,5 +87,3 @@ protected: // functions
 };
 
 }; // end ns
-
-#endif // inc. guard

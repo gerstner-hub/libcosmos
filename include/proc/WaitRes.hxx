@@ -1,5 +1,4 @@
-#ifndef COSMOS_WAITRES_HXX
-#define COSMOS_WAITRES_HXX
+#pragma once
 
 // C++
 #include <iosfwd>
@@ -122,5 +121,3 @@ COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::ExitStatus st
 
 /// Outputs a human readable summary of the WaitRes.
 COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::WaitRes &res);
-
-#endif // inc. guard

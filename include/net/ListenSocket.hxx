@@ -1,5 +1,4 @@
-#ifndef COSMOS_LISTEN_SOCKET_HXX
-#define COSMOS_LISTEN_SOCKET_HXX
+#pragma once
 
 // cosmos
 #include "cosmos/net/Socket.hxx"
@@ -35,5 +34,3 @@ protected:
 };
 
 } // end ns
-
-#endif // inc. guard

@@ -1,5 +1,4 @@
-#ifndef COSMOS_OSTYPES_HXX
-#define COSMOS_OSTYPES_HXX
+#pragma once
 
 // Linux
 #include <fcntl.h>
@@ -103,5 +102,3 @@ enum class FileNum : int {
 };
 
 } // end ns
-
-#endif // inc. agurd

@@ -1,5 +1,4 @@
-#ifndef COSMOS_EXPORT_HXX
-#define COSMOS_EXPORT_HXX
+#pragma once
 
 /*
  * Helper macro to control visibility of public APIs of the cosmos shared
@@ -12,5 +11,3 @@
 #else
 #	define COSMOS_API
 #endif
-
-#endif // inc. guard

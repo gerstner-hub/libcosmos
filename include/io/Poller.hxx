@@ -1,5 +1,4 @@
-#ifndef COSMOS_POLLER_HXX
-#define COSMOS_POLLER_HXX
+#pragma once
 
 // C++
 #include <chrono>
@@ -199,5 +198,3 @@ protected: // data
 };
 
 } // end ns
-
-#endif // inc. guard

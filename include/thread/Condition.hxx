@@ -1,5 +1,4 @@
-#ifndef COSMOS_CONDITION_HXX
-#define COSMOS_CONDITION_HXX
+#pragma once
 
 // Linux
 #include <pthread.h>
@@ -151,5 +150,3 @@ public: // functions
 };
 
 } // end ns
-
-#endif // inc. guard

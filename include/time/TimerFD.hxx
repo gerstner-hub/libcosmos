@@ -1,5 +1,4 @@
-#ifndef COSMOS_TIMERFD_HXX
-#define COSMOS_TIMERFD_HXX
+#pragma once
 
 // Linux
 #include <sys/timerfd.h>
@@ -237,5 +236,3 @@ extern template class COSMOS_API TimerFD<ClockType::MONOTONIC>;
 extern template class COSMOS_API TimerFD<ClockType::REALTIME>;
 
 } // end ns
-
-#endif // inc. guard

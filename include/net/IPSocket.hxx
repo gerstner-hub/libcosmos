@@ -1,5 +1,4 @@
-#ifndef COSMOS_IPSOCKET_HXX
-#define COSMOS_IPSOCKET_HXX
+#pragma once
 
 // cosmos
 #include "cosmos/net/IPOptions.hxx"
@@ -58,5 +57,3 @@ using IP4Socket = IPSocketT<SocketFamily::INET>;
 using IP6Socket = IPSocketT<SocketFamily::INET6>;
 
 } // end ns
-
-#endif // inc. guard

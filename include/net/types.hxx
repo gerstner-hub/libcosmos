@@ -1,5 +1,4 @@
-#ifndef COSMOS_NET_TYPES_HXX
-#define COSMOS_NET_TYPES_HXX
+#pragma once
 
 // C++
 #include <array>
@@ -228,5 +227,3 @@ enum class MessageFlag : int {
 using MessageFlags = BitMask<MessageFlag>;
 
 } // end ns
-
-#endif // inc. guard

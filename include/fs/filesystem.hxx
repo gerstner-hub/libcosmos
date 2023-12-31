@@ -1,5 +1,4 @@
-#ifndef COSMOS_FILESYSTEM_HXX
-#define COSMOS_FILESYSTEM_HXX
+#pragma once
 
 // C++
 #include <optional>
@@ -586,5 +585,3 @@ COSMOS_API void truncate(const FileDescriptor fd, off_t length);
 COSMOS_API void truncate(const std::string_view path, off_t length);
 
 } // end ns
-
-#endif // inc. guard

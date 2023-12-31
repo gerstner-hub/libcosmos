@@ -1,5 +1,4 @@
-#ifndef COSMOS_TEMPFILE_HXX
-#define COSMOS_TEMPFILE_HXX
+#pragma once
 
 // cosmos
 #include "cosmos/fs/filesystem.hxx"
@@ -86,5 +85,3 @@ protected: // data
 };
 
 } // end ns
-
-#endif // inc. guard

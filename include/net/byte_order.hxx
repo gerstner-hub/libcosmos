@@ -1,5 +1,4 @@
-#ifndef COSMOS_BYTE_ORDER_HXX
-#define COSMOS_BYTE_ORDER_HXX
+#pragma once
 
 // Linux
 #include <arpa/inet.h>
@@ -23,5 +22,3 @@ inline uint32_t to_network_order(uint32_t network) {
 }
 
 } // end ns
-
-#endif // inc. guard

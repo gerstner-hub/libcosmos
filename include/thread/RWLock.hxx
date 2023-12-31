@@ -1,5 +1,4 @@
-#ifndef COSMOS_RWLOCK_HXX
-#define COSMOS_RWLOCK_HXX
+#pragma once
 
 // POSIX
 #include <pthread.h>
@@ -86,5 +85,3 @@ struct WriteLockGuard :
 };
 
 } // end ns
-
-#endif // inc. guard

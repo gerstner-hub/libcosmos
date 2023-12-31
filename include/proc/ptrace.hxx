@@ -1,5 +1,4 @@
-#ifndef COSMOS_PTRACE_HXX
-#define COSMOS_PTRACE_HXX
+#pragma once
 
 /**
  * @file
@@ -69,5 +68,3 @@ enum class TraceEvent {
 };
 
 } // end ns
-
-#endif // inc. guard

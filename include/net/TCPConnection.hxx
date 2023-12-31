@@ -1,5 +1,4 @@
-#ifndef COSMOS_TCP_CONNECTION_HXX
-#define COSMOS_TCP_CONNECTION_HXX
+#pragma once
 
 // cosmos
 #include "cosmos/net/IPSocket.hxx"
@@ -44,5 +43,3 @@ using TCP4Connection = TCPConnectionT<SocketFamily::INET>;
 using TCP6Connection = TCPConnectionT<SocketFamily::INET6>;
 
 } // end ns
-
-#endif // inc. guard

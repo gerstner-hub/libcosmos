@@ -1,5 +1,4 @@
-#ifndef COSMOS_TEST_BASE_HXX
-#define COSMOS_TEST_BASE_HXX
+#pragma once
 
 // C++
 #include <iostream>
@@ -287,5 +286,3 @@ protected: // data
 };
 
 }
-
-#endif // inc. guard

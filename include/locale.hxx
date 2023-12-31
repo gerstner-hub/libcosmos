@@ -1,5 +1,4 @@
-#ifndef COSMOS_LOCALE_HXX
-#define COSMOS_LOCALE_HXX
+#pragma once
 
 // libc
 #include <locale.h>
@@ -63,5 +62,3 @@ COSMOS_API void set_to_default(Category category);
 COSMOS_API void set_from_environment(Category category);
 
 } // end ns
-
-#endif // inc. guard

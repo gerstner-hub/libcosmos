@@ -1,5 +1,4 @@
-#ifndef COSMOS_PRIVATE_INFOBASE_HXX
-#define COSMOS_PRIVATE_INFOBASE_HXX
+#pragma once
 
 // C++
 #include <cstring>
@@ -45,5 +44,3 @@ void InfoBase<DB_STRUCT>::reset() {
 }
 
 } // end ns
-
-#endif // inc. guard

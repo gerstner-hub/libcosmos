@@ -1,5 +1,4 @@
-#ifndef COSMOS_INTERNALERROR_HXX
-#define COSMOS_INTERNALERROR_HXX
+#pragma once
 
 // cosmos
 #include "cosmos/error/CosmosError.hxx"
@@ -24,5 +23,3 @@ public: // functions
 };
 
 } // end ns
-
-#endif // inc. guard

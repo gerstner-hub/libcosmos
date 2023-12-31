@@ -1,5 +1,4 @@
-#ifndef COSMOS_UNIX_ADDRESS_HXX
-#define COSMOS_UNIX_ADDRESS_HXX
+#pragma once
 
 // Linux
 #include <sys/un.h>
@@ -171,5 +170,3 @@ protected: // data
 };
 
 } // end ns
-
-#endif // inc. guard

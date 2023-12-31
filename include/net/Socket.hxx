@@ -1,5 +1,4 @@
-#ifndef COSMOS_SOCKET_HXX
-#define COSMOS_SOCKET_HXX
+#pragma once
 
 // C++
 #include <string_view>
@@ -196,5 +195,3 @@ protected: // functions
 };
 
 } // end ns
-
-#endif // inc. guard
