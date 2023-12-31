@@ -29,7 +29,7 @@ public: // functions
 
 	/// Open a directory by path without special flags (close-on-exec will be set).
 	explicit Directory(const std::string_view path, const OpenMode mode = OpenMode::READ_ONLY) :
-			Directory{path, mode, OpenFlags{OpenFlag::CLOEXEC}} {}
+			Directory{path, mode, {OpenFlag::CLOEXEC}} {}
 
 	/// Open a directory by path using the given mode and flags.
 	/**
@@ -41,7 +41,7 @@ public: // functions
 
 	/// Open a directory by path relative to \c dir_fd using the given mode and default flags.
 	Directory(const DirFD dir_fd, const std::string_view path, const OpenMode mode = OpenMode::READ_ONLY) :
-			Directory{dir_fd, path, mode, OpenFlags{OpenFlag::CLOEXEC}} {}
+			Directory{dir_fd, path, mode, {OpenFlag::CLOEXEC}} {}
 
 	/// Open a directory by path relative to \c dir_fd using the given mode and flags.
 	Directory(const DirFD dir_fd, const std::string_view path, const OpenMode mode,
@@ -70,7 +70,7 @@ public: // functions
 
 	/// Open a directory by path without special flags (close-on-exec will be set).
 	void open(const std::string_view path, const OpenMode mode = OpenMode::READ_ONLY) {
-		return open(path, mode, OpenFlags{OpenFlag::CLOEXEC});
+		return open(path, mode, {OpenFlag::CLOEXEC});
 	}
 
 	/// Open a directory by path using the given mode and flags.
@@ -83,7 +83,7 @@ public: // functions
 
 	/// Open a directory by path relative to \c dir_fd using the given mode and default flags.
 	void open(const DirFD dir_fd, const std::string_view path, const OpenMode mode) {
-		open(dir_fd, path, mode, OpenFlags{OpenFlag::CLOEXEC});
+		open(dir_fd, path, mode, {OpenFlag::CLOEXEC});
 	}
 
 	/// Open a directory by path relative to \c dir_fd using the given mode and flags.

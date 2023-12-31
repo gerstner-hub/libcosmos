@@ -74,7 +74,7 @@ class StringTest :
 
 		constexpr auto splitstr{"how is  this?"};
 
-		parts = cosmos::split(splitstr, " ", cosmos::SplitFlags{cosmos::SplitFlag::KEEP_EMPTY});
+		parts = cosmos::split(splitstr, " ", {cosmos::SplitFlag::KEEP_EMPTY});
 		const auto expected_keep_empty = {"how", "is", "", "this?"};
 
 		RUN_STEP("keep-empty-split-matches", compareParts(parts, expected_keep_empty));
@@ -85,7 +85,7 @@ class StringTest :
 
 		RUN_STEP("bigsep-split-matches", compareParts(parts, expected_bigsep));
 
-		parts = cosmos::split(bigsep, "--", cosmos::SplitFlags{cosmos::SplitFlag::STRIP_PARTS});
+		parts = cosmos::split(bigsep, "--", {cosmos::SplitFlag::STRIP_PARTS});
 		const auto expected_bigsep_stripped = {"A bit", "more", "of", "splitting"};
 		RUN_STEP("bigsep-split-strip-matches", compareParts(parts, expected_bigsep_stripped));
 	}

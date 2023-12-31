@@ -153,7 +153,7 @@ class FileSystemTest :
 		cosmos::File testfile{
 			"umask.test",
 			cosmos::OpenMode{cosmos::OpenMode::WRITE_ONLY},
-			cosmos::OpenFlags{cosmos::OpenFlag::CREATE},
+			{cosmos::OpenFlag::CREATE},
 			cosmos::FileMode{cosmos::ModeT{0777}}
 		};
 
@@ -241,7 +241,7 @@ class FileSystemTest :
 			tmp.fd(),
 			".",
 			cosmos::OpenMode{cosmos::OpenMode::WRITE_ONLY},
-			cosmos::OpenFlags{cosmos::OpenFlag::TMPFILE},
+			{cosmos::OpenFlag::TMPFILE},
 			cosmos::FileMode{cosmos::ModeT{0600}}
 		};
 
@@ -272,7 +272,7 @@ class FileSystemTest :
 		cosmos::File modfile{
 			path.string(),
 			cosmos::OpenMode{cosmos::OpenMode::WRITE_ONLY},
-			cosmos::OpenFlags{cosmos::OpenFlag::CREATE},
+			{cosmos::OpenFlag::CREATE},
 			cosmos::FileMode{cosmos::ModeT{0600}}
 		};
 
@@ -298,7 +298,7 @@ class FileSystemTest :
 		cosmos::File ownfile{
 			path.string(),
 			cosmos::OpenMode{cosmos::OpenMode::WRITE_ONLY},
-			cosmos::OpenFlags{cosmos::OpenFlag::CREATE},
+			{cosmos::OpenFlag::CREATE},
 			cosmos::FileMode{cosmos::ModeT{0600}}
 		};
 
@@ -395,7 +395,7 @@ class FileSystemTest :
 		cosmos::File targetfile{
 			linktarget.string(),
 			cosmos::OpenMode{cosmos::OpenMode::WRITE_ONLY},
-			cosmos::OpenFlags{cosmos::OpenFlag::CREATE},
+			{cosmos::OpenFlag::CREATE},
 			cosmos::FileMode{cosmos::ModeT{0600}}
 		};
 

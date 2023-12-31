@@ -71,7 +71,7 @@ public:
 
 		EXPECT_EXCEPTION("open-relative-with-bad-fd-fails", f.open(cosmos::DirFD{cosmos::FileNum::INVALID}, "fstab", cosmos::OpenMode::READ_ONLY));
 
-		f.open(cosmos::AT_CWD, "new_file", cosmos::OpenMode::READ_WRITE, cosmos::OpenFlags{cosmos::OpenFlag::CREATE}, cosmos::FileMode{cosmos::ModeT{0600}});
+		f.open(cosmos::AT_CWD, "new_file", cosmos::OpenMode::READ_WRITE, {cosmos::OpenFlag::CREATE}, cosmos::FileMode{cosmos::ModeT{0600}});
 		RUN_STEP("create-at-cwd-works", f.isOpen());
 
 		cosmos::fs::unlink_file("new_file");
@@ -104,7 +104,7 @@ public:
 
 		cosmos::File sf;
 		START_STEP("writing two-part test data to tmpfile");
-		sf.open("/tmp", cosmos::OpenMode::READ_WRITE, cosmos::OpenFlags({cosmos::OpenFlag::TMPFILE}), cosmos::ModeT{0700});
+		sf.open("/tmp", cosmos::OpenMode::READ_WRITE, {cosmos::OpenFlag::TMPFILE}, cosmos::ModeT{0700});
 
 		{
 			cosmos::WriteIOVector iovec;
@@ -144,7 +144,7 @@ public:
 
 		cosmos::File sf;
 		START_STEP("Writing hosts data to tmpfile");
-		sf.open("/tmp", cosmos::OpenMode::READ_WRITE, cosmos::OpenFlags({cosmos::OpenFlag::TMPFILE}), cosmos::ModeT{0700});
+		sf.open("/tmp", cosmos::OpenMode::READ_WRITE, {cosmos::OpenFlag::TMPFILE}, cosmos::ModeT{0700});
 		sf.writeAll(m_hosts_content.data(), m_hosts_content.size());
 		sf.seekFromStart(0);
 		FINISH_STEP(true);

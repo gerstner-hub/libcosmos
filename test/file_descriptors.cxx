@@ -65,7 +65,7 @@ public:
 		cosmos::File sf{
 			".",
 				cosmos::OpenMode::WRITE_ONLY,
-				cosmos::OpenFlags{cosmos::OpenFlag::TMPFILE},
+				{cosmos::OpenFlag::TMPFILE},
 				cosmos::FileMode{cosmos::ModeT{0700}}};
 
 		auto fd = sf.fd();

@@ -60,7 +60,7 @@ public: // functions
 
 	/// \see File(const std::string_view, const OpenMode).
 	void open(const std::string_view path, const OpenMode mode) {
-		return open(path, mode, OpenFlags{OpenFlag::CLOEXEC});
+		return open(path, mode, {OpenFlag::CLOEXEC});
 	}
 
 	/// Open the given path applying the specified mode and flags.
@@ -73,7 +73,7 @@ public: // functions
 
 	/// \see open(const DirFD, const std::string_view, const OpenMode, const OpenFlags, const std::optional<FileMode>).
 	void open(const DirFD dir_fd, const std::string_view path, const OpenMode mode) {
-		open(dir_fd, path, mode, OpenFlags{OpenFlag::CLOEXEC});
+		open(dir_fd, path, mode, {OpenFlag::CLOEXEC});
 	}
 
 	/// Open the given path relative to the given directory file descriptor \c dir_fd.

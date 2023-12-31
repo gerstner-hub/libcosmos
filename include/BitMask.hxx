@@ -37,7 +37,7 @@ public: // functions
 	}
 
 	/// Sets only the flags found in the given initializer list.
-	explicit constexpr BitMask(const std::initializer_list<ENUM> &init_list) {
+	constexpr BitMask(const std::initializer_list<ENUM> &init_list) {
 		for (auto val: init_list) {
 			m_flags |= static_cast<EnumBaseType>(val);
 		}

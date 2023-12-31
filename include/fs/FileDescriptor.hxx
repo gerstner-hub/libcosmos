@@ -34,6 +34,7 @@ public: // types
 
 	/// Configurable per file-descriptors flags.
 	enum class DescFlag : int {
+		NONE    = 0,
 		CLOEXEC = FD_CLOEXEC
 	};
 
@@ -124,7 +125,7 @@ public: // functions
 
 	/// convenience wrapper around setFlags to change CLOEXEC setting
 	void setCloseOnExec(bool on_off) {
-		setFlags(on_off ? DescFlags{DescFlag::CLOEXEC} : DescFlags{0});
+		setFlags({on_off ? DescFlag::CLOEXEC : DescFlag::NONE});
 	}
 
 	/// Retrieve the file's OpenMode and current OpenFlags.

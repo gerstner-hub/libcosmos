@@ -84,7 +84,7 @@ SubProc ChildCloner::run() {
 	PidFD pidfd;
 	CloneArgs clone_args;
 	clone_args.setPidFD(pidfd);
-	clone_args.setFlags(CloneFlags{CloneFlag::CLEAR_SIGHAND, CloneFlag::PIDFD});
+	clone_args.setFlags({CloneFlag::CLEAR_SIGHAND, CloneFlag::PIDFD});
 
 	if (auto pid = proc::clone(clone_args); pid != std::nullopt) {
 		// parent process with child pid

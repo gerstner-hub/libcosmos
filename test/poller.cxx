@@ -43,7 +43,7 @@ class PollerTest :
 		poller.create();
 		cosmos::Pipe pp;
 
-		poller.addFD(pp.readEnd(), cosmos::Poller::MonitorFlags({cosmos::Poller::MonitorFlag::INPUT}));
+		poller.addFD(pp.readEnd(), {cosmos::Poller::MonitorFlag::INPUT});
 
 		auto ready = poller.wait(std::chrono::milliseconds(500));
 

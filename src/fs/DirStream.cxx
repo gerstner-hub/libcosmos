@@ -81,7 +81,7 @@ void DirStream::open(const FileNum fd) {
 
 void DirStream::open(const DirFD dir_fd, const std::string_view subpath) {
 
-	const auto flags = OpenFlags{OpenFlag::DIRECTORY};
+	const OpenFlags flags{OpenFlag::DIRECTORY};
 	auto fd = fs::open_at(dir_fd, subpath, OpenMode::READ_ONLY, flags);
 
 	// ownership is transferred to the stream
