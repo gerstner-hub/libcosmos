@@ -35,7 +35,9 @@ enum class FileNum : int {
 	STDOUT  = STDOUT_FILENO,
 	STDERR  = STDERR_FILENO,
 	/// special constant denoting the CWD in the *at family of API calls.
-	AT_CWD  = AT_FDCWD
+	AT_CWD  = AT_FDCWD,
+	/// maximum file descriptor number; useful in fs::close_range().
+	MAX_FD  = ~int(0)
 };
 
 /// A unique file number for a file on a block device.

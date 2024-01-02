@@ -39,6 +39,7 @@ class FileSystemTest :
 		testMakeTempdir();
 		testTruncate();
 		testMakeFIFO();
+		testCloseRange();
 	}
 
 	std::pair<std::filesystem::path, cosmos::TempDir> getTestDir() {
@@ -503,6 +504,20 @@ class FileSystemTest :
 		dir.close();
 
 		cosmos::fs::remove_tree(path);
+	}
+
+	void testCloseRange() {
+		START_TEST("close_range()");
+		
+		auto fd1 = cosmos::fs::open("/etc/fstab", cosmos::OpenMode::READ_ONLY, cosmos::OpenFlags{});
+		auto fd2 = cosmos::fs::open("/etc/fstab", cosmos::OpenMode::READ_ONLY, cosmos::OpenFlags{});
+
+		EVAL_STEP(fd1.raw() != fd2.raw());
+		DOES_NOT_THROW("fd1 valid", fd1.getFlags());
+		DOES_NOT_THROW("fd2 valid", fd2.getFlags());
+		cosmos::fs::close_range(fd1.raw());
+		EXPECT_EXCEPTION("fd1 now invalid", fd1.getFlags());
+		EXPECT_EXCEPTION("fd2 now invalid", fd2.getFlags());
 	}
 
 protected:

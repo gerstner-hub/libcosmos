@@ -1,5 +1,8 @@
 #pragma once
 
+// Linux
+#include <linux/close_range.h>
+
 // C++
 #include <optional>
 #include <string>
@@ -59,6 +62,38 @@ COSMOS_API FileDescriptor open_at(
 		const DirFD dir_fd, const std::string_view path,
 		const OpenMode mode, const OpenFlags flags,
 		const std::optional<FileMode> fmode = {});
+
+enum class CloseRangeFlag : unsigned int {
+	/// Instead of closing, mark all matching file descriptors as CLOEXEC
+	CLOEXEC = CLOSE_RANGE_CLOEXEC,
+	/// Unshare specified file descriptors beforce closing to avoid race conditions with other threads.
+	UNSHARE = CLOSE_RANGE_UNSHARE
+};
+
+/// Flags used in cosmos::fs::close_range().
+using CloseRangeFlags = BitMask<CloseRangeFlag>;
+
+/// Close a range of file descriptor numbers in the current process.
+/**
+ * This call closes all file descriptor numbers in the range [first, last],
+ * where last is included in the range.
+ *
+ * This is mostly useful before executing a child process to get rid of any
+ * file descriptors not marked with the close-on-exec file descriptor flag.
+ * The call is a lot more efficient then a loop in userspace calling `close()`
+ * on every single file descriptor.
+ *
+ * You can specify FileNum::MAX_FD for \c last if you want to close all file
+ * descriptors starting from a given range. This is also the default for \c
+ * last.
+ *
+ * This system call can fail on out of memory conditions or if the maximum
+ * number of file descriptors is exceeded in combination with
+ * CloseRangeFlag::UNSHARE.
+ **/
+COSMOS_API void close_range(const FileNum first,
+		const FileNum last = FileNum::MAX_FD,
+		const CloseRangeFlags flags = CloseRangeFlags{});
 
 /// Safely create a temporary file and return it's file descriptor and path.
 /**

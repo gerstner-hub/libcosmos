@@ -70,6 +70,15 @@ FileDescriptor open_at(
 	return FileDescriptor{FileNum{fd}};
 }
 
+void close_range(const FileNum first, const FileNum last, const CloseRangeFlags flags) {
+	// NOTE: close_range() uses unsigned int for file descriptor numbers,
+	// inconsistent with all other system calls. Using FileNum::MAX_FD
+	// (int) as the maximum file descriptor should still work I guess.
+	if (::close_range(to_integral(first), to_integral(last), flags.raw()) != 0) {
+		cosmos_throw (ApiError("close_range"));
+	}
+}
+
 namespace {
 
 	std::pair<std::string, int> expand_temp_path(const std::string_view _template) {
