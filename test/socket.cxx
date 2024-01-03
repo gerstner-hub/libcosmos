@@ -363,7 +363,7 @@ public:
 
 	void subCheckAbstractAddress() {
 		cosmos::UnixDatagramSocket first, second;
-		const auto addr = cosmos::UnixAddress{"somepath", cosmos::UnixAddress::AbstractAddress{true}};
+		const auto addr = cosmos::UnixAddress{"somepath", cosmos::UnixAddress::Abstract{true}};
 		first.bind(addr);
 		second.connect(addr);
 
@@ -376,7 +376,7 @@ public:
 		RUN_STEP("verify-abstract-addr-msg-matches", msg == "how about this?");
 
 		second.send("some more");
-		const auto otheraddr = cosmos::UnixAddress{"otherpath", cosmos::UnixAddress::AbstractAddress{true}};
+		const auto otheraddr = cosmos::UnixAddress{"otherpath", cosmos::UnixAddress::Abstract{true}};
 		second.bind(otheraddr);
 		auto [len2, fromaddr] = first.receiveFrom(msg.data(), msg.size());
 
@@ -389,7 +389,7 @@ public:
 	void subCheckUnixStreamConnections() {
 		cosmos::UnixStreamListenSocket listener;
 		cosmos::UnixStreamClientSocket client;
-		const auto addr = cosmos::UnixAddress{"someaddr", cosmos::UnixAddress::AbstractAddress{true}};
+		const auto addr = cosmos::UnixAddress{"someaddr", cosmos::UnixAddress::Abstract{true}};
 		listener.bind(addr);
 		listener.listen(10);
 		auto conn = client.connect(addr);
@@ -416,7 +416,7 @@ public:
 	void subCheckUnixSeqPacketConnections() {
 		cosmos::UnixSeqPacketListenSocket listener;
 		cosmos::UnixSeqPacketClientSocket client;
-		const auto addr = cosmos::UnixAddress{"someaddr", cosmos::UnixAddress::AbstractAddress{true}};
+		const auto addr = cosmos::UnixAddress{"someaddr", cosmos::UnixAddress::Abstract{true}};
 		listener.bind(addr);
 		listener.listen(10);
 		auto conn = client.connect(addr);

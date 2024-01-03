@@ -10,7 +10,6 @@
 #include "cosmos/dso_export.h"
 #include "cosmos/net/SocketAddress.hxx"
 #include "cosmos/utils.hxx"
-#include "cosmos/utils.hxx"
 
 namespace cosmos {
 
@@ -55,7 +54,7 @@ class COSMOS_API UnixAddress :
 public: // types
 
 	/// Strong boolean type to indicate the use an abstract address.
-	using AbstractAddress = NamedBool<struct abstract_address_t, false>;
+	using Abstract = NamedBool<struct abstract_address_t, false>;
 
 public: // functions
 
@@ -66,7 +65,7 @@ public: // functions
 	}
 
 	/// Creates an address from the given path which can also be abstract.
-	explicit UnixAddress(const std::string_view path, const AbstractAddress abstract = AbstractAddress{false}) :
+	explicit UnixAddress(const std::string_view path, const Abstract abstract = Abstract{false}) :
 			UnixAddress{} {
 		setPath(path, abstract);
 	}
@@ -102,7 +101,7 @@ public: // functions
 	 * embedded into \c path for the abstract case. The implementation
 	 * will take care of this transparently.
 	 **/
-	void setPath(const std::string_view path, const AbstractAddress abstract = AbstractAddress{false});
+	void setPath(const std::string_view path, const Abstract abstract = Abstract{false});
 
 	/// Returns the currently set path.
 	/**

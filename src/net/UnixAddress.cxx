@@ -4,7 +4,7 @@
 
 namespace cosmos {
 
-void UnixAddress::setPath(const std::string_view path, const AbstractAddress abstract) {
+void UnixAddress::setPath(const std::string_view path, const Abstract abstract) {
 
 	if (path.size() > maxPathLen()) {
 		cosmos_throw( RuntimeError("UNIX address path too long") );
