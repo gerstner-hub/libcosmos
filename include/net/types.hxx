@@ -4,7 +4,10 @@
 #include <array>
 
 // Linux
-#include <net/if.h>
+//#include <net/if.h>
+// LOWER_UP and higher InterfaceFlag bits are only found in the kernel
+// headers, not in net/if.h. The latter conflicts with the kernel header.
+#include <linux/if_arp.h>
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <sys/socket.h>
