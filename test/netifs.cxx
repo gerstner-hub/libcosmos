@@ -2,6 +2,7 @@
 #include <map>
 
 // cosmos
+#include "cosmos/net/InterfaceEnumerator.hxx"
 #include "cosmos/net/InterfaceAddressList.hxx"
 #include "cosmos/net/network.hxx"
 
@@ -44,6 +45,7 @@ class TestNetInterfaces :
 public:
 	void runTests() override {
 		checkAddressList();
+		checkIFEnumerator();
 	}
 
 	void subCheckAddress(const cosmos::InterfaceAddress &addr) {
@@ -126,6 +128,26 @@ public:
 			EVAL_STEP(it != list.begin());
 		}
 
+	}
+
+	void checkIFEnumerator() {
+		START_TEST("Testing interface enumeration");
+		cosmos::InterfaceEnumerator enumerator;
+		RUN_STEP("empty-enumerator-begin-equals-end", enumerator.begin() == enumerator.end());
+
+		enumerator.fetch();
+
+		RUN_STEP("filled-enumerator-being-differs-end", enumerator.begin() != enumerator.end());
+
+		for (const auto &info: enumerator) {
+			std::cout << "device name " << info.name() << " has index " << cosmos::to_integral(info.index()) << "\n";
+		}
+
+		auto it = enumerator.begin();
+		++it;
+		if (it != enumerator.end()) {
+			EVAL_STEP(it != enumerator.begin());
+		}
 	}
 };
 
