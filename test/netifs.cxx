@@ -79,12 +79,25 @@ public:
 				std::cout << " broadcast " << (addr.broadcastAsIP4()->ipAsString());
 			}
 			std::cout << "\n";
-		} else if(addr.isIP6()) {
+		} else if (addr.isIP6()) {
 			std::cout << "IPv6 addr: " << (addr.addrAsIP6())->ipAsString();
 			if (addr.hasNetmask()) {
 				std::cout << " netmask " << (addr.netmaskAsIP6())->ipAsString();
 			}
 			std::cout << "\n";
+		} else if (addr.isLinkLayer()) {
+			const auto ll = *addr.addrAsLLA();
+			std::cout << "MAC addr: ";
+			bool start = true;
+			for (const auto byte: ll.macAddress()) {
+				if (!start)
+					std::cout << ":";
+				else
+					start = false;
+				std::cout << cosmos::HexNum{static_cast<size_t>(byte), 2}.showBase(false);
+			}
+			std::cout << "\n";
+			std::cout << "Interface index: " << cosmos::to_integral(ll.ifindex()) << "\n";
 		}
 	}
 

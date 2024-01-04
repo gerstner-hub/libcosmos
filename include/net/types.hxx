@@ -51,11 +51,15 @@ enum class SocketType : int {
 /// Specific protocol to use on a socket.
 /**
  * This is usually specified as zero (DEFAULT) but some special sockets may
- * offer different options. These numbers correspond to the protocols found in
- * /etc/protocols.
+ * offer different options.
+ *
+ * For IP these numbers correspond to the protocols found in /etc/protocols.
+ *
+ * For packet sockets these numbers correspond to the ethernet 802.3 ethernet
+ * protocol ID.
  **/
 enum class SocketProtocol : int {
-	DEFAULT = 0
+	DEFAULT = 0, ///< if used on a packet socket then no packets will be received (until bind).
 };
 
 /// Additional socket settings used during socket creation.
@@ -95,12 +99,12 @@ constexpr auto MAX_NET_INTERFACE_NAME = IFNAMSIZ;
 /**
  * Linux APIs are somewhat inconsistent about the type of this. E.g. in the
  * `sockaddr_in6` structure it is an `uint32_t` while in netdevice it is an
- * int. So the signedness is unclear.
+ * `int`. So the signedness is unclear. In LinkLayerAddress it is also an `int`.
  **/
-enum class InterfaceIndex : int {};
-
-/// Interface index used to refer to an invalid value / non-existing network device.
-constexpr InterfaceIndex INVAL_IF{0};
+enum class InterfaceIndex : int {
+	INVALID = 0, /// zero is in some contexts used for invalid (non-existing) devices.
+	ANY     = 0, /// in other contexts it is interpreted as "any" device (packet sockets).
+};
 
 // TODO: integrate smart ByteOrder helper and make IPPort and IPRawAddress
 // suitable for both, so we can e.g. drop the weak uint32_t in IP4Address and
@@ -141,6 +145,11 @@ struct IP6RawAddress :
 constexpr IP6RawAddress IP6_LOOPBACK{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1};
 /// The binary IPv6 "any" address `::` specifying all possible addresses or a "don't care" address for automatic assignment, dependingo n context.
 constexpr IP6RawAddress IP6_ANY_ADDR{};
+
+/// A 48-bit ethernet 802.3 MAC address.
+struct MACAddress :
+		public std::array<uint8_t, 6> {
+};
 
 /// Flags available for the send() and recv() family of socket I/O functions.
 enum class MessageFlag : int {

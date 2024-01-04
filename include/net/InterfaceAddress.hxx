@@ -11,6 +11,7 @@
 // cosmos
 #include "cosmos/BitMask.hxx"
 #include "cosmos/net/IPAddress.hxx"
+#include "cosmos/net/LinkLayerAddress.hxx"
 #include "cosmos/net/types.hxx"
 
 
@@ -136,6 +137,11 @@ public: // functions
 		return family() == SocketFamily::INET6;
 	}
 
+	/// Returns whether the interface address is a LinkLayerAddress.
+	bool isLinkLayer() const {
+		return family() == SocketFamily::PACKET;
+	}
+
 	/// If this is an IPv4 address, return it.
 	std::optional<cosmos::IP4Address> addrAsIP4() const {
 		if (!isIP4())
@@ -150,6 +156,14 @@ public: // functions
 			return std::nullopt;
 
 		return cosmos::IP6Address{*(reinterpret_cast<sockaddr_in6*>(ifa_addr))};
+	}
+
+	/// If this is a link layer address, return it.
+	std::optional<cosmos::LinkLayerAddress> addrAsLLA() const {
+		if (!isLinkLayer())
+			return std::nullopt;
+
+		return cosmos::LinkLayerAddress{*(reinterpret_cast<sockaddr_ll*>(ifa_addr))};
 	}
 
 	/// If an IPv4 netmask is available, return it.
