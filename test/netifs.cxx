@@ -3,6 +3,7 @@
 
 // cosmos
 #include "cosmos/net/InterfaceAddressList.hxx"
+#include "cosmos/net/network.hxx"
 
 // Test
 #include "TestBase.hxx"
@@ -98,6 +99,10 @@ public:
 			}
 			std::cout << "\n";
 			std::cout << "Interface index: " << cosmos::to_integral(ll.ifindex()) << "\n";
+			const auto index = cosmos::net::nameToIndex(addr.ifname());
+			RUN_STEP("interface-index-resolve-works", index == ll.ifindex());
+			const auto name = cosmos::net::indexToName(ll.ifindex());
+			RUN_STEP("interface-name-resolve-works", name == addr.ifname());
 		}
 	}
 

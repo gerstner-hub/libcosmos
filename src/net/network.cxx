@@ -1,3 +1,6 @@
+// Linux
+#include <net/if.h>
+
 // cosmos
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/net/UnixConnection.hxx"
@@ -33,6 +36,25 @@ std::pair<UnixConnection, UnixConnection> create_seqpacket_socket_pair() {
 std::pair<UnixDatagramSocket, UnixDatagramSocket> create_dgram_socket_pair() {
 	auto [fd1, fd2] = create_socket_pair(SocketFamily::UNIX, SocketType::DGRAM);
 	return {UnixDatagramSocket{fd1}, UnixDatagramSocket{fd2}};
+}
+
+InterfaceIndex nameToIndex(const std::string_view name) {
+	const auto index = if_nametoindex(name.data()); 
+	if (index == 0) {
+		cosmos_throw(ApiError("if_nametoindex"));
+	}
+	return InterfaceIndex{static_cast<int>(index)};
+}
+
+std::string indexToName(const InterfaceIndex index) {
+	std::string ret;
+	ret.resize(IF_NAMESIZE);
+	if (!if_indextoname(to_integral(index), ret.data())) {
+		cosmos_throw(ApiError("if_indextoname"));
+	}
+
+	ret.resize(std::strlen(ret.data()));
+	return ret;
 }
 
 } // end ns
