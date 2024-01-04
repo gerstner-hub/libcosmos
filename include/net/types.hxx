@@ -127,7 +127,9 @@ constexpr uint32_t IP4_BROADCAST_ADDR{INADDR_BROADCAST};
  * integer type any more but represents a sequence of bytes, there is no need
  * to consider host and network byte order anymore.
  **/
-using IP6RawAddress = std::array<unsigned char, 16>;
+struct IP6RawAddress :
+		public std::array<uint8_t, 16> {
+};
 
 /*
  * NOTE: there exist preprocessor defines for these IN6ADDR_ANY_INIT and
