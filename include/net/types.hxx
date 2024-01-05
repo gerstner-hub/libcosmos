@@ -42,6 +42,7 @@ enum class SocketFamily : int {
  * guarantees that the network communication using this socket will offer.
  **/
 enum class SocketType : int {
+	ANY       = 0,                ///< can be used in AddressHints to return any socket types.
 	STREAM    = SOCK_STREAM,      ///< connection oriented, reliable, in-order, but no record boundaries.
 	DGRAM     = SOCK_DGRAM,       ///< connection-less, unreliable, unordered with length limitation, keeps message boundaries.
 	RAW       = SOCK_RAW,         ///< raw packets as seen on network device level.

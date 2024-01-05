@@ -12,6 +12,13 @@
 
 namespace cosmos {
 
+/* netdb.h contains a preprocessor define for this it is part of the
+ * deprecated gethost* API (`man h_errno`). This conflicts with
+ * Errno::NO_DATA. Undefine it. */
+#ifdef NO_DATA
+#	undef NO_DATA
+#endif
+
 /// Strong enum type representing errno error constants.
 enum class Errno : int { // errnos are distinct positive `int` values says `man errno.h`
 	NO_ERROR              = 0,
@@ -98,6 +105,8 @@ enum class Errno : int { // errnos are distinct positive `int` values says `man 
 inline Errno get_errno() { return Errno{errno}; }
 /// Resets the currently set errno to indicate no error.
 inline void reset_errno() { errno = static_cast<int>(Errno::NO_ERROR); }
+/// Explicitly set a new errno value.
+inline void set_errno(const Errno err) { errno = static_cast<int>(err); }
 /// Checks whether currently an errno is set.
 inline bool is_errno_set() { return get_errno() != Errno::NO_ERROR; }
 
