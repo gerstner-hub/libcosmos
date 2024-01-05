@@ -278,6 +278,7 @@ def initSCons(project, rtti=True):
         sanitizers = ["address", "return", "undefined", "leak"]
         sanitizers = ["-fsanitize={}".format(f) for f in sanitizers]
         env.Append(CXXFLAGS = sanitizers)
+        env.Append(LINKFLAGS = sanitizers)
         env.Append(LIBS = ["asan", "ubsan"])
 
     if evalBool(ARGUMENTS.get('debug', "0")):
