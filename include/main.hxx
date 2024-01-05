@@ -86,7 +86,12 @@ int main(const int argc, const char **argv) {
 						std::string_view{argv[0]},
 						StringViewVector{argv+1, argv+argc});
 			} else {
-				static_assert(false, "MAIN type does not implement a main function interface");
+				// we cannot use `false` here, because if the
+				// condition does not depend on the template
+				// parameter then it will still be evaluated,
+				// even if the else branch doesn't match
+				// during compile time!
+				static_assert(sizeof(MAIN) == 0, "MAIN type does not implement a main function interface");
 			}
 
 			return to_integral(status);
