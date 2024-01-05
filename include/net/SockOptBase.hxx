@@ -60,4 +60,10 @@ protected: // data
 	FileDescriptor m_sock; ///< The socket file descriptor to operate on.
 };
 
+extern template class COSMOS_API SockOptBase<OptLevel::SOCKET>;
+extern template class COSMOS_API SockOptBase<OptLevel::IP>;
+extern template class COSMOS_API SockOptBase<OptLevel::IPV6>;
+extern template class COSMOS_API SockOptBase<OptLevel::TCP>;
+extern template class COSMOS_API SockOptBase<OptLevel::UDP>;
+
 }; // end ns
