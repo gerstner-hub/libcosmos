@@ -30,6 +30,7 @@ public:
 
 		// should do nothing
 		dir.close();
+		RUN_STEP("begin-end-equal", begin(dir) == end(dir));
 
 		EXPECT_EXCEPTION("throw-if-no-fd", dir.fd());
 
@@ -54,6 +55,18 @@ public:
 		}
 
 		auto startpos = dir.tell();
+
+		RUN_STEP("begin-end-differ", begin(dir) != end(dir));
+		RUN_STEP("begin-begin-equal", begin(dir) == begin(dir));
+
+		{
+			auto it = begin(dir);
+			++it;
+			if (it != end(dir)) {
+				RUN_STEP("two-valid-its-differ", it != begin(dir));
+			}
+		}
+
 		std::string first_name;
 
 		using EntryType = cosmos::DirEntry::Type;
@@ -70,7 +83,9 @@ public:
 		};
 
 		START_STEP("Evaluating dir entries");
+		size_t num_entries = 0;
 		for (auto entry: dir) {
+			num_entries++;
 			auto it = TYPE_MAP.find(entry.type());
 			EVAL_STEP(it != TYPE_MAP.end());
 
@@ -95,6 +110,16 @@ public:
 			EVAL_STEP(sname.size() == entry.view().size());
 		}
 		FINISH_STEP(true);
+
+		{
+			size_t num_entries2 = 0;
+			for (auto entry: dir) {
+				(void)entry;
+				num_entries2++;
+			}
+
+			EVAL_STEP(num_entries == num_entries2);
+		}
 
 		dir.seek(startpos);
 		std::optional<cosmos::DirEntry> entry;

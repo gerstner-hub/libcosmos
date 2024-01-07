@@ -19,15 +19,18 @@ public: // functions
 			m_entry = dir.nextEntry();
 	}
 
-	bool operator!=(const DirIterator &other) const {
-		// this only needs to report true for the `begin() != end()`
-		// comparison so ignore the content
-		if (m_entry || other.m_entry) {
+	bool operator==(const DirIterator &other) const {
+		if (m_entry.has_value() != other.m_entry.has_value())
+			return false;
+		else if (!m_entry.has_value())
+			// both are at the end
 			return true;
-		}
 
-		// both unassigned so we're at the end
-		return false;
+		return m_entry->inode() == other.m_entry->inode();
+	}
+
+	bool operator!=(const DirIterator &other) const {
+		return !(*this == other);
 	}
 
 	auto& operator++() {
@@ -44,12 +47,27 @@ protected: // data
 	std::optional<DirEntry> m_entry;
 };
 
-inline DirIterator begin(DirStream &dir) {
-	return DirIterator{dir, false};
-}
-
 inline DirIterator end(DirStream &dir) {
 	return DirIterator{dir, true};
+}
+
+/// Get a begin iterator for the given DirStream.
+/**
+ * \warning Due to the nature of the DirStream (the internal data is kept in
+ * the C library), this begin() function modifies the state of the underlying
+ * DirStream object and thus has side effects.
+ *
+ * This iterator type is only intended for forward iteration over the
+ * DirStream with no other iterators being around in parallel.
+ **/
+inline DirIterator begin(DirStream &dir) {
+	if (!dir.isOpen())
+		return end(dir);
+
+	// make sure we really start from the beginning.
+	dir.rewind();
+
+	return DirIterator{dir, false};
 }
 
 } // end ns

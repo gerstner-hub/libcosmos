@@ -132,6 +132,11 @@ public: // functions
 		::seekdir(m_stream, to_integral(pos));
 	}
 
+	/// Rewind the directory stream to the beginning.
+	void rewind() {
+		::rewinddir(m_stream);
+	}
+
 	/// Returns the next entry in the associated directory.
 	/**
 	 * Calls to this function are only allowed if isOpen() returns \c
