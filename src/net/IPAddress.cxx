@@ -3,6 +3,7 @@
 
 // Cosmos
 #include "cosmos/error/ApiError.hxx"
+#include "cosmos/error/ResolveError.hxx"
 #include "cosmos/error/RuntimeError.hxx"
 #include "cosmos/net/IPAddress.hxx"
 
@@ -49,6 +50,55 @@ void IPAddressBase::setIpFromString(const std::string_view sv) {
 		cosmos_throw (ApiError("inet_pton"));
 	} else if (res == 0) {
 		cosmos_throw (RuntimeError("inet_pton: bad IP address string"));
+	}
+}
+
+void IPAddressBase::getNameInfo(std::string &host, std::string &service, const NameInfoFlags flags) {
+	getNameInfo(&host, &service, flags);
+}
+
+std::string IPAddressBase::getHostInfo(const NameInfoFlags flags) {
+	std::string ret;
+
+	getNameInfo(&ret, nullptr, flags);
+
+	return ret;
+}
+
+std::string IPAddressBase::getServiceInfo(const NameInfoFlags flags) {
+	std::string ret;
+
+	getNameInfo(nullptr, &ret, flags);
+
+	return ret;
+}
+
+void IPAddressBase::getNameInfo(std::string *host, std::string *service, const NameInfoFlags flags) {
+
+	if (host) {
+		host->resize(MAX_HOSTNAME);
+	}
+
+	if (service) {
+		service->resize(MAX_SERVICE);
+	}
+
+	const auto res = ::getnameinfo(
+			this->basePtr(), this->size(),
+			host    ? host->data()    : nullptr, host    ? host->size()    : 0,
+			service ? service->data() : nullptr, service ? service->size() : 0,
+			flags.raw());
+
+	if (res != 0) {
+		cosmos_throw (ResolveError(ResolveError::Code{res}));
+	}
+
+	if (host) {
+		host->resize(std::strlen(host->c_str()));
+	}
+
+	if (service) {
+		service->resize(std::strlen(service->c_str()));
 	}
 }
 

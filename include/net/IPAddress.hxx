@@ -1,14 +1,18 @@
 #pragma once
 
+// Linux
+#include <netdb.h>
+
 // C++
 #include <cstring>
 #include <string>
 #include <string_view>
 
 // cosmos
+#include "cosmos/BitMask.hxx"
 #include "cosmos/dso_export.h"
-#include "cosmos/net/SocketAddress.hxx"
 #include "cosmos/net/byte_order.hxx"
+#include "cosmos/net/SocketAddress.hxx"
 #include "cosmos/utils.hxx"
 
 namespace cosmos {
@@ -20,6 +24,31 @@ namespace cosmos {
  **/
 class COSMOS_API IPAddressBase :
 		public SocketAddress {
+public: // types
+
+	/// Flags used with the getNameInfo() function.
+	enum class NameInfoFlag : int {
+		/// Return an error if a hostname cannot be determined (instead of returning a numerical string address).
+		NAME_REQUIRED    = NI_NAMEREQD,
+		/// Use UDP context instead of TCP (this will return different service names for a few ports).
+		DGRAM            = NI_DGRAM,
+		/// Return only the hostname part of the FQDN for local hosts.
+		NO_FQDN          = NI_NOFQDN,
+		/// Return the numeric form of the hostname.
+		NUMERIC_HOST     = NI_NUMERICHOST,
+		/// Return the numeric form of the service (if unset this can still happen if the service's name cannot be determined).
+		NUMERIC_SERVICE  = NI_NUMERICSERV,
+		/// If necessary convert the resulting hostname from IDN format to the current locale.
+		IDN              = NI_IDN,
+#if 0 /* these are declared as deprecated */
+		IDN_ALLOW_UNASSIGNED = NI_IDN_ALLOW_UNASSIGNED,
+		IDN_USE_STD3_ASCII_RULES = NI_IDN_USE_STD3_ASCII_RULES,
+#endif
+	};
+
+	/// Collection of NameInfoFlag used with the getNameInfo() function.
+	using NameInfoFlags = BitMask<NameInfoFlag>;
+
 public: // functions
 
 	bool isV4() const { return this->family() == SocketFamily::INET; }
@@ -29,11 +58,42 @@ public: // functions
 	std::string ipAsString() const;
 	/// Sets the binary IP address from the given string.
 	void setIpFromString(const std::string_view sv);
+
+	/// Reverse resolve the binary IP address and port into DNS and service names.
+	/**
+	 * \c host and \c service will be filled with the textual
+	 * representation of the currently stored binary IP address and port
+	 * number. The given flags influence the behaviour of this reverse
+	 * lookup.
+	 *
+	 * On error conditions a cosmos::ResolveError is thrown.
+	 **/
+	void getNameInfo(std::string &host, std::string &service, const NameInfoFlags flags = {});
+
+	/// Reverse resolve only the IP address portion into a DNS name and return it.
+	/**
+	 * This does the same as getNameInfo() but only reverse resolves the
+	 * hostname, not the service.
+	 *
+	 * \see getNameInfo()
+	 **/
+	std::string getHostInfo(const NameInfoFlags flags = {});
+
+	/// Reverse resolve only the port portion into a service name and return it.
+	/**
+	 * This does the same as getNameInfo() but only reverse resolves the
+	 * port, not the hostname.
+	 **/
+	std::string getServiceInfo(const NameInfoFlags flags = {});
+
 protected: // functions
+
 	/// returns a pointer to the in_addr or in6_addr.
 	void* ipAddrPtr();
 	/// returns a pointer to the in_addr or in6_addr.
 	const void* ipAddrPtr() const;
+
+	void getNameInfo(std::string *host, std::string *service, const NameInfoFlags flags);
 };
 
 /// A 32-bit IPv4 address and 16 bit port number for use with SocketFamily::INET sockets.

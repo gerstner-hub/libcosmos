@@ -50,7 +50,9 @@ public: // types
 		/// The requested SocketType is not supported.
 		SOCKTYPE    = EAI_SOCKTYPE,
 		/// Other system error, check Errno from systemError().
-		SYSTEM      = EAI_SYSTEM
+		SYSTEM      = EAI_SYSTEM,
+		/// The buffer pointed to by host or serv was too small (only used in IPAddress::getNameInfo()).
+		OVERFLOW    = EAI_OVERFLOW,
 	};
 
 public: // functions

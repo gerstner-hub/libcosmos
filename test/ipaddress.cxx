@@ -15,6 +15,7 @@ public:
 		checkBasics();
 		checkIpConversion();
 		checkPort();
+		checkNameInfo();
 	}
 
 	void checkBasics() {
@@ -56,6 +57,30 @@ public:
 		RUN_STEP("ip4 host port in net order", ip4.portNet() == cosmos::IPPort{256});
 		ip4.setPortNet(cosmos::IPPort{1});
 		RUN_STEP("ip4 host port in net order", ip4.portHost() == 256);
+	}
+
+	void checkNameInfo() {
+		START_TEST("getnameinfo test");
+		cosmos::IP4Address ip4;
+		ip4.setAddrHost(cosmos::IP4_LOOPBACK_ADDR);
+		ip4.setPortHost(22);
+
+		std::string host, service;
+		ip4.getNameInfo(host, service);
+
+		RUN_STEP("IP4_LOOPBACK_ADDR == localhost", host == "localhost");
+		RUN_STEP("Port 22 == \"ssh\"", service == "ssh");
+
+		EVAL_STEP(ip4.getHostInfo() == "localhost");
+		EVAL_STEP(ip4.getServiceInfo() == "ssh");
+
+		using NameInfoFlag = cosmos::IP4Address::NameInfoFlag;
+		RUN_STEP("NameInfoFlag::NUMERIC_HOST", ip4.getHostInfo({NameInfoFlag::NUMERIC_HOST}) == "127.0.0.1");
+		RUN_STEP("NameInfoFlag::NUMERIC_SERV", ip4.getServiceInfo({NameInfoFlag::NUMERIC_SERVICE}) == "22");
+
+		ip4.setIpFromString("123.124.125.126");
+		RUN_STEP("unknown-host-becomes-numeric", ip4.getHostInfo() == "123.124.125.126");
+		EXPECT_EXCEPTION("NameInfoFlag::NAME_REQUIRED", ip4.getHostInfo({NameInfoFlag::NAME_REQUIRED}));
 	}
 };
 

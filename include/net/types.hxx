@@ -9,6 +9,7 @@
 // headers, not in net/if.h. The latter conflicts with the kernel header, if
 // pulled in in the wrong order.
 #include <linux/if_arp.h>
+#include <netdb.h>
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <sys/socket.h>
@@ -95,7 +96,12 @@ enum class OptLevel : int {
 enum class OptName : int {};
 
 /// Maximum length of a network device name in bytes.
-constexpr auto MAX_NET_INTERFACE_NAME = IFNAMSIZ;
+constexpr size_t MAX_NET_INTERFACE_NAME = IFNAMSIZ;
+
+/// Maximum length of a DNS hostname.
+constexpr size_t MAX_HOSTNAME = NI_MAXHOST;
+/// Maximum length of a port service name (from /etc/services).
+constexpr size_t MAX_SERVICE = NI_MAXSERV;
 
 /// A network device interface index.
 /**
