@@ -251,9 +251,10 @@ public: // functions
 
 	int run(int argc, const char **argv) {
 		setArgv(argc, argv);
+		int ret = 0;
 		try {
 			runTests();
-			auto ret = finishTest();
+			ret = finishTest();
 
 			// only run file leak checks if all tests succeeded
 			// and if not on valgrind; valgrind uses various file
@@ -262,12 +263,20 @@ public: // functions
 			if (ret == 0 && !onValgrind() && !verifyNoFileLeaks()) {
 				ret = 1;
 			}
-
-			return ret;
 		} catch (const std::exception &ex) {
 			std::cerr << "test failed: " << ex.what() << std::endl;
-			return 1;
+			ret = 1;
 		}
+
+		if (ret != 0) {
+			// explicitly exit this way to avoid potential
+			// ignoring of the exit code, since the main()
+			// function implicitly returns 0, if there's not
+			// explicit return.
+			cosmos::proc::exit(cosmos::ExitStatus{ret});
+		}
+
+		return ret;
 	}
 
 	void runOrThrow(int argc, const char **argv) {
