@@ -86,5 +86,5 @@ public:
 
 int main(const int argc, const char **argv) {
 	TestIPAddress test;
-	test.run(argc, argv);
+	return test.run(argc, argv);
 }

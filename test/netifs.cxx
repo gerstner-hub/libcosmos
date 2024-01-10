@@ -153,5 +153,5 @@ public:
 
 int main(const int argc, const char **argv) {
 	TestNetInterfaces test;
-	test.run(argc, argv);
+	return test.run(argc, argv);
 }
