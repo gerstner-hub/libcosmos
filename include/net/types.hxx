@@ -16,6 +16,7 @@
 
 // cosmos
 #include "cosmos/BitMask.hxx"
+#include "cosmos/net/byte_order.hxx"
 
 namespace cosmos {
 
@@ -114,24 +115,22 @@ enum class InterfaceIndex : int {
 	ANY     = 0, /// in other contexts it is interpreted as "any" device (packet sockets).
 };
 
-// TODO: integrate smart ByteOrder helper and make IPPort and IPRawAddress
-// suitable for both, so we can e.g. drop the weak uint32_t in IP4Address and
-// make the interface simpler.
-
 /// A 16-bit IP port in network byte order.
-enum class IPPort : in_port_t {
+class IPPort : public net::NetInt16 {
+	using net::NetInt16::EndianNumber;
 };
 
 /// A 32-bit IPv4 binary address in network byte order.
-enum class IP4RawAddress : uint32_t {
+class IP4RawAddress : public net::NetInt32 {
+	using net::NetInt32::EndianNumber;
 };
 
 /// The loopback IPv4 address refering to the localhost.
-constexpr uint32_t IP4_LOOPBACK_ADDR{INADDR_LOOPBACK};
+constexpr net::HostInt32 IP4_LOOPBACK_ADDR{INADDR_LOOPBACK};
 /// The any IPv4 address specifying all possible addresses or a "don't care" address for automatic assignment, depending on context.
-constexpr uint32_t IP4_ANY_ADDR{INADDR_ANY};
+constexpr net::HostInt32 IP4_ANY_ADDR{INADDR_ANY};
 /// The IPv4 broadcast address to reach all hosts in the neighborhood.
-constexpr uint32_t IP4_BROADCAST_ADDR{INADDR_BROADCAST};
+constexpr net::HostInt32 IP4_BROADCAST_ADDR{INADDR_BROADCAST};
 
 /// A 128-bit IPv6 address
 /**

@@ -51,7 +51,7 @@ public:
 			RUN_STEP("result-addr-is-ipv6", address.isV6());
 			RUN_STEP("result-addr-is--not-ipv4", !address.isV4());
 			RUN_STEP("result-type-is-stream", address.type() == cosmos::SocketType::STREAM);
-			RUN_STEP("result-port-matches", address.asIP6().value().portHost() == 22);
+			RUN_STEP("result-port-matches", address.asIP6().value().port() == 22);
 		}
 
 		al.clear();
@@ -65,7 +65,7 @@ public:
 		for (auto &address: al) {
 			RUN_STEP("result-addr-is-ipv4", address.isV4());
 			RUN_STEP("result-type-is-dgram", address.type() == cosmos::SocketType::DGRAM);
-			RUN_STEP("result-port-matches", address.asIP4().value().portHost() == 80);
+			RUN_STEP("result-port-matches", address.asIP4().value().port() == 80);
 		}
 
 		auto flags = hints.flags();
@@ -100,10 +100,10 @@ public:
 			for (auto &info: al) {
 				if (info.isV4()) {
 					auto addr = info.asIP4().value();
-					std::cout << "- " << addr.ipAsString() << ":" << addr.portHost() << "\n";
+					std::cout << "- " << addr.ipAsString() << ":" << addr.port() << "\n";
 				} else {
 					auto addr = info.asIP6().value();
-					std::cout << "- " << addr.ipAsString() << ":" << addr.portHost() << "\n";
+					std::cout << "- " << addr.ipAsString() << ":" << addr.port() << "\n";
 				}
 
 				std::cout << "canonical name: " << info.canonName() << "\n";

@@ -109,22 +109,16 @@ public: // functions
 		m_addr = raw;
 	}
 
-	explicit IP4Address(const IP4RawAddress addr, IPPort port = IPPort{0}) {
+	explicit IP4Address(const IP4RawAddress addr, const IPPort port = IPPort{0}) {
 		setFamily();
-		setAddrNet(addr);
-		setPortNet(port);
+		setAddr(addr);
+		setPort(port);
 	}
 
-	explicit IP4Address(const uint32_t addr, const uint16_t port = 0) {
-		setFamily();
-		setAddrHost(addr);
-		setPortHost(port);
-	}
-
-	explicit IP4Address(const std::string_view ip, const uint16_t port_host = 0) {
+	explicit IP4Address(const std::string_view ip, const IPPort port = IPPort{0}) {
 		setFamily();
 		setIpFromString(ip);
-		setPortHost(port_host);
+		setPort(port);
 	}
 
 	SocketFamily family() const override {
@@ -135,20 +129,14 @@ public: // functions
 		return sizeof(m_addr);
 	}
 
-	IPPort portNet() const { return IPPort{m_addr.sin_port}; }
-	void setPortNet(const IPPort port) { m_addr.sin_port = to_integral(port); }
+	net::NetInt16 port() const { return net::NetInt16{net::RawNetInt16{m_addr.sin_port}}; }
+	void setPort(const net::NetInt16 port) { m_addr.sin_port = to_integral(port.raw()); }
 
-	uint16_t portHost() const { return net::to_host_order(m_addr.sin_port); }
-	void setPortHost(const uint16_t port) { m_addr.sin_port = net::to_network_order(port); }
-
-	IP4RawAddress addrNet() const { return IP4RawAddress{m_addr.sin_addr.s_addr}; }
-	void setAddrNet(const IP4RawAddress addr) { m_addr.sin_addr.s_addr = to_integral(addr); }
-
-	uint32_t addrHost() const { return net::to_host_order(m_addr.sin_addr.s_addr); }
-	void setAddrHost(const uint32_t addr) { m_addr.sin_addr.s_addr = net::to_network_order(addr); }
+	IP4RawAddress addr() const { return IP4RawAddress{net::RawNetInt32{m_addr.sin_addr.s_addr}}; }
+	void setAddr(const IP4RawAddress addr) { m_addr.sin_addr.s_addr = to_integral(addr.raw()); }
 
 	bool operator==(const IP4Address &other) const {
-		return addrNet() == other.addrNet() && portNet() == other.portNet();
+		return addr() == other.addr() && port() == other.port();
 	}
 
 	bool operator!=(const IP4Address &other) const {
@@ -190,7 +178,7 @@ public: // functions
 	explicit IP6Address(const IP6RawAddress &addr, const IPPort port = IPPort{0}) {
 		clear();
 		setAddr(addr);
-		setPortNet(port);
+		setPort(port);
 	}
 
 	SocketFamily family() const override {
@@ -201,11 +189,8 @@ public: // functions
 		return sizeof(m_addr);
 	}
 
-	IPPort portNet() const { return IPPort{m_addr.sin6_port}; }
-	void setPortNet(const IPPort port) { m_addr.sin6_port = to_integral(port); }
-
-	uint16_t portHost() const { return net::to_host_order(m_addr.sin6_port); }
-	void setPortHost(const uint16_t port) { m_addr.sin6_port = net::to_network_order(port); }
+	IPPort port() const { return IPPort{net::RawNetInt16{m_addr.sin6_port}}; }
+	void setPort(const IPPort port) { m_addr.sin6_port = to_integral(port.raw()); }
 
 	IP6RawAddress addr() const {
 		IP6RawAddress ret;
@@ -253,7 +238,7 @@ public: // functions
 		const auto cmp_res = std::memcmp(m_addr.sin6_addr.s6_addr,
 				other.m_addr.sin6_addr.s6_addr,
 				sizeof(m_addr.sin6_addr.s6_addr));
-		return cmp_res == 0 && portNet() == other.portNet();
+		return cmp_res == 0 && port() == other.port();
 	}
 
 	bool operator!=(const IP6Address &other) const {

@@ -34,11 +34,11 @@ public:
 	void checkIpConversion() {
 		START_TEST("IP conversion tests");
 		cosmos::IP4Address ip4;
-		ip4.setAddrHost(cosmos::IP4_LOOPBACK_ADDR);
+		ip4.setAddr(cosmos::IP4_LOOPBACK_ADDR);
 		RUN_STEP("loopback == 127.0.0.1", ip4.ipAsString() == "127.0.0.1");
 		ip4 = cosmos::IP4Address{};
 		ip4.setIpFromString("127.0.0.1");
-		RUN_STEP("127.0.0.1 == loopback", ip4.addrHost() == cosmos::IP4_LOOPBACK_ADDR);
+		RUN_STEP("127.0.0.1 == loopback", ip4.addr() == cosmos::IP4_LOOPBACK_ADDR);
 
 		cosmos::IP6Address ip6;
 		ip6.setAddr(cosmos::IP6RawAddress{0x05, 0x05, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x10, 0x10});
@@ -53,17 +53,17 @@ public:
 	void checkPort() {
 		START_TEST("port setter/getter test");
 		cosmos::IP4Address ip4;
-		ip4.setPortHost(1);
-		RUN_STEP("ip4 host port in net order", ip4.portNet() == cosmos::IPPort{256});
-		ip4.setPortNet(cosmos::IPPort{1});
-		RUN_STEP("ip4 host port in net order", ip4.portHost() == 256);
+		ip4.setPort(1);
+		RUN_STEP("ip4 host port in net order", ip4.port() == cosmos::IPPort{1});
+		ip4.setPort(256);
+		RUN_STEP("ip4 host port in net order", ip4.port() == 256);
 	}
 
 	void checkNameInfo() {
 		START_TEST("getnameinfo test");
 		cosmos::IP4Address ip4;
-		ip4.setAddrHost(cosmos::IP4_LOOPBACK_ADDR);
-		ip4.setPortHost(22);
+		ip4.setAddr(cosmos::IP4_LOOPBACK_ADDR);
+		ip4.setPort(22);
 
 		std::string host, service;
 		ip4.getNameInfo(host, service);

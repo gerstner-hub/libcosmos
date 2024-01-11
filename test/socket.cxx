@@ -288,7 +288,7 @@ public:
 		cosmos::IP4Address peer;
 		auto conn = listener.accept(&peer);
 		DOES_NOT_THROW("accepting-client", conn.isOpen());
-		std::cout << "client connected from " << peer.ipAsString() << ":" << peer.portHost() << "\n";
+		std::cout << "client connected from " << peer.ipAsString() << ":" << peer.port() << "\n";
 
 		conn.writeAll(server_msg);
 
