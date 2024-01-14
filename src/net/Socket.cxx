@@ -99,7 +99,7 @@ Socket::receiveFrom(void *buf, size_t length, SocketAddress &addr, const Message
 
 	const AddressFilledIn filled_in{addrlen != 0};
 
-	// what happens when no sender's address is available addrlen will be zero.
+	// when no sender's address is available addrlen will be zero.
 	if (filled_in) {
 		addr.update(addrlen);
 	}

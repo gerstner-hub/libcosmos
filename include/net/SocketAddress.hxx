@@ -39,7 +39,7 @@ public: // functions
 	/// Returns the size of the socket address in bytes found at basePtr().
 	/**
 	 * This returns the number of bytes currently used in the socket
-	 * address. Some implementation may have dynamic sizes in which case
+	 * address. Some implementations may have dynamic sizes in which case
 	 * this can differ from maxSize().
 	 **/
 	virtual size_t size() const = 0;

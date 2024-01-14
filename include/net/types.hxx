@@ -18,6 +18,12 @@
 #include "cosmos/BitMask.hxx"
 #include "cosmos/net/byte_order.hxx"
 
+/**
+ * @file
+ *
+ * Basic types used in networking APIs.
+ **/
+
 namespace cosmos {
 
 /// A socket's family setting.
@@ -213,7 +219,7 @@ enum class MessageFlag : int {
 	 * caller.
 	 **/
 	TRUNCATE = MSG_TRUNC,
-	/// In recvmsg() `msg_flags` this indicates that some control data was discarded due to lack of space in the ancilliary data buffer.
+	/// In recvmsg() `msg_flags` this indicates that some control data was discarded due to lack of space in the ancillary data buffer.
 	CTL_WAS_TRUNCATED = MSG_CTRUNC,
 	/// Block on receiving until all requested data has been received.
 	/**
