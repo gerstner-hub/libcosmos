@@ -12,9 +12,9 @@ namespace cosmos::net {
 namespace {
 	using cosmos::to_integral;
 	std::pair<FileDescriptor, FileDescriptor> create_socket_pair(const SocketFamily family,
-			const SocketType type, const SocketProtocol protocol = SocketProtocol{0}) {
+			const SocketType type, const SocketFlags flags, const SocketProtocol protocol = SocketProtocol{0}) {
 		int fds[2];
-		const auto res = ::socketpair(to_integral(family), to_integral(type), to_integral(protocol), fds);
+		const auto res = ::socketpair(to_integral(family), to_integral(type) | flags.raw(), to_integral(protocol), fds);
 		if (res != 0) {
 			cosmos_throw(ApiError("socketpair"));
 		}
@@ -23,18 +23,18 @@ namespace {
 	}
 }
 
-std::pair<UnixConnection, UnixConnection> create_stream_socket_pair() {
-	auto [fd1, fd2] = create_socket_pair(SocketFamily::UNIX, SocketType::STREAM);
+std::pair<UnixConnection, UnixConnection> create_stream_socket_pair(const SocketFlags flags) {
+	auto [fd1, fd2] = create_socket_pair(SocketFamily::UNIX, SocketType::STREAM, flags);
 	return {UnixConnection{fd1}, UnixConnection{fd2}};
 }
 
-std::pair<UnixConnection, UnixConnection> create_seqpacket_socket_pair() {
-	auto [fd1, fd2] = create_socket_pair(SocketFamily::UNIX, SocketType::SEQPACKET);
+std::pair<UnixConnection, UnixConnection> create_seqpacket_socket_pair(const SocketFlags flags) {
+	auto [fd1, fd2] = create_socket_pair(SocketFamily::UNIX, SocketType::SEQPACKET, flags);
 	return {UnixConnection{fd1}, UnixConnection{fd2}};
 }
 
-std::pair<UnixDatagramSocket, UnixDatagramSocket> create_dgram_socket_pair() {
-	auto [fd1, fd2] = create_socket_pair(SocketFamily::UNIX, SocketType::DGRAM);
+std::pair<UnixDatagramSocket, UnixDatagramSocket> create_dgram_socket_pair(const SocketFlags flags) {
+	auto [fd1, fd2] = create_socket_pair(SocketFamily::UNIX, SocketType::DGRAM, flags);
 	return {UnixDatagramSocket{fd1}, UnixDatagramSocket{fd2}};
 }
 
