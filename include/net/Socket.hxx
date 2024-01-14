@@ -13,6 +13,8 @@
 namespace cosmos {
 
 class SocketAddress;
+class SendMessageHeader;
+class ReceiveMessageHeader;
 
 /// Base class for Socket types with ownership of a FileDescriptor.
 /**
@@ -171,6 +173,29 @@ protected: // functions
 		return sendTo(data.data(), data.size(), addr, flags);
 	}
 
+	/// Sends a message over the socket using extended SendMessageHeader data.
+	/**
+	 * This variant of the send family of functions allows the following
+	 * advanced features compared to sendTo():
+	 *
+	 * - sending data from multiple scatter/gather memory locations using
+	 *   the WriteIOVector `iovec` member of `header`.
+	 * - passing additional ancillary data using the `control_msg` member
+	 *   of `header`.
+	 *
+	 * If \c addr is passed then this specific target address is used for
+	 * sending the data.
+	 *
+	 * The amount of sent data is reflected in an updated `iovec` member
+	 * of the `header` parameter. Partial sends are possible. If a
+	 * `control_msg` is set in `header` and at least one succesful (even
+	 * partial) sendMessage() call was performed, then the control message
+	 * will have been processed completely. The `control_msg` member will
+	 * be reset automaically in this case to avoid it being sent multiple
+	 * times without intent.
+	 **/
+	void sendMessage(SendMessageHeader &header, const SocketAddress* addr = nullptr);
+
 	/// Receive data from the socket, using specific receive flags.
 	/**
 	 * This is like a regular read() call but allows to specify socket
@@ -192,6 +217,31 @@ protected: // functions
 	std::pair<size_t, AddressFilledIn> receiveFrom(
 			void *buf, size_t length, SocketAddress &addr,
 			const MessageFlags flags = MessageFlags{});
+
+	/// Receives a message from the socket using extended ReceiveMessageHeader data.
+	/**
+	 * This variant of the receive family of functions allows the
+	 * following advanced features compared to recvFrom():
+	 *
+	 * - receiving data into multiple scatter/gather memory locations
+	 *   using the ReadIOVector `iovec` member of `header`.
+	 * - reception of additional ancillary data using
+	 *   ReceiveMessageHeader::setControlBufferSize().
+	 *
+	 * If \c addr is passed then the source address of the message is
+	 * placed in this SocketAddress structure, if one is available.
+	 * Whether it was filled in is indicated by the return value.
+	 *
+	 * The amount of received data is reflected in an updated `iovec`
+	 * member of the `header` parameter. Partial receives are possible. If
+	 * the control message buffer is setup in `header` then you need to
+	 * check for received ancillary messages using the iterator interface
+	 * of `header`. Control messages can have side effects when using them
+	 * on UNIX domain sockets (file descriptors being allocated in the
+	 * receiving process). Therefore accepting ancillary messages should
+	 * not be taken lightly.
+	 **/
+	AddressFilledIn receiveMessage(ReceiveMessageHeader &header, SocketAddress *addr = nullptr);
 };
 
 } // end ns

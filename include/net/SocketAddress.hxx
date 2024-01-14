@@ -31,6 +31,8 @@ namespace cosmos {
  **/
 class COSMOS_API SocketAddress {
 	friend class Socket;
+	friend class SendMessageHeader;
+	friend class ReceiveMessageHeader;
 public: // functions
 
 	//// Returns the concrete SocketFamily for the implementation address type.

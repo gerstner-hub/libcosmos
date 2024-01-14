@@ -253,4 +253,13 @@ enum class MessageFlag : int {
 
 using MessageFlags = BitMask<MessageFlag>;
 
+// hint: the SCM prefix stands for socket-level control message
+
+/// Ancillary message types available for UNIX domain sockets.
+enum class UnixMessage : int {
+	RIGHTS = SCM_RIGHTS, ///< file descriptor passing.
+	CREDENTIALS = SCM_CREDENTIALS
+	//SECURITY = SCM_SECURITY // the define for this seems to be missing?
+};
+
 } // end ns

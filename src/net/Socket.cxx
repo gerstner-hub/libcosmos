@@ -1,8 +1,9 @@
 // cosmos
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/error/RuntimeError.hxx"
-#include "cosmos/net/Socket.hxx"
+#include "cosmos/net/message_header.hxx"
 #include "cosmos/net/SocketAddress.hxx"
+#include "cosmos/net/Socket.hxx"
 #include "cosmos/utils.hxx"
 
 namespace cosmos {
@@ -120,6 +121,51 @@ void Socket::getSockName(SocketAddress &addr) {
 	}
 
 	addr.update(size);
+}
+
+void Socket::sendMessage(SendMessageHeader &header, const SocketAddress* addr) {
+	header.prepareSend(addr);
+
+	const auto res = ::sendmsg(
+			to_integral(m_fd.raw()),
+			header.rawHeader(),
+			header.ioFlags().raw());
+
+	if (res < 0) {
+		cosmos_throw(ApiError("sendmsg"));
+	}
+
+	// NOTE: if a control message is configured in the header, then even
+	// on partial writes the control message will always be transmitted.
+	// The result will contain the bytes of the control message, only the
+	// actual message payload.
+	header.postSend(res);
+}
+
+Socket::AddressFilledIn Socket::receiveMessage(ReceiveMessageHeader &header, SocketAddress *addr) {
+	header.prepareReceive(addr);
+
+	const auto res = ::recvmsg(
+			to_integral(m_fd.raw()),
+			header.rawHeader(),
+			header.ioFlags().raw());
+
+	if (res < 0) {
+		cosmos_throw(ApiError("recvmsg"));
+	}
+
+	auto ret = Socket::AddressFilledIn{false};
+
+	if (addr) {
+		if (const auto namelen = header.rawHeader()->msg_namelen; namelen != 0) {
+			ret = Socket::AddressFilledIn{true};
+			addr->update(namelen);
+		}
+	}
+
+	header.postReceive(res);
+
+	return ret;
 }
 
 } // end ns

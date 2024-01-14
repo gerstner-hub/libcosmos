@@ -143,8 +143,12 @@ struct OutputMemoryRegion :
 template <typename MEMORY_REGION>
 class IOVector :
 		public std::vector<MEMORY_REGION> {
-	// only let StreamIO access the raw data
+	// only let these classes access the raw data
 	friend class StreamIO;
+	friend class SendMessageHeader;
+	friend class ReceiveMessageHeader;
+	template <typename MSGHDR>
+	friend class MessageHeaderBase;
 
 public: // functions
 

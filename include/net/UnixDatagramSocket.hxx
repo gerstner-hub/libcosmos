@@ -80,6 +80,25 @@ public:
 
 	using Socket::send;
 	using Socket::receive;
+
+	void sendMessage(SendMessageHeader &header) {
+		return Socket::sendMessage(header);
+	}
+
+	void sendMessageTo(SendMessageHeader &header, const UnixAddress &addr) {
+		return Socket::sendMessage(header, &addr);
+	}
+
+	void receiveMessage(ReceiveMessageHeader &header) {
+		(void)Socket::receiveMessage(header);
+	}
+
+	std::optional<UnixAddress> receiveMessageFrom(ReceiveMessageHeader &header) {
+		UnixAddress addr;
+		auto filled = Socket::receiveMessage(header, &addr);
+
+		return filled ? std::optional<UnixAddress>{addr} : std::nullopt;
+	}
 };
 
 } // end ns

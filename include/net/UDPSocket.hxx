@@ -98,6 +98,25 @@ public: // functions
 
 	using Socket::send;
 	using Socket::receive;
+
+	void sendMessage(SendMessageHeader &header) {
+		return Socket::sendMessage(header);
+	}
+
+	void sendMessageTo(SendMessageHeader &header, const IPAddress &addr) {
+		return Socket::sendMessage(header, &addr);
+	}
+
+	void receiveMessage(ReceiveMessageHeader &header) {
+		(void)Socket::receiveMessage(header);
+	}
+
+	std::optional<IPAddress> receiveMessageFrom(ReceiveMessageHeader &header) {
+		IPAddress addr;
+		auto filled = Socket::receiveMessage(header, &addr);
+
+		return filled ? std::optional<IPAddress>{addr} : std::nullopt;
+	}
 };
 
 using UDP4Socket = UDPSocketT<SocketFamily::INET>;

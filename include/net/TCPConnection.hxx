@@ -37,6 +37,14 @@ public: // functions
 	using Socket::receive;
 	using Socket::send;
 	using Socket::shutdown;
+
+	void sendMessage(SendMessageHeader &header) {
+		return Socket::sendMessage(header);
+	}
+
+	Socket::AddressFilledIn receiveMessage(ReceiveMessageHeader &header) {
+		return Socket::receiveMessage(header);
+	}
 };
 
 using TCP4Connection = TCPConnectionT<SocketFamily::INET>;
