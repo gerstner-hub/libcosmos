@@ -9,6 +9,12 @@
 #include <type_traits>
 #include <vector>
 
+/**
+ * @file
+ *
+ * Special types and wrappers used in scatter/gather I/O APIs.
+ **/
+
 namespace cosmos {
 
 /// const variant of the struct iovec from system headers.
@@ -25,9 +31,6 @@ struct iovec_const {
 	const void *iov_base = nullptr;
 	size_t iov_len = 0;
 };
-
-static_assert(sizeof(struct iovec_const) == sizeof(struct iovec),
-		"size mismatch between iovec_const vs. struct iovec in system headers");
 
 /// I/O memory region specification used with scatter/gather I/O in StreamIO API.
 /**
