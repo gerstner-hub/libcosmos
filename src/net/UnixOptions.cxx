@@ -4,8 +4,8 @@
 
 namespace cosmos {
 
-UnixOptions::Credentials UnixOptions::credentials() const {
-	Credentials ret;
+UnixCredentials UnixOptions::credentials() const {
+	UnixCredentials ret;
 	getsockopt(m_sock, M_LEVEL, OptName{SO_PEERCRED}, &ret, sizeof(ret));
 	return ret;
 }

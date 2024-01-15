@@ -8,6 +8,7 @@
 #include "cosmos/fs/types.hxx"
 #include "cosmos/net/message_header.hxx"
 #include "cosmos/net/types.hxx"
+#include "cosmos/proc/process.hxx"
 
 namespace cosmos {
 
@@ -17,6 +18,39 @@ namespace cosmos {
  * The types in this header support serialization and deserialization of
  * ancillary messages used with SocketFamily::UNIX.
  **/
+
+/// User and group credentials of a peer process.
+/**
+ * This type is used to indicate process credentials passed over a UNIX domain
+ * socket. It is used in UnixOptions::credentials() and in the
+ * UnixCredentialsMessage ancillary message.
+ **/
+struct COSMOS_API UnixCredentials :
+		protected ::ucred {
+
+	/// Create credentials all set to INVALID values.
+	UnixCredentials() :
+		UnixCredentials{ProcessID::INVALID, UserID::INVALID, GroupID::INVALID} {
+	}
+
+	/// Create credentials using the given values.
+	UnixCredentials(const ProcessID p_pid, const UserID p_uid, const GroupID p_gid) {
+		pid = cosmos::to_integral(p_pid);
+		uid = cosmos::to_integral(p_uid);
+		gid = cosmos::to_integral(p_gid);
+	}
+
+	/// Fill in the credentials from the current process context.
+	/**
+	 * The current process ID, effective UID and effective GID will be set
+	 * in the structure.
+	 **/
+	void setCurrentCreds();
+
+	auto processID() { return ProcessID{pid}; }
+	auto userID() { return UserID{uid}; }
+	auto groupID() { return GroupID{gid}; }
+};
 
 /// Wrapper for the SCM_RIGHTS socket ancillary message to pass file descriptors to other processes.
 /**
@@ -69,7 +103,8 @@ namespace cosmos {
  *   as you expect such a transmission. Don't wait for a specific payload
  *   message accompanied by the file descriptors.
  **/
-class COSMOS_API UnixRightsMessage {
+class COSMOS_API UnixRightsMessage :
+		public AncillaryMessage<OptLevel::SOCKET, UnixMessage> {
 public: // types
 
 	/// A vector to keep a series of FileNum file descriptor numbers to pass between processes.
@@ -134,6 +169,43 @@ protected: // data
 
 	FileNumVector m_fds;
 	bool m_unclaimed_fds = false; ///< Flag whether "live" FDs in m_fds have not yet been collected.
+};
+
+/// Wrapper for the SCM_CREDENTIALS socket ancillary message to transfer process credentials between processes.
+/**
+ *  This ancillary message carries a UnixCredentials structure consisting of a
+ *  ProcessID, UserID and GroupID. Both ends of a UNIX domain socket need to
+ *  enable UnixOptions::setPassCredentials() for this to work.
+ *
+ *  On the sending side only the caller's ProcessID and one of its real,
+ *  effective or saved UserIDs and/or GroupIDs may be specified. Privileged
+ *  processes with CAP_SYS_ADMIN may specify arbitrary ProcessID, with
+ *  CAP_SETUID may specify arbitrary UserIDs and GroupIDs.
+ *
+ *  Once the socket option is set each received message will carry an implicit
+ *  UnixCredentialsMessage, even if the peer did not send one. This is
+ *  automatically filled in by the kernel with the process's PID and real
+ *  UserID and GroupID.
+ **/
+class COSMOS_API UnixCredentialsMessage :
+		public AncillaryMessage<OptLevel::SOCKET, UnixMessage> {
+public: // functions
+
+	void deserialize(const ReceiveMessageHeader::ControlMessage &msg);
+
+	SendMessageHeader::ControlMessage serialize() const;
+
+	void setCreds(const UnixCredentials &creds) {
+		m_creds = creds;
+	}
+
+	const UnixCredentials& creds() const {
+		return m_creds;
+	}
+
+protected: // data
+
+	UnixCredentials m_creds;
 };
 
 } // end ns

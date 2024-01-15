@@ -150,7 +150,8 @@ public: // types
 	 * ControlMessage for sending.
 	 **/
 	class ControlMessage {
-		friend class UnixRightsMessage;
+		template <OptLevel, typename MSG_TYPE>
+		friend class AncillaryMessage;
 		friend class SendMessageHeader;
 	protected: // functions
 
@@ -178,7 +179,7 @@ public: // types
 			return CMSG_DATA(m_header);
 		}
 
-		uint8_t* data() const {
+		const uint8_t* data() const {
 			return CMSG_DATA(m_header);
 		}
 
@@ -253,6 +254,8 @@ public: // types
 
 	/// Wrapper for `struct cmsghdr` used for iterating over received control messages.
 	class ControlMessage {
+		template <OptLevel, typename MSG_TYPE>
+		friend class AncillaryMessage;
 	protected: // functions
 
 		/// Returns the raw control message type (which is a different type depending on `level()`.
@@ -427,6 +430,32 @@ protected: // data
 
 	/// Optional buffer used to receive ancillary messages.
 	std::vector<uint8_t> m_control_buffer;
+};
+
+/// Base class for types that deal with (de)serializing ancillary socket messages.
+/**
+ * This base class keeps some common logic that is shared between ancillary
+ * socket message types. More importantly this type is here to allow access to
+ * the API of SendMessageHeader::ControlMessage without adding a lot of friend
+ * declerations for each type of ancillary message.
+ **/
+template <OptLevel level, typename MSG_TYPE>
+class AncillaryMessage {
+protected: // functions
+
+	SendMessageHeader::ControlMessage createMsg(MSG_TYPE type, const size_t data_len) const {
+		return SendMessageHeader::ControlMessage{level, to_integral(type), data_len};
+	}
+
+	void checkMsg(const ReceiveMessageHeader::ControlMessage &msg, MSG_TYPE type) const {
+		if (msg.level() != level || type != MSG_TYPE(msg.type())) {
+			cosmos_throw(RuntimeError("ancillary message type mismatch"));
+		}
+	}
+
+	uint8_t* data(SendMessageHeader::ControlMessage &msg) const {
+		return msg.data();
+	}
 };
 
 } // end ns

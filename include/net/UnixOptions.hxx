@@ -5,13 +5,9 @@
 
 // cosmos
 #include "cosmos/net/SockOptBase.hxx"
-#include "cosmos/proc/process.hxx"
+#include "cosmos/net/unix_aux.hxx"
 
 namespace cosmos {
-
-// fwd. decl. for friend declarations below
-template <SocketFamily family>
-class TCPListenSocketT;
 
 /// UnixSocket level option setter/getter helper.
 class COSMOS_API UnixOptions :
@@ -21,24 +17,25 @@ class COSMOS_API UnixOptions :
 	friend class UnixConnection;
 	friend class UnixListenSocket;
 	friend class UnixClientSocket;
-public: // types
-
-	/// User and group credentials of a peer process.
-	struct Credentials :
-			protected ::ucred {
-		auto processID() { return ProcessID{pid}; }
-		auto groupID() { return GroupID{gid}; }
-		auto userID() { return UserID{uid}; }
-	};
-
 public: // functions
 
-	/// This enables or disables the reception of SCM_CREDENTIALS control messages.
+	/// This enables or disables the transfer of SCM_CREDENTIALS control messages.
 	/**
-	 * If enabled then this message can be passed from connected-to
-	 * processes.
+	 * If enabled then this message can be passed between processes that
+	 * communicate via a UNIX domain socket. Note that both sides of the
+	 * socket, the sender and the receiver need to enable this to work
+	 * properly. Otherwise the message can be seen on the receiver side
+	 * but with overflow values filled in for user and group ID and a
+	 * ProcessID of 0.
+	 *
+	 * Note that the ancillary message is not only provided to the
+	 * receiving side if the sender explicitly sends the ancillary
+	 * message, but also implicitly with each received message. The kernel
+	 * fills in default values for the peer process (its PID and real user
+	 * and group ID).
 	 *
 	 * \see credentials()
+	 * \see UnixCredentialsMessage
 	 **/
 	void setPassCredentials(const bool on_off) {
 		setBoolOption(OptName{SO_PASSCRED}, on_off);
@@ -58,7 +55,7 @@ public: // functions
 	 * the peer process. These credentials are stored in the kernel during
 	 * `connect()` or `socketpair()` of the related socket.
 	 **/
-	Credentials credentials() const;
+	UnixCredentials credentials() const;
 
 	/// Sets an offset for the MessageFlag::PEEK receive() flag.
 	/**

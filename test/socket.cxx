@@ -598,18 +598,36 @@ public:
 
 	void subCheckUnixAncillaryMessage() {
 		auto [parent_sock, child_sock] = cosmos::net::create_dgram_socket_pair();
+		child_sock.unixOptions().setPassCredentials(true);
+		parent_sock.unixOptions().setPassCredentials(true);
+
+		const auto parent_pid = cosmos::proc::get_own_pid();
+		const auto parent_euid = cosmos::proc::get_effective_user_id();
+		const auto parent_egid = cosmos::proc::get_effective_group_id();
 
 		if (auto child = cosmos::proc::fork()) {
 			child_sock.close();
 			cosmos::File hosts{"/etc/hosts", cosmos::OpenMode::READ_ONLY};
 
-			cosmos::UnixRightsMessage msg;
-			msg.addFD(hosts.fd().raw());
-			auto ctl_msg = msg.serialize();
+			{
+				cosmos::UnixRightsMessage msg;
+				msg.addFD(hosts.fd().raw());
 
-			cosmos::SendMessageHeader header;
-			header.control_msg = ctl_msg;
-			parent_sock.sendMessage(header);
+				cosmos::SendMessageHeader header;
+				header.control_msg = msg.serialize();
+				parent_sock.sendMessage(header);
+			}
+
+			{
+				cosmos::UnixCredentialsMessage msg;
+				auto creds = cosmos::UnixCredentials{};
+				creds.setCurrentCreds();
+				msg.setCreds(creds);
+
+				cosmos::SendMessageHeader header;
+				header.control_msg = msg.serialize();
+				parent_sock.sendMessage(header);
+			}
 
 			auto res = cosmos::proc::wait(*child);
 
@@ -623,38 +641,57 @@ public:
 
 			child_sock.receiveMessage(header);
 
+			bool saw_rights_msg = false;
+			bool saw_creds_msg = false;
+
 			for (const auto &ctrl_message: header) {
 				if (const auto unix_msg = ctrl_message.asUnixMessage(); unix_msg) {
-					if (unix_msg != cosmos::UnixMessage::RIGHTS) {
-						continue;
+					switch(*unix_msg) {
+						case cosmos::UnixMessage::RIGHTS: {
+							saw_rights_msg = true;
+							cosmos::UnixRightsMessage msg;
+							msg.deserialize(ctrl_message);
+
+							RUN_STEP("verify-one-fd-unclaimed", msg.numFDs() == 1);
+
+							cosmos::UnixRightsMessage::FileNumVector vec;
+							msg.takeFDs(vec);
+
+							RUN_STEP("verify-one-fd-taken", vec.size() == 1);
+							RUN_STEP("verify-no-fds-left", msg.numFDs() == 0);
+
+							const auto hosts_num = vec[0];
+
+							cosmos::FileDescriptor hosts_fd{hosts_num};
+							cosmos::File hosts_file{hosts_fd, cosmos::AutoCloseFD{true}};
+
+							RUN_STEP("verify-fd-valid", hosts_fd.valid());
+							RUN_STEP("verify-file-valid", hosts_file.isOpen());
+
+							cosmos::File hosts_file2{"/etc/hosts", cosmos::OpenMode::READ_ONLY};
+							cosmos::FileStatus hosts_stat1{hosts_fd};
+							cosmos::FileStatus hosts_stat2{hosts_file2.fd()};
+
+							RUN_STEP("verify-hosts-fd-is-for-hosts", hosts_stat1.isSameFile(hosts_stat2));
+							break;
+						}
+						case cosmos::UnixMessage::CREDENTIALS: {
+							saw_creds_msg = true;
+							cosmos::UnixCredentialsMessage msg;
+							msg.deserialize(ctrl_message);
+							auto peer_creds = msg.creds();
+
+							RUN_STEP("verify-peer-pid-matches-parent", peer_creds.processID() == parent_pid);
+							RUN_STEP("verify-peer-uid-matches-parent", peer_creds.userID() == parent_euid);
+							RUN_STEP("verify-peer-gid-matches-parent", peer_creds.groupID() == parent_egid);
+
+							break;
+					        }
 					}
-
-					cosmos::UnixRightsMessage msg;
-					msg.deserialize(ctrl_message);
-
-					RUN_STEP("verify-one-fd-unclaimed", msg.numFDs() == 1);
-
-					cosmos::UnixRightsMessage::FileNumVector vec;
-					msg.takeFDs(vec);
-
-					RUN_STEP("verify-one-fd-taken", vec.size() == 1);
-					RUN_STEP("verify-no-fds-left", msg.numFDs() == 0);
-
-					const auto hosts_num = vec[0];
-
-					cosmos::FileDescriptor hosts_fd{hosts_num};
-					cosmos::File hosts_file{hosts_fd, cosmos::AutoCloseFD{true}};
-
-					RUN_STEP("verify-fd-valid", hosts_fd.valid());
-					RUN_STEP("verify-file-valid", hosts_file.isOpen());
-
-					cosmos::File hosts_file2{"/etc/hosts", cosmos::OpenMode::READ_ONLY};
-					cosmos::FileStatus hosts_stat1{hosts_fd};
-					cosmos::FileStatus hosts_stat2{hosts_file2.fd()};
-
-					RUN_STEP("verify-hosts-fd-is-for-hosts", hosts_stat1.isSameFile(hosts_stat2));
 				}
 			}
+			RUN_STEP("verify-unix-rights-seen", saw_rights_msg);
+			RUN_STEP("verify-unix-creds-seen", saw_creds_msg);
 			cosmos::proc::exit(cosmos::ExitStatus::SUCCESS);
 		}
 	}
