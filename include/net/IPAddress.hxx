@@ -99,6 +99,10 @@ protected: // functions
 /// A 32-bit IPv4 address and 16 bit port number for use with SocketFamily::INET sockets.
 class IP4Address :
 		public IPAddressBase {
+public: // types
+
+	static constexpr inline SocketFamily FAMILY = SocketFamily::INET;
+
 public: // functions
 
 	IP4Address() {
@@ -122,7 +126,7 @@ public: // functions
 	}
 
 	SocketFamily family() const override {
-		return SocketFamily::INET;
+		return FAMILY;
 	}
 
 	size_t size() const override {
@@ -165,6 +169,10 @@ protected: // data
 /// A 128 bit IPv6 address and 16-bit port number plus some IPv6 specific extra fields.
 class IP6Address :
 		public IPAddressBase {
+public: // data
+
+	static constexpr inline SocketFamily FAMILY  = SocketFamily::INET6;
+
 public: // functions
 
 	IP6Address() {
@@ -182,7 +190,7 @@ public: // functions
 	}
 
 	SocketFamily family() const override {
-		return SocketFamily::INET6;
+		return FAMILY;
 	}
 
 	size_t size() const override {

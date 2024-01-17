@@ -160,8 +160,9 @@ public: // functions
 
 	/// Enable extended reliable error reporting for datagram sockets.
 	/**
-	 * If enabled then special `sock_extended_err` messages can be
-	 * received via `rcvmsg()` with the ERRQUEUE flag set.
+	 * If enabled then SocketError ancillary messages can be
+	 * received via `Socket::receiveMessage()` with MessageFlag::ERRQUEUE
+	 * set.
 	 **/
 	void setReceiveErrors(const bool on_off) {
 		setBoolOption(OptName{IP_RECVERR}, on_off);

@@ -288,6 +288,22 @@ public: // types
 			return std::nullopt;
 		}
 
+		std::optional<IP4Message> asIP4Message() const {
+			if (level() == OptLevel::IP) {
+				return IP4Message{type()};
+			}
+
+			return std::nullopt;
+		}
+
+		std::optional<IP6Message> asIP6Message() const {
+			if (level() == OptLevel::IPV6) {
+				return IP6Message{type()};
+			}
+
+			return std::nullopt;
+		}
+
 		/// Returns the data portion of the control message.
 		/**
 		 * This pointer is not necessarily suitably aligned to access

@@ -262,4 +262,24 @@ enum class UnixMessage : int {
 	//SECURITY = SCM_SECURITY // the define for this seems to be missing?
 };
 
+/// Ancillary message types available for IPv4 based sockets.
+enum class IP4Message : int {
+	/// \see IPOptions::setReceiveErrors().
+	RECVERR = IP_RECVERR,
+	/// \see IPOptions::setReceivePktInfo().
+	PKTINFO = IP_PKTINFO,
+	/// \see IPOptions::setReceiveOrigDestAddr().
+	ORIGDSTADDR = IP_ORIGDSTADDR,
+	/// \see IPOptions::setReceiveTOS().
+	TOS = IP_TOS,
+	/// \see IPOptions::setReceiveTTL().
+	TTL = IP_TTL,
+};
+
+/// Ancillary message types available for IPv6 based sockets.
+enum class IP6Message : int {
+	RECVERR = IPV6_RECVERR,
+	PKTINFO = IPV6_PKTINFO
+};
+
 } // end ns

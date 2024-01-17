@@ -5,6 +5,7 @@
 // cosmos
 #include "cosmos/fs/File.hxx"
 #include "cosmos/fs/FileStatus.hxx"
+#include "cosmos/net/ip_aux.hxx"
 #include "cosmos/net/message_header.hxx"
 #include "cosmos/net/network.hxx"
 #include "cosmos/net/TCPClientSocket.hxx"
@@ -509,6 +510,7 @@ public:
 		subCheckTCPMsgHeader();
 		subCheckUDPMsgHeader();
 		subCheckUnixAncillaryMessage();
+		subCheckIPSocketError();
 	}
 
 	void subCheckTCPMsgHeaderThread() {
@@ -694,6 +696,44 @@ public:
 			RUN_STEP("verify-unix-creds-seen", saw_creds_msg);
 			cosmos::proc::exit(cosmos::ExitStatus::SUCCESS);
 		}
+	}
+
+	void subCheckIPSocketError() {
+		cosmos::UDP4Socket sock;
+		sock.ipOptions().setReceiveErrors(true);
+		const cosmos::IP4Address addr{cosmos::IP4_LOOPBACK_ADDR, 1111};
+		const std::string testmsg{"testmsg"};
+		sock.sendTo(testmsg, addr);
+		cosmos::ReceiveMessageHeader header;
+		header.setIOFlags({cosmos::MessageFlag::ERRQUEUE});
+		header.setControlBufferSize(1024);
+		std::string payload;
+		payload.resize(1024);
+		header.iovec.push_back({payload.data(), payload.size()});
+		sock.receiveMessage(header);
+		const auto received_bytes = payload.size() - header.iovec.leftBytes();
+		payload.resize(received_bytes);
+		RUN_STEP("sockerr-payload-matches-msg", payload == testmsg);
+		bool found_sockerr = false;
+		for (const auto &ctrl: header) {
+			auto ip4_msg = ctrl.asIP4Message();
+			RUN_STEP("received-ip4-ctrl-msg", ip4_msg.has_value());
+			RUN_STEP("received-ip4-socket-error", *ip4_msg == cosmos::IP4Message::RECVERR);
+			cosmos::IP4SocketErrorMessage errmsg;
+			errmsg.deserialize(ctrl);
+			found_sockerr = true;
+			auto errobj = errmsg.error();
+			RUN_STEP("raw-sockerr-non-null", errobj != nullptr);
+			RUN_STEP("sockerr-origin-is-icmp", errobj->origin() == cosmos::IP4SocketError::Origin::ICMP);
+			RUN_STEP("sockerr-errnum-is-ECONNREF", errobj->errnum() == cosmos::Errno::CONN_REFUSED);
+			std::cout << "icmp-error-type: " << (size_t)*errobj->icmpType() << std::endl;
+			std::cout << "icmp-error-code: " << (size_t)*errobj->icmpCode() << std::endl;
+			RUN_STEP("has-offender-addr", errobj->hasOffenderAddress());
+			auto offender = errobj->offenderAddress();
+			RUN_STEP("offender-addr-non-null", offender.has_value());
+			std::cout << "offender is: " << offender->ipAsString() << ":" << offender->port() << std::endl;
+		}
+		RUN_STEP("seen-socket-error", found_sockerr);
 	}
 };
 
