@@ -9,6 +9,9 @@
 #include <type_traits>
 #include <vector>
 
+// Cosmos
+#include "cosmos/dso_export.h"
+
 /**
  * @file
  *
@@ -172,5 +175,8 @@ protected: // functions
 
 using ReadIOVector = IOVector<InputMemoryRegion>;
 using WriteIOVector = IOVector<OutputMemoryRegion>;
+
+extern template class COSMOS_API IOVector<InputMemoryRegion>;
+extern template class COSMOS_API IOVector<OutputMemoryRegion>;
 
 } // end ns
