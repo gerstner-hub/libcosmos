@@ -19,25 +19,25 @@ namespace cosmos {
  * instance that represents an open connection and also offers corresponding
  * I/O methods.
  **/
-template <SocketFamily family>
+template <SocketFamily FAMILY>
 class COSMOS_API TCPListenSocketT :
 		public ListenSocket {
 public: // types
 
-	using IPAddress = typename FamilyTraits<family>::Address;
+	using IPAddress = typename FamilyTraits<FAMILY>::Address;
 
 public: // functions
 
 	explicit TCPListenSocketT(const SocketFlags flags = SocketFlags{SocketFlag::CLOEXEC}) :
-			ListenSocket{family, SocketType::STREAM, flags} {
+			ListenSocket{FAMILY, SocketType::STREAM, flags} {
 	}
 
 	auto ipOptions() {
-		return typename FamilyTraits<family>::Options{m_fd};
+		return typename FamilyTraits<FAMILY>::Options{m_fd};
 	}
 
 	auto ipOptions() const {
-		return typename FamilyTraits<family>::Options{m_fd};
+		return typename FamilyTraits<FAMILY>::Options{m_fd};
 	}
 
 	auto tcpOptions() {
@@ -60,9 +60,9 @@ public: // functions
 		return Socket::bind(addr);
 	}
 
-	TCPConnectionT<family> accept(IPAddress *addr = nullptr) {
+	TCPConnectionT<FAMILY> accept(IPAddress *addr = nullptr) {
 		auto fd = Socket::accept(addr);
-		return TCPConnectionT<family>{fd};
+		return TCPConnectionT<FAMILY>{fd};
 	}
 };
 

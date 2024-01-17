@@ -17,13 +17,13 @@ namespace cosmos {
  * also be created from an existing file descriptor that has been obtained by
  * other means.
  **/
-template <SocketFamily family>
+template <SocketFamily FAMILY>
 class TCPConnectionT :
-		public IPSocketT<family> {
+		public IPSocketT<FAMILY> {
 public: // functions
 
 	explicit TCPConnectionT(FileDescriptor fd, const AutoCloseFD auto_close = AutoCloseFD{true}) :
-			IPSocketT<family>{fd, auto_close} {
+			IPSocketT<FAMILY>{fd, auto_close} {
 	}
 
 	auto tcpOptions() {

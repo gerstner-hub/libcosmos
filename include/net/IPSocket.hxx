@@ -16,21 +16,21 @@ namespace cosmos {
  * IP4Socket and IP6Socket are the specific configurations for the IPv6 and
  * IPv4 protocols.
  **/
-template <SocketFamily family>
+template <SocketFamily FAMILY>
 class IPSocketT :
 		public Socket {
 public: // types
 
-	using IPAddress = typename FamilyTraits<family>::Address;
+	using IPAddress = typename FamilyTraits<FAMILY>::Address;
 
 public: // functions
 
 	auto ipOptions() {
-		return typename FamilyTraits<family>::Options{m_fd};
+		return typename FamilyTraits<FAMILY>::Options{m_fd};
 	}
 
 	auto ipOptions() const {
-		return typename FamilyTraits<family>::Options{m_fd};
+		return typename FamilyTraits<FAMILY>::Options{m_fd};
 	}
 
 	/// Returns the current address that the socket is bound to, if any.
@@ -45,7 +45,7 @@ protected: // functions
 			const SocketType type,
 			const SocketFlags flags = SocketFlags{SocketFlag::CLOEXEC},
 			const SocketProtocol protocol = SocketProtocol::DEFAULT) :
-			Socket{family, type, flags, protocol} {}
+			Socket{FAMILY, type, flags, protocol} {}
 
 	/// \see Socket::Socket(FileDescriptor)
 	IPSocketT(FileDescriptor fd, const AutoCloseFD auto_close) :

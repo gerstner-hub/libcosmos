@@ -22,17 +22,17 @@ namespace cosmos {
  * For the server side listening socket look at the TCP4ListenSocket and
  * TCP6ListenSocket classes.
  **/
-template <SocketFamily family>
+template <SocketFamily FAMILY>
 class TCPClientSocketT :
-		public IPSocketT<family> {
+		public IPSocketT<FAMILY> {
 public: // types
 
-	using IPAddress = typename FamilyTraits<family>::Address;
+	using IPAddress = typename FamilyTraits<FAMILY>::Address;
 
 public: // functions
 
 	explicit TCPClientSocketT(const SocketFlags flags = SocketFlags{SocketFlag::CLOEXEC}) :
-			IPSocketT<family>{SocketType::STREAM, flags} {
+			IPSocketT<FAMILY>{SocketType::STREAM, flags} {
 	}
 
 	auto tcpOptions() {
@@ -74,9 +74,9 @@ public: // functions
 	 *
 	 * \see Socket::connect
 	 **/
-	TCPConnectionT<family> connect(const IPAddress &addr) {
+	TCPConnectionT<FAMILY> connect(const IPAddress &addr) {
 		Socket::connect(addr);
-		auto ret = TCPConnectionT<family>{this->m_fd};
+		auto ret = TCPConnectionT<FAMILY>{this->m_fd};
 		this->m_fd.reset();
 		return ret;
 	}

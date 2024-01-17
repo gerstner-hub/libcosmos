@@ -20,17 +20,17 @@ namespace cosmos {
  * The send and receive I/O functions are also available to send and receive
  * datagrams using specific MessageFlags.
  **/
-template <SocketFamily family>
+template <SocketFamily FAMILY>
 class UDPSocketT :
-		public IPSocketT<family> {
+		public IPSocketT<FAMILY> {
 public: // types
 
-	using IPAddress = typename IPSocketT<family>::IPAddress;
+	using IPAddress = typename IPSocketT<FAMILY>::IPAddress;
 
 public: // functions
 
 	explicit UDPSocketT(const SocketFlags flags = SocketFlags{SocketFlag::CLOEXEC}) :
-			IPSocketT<family>{SocketType::DGRAM, flags} {
+			IPSocketT<FAMILY>{SocketType::DGRAM, flags} {
 	}
 
 	auto udpOptions() {
