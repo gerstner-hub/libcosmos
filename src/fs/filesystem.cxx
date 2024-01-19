@@ -584,4 +584,43 @@ void truncate(const std::string_view path, off_t length) {
 	}
 }
 
+namespace {
+
+	size_t copy_file_range(
+			const FileDescriptor fd_in, off_t *off_in,
+			const FileDescriptor fd_out, off_t *off_out,
+			const size_t len) {
+		// there are currently no flags defined for the final
+		// parameter
+		const auto res = ::copy_file_range(
+				to_integral(fd_in.raw()),  off_in,
+				to_integral(fd_out.raw()), off_out,
+				len, 0);
+
+		if (res < 0) {
+			cosmos_throw (ApiError("copy_file_range()"));
+		}
+
+		return static_cast<size_t>(res);
+	}
+
+} // end anon ns
+
+size_t copy_file_range(
+		const FileDescriptor fd_in, const FileDescriptor fd_out,
+		const size_t len) {
+	return copy_file_range(fd_in, nullptr, fd_out, nullptr, len);
+}
+
+size_t copy_file_range(CopyFileRangeParameters &pars) {
+	auto copied = copy_file_range(
+		pars.in,  pars.off_in  ? &pars.off_in.value()  : nullptr,
+		pars.out, pars.off_out ? &pars.off_out.value() : nullptr,
+		pars.len);
+
+	pars.len -= copied;
+
+	return copied;
+}
+
 } // end ns

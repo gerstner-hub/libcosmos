@@ -2,6 +2,7 @@
 #include <iostream>
 #include <filesystem>
 #include <fstream>
+#include <vector>
 
 // cosmos
 #include "cosmos/error/FileError.hxx"
@@ -40,6 +41,7 @@ class FileSystemTest :
 		testTruncate();
 		testMakeFIFO();
 		testCloseRange();
+		testCopyFileRange();
 	}
 
 	std::pair<std::filesystem::path, cosmos::TempDir> getTestDir() {
@@ -508,7 +510,7 @@ class FileSystemTest :
 
 	void testCloseRange() {
 		START_TEST("close_range()");
-		
+
 		auto fd1 = cosmos::fs::open("/etc/fstab", cosmos::OpenMode::READ_ONLY, cosmos::OpenFlags{});
 		auto fd2 = cosmos::fs::open("/etc/fstab", cosmos::OpenMode::READ_ONLY, cosmos::OpenFlags{});
 
@@ -518,6 +520,99 @@ class FileSystemTest :
 		cosmos::fs::close_range(fd1.raw());
 		EXPECT_EXCEPTION("fd1 now invalid", fd1.getFlags());
 		EXPECT_EXCEPTION("fd2 now invalid", fd2.getFlags());
+	}
+
+	void testCopyFileRange() {
+		START_TEST("copy_file_range()");
+
+		const std::string_view _template{"/tmp/cfr.{}.txt"};
+		cosmos::TempFile in{_template};
+		cosmos::TempFile out{_template};
+
+		std::vector<uint8_t> v;
+		for (size_t b = 0; b < 255; b++) {
+			v.push_back(b);
+		}
+
+		// write some well defined data into the input file
+		in.writeAll(v.data(), v.size());
+		in.seekFromStart(0);
+		size_t left = v.size();
+
+		while (left) {
+			auto res = cosmos::fs::copy_file_range(in.fd(), out.fd(), left);
+			if (res == 0) {
+				break;
+			}
+			left -= res;
+		}
+
+		out.seekFromStart(0);
+		std::vector <uint8_t> v2;
+		v2.resize(v.size());
+		out.readAll(v2.data(), v2.size());
+
+		RUN_STEP("verify-copied-data-matches", v == v2);
+		RUN_STEP("verify-target-file-size-matches", size_t(cosmos::FileStatus{out.fd()}.size()) == v.size());
+
+		in.seekFromStart(100);
+		left = 100;
+		while (left) {
+			auto res = cosmos::fs::copy_file_range(in.fd(), out.fd(), left);
+			if (res == 0) {
+				break;
+			}
+			left -= res;
+		}
+
+		out.seekFromStart(v.size());
+		v2.resize(100);
+		out.readAll(v2.data(), v2.size());
+
+		uint8_t compare = 100;
+		for (const auto element: v2) {
+			if (element != compare++) {
+				RUN_STEP("offset-byte-comparison", false);
+			}
+		}
+
+		RUN_STEP("offset-byte-comparison", true);
+
+		cosmos::fs::truncate(out.fd(), 0);
+
+		cosmos::fs::CopyFileRangeParameters pars;
+		pars.in = in.fd();
+		pars.out = out.fd();
+		pars.len = 100;
+		pars.off_in = 50;
+		pars.off_out = 50;
+
+		while (pars.len != 0) {
+			cosmos::fs::copy_file_range(pars);
+		}
+
+		RUN_STEP("verify-offset-copy-file-size", cosmos::FileStatus{out.fd()}.size() == 150);
+
+		v2.resize(150);
+		out.seekFromStart(0);
+		out.readAll(v2.data(), v2.size());
+
+		compare = 0;
+		for (const auto element: v2) {
+			if (compare < 50) {
+				if (element != 0) {
+					RUN_STEP("offset-copy-file-size-filled-with-zeroes", false);
+				}
+			} else {
+				if (element != compare) {
+					RUN_STEP("verify-offset-copy-file-size-matches", false);
+				}
+			}
+
+			compare++;
+		}
+
+		RUN_STEP("verify-offset-copy-file-size-matches", true);
 	}
 
 protected:

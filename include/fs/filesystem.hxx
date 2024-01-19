@@ -125,7 +125,7 @@ COSMOS_API void close_range(const FileNum first,
  * tasks, if necessary.
  **/
 COSMOS_API std::pair<FileDescriptor, std::string> make_tempfile(
-		const std::string_view _template, const OpenFlags flags = OpenFlags{});
+		const std::string_view _template, const OpenFlags flags = OpenFlags{OpenFlag::CLOEXEC});
 
 /// Safely create a temporary directory and return it's path.
 /**
@@ -619,5 +619,57 @@ COSMOS_API void truncate(const FileDescriptor fd, off_t length);
  * be writable.
  **/
 COSMOS_API void truncate(const std::string_view path, off_t length);
+
+/// set of parameters for copy_file_range().
+struct CopyFileRangeParameters {
+	FileDescriptor in;
+	FileDescriptor out;
+	size_t len;
+	std::optional<off_t> off_in;
+	std::optional<off_t> off_out;
+};
+
+/// Copy data between files directly in the kernel.
+/**
+ * This operation allows for an efficient copy operation between two file
+ * descriptors, without routing data through userspace. Additionally, if both
+ * file descriptors belong to the same file system, this system call allows
+ * to optimize the copy on lower levels e.g. by employing copy-on-write
+ * techniques.
+ *
+ * The output file descriptor must not be opened with OpenFlag::APPEND,
+ * otherwise an error is thrown.
+ *
+ * As usual partial I/O can occur. The call attempts to copy \c pars.len bytes
+ * and the number of actually copied bytes is returned from this call. If the
+ * input file descriptor reached the end of file then 0 is returned. The
+ * remaining number of bytes is updated in \c pars.len. This way the same
+ * parameter structure can be used to continue the operation until it is
+ * complete.
+ *
+ * If an input offset is supplied then reading from the input file descriptor
+ * starts at this position and the file descriptor's offset it not altered.
+ * The provided offset is updated by the number of bytes copied. If no input
+ * offset is supplied then reading starts from the file descriptor's offset
+ * and the offset is altered accordingly. The same holds true for the output
+ * offset.
+ *
+ * There are two other system calls on Linux that perform similar tasks, but
+ * have restrictions:
+ *
+ * - splice(): this is limited to one of the FDs being a pipe
+ * - sendfile(): this used to be limited to writing to sockets FDs. Also it
+ *   only supports an input FD offset, no output FD offset.
+ **/
+COSMOS_API size_t copy_file_range(CopyFileRangeParameters &pars);
+
+/// Copy data between files directly in the kernel.
+/**
+ * This is a simplified version of copy_file_range(CopyFileRangeParameters&)
+ * that does not use explicit offsets. Instead the current file descriptor
+ * offsets will be used and updated.
+ **/
+COSMOS_API size_t copy_file_range(
+		const FileDescriptor fd_in, const FileDescriptor fd_out, const size_t len);
 
 } // end ns
