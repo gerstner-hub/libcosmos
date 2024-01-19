@@ -23,7 +23,7 @@ public: // functions
 
 	TempFile() = default;
 
-	explicit TempFile(const std::string_view _template, const OpenFlags flags = OpenFlags{}) {
+	explicit TempFile(const std::string_view _template, const OpenFlags flags = OpenFlags{OpenFlag::CLOEXEC}) {
 		open(_template, flags);
 	}
 
@@ -50,7 +50,7 @@ public: // functions
 		unlinkPath();
 	}
 
-	void open(const std::string_view _template, const OpenFlags flags = OpenFlags{}) {
+	void open(const std::string_view _template, const OpenFlags flags = OpenFlags{OpenFlag::CLOEXEC}) {
 		close();
 
 		auto [fd, path] = fs::make_tempfile(_template, flags);
