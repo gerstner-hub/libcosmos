@@ -33,7 +33,6 @@ public: // functions
 		Socket::getSockName(addr);
 	}
 
-	using Socket::shutdown;
 	using Socket::listen;
 
 	void bind(const UnixAddress &addr) {

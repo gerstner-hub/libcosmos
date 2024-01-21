@@ -62,6 +62,17 @@ public: // functions
 	/// Returns the current address that the socket is bound to, if any.
 	void getSockName(SocketAddress &addr);
 
+	/// Shutdown part or all of the connection on protocol level.
+	/**
+	 * This is distinct from a close() operation in that it performs a
+	 * graceful shutdown of a network connection. It can be limited to the
+	 * receiving end, the sending end or affect both.
+	 *
+	 * On Linux this can also be used to stop a blocking `accept()` call
+	 * on a listening socket.
+	 **/
+	void shutdown(const Direction dir);
+
 protected: // functions
 
 	/// Creates a new socket using the given properties.
@@ -103,17 +114,6 @@ protected: // functions
 	 * can also be influenced by further socket specific options.
 	 **/
 	void connect(const SocketAddress &addr);
-
-	/// Shutdown part or all of the connection on protocol level.
-	/**
-	 * This is distinct from a close() operation in that it performs a
-	 * graceful shutdown of a network connection. It can be limited to the
-	 * receiving end, the sending end or affect both.
-	 *
-	 * On Linux this can also be used to stop a blocking `accept()` call
-	 * on a listening socket.
-	 **/
-	void shutdown(const Direction dir);
 
 	/// Enter into a passive listen state, allowing new connections.
 	/**

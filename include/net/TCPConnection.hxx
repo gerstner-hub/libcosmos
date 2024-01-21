@@ -36,7 +36,6 @@ public: // functions
 
 	using Socket::receive;
 	using Socket::send;
-	using Socket::shutdown;
 
 	void sendMessage(SendMessageHeader &header) {
 		return Socket::sendMessage(header);
