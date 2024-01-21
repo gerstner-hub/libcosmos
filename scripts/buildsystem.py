@@ -265,6 +265,7 @@ def initSCons(project, rtti=True):
     env['project'] = project
     env['use_rpath'] = use_rpath
     env['libtype'] = ARGUMENTS.get("libtype", "shared")
+    env['compiler'] = 'clang' if use_clang else 'gcc'
 
     if env['libtype'] not in ("shared", "static"):
         print(f"Invalid libtype {env['libtype']}: use 'shared' or 'static'", file=sys.stderr)
