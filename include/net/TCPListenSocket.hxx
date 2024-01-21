@@ -25,11 +25,13 @@ class COSMOS_API TCPListenSocketT :
 public: // types
 
 	using IPAddress = typename FamilyTraits<FAMILY>::Address;
+	using Connection = TCPConnectionT<FAMILY>;
+	static inline constexpr auto TYPE = SocketType::STREAM;
 
 public: // functions
 
 	explicit TCPListenSocketT(const SocketFlags flags = SocketFlags{SocketFlag::CLOEXEC}) :
-			ListenSocket{FAMILY, SocketType::STREAM, flags} {
+			ListenSocket{FAMILY, TYPE, flags} {
 	}
 
 	auto ipOptions() {

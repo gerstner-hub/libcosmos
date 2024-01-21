@@ -28,11 +28,13 @@ class TCPClientSocketT :
 public: // types
 
 	using IPAddress = typename FamilyTraits<FAMILY>::Address;
+	using Connection = TCPConnectionT<FAMILY>;
+	static inline constexpr auto TYPE = SocketType::STREAM;
 
 public: // functions
 
 	explicit TCPClientSocketT(const SocketFlags flags = SocketFlags{SocketFlag::CLOEXEC}) :
-			IPSocketT<FAMILY>{SocketType::STREAM, flags} {
+			IPSocketT<FAMILY>{TYPE, flags} {
 	}
 
 	auto tcpOptions() {

@@ -17,10 +17,14 @@ namespace cosmos {
  **/
 class UnixDatagramSocket :
 		public Socket {
-public:
+public: // types
+
+	static inline constexpr auto TYPE = SocketType::DGRAM;
+
+public: // functions
 
 	explicit UnixDatagramSocket(const SocketFlags flags = SocketFlags{SocketFlag::CLOEXEC}) :
-			Socket{SocketFamily::UNIX, SocketType::DGRAM, flags} {
+			Socket{SocketFamily::UNIX, TYPE, flags} {
 	}
 
 	explicit UnixDatagramSocket(const FileDescriptor fd, const AutoCloseFD auto_close = AutoCloseFD{true}) :

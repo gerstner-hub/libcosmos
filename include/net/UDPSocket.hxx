@@ -26,11 +26,12 @@ class UDPSocketT :
 public: // types
 
 	using IPAddress = typename IPSocketT<FAMILY>::IPAddress;
+	static inline constexpr auto TYPE = SocketType::DGRAM;
 
 public: // functions
 
 	explicit UDPSocketT(const SocketFlags flags = SocketFlags{SocketFlag::CLOEXEC}) :
-			IPSocketT<FAMILY>{SocketType::DGRAM, flags} {
+			IPSocketT<FAMILY>{TYPE, flags} {
 	}
 
 	auto udpOptions() {

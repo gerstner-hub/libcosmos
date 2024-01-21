@@ -15,6 +15,10 @@ namespace cosmos {
  **/
 class COSMOS_API UnixListenSocket :
 		public ListenSocket {
+public: // types
+
+	using Connection = UnixConnection;
+
 public: // functions
 
 	explicit UnixListenSocket(const SocketType type,
@@ -48,19 +52,27 @@ public: // functions
 /// Implementation of a UNIX domain socket listener of SocketType::STREAM.
 class UnixStreamListenSocket :
 		public UnixListenSocket {
+public: // types
+
+	static inline constexpr auto TYPE = SocketType::STREAM;
+
 public: // functions
 
 	explicit UnixStreamListenSocket(const SocketFlags flags = SocketFlags{SocketFlag::CLOEXEC}) :
-			UnixListenSocket{SocketType::STREAM, flags} {}
+			UnixListenSocket{TYPE, flags} {}
 };
 
 /// Implementation of a UNIX domain socket listener of SocketType::SEQPACKET.
 class UnixSeqPacketListenSocket :
 		public UnixListenSocket {
+public: // types
+
+	static inline constexpr auto TYPE = SocketType::SEQPACKET;
+
 public: // functions
 
 	explicit UnixSeqPacketListenSocket(const SocketFlags flags = SocketFlags{SocketFlag::CLOEXEC}) :
-			UnixListenSocket{SocketType::SEQPACKET, flags} {}
+			UnixListenSocket{TYPE, flags} {}
 };
 
 } // end ns

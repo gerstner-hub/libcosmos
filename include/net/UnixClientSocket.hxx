@@ -16,6 +16,10 @@ namespace cosmos {
  **/
 class COSMOS_API UnixClientSocket :
 		public Socket {
+public: // types
+
+	using Connection = UnixConnection;
+
 public: // functions
 
 	explicit UnixClientSocket(const SocketType type, const SocketFlags flags = SocketFlags{SocketFlag::CLOEXEC});
@@ -81,19 +85,27 @@ protected:
 /// Implementation of a UNIX domain client socket of SocketType::STREAM.
 class UnixStreamClientSocket :
 		public UnixClientSocket {
+public: // types
+
+	static inline constexpr auto TYPE = SocketType::STREAM;
+
 public: // functions
 
 	explicit UnixStreamClientSocket(const SocketFlags flags = SocketFlags{SocketFlag::CLOEXEC}) :
-			UnixClientSocket{SocketType::STREAM, flags} {}
+			UnixClientSocket{TYPE, flags} {}
 };
 
 /// Implementation of a UNIX domain client socket of SocketType::SEQPACKET.
 class UnixSeqPacketClientSocket :
 		public UnixClientSocket {
+public: // types
+
+	static inline constexpr auto TYPE = SocketType::SEQPACKET;
+
 public: // functions
 
 	explicit UnixSeqPacketClientSocket(const SocketFlags flags = SocketFlags{SocketFlag::CLOEXEC}) :
-			UnixClientSocket{SocketType::SEQPACKET, flags} {}
+			UnixClientSocket{TYPE, flags} {}
 };
 
 } // end ns
