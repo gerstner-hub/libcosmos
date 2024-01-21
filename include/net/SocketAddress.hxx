@@ -35,6 +35,8 @@ class COSMOS_API SocketAddress {
 	friend class ReceiveMessageHeader;
 public: // functions
 
+	virtual ~SocketAddress() {}
+
 	//// Returns the concrete SocketFamily for the implementation address type.
 	virtual SocketFamily family() const = 0;
 
