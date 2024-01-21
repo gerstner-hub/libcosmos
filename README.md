@@ -204,16 +204,22 @@ tests there is only limited real world integration testing of *libcosmos*,
 yet. Thus a range of bugs is sure still to be found. At least nothing should
 break just from looking at it.
 
+API History
+===========
+
+Since library version 0.2.0 a large chunk of API has been added mainly for the
+net subsystem. There is now extensive support for sockets, concrete APIs for
+TCP, UDP, Unix domain sockets and various infrastructure that allows to
+integrate more socket types in the future. The `sendmsg()` and `recvmsg()` is
+also supported and some more common ancillary message types like file
+descriptor passing over UNIX domain sockets is implemented.
+
 Future Directions
 =================
 
-The biggest chunk that is currently still missing is networking i.e. modeling
-of the socket API and the most common socket types like stream (TCP), datagram
-(UDP) and UNIX domain sockets and its related functions. This is on my todo
-list.
-
-Otherwise the Linux API is rich and a lot of stuff can still be modeled and
-added as the need arises.
+The Linux API is rich and a lot of stuff can still be modeled and added as the
+need arises. One aspect that I intent to tackle is memory mappings, for
+example.
 
 Contributing
 ============

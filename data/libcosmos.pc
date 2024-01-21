@@ -4,7 +4,7 @@ Name: libcosmos
 # a version is required for pkg-config to recognise this file
 # this should be dynamically generated via SCons placing the current version
 # in there
-Version: 0.1.0
+Version: 0.2.0
 Description: libcosmos C++ systems programming library for Linux
 URL: https://www.github.com/gerstner-hub/libcosmos
 Libs: -lcosmos
