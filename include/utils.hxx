@@ -53,6 +53,10 @@ public:
 		m_val{val} {}
 
 	operator bool() const { return m_val; }
+
+	void flip() {
+		m_val = !m_val;
+	}
 protected:
 	bool m_val = def;
 };
