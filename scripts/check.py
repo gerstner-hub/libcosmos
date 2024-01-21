@@ -21,6 +21,6 @@ configurations = (
 )
 
 for config in configurations:
-    cmdline = ["scons", "-j5"] + config.split() + ["run_tests"]
+    cmdline = ["scons", "-j5"] + config.split() + ["run_tests", "samples"]
     print("Running", ' '.join(cmdline))
     subprocess.check_call(cmdline, stdout=subprocess.DEVNULL)

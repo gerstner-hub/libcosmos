@@ -1,0 +1,28 @@
+Import('env')
+import os
+
+samples = env.GatherSources(suffixes=[".cxx"], recursive=False)
+
+sample_env = env.Clone()
+sources = []
+sample_env.ConfigureForLib('libcosmos', sources)
+
+if sample_env['compiler'] == 'gcc':
+	# # these seems to be a compiler bug in GCC when static linking with LTO:
+	# /usr/lib/gcc/x86_64-pc-linux-gnu/13/include/g++-v13/bits/new_allocator.h:168:33: warning: 'operator delete' called on pointer '_374' with nonzero offset [1, 25769803764] [-Wfree-nonheap-object]
+	# /usr/lib/gcc/x86_64-pc-linux-gnu/13/include/g++-v13/bits/new_allocator.h:147:55: note: returned from 'operator new'
+	# it's complaining deep within std::vector STL implementation about the
+	# vector returned from cosmos::Poller::wait(). There's nothing special
+	# there memory management wise though.
+    sample_env.Append(LINKFLAGS = ["-Wno-free-nonheap-object"])
+
+for sample in samples:
+
+    label = '.'.join(sample.split('.')[:-1])
+    sample_prog_out = f"sample_{label}"
+
+    sample_bin = sample_env.Program(sample_prog_out, [sample] + sources)
+
+    env.Alias("cosmos_samples", sample_prog_out)
+
+env.Alias("samples", "cosmos_samples")

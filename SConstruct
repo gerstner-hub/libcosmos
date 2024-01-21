@@ -21,6 +21,7 @@ is_main_project = env['project'] == "libcosmos"
 
 if is_main_project:
     SConscript(env['buildroot'] + 'test/SConstruct')
+    SConscript(env['buildroot'] + 'sample/SConstruct')
     SConscript(env['buildroot'] + 'doc/SConstruct')
     Default(env['libs']['libcosmos'])
 
