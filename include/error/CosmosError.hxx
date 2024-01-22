@@ -105,6 +105,9 @@ public: // functions
 	 **/
 	const char* what() const throw() override;
 
+	/// Returns a shorter description of the error without verbose context.
+	std::string shortWhat() const;
+
 	/// Throw the most specialized type of this object in the inheritance hierarchy.
 	[[ noreturn ]] virtual void raise() = 0;
 

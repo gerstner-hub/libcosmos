@@ -21,4 +21,12 @@ const char* CosmosError::what() const throw() {
 	return m_msg.c_str();
 }
 
+std::string CosmosError::shortWhat() const {
+	const std::string_view what{this->what()};
+
+	const auto start = what.find(m_error_class) + m_error_class.size() + 2;
+
+	return std::string{what.substr(start)};
+}
+
 } // end ns

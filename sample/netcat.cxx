@@ -201,7 +201,7 @@ void NetCat::setupSocket() {
 		}
 	} catch (const cosmos::CosmosError &error) {
 		std::cerr << "Failed to resolve IP address specification '" << m_config.addrspec << "': "
-			<< error.what() << std::endl;
+			<< error.shortWhat() << std::endl;
 		throw status::ADDR_ERROR;
 	}
 
