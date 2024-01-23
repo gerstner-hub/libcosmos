@@ -39,7 +39,7 @@ std::pair<UnixDatagramSocket, UnixDatagramSocket> create_dgram_socket_pair(const
 }
 
 InterfaceIndex nameToIndex(const SysString name) {
-	const auto index = if_nametoindex(name.raw()); 
+	const auto index = if_nametoindex(name.raw());
 	if (index == 0) {
 		cosmos_throw(ApiError("if_nametoindex"));
 	}

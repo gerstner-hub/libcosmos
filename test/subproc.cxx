@@ -595,7 +595,7 @@ public:
 
 			if (nr != 19)
 				continue;
-			
+
 			char *end;
 			auto prio = std::strtoul(field.c_str(), &end, 10);
 			if (static_cast<size_t>(end - field.data()) != field.size()) {

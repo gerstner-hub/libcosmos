@@ -6,7 +6,7 @@
 
 class MainTest :
 		public cosmos::TestBase {
-	
+
 	void runTests() override {
 		testArgvCorrect();
 		testExitByReturn();

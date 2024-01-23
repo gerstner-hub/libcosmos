@@ -30,7 +30,7 @@ namespace {
 
 		const auto res = ::getsockopt(
 				to_integral(sock.raw()),
-				to_integral(lvl), 
+				to_integral(lvl),
 				to_integral(name),
 				&out,
 				&len);
@@ -77,7 +77,7 @@ namespace {
 
 		const auto res = ::getsockopt(
 				to_integral(sock.raw()),
-				to_integral(lvl), 
+				to_integral(lvl),
 				to_integral(name),
 				ptr,
 				&ptr_len);

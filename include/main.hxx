@@ -53,7 +53,7 @@ protected: // functions
  *
  * Use this wrapper in the actual `main()` entry point of your program to
  * instantiate the MAIN class type. This type needs to implement one of the
- * main class interfaces MainNoArgs, MainPlainArgs or MainContainerArgs. 
+ * main class interfaces MainNoArgs, MainPlainArgs or MainContainerArgs.
  *
  * These classes use the cosmos::ExitStatus strong type instead of the plain
  * `int` exit code. This offers improved readability and less room for

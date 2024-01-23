@@ -76,7 +76,7 @@ protected: // functions
 		cosmos::PosixThread thread{
 			{std::bind(&ThreadTest::exitEntry, this, std::placeholders::_1)},
 				ThreadArg{4711}, "exitthread"};
-		
+
 		auto res = thread.join();
 
 		RUN_STEP("exit-value-matches", res == ExitValue{4711});
@@ -150,7 +150,7 @@ protected: // functions
 	}
 
 	ExitValue exitEntry(ThreadArg arg) {
-		cosmos::pthread::exit(static_cast<ExitValue>(arg));	
+		cosmos::pthread::exit(static_cast<ExitValue>(arg));
 		return ExitValue{1234};
 	}
 
