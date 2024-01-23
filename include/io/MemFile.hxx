@@ -3,13 +3,11 @@
 // Linux
 #include <sys/mman.h>
 
-// C++
-#include <string_view>
-
 // cosmos
 #include "cosmos/BitMask.hxx"
 #include "cosmos/dso_export.h"
 #include "cosmos/fs/FileBase.hxx"
+#include "cosmos/SysString.hxx"
 
 namespace cosmos {
 
@@ -55,7 +53,7 @@ public: // functions
 	MemFile() = default;
 
 	/// \c see create().
-	explicit MemFile(const std::string_view name,
+	explicit MemFile(const SysString name,
 			const OpenFlags flags = OpenFlags{OpenFlag::CLOEXEC},
 			const HugePageSize tlb_ps = HugePageSize::DEFAULT) {
 		create(name, flags, tlb_ps);
@@ -67,7 +65,7 @@ public: // functions
 	 * size. The \c name is only for debugging purposes and is used as an
 	 * identifier in the /proc file system.
 	 **/
-	void create(const std::string_view name,
+	void create(const SysString name,
 			const OpenFlags flags = OpenFlags{OpenFlag::CLOEXEC},
 			const HugePageSize tlb_ps = HugePageSize::DEFAULT);
 };

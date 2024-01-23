@@ -15,6 +15,7 @@ class StringTest :
 		testStrip();
 		testPrefix();
 		testSplit();
+		testSysString();
 	}
 
 	void testLowerUpper() {
@@ -88,6 +89,11 @@ class StringTest :
 		parts = cosmos::split(bigsep, "--", {cosmos::SplitFlag::STRIP_PARTS});
 		const auto expected_bigsep_stripped = {"A bit", "more", "of", "splitting"};
 		RUN_STEP("bigsep-split-strip-matches", compareParts(parts, expected_bigsep_stripped));
+	}
+
+	void testSysString() {
+		START_TEST("SysString");
+		std::cout << "sizeof(SysString): " << sizeof(cosmos::SysString) << std::endl;
 	}
 
 	const std::string m_test_string = "A test string. Have a nice day!";

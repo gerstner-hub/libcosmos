@@ -2,11 +2,11 @@
 
 // C++
 #include <optional>
-#include <string_view>
 
 // cosmos
-#include "cosmos/fs/FDFile.hxx"
+#include "cosmos/SysString.hxx"
 #include "cosmos/fs/DirFD.hxx"
+#include "cosmos/fs/FDFile.hxx"
 
 namespace cosmos {
 
@@ -27,7 +27,7 @@ public: // functions
 	File() = default;
 
 	/// Open a file without special flags (close-on-exec will be set).
-	File(const std::string_view path, const OpenMode mode) :
+	File(const SysString path, const OpenMode mode) :
 			File{path, mode, OpenFlags{OpenFlag::CLOEXEC}} {}
 
 	/// Open a file using specific OpenFlags, potentially creating it first using the given \c fmode.
@@ -36,16 +36,16 @@ public: // functions
 	 * also the FileMode in that case. An exception will the thrown if
 	 * this condition is violated.
 	 **/
-	File(const std::string_view path, const OpenMode mode, const OpenFlags flags,
+	File(const SysString path, const OpenMode mode, const OpenFlags flags,
 			const std::optional<FileMode> fmode = {}) {
 		open(path, mode, flags, fmode);
 	}
 
 	/// Open the given path relative to the given directory file descriptor \c dir_fd.
 	/**
-	 * \see open(const DirFD, const std::string_view, const OpenFlags, const std::optional<FileMode>).
+	 * \see open(const DirFD, const SysString, const OpenFlags, const std::optional<FileMode>).
 	 **/
-	File(const DirFD dir_fd, const std::string_view path, const OpenMode mode,
+	File(const DirFD dir_fd, const SysString path, const OpenMode mode,
 			const OpenFlags flags, const std::optional<FileMode> fmode = {}) {
 		open(dir_fd, path, mode, flags, fmode);
 	}
@@ -57,8 +57,8 @@ public: // functions
 
 	using FDFile::open;
 
-	/// \see File(const std::string_view, const OpenMode).
-	void open(const std::string_view path, const OpenMode mode) {
+	/// \see File(const SysString, const OpenMode).
+	void open(const SysString path, const OpenMode mode) {
 		return open(path, mode, {OpenFlag::CLOEXEC});
 	}
 
@@ -67,11 +67,11 @@ public: // functions
 	 * If in \p flags the #CREATE bit is set then you \b must specify also
 	 * \p fmode, otherwise an exception is thrown.
 	 **/
-	void open(const std::string_view path, const OpenMode mode,
+	void open(const SysString path, const OpenMode mode,
 			const OpenFlags flags, const std::optional<FileMode> fmode = {});
 
-	/// \see open(const DirFD, const std::string_view, const OpenMode, const OpenFlags, const std::optional<FileMode>).
-	void open(const DirFD dir_fd, const std::string_view path, const OpenMode mode) {
+	/// \see open(const DirFD, const SysString, const OpenMode, const OpenFlags, const std::optional<FileMode>).
+	void open(const DirFD dir_fd, const SysString path, const OpenMode mode) {
 		open(dir_fd, path, mode, {OpenFlag::CLOEXEC});
 	}
 
@@ -79,7 +79,7 @@ public: // functions
 	/**
 	 * \see fs::open_at().
 	 **/
-	void open(const DirFD dir_fd, const std::string_view path, const OpenMode mode,
+	void open(const DirFD dir_fd, const SysString path, const OpenMode mode,
 			const OpenFlags flags, const std::optional<FileMode> fmode = {});
 };
 

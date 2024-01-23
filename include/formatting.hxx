@@ -5,7 +5,6 @@
 #include <functional>
 #include <ostream>
 #include <string>
-#include <string_view>
 #include <sstream>
 #include <type_traits>
 
@@ -16,6 +15,7 @@
 #include "cosmos/proc/types.hxx"
 #include "cosmos/types.hxx"
 #include "cosmos/utils.hxx"
+#include "cosmos/string.hxx"
 
 /**
  * @file
@@ -78,7 +78,7 @@ protected: // types
 
 protected: // functions
 
-	FormattedNumber(const NUM num, size_t width, SetBaseFN fn, std::string_view base_prefix) :
+	FormattedNumber(const NUM num, size_t width, SetBaseFN fn, std::string base_prefix) :
 		m_num{num}, m_width{width}, m_setbase_fn{fn}, m_base_prefix{base_prefix} {}
 
 public: // functions
@@ -89,7 +89,7 @@ public: // functions
 	size_t width() const { return m_width; }
 	bool showBase() const { return m_show_base; }
 	auto num() const { return m_num; }
-	const std::string_view basePrefix() const { return m_base_prefix; }
+	const std::string& basePrefix() const { return m_base_prefix; }
 	SetBaseFN baseFN() const { return m_setbase_fn; }
 
 	explicit operator std::string() const {
@@ -103,7 +103,7 @@ protected: // data
 	NUM m_num;
 	size_t m_width = 0;
 	SetBaseFN m_setbase_fn;
-	std::string_view m_base_prefix;
+	std::string m_base_prefix;
 	bool m_show_base = true;
 };
 

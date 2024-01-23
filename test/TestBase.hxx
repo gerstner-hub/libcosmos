@@ -181,9 +181,11 @@ protected: // functions
 		if (!preload)
 			return false;
 
+		std::string_view preloadv{*preload};
+
 		// this is only a heuristic, valgrind uses LD_PRELOAD to pull
 		// itself in.
-		return preload->find("valgrind") != preload->npos;
+		return preloadv.find("valgrind") != preloadv.npos;
 	}
 
 	// checks that no open file descriptors have leaked.
@@ -208,7 +210,7 @@ protected: // functions
 			else if (cosmos::FileNum{fd_num} == proc_fds.fd().raw())
 				continue;
 			else {
-				auto label = cosmos::fs::read_symlink_at(proc_fds.fd(), entry.view());
+				auto label = cosmos::fs::read_symlink_at(proc_fds.fd(), entry.name());
 				excess_fds.push_back({fd_num, label});
 			}
 		}

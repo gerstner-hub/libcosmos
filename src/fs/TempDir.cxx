@@ -14,7 +14,7 @@ TempDir::~TempDir() {
 	}
 }
 
-void TempDir::create(const std::string_view _template) {
+void TempDir::create(const SysString _template) {
 	close();
 	m_tmp_path = fs::make_tempdir(fs::normalize_path(_template));
 }

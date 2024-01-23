@@ -7,7 +7,7 @@
 
 namespace cosmos {
 
-void SocketOptions::bindToDevice(const std::string_view ifname) {
+void SocketOptions::bindToDevice(const SysString ifname) {
 	setStringOption(OptName{SO_BINDTODEVICE}, ifname);
 }
 

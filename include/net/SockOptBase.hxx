@@ -1,6 +1,7 @@
 #pragma once
 
 // cosmos
+#include "cosmos/SysString.hxx"
 #include "cosmos/dso_export.h"
 #include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/net/types.hxx"
@@ -34,7 +35,7 @@ protected: // functions
 	/// Return a null terminated string option.
 	std::string getStringOption(const OptName name, size_t max_len) const;
 	/// Set a null terminated string option.
-	void setStringOption(const OptName name, const std::string_view sv);
+	void setStringOption(const OptName name, const SysString str);
 
 	/// Returns the labeled IPSEC or NetLabel of the peer.
 	/**

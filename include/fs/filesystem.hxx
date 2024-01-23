@@ -10,8 +10,9 @@
 #include <utility>
 
 // cosmos
-#include "cosmos/error/errno.hxx"
+#include "cosmos/SysString.hxx"
 #include "cosmos/dso_export.h"
+#include "cosmos/error/errno.hxx"
 #include "cosmos/fs/DirFD.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
 #include "cosmos/fs/types.hxx"
@@ -38,12 +39,12 @@ namespace cosmos::fs {
  * yourself!
  **/
 COSMOS_API FileDescriptor open(
-		const std::string_view path, const OpenMode mode,
+		const SysString path, const OpenMode mode,
 		const OpenFlags flags, const std::optional<FileMode> fmode = {});
 
 /// Open the given path relative to the given directory file descriptor \c dir_fd.
 /**
- * This open variant behaves similar to open(const std::string_view,
+ * This open variant behaves similar to open(const SysString,,
  * const OpenMode, const OpenFlags, const std::optional<FileMode>).
  * The following differences exist:
  *
@@ -59,7 +60,7 @@ COSMOS_API FileDescriptor open(
  *   used to open files relative to the current working directory.
  **/
 COSMOS_API FileDescriptor open_at(
-		const DirFD dir_fd, const std::string_view path,
+		const DirFD dir_fd, const SysString path,
 		const OpenMode mode, const OpenFlags flags,
 		const std::optional<FileMode> fmode = {});
 
@@ -125,7 +126,7 @@ COSMOS_API void close_range(const FileNum first,
  * tasks, if necessary.
  **/
 COSMOS_API std::pair<FileDescriptor, std::string> make_tempfile(
-		const std::string_view _template, const OpenFlags flags = OpenFlags{OpenFlag::CLOEXEC});
+		const SysString _template, const OpenFlags flags = OpenFlags{OpenFlag::CLOEXEC});
 
 /// Safely create a temporary directory and return it's path.
 /**
@@ -143,7 +144,7 @@ COSMOS_API std::pair<FileDescriptor, std::string> make_tempfile(
  * \see TempDir for a convenience type that transparently handles removal of
  * the temporary directory.
  **/
-COSMOS_API std::string make_tempdir(const std::string_view _template);
+COSMOS_API std::string make_tempdir(const SysString _template);
 
 /// Creates a named pipe at the given file system location.
 /**
@@ -167,7 +168,7 @@ COSMOS_API std::string make_tempdir(const std::string_view _template);
  * symlinks or reuse existing files. Instead an error is thrown if the path
  * already exists in any form.
  **/
-COSMOS_API void make_fifo(const std::string_view path, const FileMode mode);
+COSMOS_API void make_fifo(const SysString path, const FileMode mode);
 
 /// Creates a named pipe relative to the given directory descriptor.
 /**
@@ -178,7 +179,7 @@ COSMOS_API void make_fifo(const std::string_view path, const FileMode mode);
  * - if \c path is relative and \c dir_fd has the special value cosmos::AT_CWD
  *   then it is interpreted relative to the current working directory.
  **/
-COSMOS_API void make_fifo_at(const DirFD dir_fd, const std::string_view path,
+COSMOS_API void make_fifo_at(const DirFD dir_fd, const SysString path,
 		const FileMode mode);
 
 /// Sets the process's file creation mask.
@@ -232,7 +233,7 @@ COSMOS_API FileMode set_umask(const FileMode mode);
  * This function does not determine the file *type* i.e. it could be also a
  * directory, socket etc.
  **/
-COSMOS_API bool exists_file(const std::string_view path);
+COSMOS_API bool exists_file(const SysString path);
 
 /// Removes the file object found at \c path.
 /**
@@ -245,7 +246,7 @@ COSMOS_API bool exists_file(const std::string_view path);
  * If the \c path does not exist then this is considered an error and an
  * exception is thrown.
  **/
-COSMOS_API void unlink_file(const std::string_view path);
+COSMOS_API void unlink_file(const SysString path);
 
 /// Removes the file object found at \c path relative to \c dir_fd.
 /**
@@ -259,13 +260,13 @@ COSMOS_API void unlink_file(const std::string_view path);
  * - if path is a relative path and \c dir_fd is a valid open directory file
  *   descriptor then \c path is looked up relative to that directory.
  **/
-COSMOS_API void unlink_file_at(const DirFD dir_fd, const std::string_view path);
+COSMOS_API void unlink_file_at(const DirFD dir_fd, const SysString path);
 
 /// Change the calling process's current working directory to \c path.
 /**
  * On error a FileError exception is thrown.
  **/
-COSMOS_API void change_dir(const std::string_view path);
+COSMOS_API void change_dir(const SysString path);
 
 /// Returns the process's current working directory.
 /**
@@ -298,7 +299,7 @@ COSMOS_API std::optional<std::string> which(const std::string_view exec_base) no
  * directory. The permissions are modified by the process's umask
  * (mode = mode * & ~umask)
  **/
-COSMOS_API void make_dir(const std::string_view path, const FileMode mode);
+COSMOS_API void make_dir(const SysString path, const FileMode mode);
 
 /// Creates a directory at the location relative to \c dir_fd.
 /**
@@ -307,14 +308,14 @@ COSMOS_API void make_dir(const std::string_view path, const FileMode mode);
  *
  * \see unlink_file_at().
  **/
-COSMOS_API void make_dir_at(const DirFD dir_fd, const std::string_view path, const FileMode mode);
+COSMOS_API void make_dir_at(const DirFD dir_fd, const SysString path, const FileMode mode);
 
 /// Removes an empty directory at the given location.
 /**
  * The directory must exist and must be empty for the call to succeed. On
  * error a FileError is thrown.
  **/
-COSMOS_API void remove_dir(const std::string_view path);
+COSMOS_API void remove_dir(const SysString path);
 
 /// Removes an empty directory relative to \c dir_fd.
 /**
@@ -323,7 +324,7 @@ COSMOS_API void remove_dir(const std::string_view path);
  *
  * \see unlink_file_at().
  **/
-COSMOS_API void remove_dir_at(const DirFD dir_fd, const std::string_view path);
+COSMOS_API void remove_dir_at(const DirFD dir_fd, const SysString path);
 
 /// Creates a directory, potentially creating multiple directory components.
 /**
@@ -339,7 +340,7 @@ COSMOS_API void remove_dir_at(const DirFD dir_fd, const std::string_view path);
  *         directory component) was created, Errno::EXISTS if the directory
  *         was already existing.
  **/
-COSMOS_API Errno make_all_dirs(const std::string_view path, const FileMode mode);
+COSMOS_API Errno make_all_dirs(const SysString path, const FileMode mode);
 
 /// Recursively removes all directory content in \c path.
 /**
@@ -353,7 +354,7 @@ COSMOS_API Errno make_all_dirs(const std::string_view path, const FileMode mode)
  * within the calling or another process in the system can cause race
  * conditions that leads to undefined behaviour.
  **/
-COSMOS_API void remove_tree(const std::string_view path);
+COSMOS_API void remove_tree(const SysString path);
 
 /// Changes the FileMode of the given path.
 /**
@@ -374,11 +375,11 @@ COSMOS_API void remove_tree(const std::string_view path);
  * - no permission to change the mode (Errno::PERMISSION)
  * - read only file system (Errno::READ_ONLY_FS)
  **/
-COSMOS_API void change_mode(const std::string_view path, const FileMode mode);
+COSMOS_API void change_mode(const SysString path, const FileMode mode);
 
 /// Changes the FileMode of the given open file descriptor.
 /**
- * This behaves the same as change_mode(std::string_view, FileMode) with the
+ * This behaves the same as change_mode(const SysString, FileMode) with the
  * exception that the file associated with the given file descriptor will be
  * affected instead of a to-be-opened path.
  *
@@ -402,11 +403,11 @@ COSMOS_API void change_mode(const FileDescriptor fd, const FileMode mode);
  * - no permission to change the owner (Errno::PERMISSION)
  * - read only file system (Errno::READ_ONLY_FS)
  **/
-COSMOS_API void change_owner(const std::string_view path, const UserID uid, const GroupID gid = GroupID::INVALID);
+COSMOS_API void change_owner(const SysString path, const UserID uid, const GroupID gid = GroupID::INVALID);
 
 /// Change numerical owner and/or group ID of the given open file descriptor.
 /**
- * This behaves the same as change_owner(std::string_view, UserID, GroupID)
+ * This behaves the same as change_owner(const SysString, UserID, GroupID)
  * with the exception that the file associated with the given file descriptor
  * will be affected instead of a to-be-opened path.
  *
@@ -418,28 +419,28 @@ COSMOS_API void change_owner(const FileDescriptor fd, const UserID uid, const Gr
 
 /// Change owner and/or group of the given path by user name and/or group name.
 /**
- * This is a convenience function on top of change_owner(std::string_view,
+ * This is a convenience function on top of change_owner(const SysString,
  * UserID, GroupID). It looks up the numerical UserID of \c user and the
  * numerical GroupID of \c group.
  *
  * To skip changing the owner of user or group simply pass an empty
- * string_view as respective parameter.
+ * SysString as respective parameter.
  *
  * Additional errors that can occur are the ones described in PasswdInfo(),
  * GroupInfo() and RuntimeError() in case the username or group do not
  * exist.
  **/
-COSMOS_API void change_owner(const std::string_view path, const std::string_view user,
-		const std::string_view group = {});
+COSMOS_API void change_owner(const SysString path, const SysString user,
+		const SysString group = {});
 
 /// Change owner and/or group of the given file descriptor by user name and/or group name.
 /**
  * This is a convenience function on top of change_owner(FileDescriptor,
- * UserID, GroupID). The description of change_owner(std::string_view,
- * std::string_view, std::string_view) applies here as well.
+ * UserID, GroupID). The description of change_owner(const SysString,
+ * const SysString, const SysString) applies here as well.
  **/
-COSMOS_API void change_owner(const FileDescriptor fd, const std::string_view user,
-		const std::string_view group = {});
+COSMOS_API void change_owner(const FileDescriptor fd, const SysString user,
+		const SysString group = {});
 
 /// Convenience wrapper of change_owner() to change only the group of a file.
 inline void change_group(const FileDescriptor fd, const GroupID id) {
@@ -447,23 +448,23 @@ inline void change_group(const FileDescriptor fd, const GroupID id) {
 }
 
 /// Convenience wrapper of change_owner() to change only the group of a file.
-inline void change_group(const FileDescriptor fd, const std::string_view group) {
+inline void change_group(const FileDescriptor fd, const SysString group) {
 	change_owner(fd, {}, group);
 }
 
 /// Convenience wrapper of change_owner() to change only the group of a file.
-inline void change_group(const std::string_view path, const GroupID id) {
+inline void change_group(const SysString path, const GroupID id) {
 	change_owner(path, UserID::INVALID, id);
 }
 
 /// Convenience wrapper of change_owner() to change only the group of a file.
-inline void change_group(const std::string_view path, const std::string_view group) {
+inline void change_group(const SysString path, const SysString group) {
 	change_owner(path, {}, group);
 }
 
 /// Changes owner and/or group of the given path while not following symlinks.
 /**
- * This behaves the same as change_owner(const std::string_view, const UserID,
+ * This behaves the same as change_owner(const SysString, const UserID,
  * const GroupID) with the exception that if the final path component refers
  * to a symbolic link that the ownership of the link is changed, not that of
  * the target.
@@ -471,15 +472,15 @@ inline void change_group(const std::string_view path, const std::string_view gro
  * If \c path is not a symlink then it's owner will still be changed and no
  * error is thrown.
  **/
-COSMOS_API void change_owner_nofollow(const std::string_view path, const UserID uid,
+COSMOS_API void change_owner_nofollow(const SysString path, const UserID uid,
 		const GroupID gid = GroupID::INVALID);
 
 /// Changes owner and/or group of the given path while not following symlinks.
 /**
- * \see change_owner_nofollow(const std::string_view, const UserID, const GroupID)
+ * \see change_owner_nofollow(const SysString, const UserID, const GroupID)
  **/
-COSMOS_API void change_owner_nofollow(const std::string_view path, const std::string_view user,
-		const std::string_view group = {});
+COSMOS_API void change_owner_nofollow(const SysString path, const SysString user,
+		const SysString group = {});
 
 /// Creates a symbolic link at \c path pointing to \c target.
 /**
@@ -503,15 +504,15 @@ COSMOS_API void change_owner_nofollow(const std::string_view path, const std::st
  *   (Errno::NO_ENTRY).
  * - \c path already exists (Errno::EXISTS).
  **/
-COSMOS_API void make_symlink(const std::string_view target, const std::string_view path);
+COSMOS_API void make_symlink(const SysString target, const SysString path);
 
 /// Creates a symbolic link relative to \c dir_fd pointing to \c target.
 /**
  * This behaves just like make_symlink(). It relates to make_symlink() the
  * same way unlink_file_at() relates to unlink_file().
  **/
-COSMOS_API void make_symlink_at(const std::string_view target, const DirFD dir_fd,
-		const std::string_view path);
+COSMOS_API void make_symlink_at(const SysString target, const DirFD dir_fd,
+		const SysString path);
 
 /// Returns the target (content) of the symbolic link at \c path.
 /**
@@ -523,7 +524,7 @@ COSMOS_API void make_symlink_at(const std::string_view target, const DirFD dir_f
  * - invalid argument if \c path is not a symlink (Errno::INVALID_ARG)
  * - no entry if \c path does not exist (Errno::NO_ENTRY)
  **/
-COSMOS_API std::string read_symlink(const std::string_view path);
+COSMOS_API std::string read_symlink(const SysString path);
 
 /// Returns the target (content) of the symbolic link \c path relative to \c dir_fd.
 /**
@@ -532,7 +533,7 @@ COSMOS_API std::string read_symlink(const std::string_view path);
  *
  * \see unlink_file_at().
  **/
-COSMOS_API std::string read_symlink_at(const DirFD dir_fd, const std::string_view path);
+COSMOS_API std::string read_symlink_at(const DirFD dir_fd, const SysString path);
 
 /// Creates a new (hard) link of the file found in \c old_path at \c new_path.
 /**
@@ -553,7 +554,7 @@ COSMOS_API std::string read_symlink_at(const DirFD dir_fd, const std::string_vie
  * On success both names will refer to the same file and it cannot be
  * determined any more which was was the "original".
  **/
-COSMOS_API void link(const std::string_view old_path, const std::string_view new_path);
+COSMOS_API void link(const SysString old_path, const SysString new_path);
 
 /// Creates a new (hard) link based on lookups relative to \c old_dir and \c new_dir.
 /**
@@ -569,8 +570,8 @@ COSMOS_API void link(const std::string_view old_path, const std::string_view new
  * \c follow_old determines whether symlink's encountered at \c old_path will
  * be resolved or not.
  **/
-COSMOS_API void linkat(const DirFD old_dir, const std::string_view old_path,
-		const DirFD new_dir, const std::string_view new_path,
+COSMOS_API void linkat(const DirFD old_dir, const SysString old_path,
+		const DirFD new_dir, const SysString new_path,
 		const FollowSymlinks follow_old = FollowSymlinks{false});
 
 /// Special variant of linkat() that can link arbitrary file descriptors at a new location.
@@ -590,7 +591,7 @@ COSMOS_API void linkat(const DirFD old_dir, const std::string_view old_path,
  * `man 2 linkat`.
  **/
 COSMOS_API void linkat_fd(const FileDescriptor fd, const DirFD new_dir,
-		const std::string_view new_path);
+		const SysString new_path);
 
 /// Performs the same as linkat_fd() using linkat() and the /proc file system.
 /**
@@ -599,7 +600,7 @@ COSMOS_API void linkat_fd(const FileDescriptor fd, const DirFD new_dir,
  * same result, see `man 2 linkat`.
  **/
 COSMOS_API void linkat_proc_fd(const FileDescriptor fd, const DirFD new_dir,
-		const std::string_view new_path);
+		const SysString new_path);
 
 /// Changes the file size of the file referred to by \c fd to \c length bytes.
 /**
@@ -618,7 +619,7 @@ COSMOS_API void truncate(const FileDescriptor fd, off_t length);
  * difference that the operation is performed on the given path. The file must
  * be writable.
  **/
-COSMOS_API void truncate(const std::string_view path, off_t length);
+COSMOS_API void truncate(const SysString path, off_t length);
 
 /// set of parameters for copy_file_range().
 struct CopyFileRangeParameters {

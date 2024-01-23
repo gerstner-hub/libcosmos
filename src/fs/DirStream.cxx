@@ -34,7 +34,7 @@ void DirStream::close() {
 	}
 }
 
-void DirStream::open(const std::string_view path, const FollowSymlinks follow_links) {
+void DirStream::open(const SysString path, const FollowSymlinks follow_links) {
 	close();
 
 	/*
@@ -43,7 +43,7 @@ void DirStream::open(const std::string_view path, const FollowSymlinks follow_li
 	 * O_CLOEXEC. This gives us more control than when using opendir().
 	 */
 	auto res = ::open(
-		path.data(),
+		path.raw(),
 		O_RDONLY | O_CLOEXEC | O_DIRECTORY | (follow_links ? O_NOFOLLOW : 0)
 	);
 
@@ -79,7 +79,7 @@ void DirStream::open(const FileNum fd) {
 	}
 }
 
-void DirStream::open(const DirFD dir_fd, const std::string_view subpath) {
+void DirStream::open(const DirFD dir_fd, const SysString subpath) {
 
 	const OpenFlags flags{OpenFlag::DIRECTORY};
 	auto fd = fs::open_at(dir_fd, subpath, OpenMode::READ_ONLY, flags);

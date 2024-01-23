@@ -6,9 +6,9 @@
 
 namespace cosmos {
 
-GroupInfo::GroupInfo(const std::string_view name) {
+GroupInfo::GroupInfo(const SysString name) {
 	auto call = [&](struct group **res) -> int {
-		return getgrnam_r(name.data(), &m_info,
+		return getgrnam_r(name.raw(), &m_info,
 				m_buf.data(), m_buf.size(),
 				res);
 	};
@@ -31,12 +31,12 @@ GroupInfo::GroupInfo(const GroupID gid) {
 		reset();
 }
 
-const StringViewVector GroupInfo::members() const {
+SysStringVector GroupInfo::members() const {
 	if (!valid()) {
 		cosmos_throw (UsageError{"cannot get members of invalid GroupInfo"});
 	}
 
-	StringViewVector ret;
+	SysStringVector ret;
 
 	for (char **member = m_info.gr_mem; *member != nullptr; member++) {
 		ret.push_back(*member);

@@ -6,6 +6,7 @@
 #include <string_view>
 
 // cosmos
+#include "cosmos/SysString.hxx"
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/error/UsageError.hxx"
 #include "cosmos/fs/DirEntry.hxx"
@@ -41,12 +42,12 @@ public: // functions
 	}
 
 	/// Open the directory \c subpath relative to \c fd.
-	DirStream(const DirFD fd, const std::string_view subpath) {
+	DirStream(const DirFD fd, const SysString subpath) {
 		open(fd, subpath);
 	}
 
 	/// Create a DirStream object operating on the directory at the given path location.
-	explicit DirStream(const std::string_view path) {
+	explicit DirStream(const SysString path) {
 		open(path);
 	}
 
@@ -83,14 +84,14 @@ public: // functions
 	void open(const DirFD fd);
 
 	/// Open the directory \c subpath relative to \c fd.
-	void open(const DirFD dir_fd, const std::string_view subpath);
+	void open(const DirFD dir_fd, const SysString subpath);
 
 	/// Associate with the directory at the given file system path location.
 	/**
 	 * If the object is already associated with another directory then this
 	 * previous associaton will be implicitly close()'d.
 	 **/
-	void open(const std::string_view path, const FollowSymlinks follow_links = FollowSymlinks{false});
+	void open(const SysString path, const FollowSymlinks follow_links = FollowSymlinks{false});
 
 	/// Indicates whether currently a directory is associated with this object.
 	auto isOpen() const { return m_stream != nullptr; }

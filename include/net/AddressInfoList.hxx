@@ -61,7 +61,7 @@ public: // functions
 	 * If resolving the requested parameters fails then a specialized
 	 * ResolveError exception is thrown to describe the error.
 	 **/
-	void resolve(const std::string_view node, const std::string_view service);
+	void resolve(const SysString node, const SysString service);
 
 	/// Clear a previously stored resolve result.
 	void clear();

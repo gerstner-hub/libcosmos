@@ -35,8 +35,8 @@ std::string SockOptBase<LEVEL>::getStringOption(const OptName name, size_t max_l
 }
 
 template <OptLevel LEVEL>
-void SockOptBase<LEVEL>::setStringOption(const OptName name, const std::string_view sv) {
-	setsockopt(m_sock, M_LEVEL, name, sv.data(), sv.size());
+void SockOptBase<LEVEL>::setStringOption(const OptName name, const SysString str) {
+	setsockopt(m_sock, M_LEVEL, name, str.raw(), str.length());
 }
 
 template <OptLevel LEVEL>

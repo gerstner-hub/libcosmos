@@ -17,7 +17,7 @@ public: // functions
 
 	TempDir() = default;
 
-	explicit TempDir(const std::string_view _template) {
+	explicit TempDir(const SysString _template) {
 		create(_template);
 	}
 
@@ -44,7 +44,7 @@ public: // functions
 		}
 	}
 
-	void create(const std::string_view _template);
+	void create(const SysString _template);
 
 	/// Returns the expanded path to the temporary dir.
 	/**

@@ -16,7 +16,7 @@ Directory::~Directory() {
 	}
 }
 
-void Directory::open(const std::string_view path, const OpenMode mode, OpenFlags flags) {
+void Directory::open(const SysString path, const OpenMode mode, OpenFlags flags) {
 
 	m_auto_close = AutoCloseFD{true};
 	flags.set(OpenFlag::DIRECTORY);
@@ -24,7 +24,7 @@ void Directory::open(const std::string_view path, const OpenMode mode, OpenFlags
 	m_fd = DirFD{fd.raw()};
 }
 
-void Directory::open(const DirFD dir_fd, const std::string_view path, const OpenMode mode, OpenFlags flags) {
+void Directory::open(const DirFD dir_fd, const SysString path, const OpenMode mode, OpenFlags flags) {
 	m_auto_close = AutoCloseFD{true};
 	flags.set(OpenFlag::DIRECTORY);
 

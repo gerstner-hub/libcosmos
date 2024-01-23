@@ -6,10 +6,10 @@
 
 // C++
 #include <optional>
-#include <string_view>
 
 // cosmos
 #include "cosmos/BitMask.hxx"
+#include "cosmos/SysString.hxx"
 #include "cosmos/net/IPAddress.hxx"
 #include "cosmos/net/LinkLayerAddress.hxx"
 #include "cosmos/net/types.hxx"
@@ -76,7 +76,7 @@ public: // functions
 	InterfaceAddress(const InterfaceAddress&) = delete;
 
 	/// Returns the unique string that identifies the network device that this address belongs to.
-	std::string_view ifname() const {
+	SysString ifname() const {
 		return ifa_name;
 	}
 

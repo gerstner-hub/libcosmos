@@ -73,7 +73,7 @@ class ProcessTest :
 
 		auto new_path = cosmos::proc::get_env_var("PATH");
 
-		RUN_STEP("PATH-no-overwrite", new_path != std::nullopt && *new_path == *path);
+		RUN_STEP("PATH-no-overwrite", new_path != std::nullopt && new_path == *path);
 
 		cosmos::proc::set_env_var("PATH", "newval", cosmos::proc::OverwriteEnv(true));
 

@@ -16,7 +16,7 @@ namespace cosmos {
 class COSMOS_API WouldBlock :
 		public ApiError {
 public:
-	WouldBlock(const std::optional<std::string_view> prefix = {}) :
+	WouldBlock(const std::string_view prefix = {}) :
 		ApiError{prefix}
 	{}
 

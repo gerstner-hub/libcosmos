@@ -6,13 +6,13 @@
 // C++
 #include <cstring>
 #include <string>
-#include <string_view>
 
 // cosmos
 #include "cosmos/BitMask.hxx"
+#include "cosmos/SysString.hxx"
 #include "cosmos/dso_export.h"
-#include "cosmos/net/byte_order.hxx"
 #include "cosmos/net/SocketAddress.hxx"
+#include "cosmos/net/byte_order.hxx"
 #include "cosmos/utils.hxx"
 
 namespace cosmos {
@@ -57,7 +57,7 @@ public: // functions
 	/// Returns a textual representation of the currently set IP.
 	std::string ipAsString() const;
 	/// Sets the binary IP address from the given string.
-	void setIpFromString(const std::string_view sv);
+	void setIpFromString(const SysString str);
 
 	/// Reverse resolve the binary IP address and port into DNS and service names.
 	/**
@@ -119,7 +119,7 @@ public: // functions
 		setPort(port);
 	}
 
-	explicit IP4Address(const std::string_view ip, const IPPort port = IPPort{0}) {
+	explicit IP4Address(const SysString ip, const IPPort port = IPPort{0}) {
 		setFamily();
 		setIpFromString(ip);
 		setPort(port);

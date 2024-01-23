@@ -1,8 +1,9 @@
 #pragma once
 
 // cosmos
-#include "cosmos/fs/types.hxx"
 #include "cosmos/fs/DirFD.hxx"
+#include "cosmos/fs/types.hxx"
+#include "cosmos/SysString.hxx"
 
 namespace cosmos {
 
@@ -27,23 +28,23 @@ public: // functions
 
 
 	/// Open a directory by path without special flags (close-on-exec will be set).
-	explicit Directory(const std::string_view path, const OpenMode mode = OpenMode::READ_ONLY) :
+	explicit Directory(const SysString path, const OpenMode mode = OpenMode::READ_ONLY) :
 			Directory{path, mode, {OpenFlag::CLOEXEC}} {}
 
 	/// Open a directory by path using the given mode and flags.
 	/**
-	 * \see open(const std::string_view, const OpenMode, const OpenFlags)
+	 * \see open(const std::SysString, const OpenMode, const OpenFlags)
 	 **/
-	explicit Directory(const std::string_view path, const OpenMode mode, const OpenFlags flags) {
+	explicit Directory(const SysString path, const OpenMode mode, const OpenFlags flags) {
 		open(path, mode, flags);
 	}
 
 	/// Open a directory by path relative to \c dir_fd using the given mode and default flags.
-	Directory(const DirFD dir_fd, const std::string_view path, const OpenMode mode = OpenMode::READ_ONLY) :
+	Directory(const DirFD dir_fd, const SysString path, const OpenMode mode = OpenMode::READ_ONLY) :
 			Directory{dir_fd, path, mode, {OpenFlag::CLOEXEC}} {}
 
 	/// Open a directory by path relative to \c dir_fd using the given mode and flags.
-	Directory(const DirFD dir_fd, const std::string_view path, const OpenMode mode,
+	Directory(const DirFD dir_fd, const SysString path, const OpenMode mode,
 			const OpenFlags flags) {
 		open(dir_fd, path, mode, flags);
 	}
@@ -68,7 +69,7 @@ public: // functions
 	virtual ~Directory();
 
 	/// Open a directory by path without special flags (close-on-exec will be set).
-	void open(const std::string_view path, const OpenMode mode = OpenMode::READ_ONLY) {
+	void open(const SysString path, const OpenMode mode = OpenMode::READ_ONLY) {
 		return open(path, mode, {OpenFlag::CLOEXEC});
 	}
 
@@ -78,15 +79,15 @@ public: // functions
 	 * flags, since this is required to ensure that the resulting file
 	 * descriptor will refer to a directory.
 	 **/
-	void open(const std::string_view path, const OpenMode mode, OpenFlags flags);
+	void open(const SysString path, const OpenMode mode, OpenFlags flags);
 
 	/// Open a directory by path relative to \c dir_fd using the given mode and default flags.
-	void open(const DirFD dir_fd, const std::string_view path, const OpenMode mode) {
+	void open(const DirFD dir_fd, const SysString path, const OpenMode mode) {
 		open(dir_fd, path, mode, {OpenFlag::CLOEXEC});
 	}
 
 	/// Open a directory by path relative to \c dir_fd using the given mode and flags.
-	void open(const DirFD dir_fd, const std::string_view path, const OpenMode mode,
+	void open(const DirFD dir_fd, const SysString path, const OpenMode mode,
 			const OpenFlags flags);
 
 	/// Takes the already open directory file descriptor fd and operators on it.
@@ -129,19 +130,19 @@ public: // functions
 	DirFD fd() const { return m_fd; }
 
 	// \see fs::unlink_file_at()
-	inline void unlinkFileAt(const std::string_view path) const;
+	inline void unlinkFileAt(const SysString path) const;
 
 	// \see fs::make_dir_at()
-	inline void makeDirAt(const std::string_view path, const FileMode mode) const;
+	inline void makeDirAt(const SysString path, const FileMode mode) const;
 
 	// \see fs::remove_dir_at()
-	inline void removeDirAt(const std::string_view path) const;
+	inline void removeDirAt(const SysString path) const;
 
 	// \see fs::read_symlink_at()
-	inline std::string readSymlinkAt(const std::string_view path) const;
+	inline std::string readSymlinkAt(const SysString path) const;
 
 	// \see fs::make_symlink_at()
-	inline void makeSymlinkAt(const std::string_view target, const std::string_view path) const;
+	inline void makeSymlinkAt(const SysString target, const SysString path) const;
 
 protected: // data
 
@@ -156,23 +157,23 @@ protected: // data
 
 namespace cosmos {
 
-void Directory::unlinkFileAt(const std::string_view path) const {
+void Directory::unlinkFileAt(const SysString path) const {
 	fs::unlink_file_at(m_fd, path);
 }
 
-void Directory::makeDirAt(const std::string_view path, const FileMode mode) const {
+void Directory::makeDirAt(const SysString path, const FileMode mode) const {
 	fs::make_dir_at(m_fd, path, mode);
 }
 
-void Directory::removeDirAt(const std::string_view path) const {
+void Directory::removeDirAt(const SysString path) const {
 	fs::remove_dir_at(m_fd, path);
 }
 
-std::string Directory::readSymlinkAt(const std::string_view path) const {
+std::string Directory::readSymlinkAt(const SysString path) const {
 	return fs::read_symlink_at(m_fd, path);
 }
 
-void Directory::makeSymlinkAt(const std::string_view target, const std::string_view path) const {
+void Directory::makeSymlinkAt(const SysString target, const SysString path) const {
 	fs::make_symlink_at(target, m_fd, path);
 }
 

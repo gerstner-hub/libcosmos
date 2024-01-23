@@ -2,6 +2,7 @@
 #include <iostream>
 
 // cosmos
+#include "cosmos/string.hxx"
 #include "cosmos/formatting.hxx"
 #include "cosmos/GroupInfo.hxx"
 #include "cosmos/PasswdInfo.hxx"
@@ -44,6 +45,7 @@ class UserTest :
 	}
 
 	void testGroup() {
+		START_TEST("group");
 		const auto our_gid = cosmos::proc::get_real_group_id();
 		cosmos::GroupInfo gi{our_gid};
 

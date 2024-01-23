@@ -5,8 +5,8 @@
 
 // cosmos
 #include "cosmos/InfoBase.hxx"
-#include "cosmos/string.hxx"
 #include "cosmos/types.hxx"
+#include "cosmos/SysString.hxx"
 
 namespace cosmos {
 
@@ -27,18 +27,18 @@ public: // functions
 	 * If simply no matching entry exists then *no* exception is thrown
 	 * but valid() return false and all members are empty.
 	 **/
-	explicit PasswdInfo(const std::string_view name);
+	explicit PasswdInfo(const SysString name);
 
 	/// Obtains PasswdInfo for the given numerical user id \c uid.
 	/**
-	 * \see PasswdInfo(const std::string_view)
+	 * \see PasswdInfo(const SysString)
 	 **/
 	explicit PasswdInfo(const UserID uid);
 
-	const std::string_view name() const { return to_string_view(m_info.pw_name); }
+	SysString name() const { return m_info.pw_name; }
 
 	/// Returns the optional encrypted password.
-	const std::string_view passwd() const { return to_string_view(m_info.pw_passwd); }
+	SysString passwd() const { return m_info.pw_passwd; }
 
 	UserID uid() const { return UserID{m_info.pw_uid}; }
 
@@ -46,13 +46,13 @@ public: // functions
 	GroupID gid() const { return GroupID{m_info.pw_gid}; }
 
 	/// Returns the comment field which is used for different things like a full user name.
-	const std::string_view gecos() const { return to_string_view(m_info.pw_gecos); }
+	SysString gecos() const { return m_info.pw_gecos; }
 
 	/// Path to the user's home directory.
-	const std::string_view homeDir() const { return to_string_view(m_info.pw_dir); }
+	SysString homeDir() const { return m_info.pw_dir; }
 
 	/// Optional command interpreter for the user.
-	const std::string_view shell() const { return to_string_view(m_info.pw_shell); }
+	SysString shell() const { return m_info.pw_shell; }
 };
 
 } // end ns

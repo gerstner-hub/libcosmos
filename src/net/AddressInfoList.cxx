@@ -4,12 +4,12 @@
 
 namespace cosmos {
 
-void AddressInfoList::resolve(const std::string_view node, const std::string_view service) {
+void AddressInfoList::resolve(const SysString node, const SysString service) {
 	clear();
 
 	const auto res = ::getaddrinfo(
-		   node.empty() ? nullptr :    node.data(),
-		service.empty() ? nullptr : service.data(),
+		   node.empty() ? nullptr :    node.raw(),
+		service.empty() ? nullptr : service.raw(),
 		&m_hints, &m_addrs
 	);
 

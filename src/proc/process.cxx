@@ -86,7 +86,7 @@ namespace {
 	using ExecFunc = std::function<int(const char*, char *const[], char *const[])>;
 
 	// wrapper to reuse execve style invocation logic
-	void exec_wrapper(ExecFunc exec_func, const std::string_view path,
+	void exec_wrapper(ExecFunc exec_func, const SysString path,
 			const CStringVector *args, const CStringVector *env) {
 		if (args && args->back() != nullptr) {
 			cosmos_throw (UsageError("argument vector without nullptr terminator encountered"));
@@ -94,7 +94,7 @@ namespace {
 			cosmos_throw (UsageError("environment vector without nullptr terminator encountered"));
 		}
 
-		const std::array<const char*, 2> defargs = {path.data(), nullptr};
+		const std::array<const char*, 2> defargs = {path.raw(), nullptr};
 
 		// the execve() signature uses `char* const []` declarations for argv
 		// end envp, POSIX specs say that this is only historically, since in
@@ -104,7 +104,7 @@ namespace {
 		auto casted_args = const_cast<char**>(args ? args->data() : defargs.data());
 		auto casted_env = const_cast<char**>(env ? env->data() : environ);
 
-		exec_func(path.data(), casted_args, casted_env);
+		exec_func(path.raw(), casted_args, casted_env);
 	}
 
 } // end anons ns
@@ -125,14 +125,14 @@ std::optional<WaitRes> wait(const PidFD fd, const WaitFlags flags) {
 	return wait(P_PIDFD, to_integral(fd.raw()), flags);
 }
 
-void exec(const std::string_view path, const CStringVector *args, const CStringVector *env) {
+void exec(const SysString path, const CStringVector *args, const CStringVector *env) {
 
 	exec_wrapper(::execvpe, path, args, env);
 
 	cosmos_throw (ApiError("execvpe()"));
 }
 
-void exec(const std::string_view path,
+void exec(const SysString path,
 		const StringViewVector &args, const StringViewVector *env) {
 
 	const auto args_vector = to_cstring_vector(args);
@@ -145,7 +145,7 @@ void exec(const std::string_view path,
 	}
 }
 
-void exec(const std::string_view path,
+void exec(const SysString path,
 		const StringVector &args, const StringVector *env) {
 
 	const auto args_vector = to_cstring_vector(args);
@@ -158,7 +158,7 @@ void exec(const std::string_view path,
 	}
 }
 
-void exec_at(const DirFD dir_fd, const std::string_view path,
+void exec_at(const DirFD dir_fd, const SysString path,
 		const CStringVector *args, const CStringVector *env,
 		const FollowSymlinks follow_symlinks) {
 
@@ -193,25 +193,25 @@ void exit(ExitStatus status) {
 	_exit(to_integral(status));
 }
 
-std::optional<std::string_view> get_env_var(const std::string_view name) {
-	if (auto res = std::getenv(name.data()); res != nullptr) {
+std::optional<SysString> get_env_var(const SysString name) {
+	if (auto res = std::getenv(name.raw()); res != nullptr) {
 		return {res};
 	}
 
 	return {};
 }
 
-void set_env_var(const std::string_view name, const std::string_view val, const OverwriteEnv overwrite) {
+void set_env_var(const SysString name, const SysString val, const OverwriteEnv overwrite) {
 	// NOTE: this is POSIX, not existing in C specs
-	const auto res = ::setenv(name.data(), val.data(), overwrite ? 1 : 0);
+	const auto res = ::setenv(name.raw(), val.raw(), overwrite ? 1 : 0);
 
 	if (res != 0) {
 		cosmos_throw (ApiError("setenv()"));
 	}
 }
 
-void clear_env_var(const std::string_view name) {
-	const auto res = ::unsetenv(name.data());
+void clear_env_var(const SysString name) {
+	const auto res = ::unsetenv(name.raw());
 
 	if (res != 0) {
 		cosmos_throw (ApiError("unsetenv()"));

@@ -44,7 +44,7 @@ public:
 
 		RUN_STEP("set-cloxec", new_fd.getFlags()[Flag::CLOEXEC] == false);
 
-		cosmos::File sf{m_argv[0], cosmos::OpenMode::READ_ONLY};
+		cosmos::File sf{std::string{m_argv[0]}, cosmos::OpenMode::READ_ONLY};
 		auto sf_fd = sf.fd();
 		// syncing a read-only FD is allowed in Linux
 		DOES_NOT_THROW("sync-on-ro-fd", sf_fd.sync());

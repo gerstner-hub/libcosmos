@@ -3,7 +3,7 @@
 
 namespace cosmos {
 
-FileError::FileError(const std::string_view path, const std::string_view operation) :
+FileError::FileError(const SysString path, const std::string_view operation) :
 		m_path{path}, m_operation{operation} {
 	setErrorClass("FileError");
 }

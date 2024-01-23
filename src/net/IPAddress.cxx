@@ -40,10 +40,10 @@ std::string IPAddressBase::ipAsString() const {
 	return ret;
 }
 
-void IPAddressBase::setIpFromString(const std::string_view sv) {
+void IPAddressBase::setIpFromString(const SysString str) {
 	const auto res = ::inet_pton(
 			to_integral(this->family()),
-			sv.data(),
+			str.raw(),
 			ipAddrPtr());
 
 	if (res < 0) {

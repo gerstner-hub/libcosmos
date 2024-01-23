@@ -42,12 +42,12 @@ public: // functions
 		return ai_canonname != nullptr;
 	}
 
-	/// Returns the canonical name, if available, or an empty view.
-	std::string_view canonName() const {
+	/// Returns the canonical name, if available, or an empty string.
+	SysString canonName() const {
 		if (ai_canonname) {
-			return std::string_view{ai_canonname};
+			return SysString{ai_canonname};
 		} else {
-			return std::string_view{};
+			return {};
 		}
 	}
 

@@ -5,14 +5,14 @@
 
 // C++
 #include <optional>
-#include <string_view>
 
 // cosmos
 #include "cosmos/fs/DirFD.hxx"
 #include "cosmos/proc/PidFD.hxx"
-#include "cosmos/proc/WaitRes.hxx"
 #include "cosmos/proc/types.hxx"
+#include "cosmos/proc/WaitRes.hxx"
 #include "cosmos/string.hxx"
+#include "cosmos/SysString.hxx"
 #include "cosmos/types.hxx"
 
 /**
@@ -142,24 +142,24 @@ COSMOS_API std::optional<WaitRes> wait(const PidFD fd, const WaitFlags flags = W
  * inherited to the new program. The ProcessID of the caller will remain the
  * same.
  **/
-COSMOS_API void exec(const std::string_view path,
+COSMOS_API void exec(const SysString path,
 		const CStringVector *args = nullptr, const CStringVector *env = nullptr);
 
-/// Variant of exec(const std::string_view, const CStringVector*, const CStringVector*) that takes StringViewVector.
+/// Variant of exec(const SysString, const CStringVector*, const CStringVector*) that takes StringViewVector.
 /**
  * This performs a conversion of the given StringViewVector(s) to
  * CStringVectors. Therefore the call requires some dynamic memory allocation
  * and copying of pointer values. \c args and \c env do not need to contain a
  * terminating nullptr at the end.
  **/
-COSMOS_API void exec(const std::string_view path,
+COSMOS_API void exec(const SysString path,
 		const StringViewVector &args, const StringViewVector *env = nullptr);
 
 /// Variant of exec() that takes StringVector.
 /**
- * \see exec(const std::string_view, const StringViewVector&, const StringViewVector*).
+ * \see exec(const SysString, const StringViewVector&, const StringViewVector*).
  **/
-COSMOS_API void exec(const std::string_view path,
+COSMOS_API void exec(const SysString path,
 		const StringVector &args, const StringVector *env = nullptr);
 
 /// Variant of exec() that looks up a program relative to \c dir_fd.
@@ -173,7 +173,7 @@ COSMOS_API void exec(const std::string_view path,
  * If \c follow_symlinks is unset and the resulting path is a symbolic link
  * then the execution fails with an ApiError and Errno::LINK_LOOP.
  **/
-COSMOS_API void exec_at(const DirFD dir_fd, const std::string_view path,
+COSMOS_API void exec_at(const DirFD dir_fd, const SysString path,
 		const CStringVector *args = nullptr, const CStringVector *env = nullptr,
 		const FollowSymlinks follow_symlinks = FollowSymlinks{false});
 
@@ -211,10 +211,10 @@ COSMOS_API void fexec(const FileDescriptor fd,
  * named \c name and returns its value. If no such variable is found then
  * nothing is returned.
  **/
-COSMOS_API std::optional<std::string_view> get_env_var(const std::string_view name);
+COSMOS_API std::optional<SysString> get_env_var(const SysString name);
 
 /// Returns whether the given environment variable exists, ignoring its content.
-inline bool exists_env_var(const std::string_view name) {
+inline bool exists_env_var(const SysString name) {
 	return get_env_var(name) != std::nullopt;
 }
 
@@ -231,7 +231,7 @@ using OverwriteEnv = NamedBool<struct overwrite_env_t, true>;
  * This call can fail with an exception (e.g. if the \c name contains invalid
  * characters).
  **/
-COSMOS_API void set_env_var(const std::string_view name, const std::string_view val, const OverwriteEnv overwrite);
+COSMOS_API void set_env_var(const SysString name, const SysString val, const OverwriteEnv overwrite);
 
 /// Remove the given environment variable.
 /**
@@ -242,7 +242,7 @@ COSMOS_API void set_env_var(const std::string_view name, const std::string_view 
  * This call can fail with an exception (e.g. if the \c name contains invalid
  * characters).
  **/
-COSMOS_API void clear_env_var(const std::string_view name);
+COSMOS_API void clear_env_var(const SysString name);
 
 /// Helper type for caching PID an PPID information.
 struct PidInfo {

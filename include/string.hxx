@@ -10,15 +10,18 @@
 // cosmos
 #include "cosmos/dso_export.h"
 #include "cosmos/BitMask.hxx"
+#include "cosmos/SysString.hxx"
 
 namespace cosmos {
 
-/// A vector of std::string
+/// A vector of std::string.
 using StringVector     = std::vector<std::string>;
-/// A vector of std::string_view
+/// A vector of std::string_view.
 using StringViewVector = std::vector<std::string_view>;
-/// A vector of plain `const char*`
+/// A vector of plain `const char*`.
 using CStringVector    = std::vector<const char*>;
+/// A vector of CString wrappers.
+using SysStringVector  = std::vector<SysString>;
 
 /**
  * @file

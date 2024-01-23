@@ -61,12 +61,12 @@ std::string normalize_path(const std::string_view path) {
 	return ret;
 }
 
-std::string canonicalize_path(const std::string_view path) {
+std::string canonicalize_path(const SysString path) {
 	// implementing this on foot is non-trivial so rely on realpath() for
 	// the time being.
 	std::string ret;
 	ret.resize(max::PATH);
-	if (::realpath(path.data(), ret.data()) == nullptr) {
+	if (::realpath(path.raw(), ret.data()) == nullptr) {
 		cosmos_throw (FileError(path, "realpath()"));
 	}
 

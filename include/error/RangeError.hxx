@@ -5,6 +5,11 @@
 
 namespace cosmos {
 
+/// Specialized exception type for out of range errors reported by the OS.
+/**
+ * This is a dedicated error type, because it can carry a hint about the
+ * supported range returend from a system or libc call.
+ **/
 class COSMOS_API RangeError :
 		public ApiError {
 public: // functions

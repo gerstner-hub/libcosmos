@@ -1,10 +1,8 @@
 #pragma once
 
-// C++
-#include <string_view>
-
 // cosmos
 #include "cosmos/net/types.hxx"
+#include "cosmos/SysString.hxx"
 
 namespace cosmos {
 
@@ -16,8 +14,8 @@ struct InterfaceInfo :
 		protected ::if_nameindex {
 
 	/// Returns the network interface name.
-	std::string_view name() const {
-		return std::string_view{this->if_name};
+	SysString name() const {
+		return SysString{this->if_name};
 	}
 
 	/// Returns the network interface index.

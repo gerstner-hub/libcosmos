@@ -8,6 +8,7 @@
 #include <string_view>
 
 // cosmos
+#include "cosmos/SysString.hxx"
 #include "cosmos/dso_export.h"
 #include "cosmos/fs/DirFD.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
@@ -37,7 +38,7 @@ public: // functions
 		reset();
 	}
 
-	explicit FileStatus(const std::string_view path, const FollowSymlinks follow = FollowSymlinks{false}) {
+	explicit FileStatus(const SysString path, const FollowSymlinks follow = FollowSymlinks{false}) {
 		updateFrom(path, follow);
 	}
 
@@ -45,7 +46,7 @@ public: // functions
 		updateFrom(fd);
 	}
 
-	explicit FileStatus(const DirFD fd, const std::string_view path, const FollowSymlinks follow = FollowSymlinks{false}) {
+	explicit FileStatus(const DirFD fd, const SysString path, const FollowSymlinks follow = FollowSymlinks{false}) {
 		updateFrom(fd, path, follow);
 	}
 
@@ -57,12 +58,12 @@ public: // functions
 	 * - Errno::ACCESS: access denied
 	 * - Errno::NO_MEMORY: out of memory
 	 **/
-	void updateFrom(const std::string_view path, const FollowSymlinks follow = FollowSymlinks{false});
+	void updateFrom(const SysString path, const FollowSymlinks follow = FollowSymlinks{false});
 
 	/// Obtains stat data for the file object represented by the given FD (fstat).
 	/**
 	 * On error an ApiError exception is thrown. Typical errors are like
-	 * in updateFrom(const std::string_view, const FollowSymlinks), with
+	 * in updateFrom(const SysString, const FollowSymlinks), with
 	 * the following addition:
 	 *
 	 * - Errno::BAD_FD: file descriptor is invalid
@@ -72,7 +73,7 @@ public: // functions
 	/// Obtains stat data for the \c path relative to \c fd.
 	/**
 	 * If \c path is an absolute path then this behaves like
-	 * updateFrom(const std::string_view, const FollowSymlinks) and \c fd
+	 * updateFrom(const SysString, const FollowSymlinks) and \c fd
 	 * is ignored.
 	 *
 	 * If \c path is relative then it will be looked up relative to the
@@ -84,7 +85,7 @@ public: // functions
 	 * descriptor (but this usage is not encouraged due to libcosmos' type
 	 * modeling).
 	 **/
-	void updateFrom(const DirFD fd, const std::string_view path, const FollowSymlinks follow = FollowSymlinks{false});
+	void updateFrom(const DirFD fd, const SysString path, const FollowSymlinks follow = FollowSymlinks{false});
 
 	void reset() {
 		// we identify an invalid stat structure by clearing the mode

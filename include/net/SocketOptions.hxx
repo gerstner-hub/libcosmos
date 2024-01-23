@@ -80,7 +80,7 @@ public: // functions
 	 * This option only works for some socket types, notably IP based
 	 * sockets. It does not work for packet sockets.
 	 **/
-	void bindToDevice(const std::string_view ifname);
+	void bindToDevice(const SysString ifname);
 
 	/// Returns the name of the network device this socket is bound to, if any.
 	std::string boundDevice() const;

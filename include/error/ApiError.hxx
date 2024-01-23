@@ -21,7 +21,7 @@ class COSMOS_API ApiError :
 public: // functions
 
 	/// Stores the current errno code in the exception
-	explicit ApiError(const std::optional<std::string_view> prefix = {});
+	explicit ApiError(const std::string_view prefix = {});
 
 	/// Stores the given errno code in the exception
 	explicit ApiError(const Errno err);

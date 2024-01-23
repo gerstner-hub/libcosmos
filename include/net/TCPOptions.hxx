@@ -35,7 +35,7 @@ public: // functions
 	 * CAP_NET_ADMIN can select any of the algorithms listed in the
 	 * "tcp_available_congestion_control" sysctl.
 	 **/
-	void setCongestionControl(const std::string_view name) {
+	void setCongestionControl(const SysString name) {
 		setStringOption(OptName{TCP_CONGESTION}, name);
 	}
 

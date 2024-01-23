@@ -5,6 +5,7 @@
 
 // cosmos
 #include "cosmos/error/ApiError.hxx"
+#include "cosmos/SysString.hxx"
 
 namespace cosmos {
 
@@ -21,7 +22,7 @@ class COSMOS_API FileError :
 		public ApiError {
 public: // functions
 
-	FileError(const std::string_view path, const std::string_view operation);
+	FileError(const SysString path, const std::string_view operation);
 
 	COSMOS_ERROR_IMPL;
 

@@ -4,6 +4,7 @@
 // C++
 #include <algorithm>
 #include <cctype>
+#include <ostream>
 
 namespace cosmos {
 

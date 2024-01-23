@@ -52,7 +52,7 @@ class FileSystemTest :
 	void testBasics() {
 		START_TEST("Basic Tests");
 
-		RUN_STEP("argv0-exists", cosmos::fs::exists_file(m_argv[0]));
+		RUN_STEP("argv0-exists", cosmos::fs::exists_file(std::string{m_argv[0]}));
 		RUN_STEP("strange-path-doesnt-exist", !cosmos::fs::exists_file("/some/really/strange/path"));
 
 		const auto orig_cwd = cosmos::fs::get_working_dir();
@@ -439,14 +439,14 @@ class FileSystemTest :
 
 	void testMakeTempfile() {
 		START_TEST("make_tempfile()");
-		const std::string_view _template{"/tmp/some.{}.txt"};
+		constexpr auto _template{"/tmp/some.{}.txt"};
 		auto [fd, path] = cosmos::fs::make_tempfile(_template);
 
 		std::cout << "make_tempfile turned " << _template << " into " << path << "\n";
 
 		RUN_STEP("tempfile-path-prefix-matches", cosmos::is_prefix(path, "/tmp/some."));
 		RUN_STEP("tempfile-path-suffix-matches", cosmos::is_suffix(path, ".txt"));
-		RUN_STEP("tempfile-path-is-expanded", path.size() > _template.size());
+		RUN_STEP("tempfile-path-is-expanded", path.size() > sizeof(_template));
 
 		fd.close();
 		cosmos::fs::unlink_file(path);
@@ -454,13 +454,13 @@ class FileSystemTest :
 
 	void testMakeTempdir() {
 		START_TEST("make_tempdir()");
-		const std::string_view _template{"/tmp/some"};
+		constexpr auto _template{"/tmp/some"};
 		auto path = cosmos::fs::make_tempdir(_template);
 
 		std::cout << "make_tempdir turned " << _template << " into " << path << "\n";
 
 		RUN_STEP("tempdir-path-prefix-matches", cosmos::is_prefix(path, _template));
-		RUN_STEP("tempdir-path-is-expanded", path.size() > _template.size());
+		RUN_STEP("tempdir-path-is-expanded", path.size() > sizeof(_template));
 
 		cosmos::fs::remove_tree(path);
 	}
@@ -525,7 +525,7 @@ class FileSystemTest :
 	void testCopyFileRange() {
 		START_TEST("copy_file_range()");
 
-		const std::string_view _template{"/tmp/cfr.{}.txt"};
+		constexpr auto _template{"/tmp/cfr.{}.txt"};
 		cosmos::TempFile in{_template};
 		cosmos::TempFile out{_template};
 

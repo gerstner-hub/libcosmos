@@ -21,17 +21,17 @@ void FileStatus::updateFrom(const FileDescriptor fd) {
 	}
 }
 
-void FileStatus::updateFrom(const std::string_view path, const FollowSymlinks follow) {
+void FileStatus::updateFrom(const SysString path, const FollowSymlinks follow) {
 	auto statfunc = follow ? ::stat : ::lstat;
 
-	if (statfunc(path.data(), &m_st) != 0) {
+	if (statfunc(path.raw(), &m_st) != 0) {
 		cosmos_throw (FileError(path, follow ? "stat" : "lstat"));
 	}
 }
 
-void FileStatus::updateFrom(const DirFD fd, const std::string_view path, const FollowSymlinks follow) {
+void FileStatus::updateFrom(const DirFD fd, const SysString path, const FollowSymlinks follow) {
 
-	auto res = ::fstatat(to_integral(fd.raw()), path.data(), &m_st, follow ? 0 : AT_SYMLINK_NOFOLLOW);
+	auto res = ::fstatat(to_integral(fd.raw()), path.raw(), &m_st, follow ? 0 : AT_SYMLINK_NOFOLLOW);
 
 	if (res != 0) {
 		cosmos_throw (FileError(path, "fstatat()"));

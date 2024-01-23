@@ -5,10 +5,10 @@
 
 // C++
 #include <string>
-#include <string_view>
 
 // cosmos
 #include "cosmos/dso_export.h"
+#include "cosmos/SysString.hxx"
 
 namespace cosmos::locale {
 
@@ -49,7 +49,7 @@ COSMOS_API std::string get(Category category);
 /**
  * This may throw an ApiError if the request cannot be honored.
  **/
-COSMOS_API void set(Category category, const std::string_view val);
+COSMOS_API void set(Category category, const SysString val);
 
 /// Set the given locale category to its default value ("C" or "POSIX").
 COSMOS_API void set_to_default(Category category);

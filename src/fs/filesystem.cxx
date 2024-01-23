@@ -31,7 +31,7 @@
 namespace cosmos::fs {
 
 FileDescriptor open(
-		const std::string_view path, const OpenMode mode,
+		const SysString path, const OpenMode mode,
 		const OpenFlags flags, const std::optional<FileMode> fmode) {
 
 	if (flags.anyOf({OpenFlag::CREATE, OpenFlag::TMPFILE}) && !fmode) {
@@ -41,7 +41,7 @@ FileDescriptor open(
 	int raw_flags = flags.raw() | to_integral(mode);
 
 
-	auto fd = ::open(path.data(), raw_flags, fmode ? to_integral(fmode.value().raw()) : 0);
+	auto fd = ::open(path.raw(), raw_flags, fmode ? to_integral(fmode.value().raw()) : 0);
 
 	if (fd == -1) {
 		cosmos_throw (FileError(path, "open"));
@@ -51,7 +51,7 @@ FileDescriptor open(
 }
 
 FileDescriptor open_at(
-		const DirFD dir_fd, const std::string_view path,
+		const DirFD dir_fd, const SysString path,
 		const OpenMode mode, const OpenFlags flags,
 		const std::optional<FileMode> fmode) {
 	int raw_flags = flags.raw() | to_integral(mode);
@@ -60,7 +60,7 @@ FileDescriptor open_at(
 		cosmos_throw (UsageError("the given open flags require an fmode argument"));
 	}
 
-	auto fd = ::openat(to_integral(dir_fd.raw()), path.data(),
+	auto fd = ::openat(to_integral(dir_fd.raw()), path.raw(),
 				raw_flags, fmode ? to_integral(fmode.value().raw()) : 0);
 
 	if (fd == -1) {
@@ -81,9 +81,10 @@ void close_range(const FileNum first, const FileNum last, const CloseRangeFlags 
 
 namespace {
 
-	std::pair<std::string, int> expand_temp_path(const std::string_view _template) {
+	std::pair<std::string, int> expand_temp_path(const SysString str) {
 		std::string path;
 		std::string base;
+		auto _template = str.view();
 		auto lastsep = _template.rfind('/');
 
 		if (lastsep != _template.npos) {
@@ -116,7 +117,7 @@ namespace {
 }
 
 std::pair<FileDescriptor, std::string> make_tempfile(
-		const std::string_view _template, const OpenFlags flags) {
+		const SysString _template, const OpenFlags flags) {
 
 	auto [path, suffixlen] = expand_temp_path(_template);
 
@@ -129,7 +130,7 @@ std::pair<FileDescriptor, std::string> make_tempfile(
 	return {FileDescriptor{FileNum{fd}}, path};
 }
 
-std::string make_tempdir(const std::string_view _template) {
+std::string make_tempdir(const SysString _template) {
 	// there's no way to have the X's in the middle of the basename like
 	// with mkostemps().
 	std::string expanded{_template};
@@ -142,17 +143,17 @@ std::string make_tempdir(const std::string_view _template) {
 	return expanded;
 }
 
-void make_fifo(const std::string_view path, const FileMode mode) {
-	auto res = ::mkfifo(path.data(), to_integral(mode.raw()));
+void make_fifo(const SysString path, const FileMode mode) {
+	auto res = ::mkfifo(path.raw(), to_integral(mode.raw()));
 
 	if (res != 0) {
 		cosmos_throw (FileError(path, "mkfifo()"));
 	}
 }
 
-void make_fifo_at(const DirFD dir_fd, const std::string_view path,
+void make_fifo_at(const DirFD dir_fd, const SysString path,
 		const FileMode mode) {
-	auto res = ::mkfifoat(to_integral(dir_fd.raw()), path.data(), to_integral(mode.raw()));
+	auto res = ::mkfifoat(to_integral(dir_fd.raw()), path.raw(), to_integral(mode.raw()));
 
 	if (res != 0) {
 		cosmos_throw (FileError(path, "mkfifoat()"));
@@ -171,9 +172,9 @@ FileMode set_umask(const FileMode mode) {
 	return FileMode{ModeT{old_mode}};
 }
 
-bool exists_file(const std::string_view path) {
+bool exists_file(const SysString path) {
 	struct stat s;
-	if (::lstat(path.data(), &s) == 0)
+	if (::lstat(path.raw(), &s) == 0)
 		return true;
 	else if (get_errno() != Errno::NO_ENTRY)
 		cosmos_throw (FileError(path, "lstat()"));
@@ -181,20 +182,20 @@ bool exists_file(const std::string_view path) {
 	return false;
 }
 
-void unlink_file(const std::string_view path) {
-	if (::unlink(path.data()) != 0) {
+void unlink_file(const SysString path) {
+	if (::unlink(path.raw()) != 0) {
 		cosmos_throw (FileError(path, "unlink()"));
 	}
 }
 
-void unlink_file_at(const DirFD dir_fd, const std::string_view path) {
-	if (::unlinkat(to_integral(dir_fd.raw()), path.data(), 0) != 0) {
+void unlink_file_at(const DirFD dir_fd, const SysString path) {
+	if (::unlinkat(to_integral(dir_fd.raw()), path.raw(), 0) != 0) {
 		cosmos_throw (FileError(path, "unlinkat()"));
 	}
 }
 
-void change_dir(const std::string_view path) {
-	if (::chdir(path.data()) != 0) {
+void change_dir(const SysString path) {
+	if (::chdir(path.raw()) != 0) {
 		cosmos_throw (FileError(path, "chdir()"));
 	}
 }
@@ -226,7 +227,7 @@ std::string get_working_dir() {
 
 std::optional<std::string> which(const std::string_view exec_base) noexcept {
 
-	auto checkExecutable = [](const std::string_view path) -> bool {
+	auto checkExecutable = [](const std::string &path) -> bool {
 		try {
 			File f{path, OpenMode::READ_ONLY};
 			FileStatus status;
@@ -254,7 +255,7 @@ std::optional<std::string> which(const std::string_view exec_base) noexcept {
 
 	if (exec_base.front() == '/') {
 		// check absolute path and be done with it
-		if (checkExecutable(exec_base)) {
+		if (checkExecutable(std::string{exec_base})) {
 		       return {std::string{exec_base}};
 		}
 		return {};
@@ -277,31 +278,31 @@ std::optional<std::string> which(const std::string_view exec_base) noexcept {
 	return {};
 }
 
-void make_dir(const std::string_view path, const FileMode mode) {
-	if (::mkdir(path.data(), to_integral(mode.raw())) != 0) {
+void make_dir(const SysString path, const FileMode mode) {
+	if (::mkdir(path.raw(), to_integral(mode.raw())) != 0) {
 		cosmos_throw (FileError(path, "mkdir()"));
 	}
 }
 
-void make_dir_at(const DirFD dir_fd, const std::string_view path, const FileMode mode) {
-	if (::mkdirat(to_integral(dir_fd.raw()), path.data(), to_integral(mode.raw())) != 0) {
+void make_dir_at(const DirFD dir_fd, const SysString path, const FileMode mode) {
+	if (::mkdirat(to_integral(dir_fd.raw()), path.raw(), to_integral(mode.raw())) != 0) {
 		cosmos_throw (FileError(path, "mkdirat()"));
 	}
 }
 
-void remove_dir(const std::string_view path) {
-	if (::rmdir(path.data()) != 0) {
+void remove_dir(const SysString path) {
+	if (::rmdir(path.raw()) != 0) {
 		cosmos_throw (FileError(path, "rmdir()"));
 	}
 }
 
-void remove_dir_at(const DirFD dir_fd, const std::string_view path) {
-	if (::unlinkat(to_integral(dir_fd.raw()), path.data(), AT_REMOVEDIR) != 0) {
+void remove_dir_at(const DirFD dir_fd, const SysString path) {
+	if (::unlinkat(to_integral(dir_fd.raw()), path.raw(), AT_REMOVEDIR) != 0) {
 		cosmos_throw (FileError(path, "unlinkat(AT_REMOVEDIR)"));
 	}
 }
 
-Errno make_all_dirs(const std::string_view path, const FileMode mode) {
+Errno make_all_dirs(const SysString path, const FileMode mode) {
 	const auto normpath = normalize_path(path);
 	size_t sep_pos = 0;
 	std::string prefix;
@@ -380,14 +381,14 @@ namespace {
 
 } // end anon ns
 
-void remove_tree(const std::string_view path) {
+void remove_tree(const SysString path) {
 	DirStream dir{path};
 	remove_tree(dir);
 	remove_dir(path);
 }
 
-void change_mode(const std::string_view path, const FileMode mode) {
-	if (::chmod(path.data(), to_integral(mode.raw())) != 0) {
+void change_mode(const SysString path, const FileMode mode) {
+	if (::chmod(path.raw(), to_integral(mode.raw())) != 0) {
 		cosmos_throw (FileError(path, "chmod()"));
 	}
 }
@@ -398,8 +399,8 @@ void change_mode(const FileDescriptor fd, const FileMode mode) {
 	}
 }
 
-void change_owner(const std::string_view path, const UserID uid, const GroupID gid) {
-	if (::chown(path.data(), to_integral(uid), to_integral(gid)) != 0) {
+void change_owner(const SysString path, const UserID uid, const GroupID gid) {
+	if (::chown(path.raw(), to_integral(uid), to_integral(gid)) != 0) {
 		cosmos_throw (FileError(path, "chown()"));
 	}
 }
@@ -412,27 +413,27 @@ void change_owner(const FileDescriptor fd, const UserID uid, const GroupID gid) 
 
 namespace {
 
-UserID resolve_user(const std::string_view user) {
+UserID resolve_user(const SysString user) {
 	if (user.empty()) {
 		return UserID::INVALID;
 	}
 
 	PasswdInfo info{user};
 	if (!info.valid()) {
-		cosmos_throw (RuntimeError{std::string{user} + " does not exist"});
+		cosmos_throw (RuntimeError{user.str() + " does not exist"});
 	}
 
 	return info.uid();
 }
 
-GroupID resolve_group(const std::string_view group) {
+GroupID resolve_group(const SysString group) {
 	if (group.empty()) {
 		return GroupID::INVALID;
 	}
 
 	GroupInfo info{group};
 	if (!info.valid()) {
-		cosmos_throw (RuntimeError{std::string{group} + "does not exist"});
+		cosmos_throw (RuntimeError{group.str() + "does not exist"});
 	}
 
 	return info.gid();
@@ -440,56 +441,53 @@ GroupID resolve_group(const std::string_view group) {
 
 } // end anon ns
 
-void change_owner(const std::string_view path, const std::string_view user,
-		const std::string_view group) {
+void change_owner(const SysString path, const SysString user, const SysString group) {
 
 	const UserID uid = resolve_user(user);
 	const GroupID gid = resolve_group(group);
 	change_owner(path, uid, gid);
 }
 
-void change_owner(const FileDescriptor fd, const std::string_view user,
-		const std::string_view group) {
+void change_owner(const FileDescriptor fd, const SysString user, const SysString group) {
 	const UserID uid = resolve_user(user);
 	const GroupID gid = resolve_group(group);
 	change_owner(fd, uid, gid);
 }
 
-void change_owner_nofollow(const std::string_view path, const UserID uid, const GroupID gid) {
-	if (::lchown(path.data(), to_integral(uid), to_integral(gid)) != 0) {
+void change_owner_nofollow(const SysString path, const UserID uid, const GroupID gid) {
+	if (::lchown(path.raw(), to_integral(uid), to_integral(gid)) != 0) {
 		cosmos_throw (FileError(path, "lchown()"));
 	}
 }
 
-void change_owner_nofollow(const std::string_view path, const std::string_view user,
-		const std::string_view group) {
+void change_owner_nofollow(const SysString path, const SysString user, const SysString group) {
 	const UserID uid = resolve_user(user);
 	const GroupID gid = resolve_group(group);
 	change_owner_nofollow(path, uid, gid);
 }
 
-void make_symlink(const std::string_view target, const std::string_view path) {
-	if (::symlink(target.data(), path.data()) != 0) {
+void make_symlink(const SysString target, const SysString path) {
+	if (::symlink(target.raw(), path.raw()) != 0) {
 		cosmos_throw (FileError(path, "symlink()"));
 	}
 }
 
-void make_symlink_at(const std::string_view target, const DirFD dir_fd,
-		const std::string_view path) {
-	if (::symlinkat(target.data(), to_integral(dir_fd.raw()), path.data()) != 0) {
+void make_symlink_at(const SysString target, const DirFD dir_fd,
+		const SysString path) {
+	if (::symlinkat(target.raw(), to_integral(dir_fd.raw()), path.raw()) != 0) {
 		cosmos_throw (FileError(path, "symlinkat()"));
 	}
 }
 
 namespace {
 
-	std::string read_symlink(const std::string_view path,
+	std::string read_symlink(const SysString path,
 			const std::string_view call, std::function<int(const char*, char*, size_t)> readlink_func) {
 		std::string ret;
 		ret.resize(128);
 
 		while (true) {
-			auto res = readlink_func(path.data(), &ret.front(), ret.size());
+			auto res = readlink_func(path.raw(), &ret.front(), ret.size());
 
 			if (res < 0) {
 				cosmos_throw (FileError(path, call));
@@ -513,11 +511,11 @@ namespace {
 	}
 }
 
-std::string read_symlink(const std::string_view path) {
+std::string read_symlink(const SysString path) {
 	return read_symlink(path, "readlink()", ::readlink);
 }
 
-std::string read_symlink_at(const DirFD dir_fd, const std::string_view path) {
+std::string read_symlink_at(const DirFD dir_fd, const SysString path) {
 
 	auto readlink_func = [&](const char *p, char *buf, size_t size) {
 		return ::readlinkat(to_integral(dir_fd.raw()), p, buf, size);
@@ -526,36 +524,34 @@ std::string read_symlink_at(const DirFD dir_fd, const std::string_view path) {
 	return read_symlink(path, "readlinkat()", readlink_func);
 }
 
-void link(const std::string_view old_path, const std::string_view new_path) {
-	if (::link(old_path.data(), new_path.data()) != 0) {
+void link(const SysString old_path, const SysString new_path) {
+	if (::link(old_path.raw(), new_path.raw()) != 0) {
 		cosmos_throw (FileError(new_path, std::string{"link() for "} + std::string{old_path}));
 	}
 }
 
-void linkat(const DirFD old_dir, const std::string_view old_path,
-		const DirFD new_dir, const std::string_view new_path,
+void linkat(const DirFD old_dir, const SysString old_path,
+		const DirFD new_dir, const SysString new_path,
 		const FollowSymlinks follow_old) {
 	if (::linkat(
-				to_integral(old_dir.raw()), old_path.data(),
-				to_integral(new_dir.raw()), new_path.data(),
+				to_integral(old_dir.raw()), old_path.raw(),
+				to_integral(new_dir.raw()), new_path.raw(),
 				follow_old ? AT_SYMLINK_FOLLOW : 0) != 0) {
 		cosmos_throw (FileError(new_path, std::string{"linkat() for "} + std::string{old_path}));
 	}
 }
 
-void linkat_fd(const FileDescriptor fd, const DirFD new_dir,
-		const std::string_view new_path) {
+void linkat_fd(const FileDescriptor fd, const DirFD new_dir, const SysString new_path) {
 	if (::linkat(
 				to_integral(fd.raw()), "",
-				to_integral(new_dir.raw()), new_path.data(),
+				to_integral(new_dir.raw()), new_path.raw(),
 				AT_EMPTY_PATH) != 0) {
 
 		cosmos_throw (FileError(new_path, std::string{"linkat(AT_EMPTY_PATH)"}));
 	}
 }
 
-void linkat_proc_fd(const FileDescriptor fd, const DirFD new_dir,
-		const std::string_view new_path) {
+void linkat_proc_fd(const FileDescriptor fd, const DirFD new_dir, const SysString new_path) {
 	// the exact security reasons why linkat_fd() isn't allowed without
 	// CAP_DAC_READ_SEARCH are a bit unclear. It seems the concern is that
 	// a process get's hold of a file descriptor for which it wouldn't
@@ -578,8 +574,8 @@ void truncate(const FileDescriptor fd, off_t length) {
 	}
 }
 
-void truncate(const std::string_view path, off_t length) {
-	if (::truncate(path.data(), length) != 0) {
+void truncate(const SysString path, off_t length) {
+	if (::truncate(path.raw(), length) != 0) {
 		cosmos_throw (ApiError("truncate()"));
 	}
 }

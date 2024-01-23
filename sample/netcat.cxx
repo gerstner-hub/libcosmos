@@ -171,8 +171,8 @@ void NetCat::setupSocket() {
 		throw status::BAD_CMDLINE;
 	}
 
-	const auto port = std::string{m_config.addrspec.substr(port_sep + 1)};
-	const auto host = std::string{m_config.addrspec.substr(0, port_sep)};
+	const auto port = m_config.addrspec.substr(port_sep + 1);
+	const auto host = m_config.addrspec.substr(0, port_sep);
 
 	cosmos::AddressInfoList addrinfo_list;
 	auto &hints = addrinfo_list.hints();
@@ -185,7 +185,7 @@ void NetCat::setupSocket() {
 	std::optional<cosmos::IP6Address> ip6addr;
 
 	try {
-		addrinfo_list.resolve(host, port);
+		addrinfo_list.resolve(std::string{host}, std::string{port});
 
 		for (const auto &addrinfo: addrinfo_list) {
 			if (m_config.matchesPreferred(addrinfo.family())) {

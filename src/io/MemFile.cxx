@@ -7,13 +7,13 @@
 
 namespace cosmos {
 
-void MemFile::create(const std::string_view name, const OpenFlags flags, const HugePageSize tlb_ps) {
+void MemFile::create(const SysString name, const OpenFlags flags, const HugePageSize tlb_ps) {
 
 	close();
 
 	// see `man mmap` for an explanation about this.
 	const auto page_size = to_integral(tlb_ps) << MAP_HUGE_SHIFT;
-	auto fd = ::memfd_create(name.data(), flags.raw() | page_size);
+	auto fd = ::memfd_create(name.raw(), flags.raw() | page_size);
 
 	if (fd == -1) {
 		cosmos_throw (ApiError("memfd_create()"));

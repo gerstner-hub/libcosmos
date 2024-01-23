@@ -6,6 +6,7 @@
 
 // cosmos
 #include "cosmos/dso_export.h"
+#include "cosmos/SysString.hxx"
 
 /**
  * @file
@@ -30,6 +31,6 @@ namespace cosmos::fs {
 COSMOS_API std::string normalize_path(const std::string_view path);
 
 /// Normalizes \c path and resolves any symbolic link components.
-COSMOS_API std::string canonicalize_path(const std::string_view path);
+COSMOS_API std::string canonicalize_path(const SysString path);
 
 } // end ns

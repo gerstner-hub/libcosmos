@@ -75,11 +75,8 @@ class COSMOS_API CosmosError :
 		public std::exception {
 public: // functions
 
-	explicit CosmosError(const std::string_view error_class) :
-		m_error_class{error_class} {}
-
-	CosmosError(const std::string_view error_class, const std::string_view fixed_text) :
-			CosmosError{error_class} {
+	explicit CosmosError(const std::string_view error_class, const std::string_view fixed_text = {}) :
+			m_error_class{error_class} {
 		m_msg = fixed_text;
 	}
 
