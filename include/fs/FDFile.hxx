@@ -39,10 +39,10 @@ public: // functions
 
 	/// Takes the already open file descriptor fd and operates on it.
 	/**
-	 * The caller is responsible for invalidating \c fd, if desired, and
+	 * The caller is responsible for invalidating `fd`, if desired, and
 	 * that the file descriptor is not used in conflicting ways.
 	 *
-	 * The parameter \c auto_close determines whether the File object
+	 * The parameter `auto_close` determines whether the File object
 	 * will take ownership of the file descriptor, or not. If so then the
 	 * file descriptor is closed on OS level if deemed necessary by the
 	 * implementation.

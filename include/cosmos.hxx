@@ -56,7 +56,7 @@ struct Init {
  * this libraray setting allows you to choose libcosmos's behaviour should an
  * EINTR error occur. The default is to transparently ignore EINTR returns and
  * restart the system call in question. If an application wants to explicitly
- * deal with EINTR returns you can call change this setting to \c false
+ * deal with EINTR returns you can call change this setting to `false`
  * which will cause ApiError() exceptions with the appropriate
  * Errno::INTERRUPTED value to be thrown, left to be handled by the
  * application.

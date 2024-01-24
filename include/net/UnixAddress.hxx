@@ -96,9 +96,9 @@ public: // functions
 
 	/// Sets a new path for the address.
 	/**
-	 * Depending on the \c abstract setting this will be either a file
+	 * Depending on the `abstract` setting this will be either a file
 	 * system path, or an abstract label. No '\0' terminators should be
-	 * embedded into \c path for the abstract case. The implementation
+	 * embedded into `path` for the abstract case. The implementation
 	 * will take care of this transparently.
 	 **/
 	void setPath(const std::string_view path, const Abstract abstract = Abstract{false});

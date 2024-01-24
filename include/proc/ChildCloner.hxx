@@ -52,7 +52,7 @@ public: // functions
 	/**
 	 * This is a convienence constructor for simple execution of child
 	 * processes without special settings. The executable path is taken
-	 * from \c args[0].
+	 * from `args[0]`.
 	 **/
 	explicit ChildCloner(const StringViewVector args) {
 		setArgsFromView(args);
@@ -84,13 +84,13 @@ public: // functions
 	 **/
 	const auto& getArgs() const { return m_argv; }
 
-	/// \c see getArgs() const
+	/// \see getArgs() const
 	StringVector& getArgs() { return m_argv; }
 
 	/// Sets the argument vector to be used including argv0.
 	/**
 	 * This also sets a new executable path from sv[0], or clears the
-	 * executable, if \c sv is empty.
+	 * executable, if `sv` is empty.
 	 **/
 	void setArgs(const StringVector &sv) {
 		m_argv = sv;
@@ -118,7 +118,7 @@ public: // functions
 
 	/// Set an explicit working directory the child process.
 	/**
-	 * If \c cwd is empty then the parent process's CWD is inherited to
+	 * If `cwd` is empty then the parent process's CWD is inherited to
 	 * the child.
 	 **/
 	void setCWD(const std::string_view cwd) { m_cwd = cwd; }
@@ -152,28 +152,28 @@ public: // functions
 	 * the implementation.
 	 **/
 	void setStdErr(FileDescriptor fd) { m_stderr = fd; }
-	/// \c see setStderr()
+	/// \see setStderr()
 	void setStdOut(FileDescriptor fd) { m_stdout = fd; }
-	/// \c see setStderr()
+	/// \see setStderr()
 	void setStdIn(FileDescriptor fd) { m_stdin = fd; }
 
 	/// Adds a file descriptor to inherit to the child process.
 	/**
 	 * Beyond the stdin, stdout and stderr file descriptor additional
-	 * descriptors can be inherited into the child process context. The \c
-	 * fd should have the O_CLOEXEC flag set. The implementation will
-	 * adjust this flag appropriately to allow the \c fd to be inherited
+	 * descriptors can be inherited into the child process context. The
+	 * `fd` should have the O_CLOEXEC flag set. The implementation will
+	 * adjust this flag appropriately to allow the `fd` to be inherited
 	 * across execution of the new child process image.
 	 *
-	 * The file descriptor number of \c fd will not be change in the child
+	 * The file descriptor number of `fd` will not be change in the child
 	 * process. Therefore it must not be number 0, 1 or 2 (stdin, stdout,
 	 * stderr), since these are already covered by the setStdErr(),
 	 * setStdOut() and setStdIn() functions.
 	 *
-	 * The ownership of \c fd remains with the caller. The caller must
-	 * ensure that the file descriptor stays valid until \c run() is
+	 * The ownership of `fd` remains with the caller. The caller must
+	 * ensure that the file descriptor stays valid until run() is
 	 * invoked. Otherwise the child process execution / descriptor
-	 * inheritance will fail. The implementation will not alter the \c fd
+	 * inheritance will fail. The implementation will not alter the `fd`
 	 * in the current process's context.
 	 *
 	 * The child process must be instructed which FD to use and for which
@@ -253,7 +253,7 @@ protected: // functions
 
 	/// Redirects the given \p orig file descriptor to \p redirect (used in child context).
 	/**
-	 * \param[in] orig The file descriptor that should be replaced by \c redirect
+	 * \param[in] orig The file descriptor that should be replaced by `redirect`
 	 **/
 	void redirectFD(FileDescriptor orig, FileDescriptor redirect);
 
@@ -303,9 +303,9 @@ protected: // data
 
 /// Adds a command line argument to the given ChildCloner instance.
 /**
- * If no executable has been configured yet in \c cloner then the first
+ * If no executable has been configured yet in `cloner` then the first
  * argument added via this operator will set both the executable path and
- * argv0 to \c arg.
+ * argv0 to `arg`.
  */
 inline cosmos::ChildCloner& operator<<(cosmos::ChildCloner &cloner, const std::string_view arg) {
 	if (!cloner.hasExe()) {

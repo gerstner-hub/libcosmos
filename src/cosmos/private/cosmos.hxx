@@ -33,8 +33,8 @@ extern RestartOnIntr auto_restart_syscalls;
  *   above in the context of destructors.
  *
  * This call will not return. The process will be terminated after writing
- * error context to stderr. Provide a description of the problem in \c msg,
- * optionally a related exception in \c ex.
+ * error context to stderr. Provide a description of the problem in `msg`,
+ * optionally a related exception in `ex`.
  **/
 [[ noreturn ]] void fatal_error(
 		const std::string_view msg,

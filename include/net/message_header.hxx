@@ -335,7 +335,7 @@ public: // types
 
 		/// Create an iterator pointing to the first ControlMessage of header.
 		/**
-		 * If there is no ControlMessage in \c header then an invalid
+		 * If there is no ControlMessage in `header` then an invalid
 		 * (end) iterator is the result.
 		 **/
 		explicit ControlMessageIterator(const ReceiveMessageHeader &header) :

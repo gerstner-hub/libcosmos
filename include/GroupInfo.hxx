@@ -23,10 +23,10 @@ class COSMOS_API GroupInfo :
 		public InfoBase<struct group> {
 public: // functions
 
-	/// Obtains GroupInfo for the given group name \c name.
+	/// Obtains GroupInfo for the given group name `name`.
 	explicit GroupInfo(const SysString name);
 
-	/// Obtains GroupInfo for the given numerical group id \c gid.
+	/// Obtains GroupInfo for the given numerical group id `gid`.
 	explicit GroupInfo(const GroupID gid);
 
 	/// The groups numerical ID.

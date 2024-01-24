@@ -19,7 +19,7 @@ public: // functions
 
 	SecretFile() = default;
 
-	/// \c see create().
+	/// \see create().
 	explicit SecretFile(const CloseOnExec cloexec) {
 		create(cloexec);
 	}
@@ -27,7 +27,7 @@ public: // functions
 	/// Create a new MemFile using the given settings.
 	/**
 	 * Create a new memory file using the given flags and optional page
-	 * size. The \c name is only for debugging purposes and is used as an
+	 * size. The `name` is only for debugging purposes and is used as an
 	 * identifier in the /proc file system.
 	 **/
 	void create(const CloseOnExec cloexec = CloseOnExec{true});

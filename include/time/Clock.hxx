@@ -46,9 +46,9 @@ public: // functions
 
 	/// Suspend execution of the calling thread until the clock reaches the given time.
 	/**
-	 * The given \c until value is an absolute time in the future until
+	 * The given `until` value is an absolute time in the future until
 	 * which the execution of the calling thread is to be suspended. If
-	 * \c until is not in the future then this call returns immediately
+	 * `until` is not in the future then this call returns immediately
 	 * without entering a suspend state.
 	 *
 	 * Depending of the libcosmos "automatic restart on interrupt"

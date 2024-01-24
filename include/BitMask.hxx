@@ -93,7 +93,7 @@ public: // functions
 		return *this;
 	}
 
-	/// Sets all the bits that are also set in \c other.
+	/// Sets all the bits that are also set in `other`.
 	BitMask& set(const BitMask other) {
 		m_flags |= other.m_flags;
 		return *this;
@@ -188,20 +188,20 @@ public: // functions
 
 	/// Returns whether the given value is set.
 	/**
-	 * \note If \c val consists of multiple bits then this only returns \c
-	 * true if all of the bits it represents are set.
+	 * \note If `val` consists of multiple bits then this only returns
+	 * `true` if all of the bits it represents are set.
 	 **/
 	bool test(const ENUM val) const {
 		const auto raw_val = static_cast<EnumBaseType>(val);
 		return (m_flags & raw_val) == raw_val;
 	}
 
-	/// Returns whether any of the bits of \c val are set.
+	/// Returns whether any of the bits of `val` are set.
 	/**
 	 * This is only different to test() if the given value
 	 * consists of multiple bit positions. In this case testAny() will
-	 * return \c true even if only some of the bit positions are set in
-	 * the mask, while test() will only return \c true if *all* of the bit
+	 * return `true` even if only some of the bit positions are set in
+	 * the mask, while test() will only return `true` if *all* of the bit
 	 * positions are set.
 	 **/
 	bool testAny(const ENUM val) const {
@@ -274,25 +274,25 @@ public: // functions
 		return BitMask{~m_flags};
 	}
 
-	/// Returns an object containing all the bits found in \c first without the bits found inc \c second.
+	/// Returns an object containing all the bits found in `first` without the bits found inc `second`.
 	friend BitMask operator-(const BitMask &first, const BitMask &second) {
 		BitMask ret{first};
 		return ret.reset(second);
 	}
 
-	/// Returns an object containing all the bits found in \c first without \c val.
+	/// Returns an object containing all the bits found in `first` without `val`.
 	friend BitMask operator-(const BitMask &first, const ENUM val) {
 		BitMask ret{first};
 		return ret.reset(val);
 	}
 
-	/// Returns an object containing all the bits found in \c first and \c second.
+	/// Returns an object containing all the bits found in `first` and `second`.
 	friend BitMask operator+(const BitMask &first, const BitMask &second) {
 		BitMask ret{first};
 		return ret.set(second);
 	}
 
-	/// Returns an object containing all the bits found in \c first and /also \c val.
+	/// Returns an object containing all the bits found in `first` and /also `val`.
 	friend BitMask operator+(const BitMask &first, const ENUM val) {
 		BitMask ret{first};
 		return ret.set(val);

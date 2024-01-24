@@ -28,7 +28,7 @@
 
 namespace cosmos::fs {
 
-/// Open a file using specific OpenFlags, potentially creating it first using the given \c fmode.
+/// Open a file using specific OpenFlags, potentially creating it first using the given `fmode`.
 /**
  * \warning If used for creating a file, then you need to specify
  * also the FileMode in that case. An exception will the thrown if
@@ -42,19 +42,19 @@ COSMOS_API FileDescriptor open(
 		const SysString path, const OpenMode mode,
 		const OpenFlags flags, const std::optional<FileMode> fmode = {});
 
-/// Open the given path relative to the given directory file descriptor \c dir_fd.
+/// Open the given path relative to the given directory file descriptor `dir_fd`.
 /**
  * This open variant behaves similar to open(const SysString,,
  * const OpenMode, const OpenFlags, const std::optional<FileMode>).
  * The following differences exist:
  *
- * - if \c path is an absolute path then \c dir_fd is ignored and the
+ * - if `path` is an absolute path then `dir_fd` is ignored and the
  *   behaviour is identical to the other open variants.
- * - if \c path is a relative path and \c dir_fd is an invalid file
+ * - if `path` is a relative path and `dir_fd` is an invalid file
  *   descriptor then the open fails (this can explicitly be used to
  *   enforce absolute path specifications.
- * - if \c path is a relative path and \c dir_fd is a valid directory file
- *   descriptor, then the path is looked up relative to \c dir_fd. \c dir_fd
+ * - if `path` is a relative path and `dir_fd` is a valid directory file
+ *   descriptor, then the path is looked up relative to `dir_fd`. `dir_fd`
  *   needs to be opened with OpenMode::READ_ONLY or with
  *   OpenFlag::PATH. The special DirFD value cosmos::AT_CWD can be
  *   used to open files relative to the current working directory.
@@ -84,9 +84,8 @@ using CloseRangeFlags = BitMask<CloseRangeFlag>;
  * The call is a lot more efficient then a loop in userspace calling `close()`
  * on every single file descriptor.
  *
- * You can specify FileNum::MAX_FD for \c last if you want to close all file
- * descriptors starting from a given range. This is also the default for \c
- * last.
+ * You can specify FileNum::MAX_FD for `last` if you want to close all file
+ * descriptors starting from a given range. This is also the default for `last`.
  *
  * This system call can fail on out of memory conditions or if the maximum
  * number of file descriptors is exceeded in combination with
@@ -98,7 +97,7 @@ COSMOS_API void close_range(const FileNum first,
 
 /// Safely create a temporary file and return it's file descriptor and path.
 /**
- * \c _template needs to be a template for the path to use for the temporary
+ * `_template` needs to be a template for the path to use for the temporary
  * file. It can be an absolute or a relative path. The path determines the
  * directory where the temporary file will be created in. The template also
  * needs to contain a basename on which the actual file path will be based.
@@ -110,10 +109,10 @@ COSMOS_API void close_range(const FileNum first,
  * It is an error to use a zero-length basename which will cause an exception
  * to be thrown.
  *
- * The \c flags argument can specify optional additional open flags to be
+ * The `flags` argument can specify optional additional open flags to be
  * applied when opening the temporary file. The implementation will implicitly
  * use OpenMode::READ_WRITE and OpenFlag::CREATE and
- * OpenFlag::EXCLUSIVE. These should *not* be set in \c flags. The file
+ * OpenFlag::EXCLUSIVE. These should *not* be set in `flags`. The file
  * will have the permissions ModeT{0600}.
  *
  * On success this call returns a pair consisting of the newly opened file
@@ -130,14 +129,14 @@ COSMOS_API std::pair<FileDescriptor, std::string> make_tempfile(
 
 /// Safely create a temporary directory and return it's path.
 /**
- * This is similar to make_tempfile(). \c _template is the relative or
+ * This is similar to make_tempfile(). `_template` is the relative or
  * absolute path to use as a template for the to be created directory. The
  * basename of the path will be expanded with a random string. An empty
  * basename is not allowed.
  *
  * The created directory will receive a mode of 0700.
  *
- * The returned string contains the expanded \c _template. It is the caller's
+ * The returned string contains the expanded `_template`. It is the caller's
  * responsibility to remove the directory from the file system again at the
  * appropriate time.
  *
@@ -153,7 +152,7 @@ COSMOS_API std::string make_tempdir(const SysString _template);
  * this way.
  *
  * The file system entry carries the usual UNIX permissions that will be
- * initialized by combinding \c mode with the calling process's umask.
+ * initialized by combinding `mode` with the calling process's umask.
  *
  * Opening named pipes will block both for reading and writing as long as no
  * communication partner exists. When opening a named pipe in non-blocking
@@ -174,9 +173,9 @@ COSMOS_API void make_fifo(const SysString path, const FileMode mode);
 /**
  * This behaves like make_fifo with the usual _at semantics:
  *
- * - if \c path is absolute then \c dir_fd is ignored.
- * - if \c path is relative then it is interpreted relative to \c dir_fd.
- * - if \c path is relative and \c dir_fd has the special value cosmos::AT_CWD
+ * - if `path` is absolute then `dir_fd` is ignored.
+ * - if `path` is relative then it is interpreted relative to `dir_fd`.
+ * - if `path` is relative and `dir_fd` has the special value cosmos::AT_CWD
  *   then it is interpreted relative to the current working directory.
  **/
 COSMOS_API void make_fifo_at(const DirFD dir_fd, const SysString path,
@@ -197,7 +196,7 @@ COSMOS_API void make_fifo_at(const DirFD dir_fd, const SysString path,
  * process and can thus cause race conditions. If necessary you should the the
  * umask in the main thread of a program early on.
  *
- * Only the lower 9 bits of \c mode will be taken into account (i.e.
+ * Only the lower 9 bits of `mode` will be taken into account (i.e.
  * owner/group/other permissions bits). If any other bits are set then an
  * UsageError exception is thrown.
  *
@@ -223,8 +222,8 @@ COSMOS_API FileMode set_umask(const FileMode mode);
  * For safely testing for existence and opening a file, you should
  * open the file right away and test for an according error condition.
  *
- * This function will not follow symlinks i.e. if \c path refers to a
- * dangling symlink then it will still return \c true.
+ * This function will not follow symlinks i.e. if `path` refers to a
+ * dangling symlink then it will still return `true`.
  *
  * If the condition cannot be exactly determined, because an error
  * different than "ENOENT" is returned by the operating system then an
@@ -235,34 +234,34 @@ COSMOS_API FileMode set_umask(const FileMode mode);
  **/
 COSMOS_API bool exists_file(const SysString path);
 
-/// Removes the file object found at \c path.
+/// Removes the file object found at `path`.
 /**
- * This function removes the file object found at \c path from the file
+ * This function removes the file object found at `path` from the file
  * system. Processes that already have opened the file can continue using it,
  * but the name is removed from the file system.
  *
  * This call does not work with directories, use remove_dir() for them instead.
  *
- * If the \c path does not exist then this is considered an error and an
+ * If the `path` does not exist then this is considered an error and an
  * exception is thrown.
  **/
 COSMOS_API void unlink_file(const SysString path);
 
-/// Removes the file object found at \c path relative to \c dir_fd.
+/// Removes the file object found at `path` relative to `dir_fd`.
 /**
  * This behaves similar to unlink_file():
  *
- * - if path is an absolute path then \c dir_fd is ignored and the call is
+ * - if path is an absolute path then `dir_fd` is ignored and the call is
  *   equivalent to unlink_file().
- * - if path is a relative path and \c dir_fd has the special value
- *   cosmos::AT_CWD, then \c path is looked up relative to the current working
+ * - if path is a relative path and `dir_fd` has the special value
+ *   cosmos::AT_CWD, then `path` is looked up relative to the current working
  *   directory, equivalent to unlink_file().
- * - if path is a relative path and \c dir_fd is a valid open directory file
- *   descriptor then \c path is looked up relative to that directory.
+ * - if path is a relative path and `dir_fd` is a valid open directory file
+ *   descriptor then `path` is looked up relative to that directory.
  **/
 COSMOS_API void unlink_file_at(const DirFD dir_fd, const SysString path);
 
-/// Change the calling process's current working directory to \c path.
+/// Change the calling process's current working directory to `path`.
 /**
  * On error a FileError exception is thrown.
  **/
@@ -275,13 +274,13 @@ COSMOS_API void change_dir(const SysString path);
  **/
 COSMOS_API std::string get_working_dir();
 
-/// Find the full path to the executable program \c exec_base.
+/// Find the full path to the executable program `exec_base`.
 /**
  * This function looks in all directories listed in the PATH environment
- * variable for an executable named \c exec_base. If one is found then the
+ * variable for an executable named `exec_base`. If one is found then the
  * full path to this executable is returned.
  *
- * If \c exec_base is an absolute path then it is only checked whether the
+ * If `exec_base` is an absolute path then it is only checked whether the
  * path (symlinks are followed) is accessible and executable and returns it
  * unmodified if this is the case.
  *
@@ -292,16 +291,16 @@ COSMOS_API std::optional<std::string> which(const std::string_view exec_base) no
 
 /// Creates a directory at the given location.
 /**
- * This attempts to create a single new directory at the given \c path. The
+ * This attempts to create a single new directory at the given `path`. The
  * parent directory must already exist, otherwise a FileError is thrown.
  *
- * The given \c mode determines the permissions of the newly created
+ * The given `mode` determines the permissions of the newly created
  * directory. The permissions are modified by the process's umask
  * (mode = mode * & ~umask)
  **/
 COSMOS_API void make_dir(const SysString path, const FileMode mode);
 
-/// Creates a directory at the location relative to \c dir_fd.
+/// Creates a directory at the location relative to `dir_fd`.
 /**
  * This relates to make_dir() the same way unlink_file_at() relates to
  * unlink_file().
@@ -317,7 +316,7 @@ COSMOS_API void make_dir_at(const DirFD dir_fd, const SysString path, const File
  **/
 COSMOS_API void remove_dir(const SysString path);
 
-/// Removes an empty directory relative to \c dir_fd.
+/// Removes an empty directory relative to `dir_fd`.
 /**
  * This relates to remove_dir() the same way unlink_file_at() relates to
  * unlink_file().
@@ -329,8 +328,8 @@ COSMOS_API void remove_dir_at(const DirFD dir_fd, const SysString path);
 /// Creates a directory, potentially creating multiple directory components.
 /**
  * This is similar to make_dir() but also creates possibly missing parent
- * directory elements in \c path. All created directory components will
- * receive the given \c mode.
+ * directory elements in `path`. All created directory components will
+ * receive the given `mode`.
  *
  * If any of the path components cannot be created (or accessed) then an
  * FileError is thrown. This could mean that some of the paths have been
@@ -342,10 +341,10 @@ COSMOS_API void remove_dir_at(const DirFD dir_fd, const SysString path);
  **/
 COSMOS_API Errno make_all_dirs(const SysString path, const FileMode mode);
 
-/// Recursively removes all directory content in \c path.
+/// Recursively removes all directory content in `path`.
 /**
- * This function recursively removes all content in \c path. It is expected
- * that as least \c path itself exists and is a directory, otherwise an
+ * This function recursively removes all content in `path`. It is expected
+ * that as least `path` itself exists and is a directory, otherwise an
  * exception is thrown.
  *
  * If an error occurs while removing any of the descendant path elements then
@@ -392,7 +391,7 @@ COSMOS_API void change_mode(const FileDescriptor fd, const FileMode mode);
 /// Change numerical owner and/or group ID of a file path.
 /**
  * Attempts to change the owner and/or the group of the file object found at
- * \c path. If \c path refers to a symbolic link then the target of the link
+ * `path`. If `path` refers to a symbolic link then the target of the link
  * is affected. UserID::INVALID and GroupID::INVALID will cause the respective
  * item *not* to be touched.
  *
@@ -420,8 +419,8 @@ COSMOS_API void change_owner(const FileDescriptor fd, const UserID uid, const Gr
 /// Change owner and/or group of the given path by user name and/or group name.
 /**
  * This is a convenience function on top of change_owner(const SysString,
- * UserID, GroupID). It looks up the numerical UserID of \c user and the
- * numerical GroupID of \c group.
+ * UserID, GroupID). It looks up the numerical UserID of `user` and the
+ * numerical GroupID of `group`.
  *
  * To skip changing the owner of user or group simply pass an empty
  * SysString as respective parameter.
@@ -469,7 +468,7 @@ inline void change_group(const SysString path, const SysString group) {
  * to a symbolic link that the ownership of the link is changed, not that of
  * the target.
  *
- * If \c path is not a symlink then it's owner will still be changed and no
+ * If `path` is not a symlink then it's owner will still be changed and no
  * error is thrown.
  **/
 COSMOS_API void change_owner_nofollow(const SysString path, const UserID uid,
@@ -482,11 +481,11 @@ COSMOS_API void change_owner_nofollow(const SysString path, const UserID uid,
 COSMOS_API void change_owner_nofollow(const SysString path, const SysString user,
 		const SysString group = {});
 
-/// Creates a symbolic link at \c path pointing to \c target.
+/// Creates a symbolic link at `path` pointing to `target`.
 /**
  * A symbolic link is simply a pointer to another file system location as
- * provided in \c target. Leading ".." components in \c target will refer to
- * the parent directories of \c path.
+ * provided in `target`. Leading ".." components in `target` will refer to
+ * the parent directories of `path`.
  *
  * The permission bits (FileMode) of a symlink are ignored by Linux. The
  * user and group ownership are ignored when dereferencing a symlink, except
@@ -496,17 +495,17 @@ COSMOS_API void change_owner_nofollow(const SysString path, const SysString user
  *
  * If an error occurs then a FileError is thrown. Common errors are:
  *
- * - access denied to \c path. Either search access in the initial components
+ * - access denied to `path`. Either search access in the initial components
  *   or write access to the final directory component (Errno::ACCESS).
  * - the file system does not allow the creation of symbolic links
  *   (Errno::PERMISSION).
- * - Earlier parts of \c path do not exist or \c target is empty
+ * - Earlier parts of `path` do not exist or `target` is empty
  *   (Errno::NO_ENTRY).
- * - \c path already exists (Errno::EXISTS).
+ * - `path` already exists (Errno::EXISTS).
  **/
 COSMOS_API void make_symlink(const SysString target, const SysString path);
 
-/// Creates a symbolic link relative to \c dir_fd pointing to \c target.
+/// Creates a symbolic link relative to `dir_fd` pointing to `target`.
 /**
  * This behaves just like make_symlink(). It relates to make_symlink() the
  * same way unlink_file_at() relates to unlink_file().
@@ -514,19 +513,19 @@ COSMOS_API void make_symlink(const SysString target, const SysString path);
 COSMOS_API void make_symlink_at(const SysString target, const DirFD dir_fd,
 		const SysString path);
 
-/// Returns the target (content) of the symbolic link at \c path.
+/// Returns the target (content) of the symbolic link at `path`.
 /**
- * This returns the target path of the symlink present at the given \c path.
+ * This returns the target path of the symlink present at the given `path`.
  *
  * If an error occurs then a FileError is thrown. Common errors are:
  *
  * - access denied (Errno::ACCESS)
- * - invalid argument if \c path is not a symlink (Errno::INVALID_ARG)
- * - no entry if \c path does not exist (Errno::NO_ENTRY)
+ * - invalid argument if `path` is not a symlink (Errno::INVALID_ARG)
+ * - no entry if `path` does not exist (Errno::NO_ENTRY)
  **/
 COSMOS_API std::string read_symlink(const SysString path);
 
-/// Returns the target (content) of the symbolic link \c path relative to \c dir_fd.
+/// Returns the target (content) of the symbolic link `path` relative to `dir_fd`.
 /**
  * This relates to read_symlink() the same way unlink_file_at() relates to
  * unlink_file().
@@ -535,16 +534,16 @@ COSMOS_API std::string read_symlink(const SysString path);
  **/
 COSMOS_API std::string read_symlink_at(const DirFD dir_fd, const SysString path);
 
-/// Creates a new (hard) link of the file found in \c old_path at \c new_path.
+/// Creates a new (hard) link of the file found in `old_path` at `new_path`.
 /**
  * Hard links only work on the same file system. An attempt to create a hard
  * link across different mounts will result in an ApiError with
  * Errno::CROSS_DEVICE.
  *
- * If \c new_path already exists then it will not be overwritten but
+ * If `new_path` already exists then it will not be overwritten but
  * Errno::EXISTS will be thrown.
  *
- * Hard links don't work for directories, if \c old_path refers to one then
+ * Hard links don't work for directories, if `old_path` refers to one then
  * Errno::PERMISSION will be thrown.
  *
  * Furthermore a range of errors related to lack of permissions, lack of
@@ -556,9 +555,9 @@ COSMOS_API std::string read_symlink_at(const DirFD dir_fd, const SysString path)
  **/
 COSMOS_API void link(const SysString old_path, const SysString new_path);
 
-/// Creates a new (hard) link based on lookups relative to \c old_dir and \c new_dir.
+/// Creates a new (hard) link based on lookups relative to `old_dir` and `new_dir`.
 /**
- * This behaves similar to link(). For \c old_path and \c new_path the usual
+ * This behaves similar to link(). For `old_path` and `new_path` the usual
  * at() API rules apply:
  *
  * - if the path is absolute then related DirFD is ignored.
@@ -567,7 +566,7 @@ COSMOS_API void link(const SysString old_path, const SysString new_path);
  * - else the path is interpreted relative to the directory represented by
  *   DirFD.
  *
- * \c follow_old determines whether symlink's encountered at \c old_path will
+ * `follow_old` determines whether symlink's encountered at `old_path` will
  * be resolved or not.
  **/
 COSMOS_API void linkat(const DirFD old_dir, const SysString old_path,
@@ -577,7 +576,7 @@ COSMOS_API void linkat(const DirFD old_dir, const SysString old_path,
 /// Special variant of linkat() that can link arbitrary file descriptors at a new location.
 /**
  * Contrary to linkat() this call can give the specified file descriptor a new
- * name at \c new_dir / \c new_path, without specifying a source name. This
+ * name at `new_dir` / `new_path`, without specifying a source name. This
  * generally only works for files that have a non-zero link count. This does
  * not work for directory file descriptors.
  *
@@ -602,10 +601,10 @@ COSMOS_API void linkat_fd(const FileDescriptor fd, const DirFD new_dir,
 COSMOS_API void linkat_proc_fd(const FileDescriptor fd, const DirFD new_dir,
 		const SysString new_path);
 
-/// Changes the file size of the file referred to by \c fd to \c length bytes.
+/// Changes the file size of the file referred to by `fd` to `length` bytes.
 /**
- * If \c length is smaller than the current file size, then the extra data
- * stored in the file is lost. If \c length is larger than the current file
+ * If `length` is smaller than the current file size, then the extra data
+ * stored in the file is lost. If `length` is larger than the current file
  * size, then the extra data reads as zero bytes.
  *
  * This operation requires the file to be opened for writing. A successful
@@ -613,7 +612,7 @@ COSMOS_API void linkat_proc_fd(const FileDescriptor fd, const DirFD new_dir,
  **/
 COSMOS_API void truncate(const FileDescriptor fd, off_t length);
 
-/// Changes the file size of the file found at the given \c path to \c length bytes.
+/// Changes the file size of the file found at the given `path` to `length` bytes.
 /**
  * Behaves just like truncate(const FileDescriptor, off_t), with the
  * difference that the operation is performed on the given path. The file must
@@ -641,10 +640,10 @@ struct CopyFileRangeParameters {
  * The output file descriptor must not be opened with OpenFlag::APPEND,
  * otherwise an error is thrown.
  *
- * As usual partial I/O can occur. The call attempts to copy \c pars.len bytes
+ * As usual partial I/O can occur. The call attempts to copy `pars.len` bytes
  * and the number of actually copied bytes is returned from this call. If the
  * input file descriptor reached the end of file then 0 is returned. The
- * remaining number of bytes is updated in \c pars.len. This way the same
+ * remaining number of bytes is updated in `pars.len`. This way the same
  * parameter structure can be used to continue the operation until it is
  * complete.
  *

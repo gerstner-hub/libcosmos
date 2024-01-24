@@ -49,7 +49,7 @@ public: // functions
 	 * passing it on to the hardware, or even in the hardware itself, it
 	 * it supports that.
 	 *
-	 * The \c segment_size defines the size of each individual segment.
+	 * The `segment_size` defines the size of each individual segment.
 	 * When sending data over the socket then it is considered to contain
 	 * a multiple of this segment_size, where the last segment can be
 	 * shorter. This size needs to be smaller than the MTU and no more

@@ -55,7 +55,7 @@ public: // functions
 
 	/// Returns whether a child process is still active.
 	/**
-	 * This can return \c true even if the child process already exited,
+	 * This can return `true` even if the child process already exited,
 	 * in case the child process's exit status was not yet collected via
 	 * wait().
 	 **/

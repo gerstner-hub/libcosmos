@@ -82,7 +82,7 @@ public: // functions
 
 	/// Set exception context information.
 	/**
-	 * This function is used by the \c cosmos_throw macro to store
+	 * This function is used by the `cosmos_throw` macro to store
 	 * information about the program location where the exception was
 	 * thrown.
 	 **/
@@ -113,9 +113,9 @@ protected: // functions
 	/// Append type specific error information to m_msg.
 	/**
 	 * This function is called by the implementation when error specific
-	 * information needs to be appened to the the \c m_msg string.
+	 * information needs to be appened to the the `m_msg` string.
 	 *
-	 * At entry into this function \c m_msg can already contain data that
+	 * At entry into this function `m_msg` can already contain data that
 	 * must not be discarded.
 	 *
 	 * This function will be called at most once during the lifetime of an

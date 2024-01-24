@@ -375,7 +375,7 @@ public: // functions
 
 	/// Set the unicast hop limit for the socket.
 	/**
-	 * If \c hops is -1 then the route default will be used. Otherwise the
+	 * If `hops` is -1 then the route default will be used. Otherwise the
 	 * value should be between 0 and 255.
 	 **/
 	void setUnicastHops(const int hops) {

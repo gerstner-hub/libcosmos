@@ -19,7 +19,7 @@ class COSMOS_API PasswdInfo :
 		public InfoBase<struct passwd> {
 public: // functions
 
-	/// Obtains PasswdInfo for the given username \c name.
+	/// Obtains PasswdInfo for the given username `name`.
 	/**
 	 * If an error occurs obtaining the entry then an ApiError exception
 	 * is thrown.
@@ -29,7 +29,7 @@ public: // functions
 	 **/
 	explicit PasswdInfo(const SysString name);
 
-	/// Obtains PasswdInfo for the given numerical user id \c uid.
+	/// Obtains PasswdInfo for the given numerical user id `uid`.
 	/**
 	 * \see PasswdInfo(const SysString)
 	 **/

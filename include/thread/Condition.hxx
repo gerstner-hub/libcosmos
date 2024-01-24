@@ -46,10 +46,10 @@ public: // types
 
 public: // functions
 
-	/// Create a condition coupled with the given \c lock.
+	/// Create a condition coupled with the given `lock`.
 	/**
 	 * The given Mutex will be associated with the Condition for the
-	 * complete lifetime of the object. You need to make sure that \c lock
+	 * complete lifetime of the object. You need to make sure that `lock`
 	 * is never destroyed before the associated Condition object is
 	 * destroyed.
 	 **/

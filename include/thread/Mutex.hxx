@@ -32,7 +32,7 @@ public: // functions
 	/**
 	 * Other mutex types are not currently provided.
 	 *
-	 * If the \c NDEBUG define is not set (during libcosmos build) then
+	 * If the `NDEBUG` define is not set (during libcosmos build) then
 	 * additional error checks are in effect that allow detection of
 	 * deadlocks etc.
 	 **/

@@ -53,7 +53,7 @@ public: // functions
 
 	/// Returns the exit status of the child.
 	/**
-	 * The returned value is only valid in case exited() returns \c true.
+	 * The returned value is only valid in case exited() returns `true`.
 	 * Otherwise -1 is returned.
 	 **/
 	ExitStatus exitStatus() const { return exited() ? ExitStatus{si_status} : ExitStatus::INVALID; }

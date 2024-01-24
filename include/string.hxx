@@ -37,9 +37,9 @@ struct CompareCString {
 	}
 };
 
-/// Returns an all lower case version of \c s.
+/// Returns an all lower case version of `s`.
 std::string COSMOS_API to_lower(const std::string_view s);
-/// Returns an all upper case veersion of \c s.
+/// Returns an all upper case veersion of `s`.
 std::string COSMOS_API to_upper(const std::string_view s);
 
 /// Strips leading and trailing whitespace from the given string in-place.
@@ -52,13 +52,13 @@ inline std::string stripped(const std::string_view s) {
 	return ret;
 }
 
-/// Returns whether \c prefix is a prefix of \c s.
+/// Returns whether `prefix` is a prefix of `s`.
 inline bool is_prefix(const std::string_view s, const std::string_view prefix) {
 	// TODO: in C++20 string_view has a starts_with() member
 	return s.substr(0, prefix.length()) == prefix;
 }
 
-/// Returns whether /\c suffix is a suffix oc \c s.
+/// Returns whether `suffix` is a suffix of `s`.
 inline bool is_suffix(const std::string_view s, const std::string_view suffix) {
 	if (s.size() < suffix.size())
 		return false;
@@ -66,7 +66,7 @@ inline bool is_suffix(const std::string_view s, const std::string_view suffix) {
 	return s.substr(s.size() - suffix.size()) == suffix;
 }
 
-/// Simple wrapper that creates a string_view from \c s and supporting also nullptr.
+/// Simple wrapper that creates a string_view from `s` and supports also nullptr.
 /**
  * The std::string_view constructor does not allow a nullptr argument. This
  * wrapper makes this limitation transparent by returning an empty string_view
@@ -100,10 +100,10 @@ using SplitFlags = BitMask<SplitFlag>;
 
 /// Split a string at separator boundaries.
 /**
- * The input string \c str will be split up at every occurence of the \c sep
+ * The input string `str` will be split up at every occurence of the `sep`
  * substring. The resulting parts are returned as a vector. By default
- * subsequent occurences of \c sep are ignored. If SplitFlag::KEEP_EMPTY is
- * set in \c flags then empty elements will be returned for these occurences
+ * subsequent occurences of `sep` are ignored. If SplitFlag::KEEP_EMPTY is
+ * set in `flags` then empty elements will be returned for these occurences
  * instead.
  **/
 template <typename CHAR>

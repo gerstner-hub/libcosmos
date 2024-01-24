@@ -101,7 +101,7 @@ enum class Errno : int { // errnos are distinct positive `int` values says `man 
 	CROSS_DEVICE          = EXDEV            ///< cross-device link
 };
 
-/// Wrapper that returns the Errno strongly typed representation of the current \c errno
+/// Wrapper that returns the Errno strongly typed representation of the current `errno`
 inline Errno get_errno() { return Errno{errno}; }
 /// Resets the currently set errno to indicate no error.
 inline void reset_errno() { errno = static_cast<int>(Errno::NO_ERROR); }

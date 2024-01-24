@@ -79,7 +79,7 @@ protected: // functions
 	/// Update the address structure after it has been filled in by the kernel.
 	/**
 	 * Some system calls update the address structure. The obtained number
-	 * of bytes is found in \c new_length. Some address structures have
+	 * of bytes is found in `new_length`. Some address structures have
 	 * dynamic sizes in which case the new length has to be accomodated
 	 * for by overriding this function call.
 	 *

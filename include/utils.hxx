@@ -104,7 +104,7 @@ struct Identity { using type = T; };
 template<typename T>
 using IdentityT = typename Identity<T>::type;
 
-/// Checks whether \c is within the given (inclusive) range.
+/// Checks whether `v` is within the given (inclusive) range.
 // the stunt with IdentityT is required to avoid deduction problems when e.g.
 // literal integer constants are involved.
 template <typename T1>
@@ -112,7 +112,7 @@ bool in_range(const T1 &v, const IdentityT<T1> &_min, const IdentityT<T1> &_max)
 	return _min <= v && v <= _max;
 }
 
-/// Checks whether the value \c v is found in the given list of values \c l.
+/// Checks whether the value `v` is found in the given list of values `l`.
 template <typename T>
 bool in_list(const T &v, const std::initializer_list<T> &l) {
 	for (const auto &cmp: l) {

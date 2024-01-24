@@ -116,7 +116,7 @@ protected: // data
  *
  * The given field width will only count towards the actual digits the number
  * consists of. A possible base prefix is not counted towards the field width.
- * I.e. if showBase() is set to \c true then HexNum(0x10, 4) will be printed
+ * I.e. if showBase() is set to `true` then HexNum(0x10, 4) will be printed
  * as: "0x0010".
  **/
 template <typename NUM>

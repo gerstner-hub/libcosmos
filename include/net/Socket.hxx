@@ -132,7 +132,7 @@ protected: // functions
 	 * been put into the listen state via the listen() function.
 	 *
 	 * The returned file descriptor refers to the new connection that has
-	 * been accepted. The optional \c addr parameter will receive the
+	 * been accepted. The optional `addr` parameter will receive the
 	 * address of the newly accepted connection.
 	 *
 	 * This is only a lower level function that returns an unmanaged file
@@ -183,7 +183,7 @@ protected: // functions
 	 * - passing additional ancillary data using the `control_msg` member
 	 *   of `header`.
 	 *
-	 * If \c addr is passed then this specific target address is used for
+	 * If `addr` is passed then this specific target address is used for
 	 * sending the data.
 	 *
 	 * The amount of sent data is reflected in an updated `iovec` member
@@ -205,14 +205,14 @@ protected: // functions
 
 	/// Receive a packet, filling in the sender's address.
 	/**
-	 * This call is like receive() but fills in the sender's address in \c
-	 * addr, if possible. This generally doesn't make sense with
+	 * This call is like receive() but fills in the sender's address in
+	 * `addr`, if possible. This generally doesn't make sense with
 	 * connection mode socket types (where the peer is defined during
-	 * connect() time). If the sender's address isn't available then \c
-	 * addr is left unchanged.
+	 * connect() time). If the sender's address isn't available then
+	 * `addr` is left unchanged.
 	 *
-	 * The returned pair contains the number of bytes written to \c buf
-	 * and a boolean type indicating whether \c addr was filled in or not.
+	 * The returned pair contains the number of bytes written to `buf`
+	 * and a boolean type indicating whether `addr` was filled in or not.
 	 **/
 	std::pair<size_t, AddressFilledIn> receiveFrom(
 			void *buf, size_t length, SocketAddress &addr,
@@ -228,7 +228,7 @@ protected: // functions
 	 * - reception of additional ancillary data using
 	 *   ReceiveMessageHeader::setControlBufferSize().
 	 *
-	 * If \c addr is passed then the source address of the message is
+	 * If `addr` is passed then the source address of the message is
 	 * placed in this SocketAddress structure, if one is available.
 	 * Whether it was filled in is indicated by the return value.
 	 *

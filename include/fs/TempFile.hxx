@@ -14,8 +14,8 @@ namespace cosmos {
  * Upon close() both the file descriptor will be closed and the file on disk
  * will be unlinked.
  *
- * \see cosmos::fs::make_tempfile() for details about the structure of the \c
- * _template path.
+ * \see cosmos::fs::make_tempfile() for details about the structure of the
+ * `_template` path.
  **/
 class COSMOS_API TempFile :
 		public FileBase {

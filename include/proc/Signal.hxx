@@ -121,7 +121,7 @@ COSMOS_API void send(const PidFD pidfd, const Signal s);
  * default action will not be executed. This allows to collect the
  * information synchronously e.g. by using a SignalFD.
  *
- * If \c old is provided then the previous signal mask is returned
+ * If `old` is provided then the previous signal mask is returned
  * into this SigSet object.
  **/
 COSMOS_API void block(const SigSet &s, std::optional<SigSet *> old = {});
@@ -141,7 +141,7 @@ inline void restore(const Signal sig) {
 /**
  * Ignoring a signal can make sense for the Signal::CHILD signal in which case
  * child processes will not become zombies even if the parent does not wait on
- * them. \c see proc::wait().
+ * them. \see proc::wait().
  **/
 inline void ignore(const Signal sig) {
 	::signal(to_integral(sig.raw()), SIG_IGN);

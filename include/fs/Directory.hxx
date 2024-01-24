@@ -39,11 +39,11 @@ public: // functions
 		open(path, mode, flags);
 	}
 
-	/// Open a directory by path relative to \c dir_fd using the given mode and default flags.
+	/// Open a directory by path relative to `dir_fd` using the given mode and default flags.
 	Directory(const DirFD dir_fd, const SysString path, const OpenMode mode = OpenMode::READ_ONLY) :
 			Directory{dir_fd, path, mode, {OpenFlag::CLOEXEC}} {}
 
-	/// Open a directory by path relative to \c dir_fd using the given mode and flags.
+	/// Open a directory by path relative to `dir_fd` using the given mode and flags.
 	Directory(const DirFD dir_fd, const SysString path, const OpenMode mode,
 			const OpenFlags flags) {
 		open(dir_fd, path, mode, flags);
@@ -75,27 +75,27 @@ public: // functions
 
 	/// Open a directory by path using the given mode and flags.
 	/**
-	 * The OpenFlag::DIRECTORY flag will implicitly be set in \c
-	 * flags, since this is required to ensure that the resulting file
-	 * descriptor will refer to a directory.
+	 * The OpenFlag::DIRECTORY flag will implicitly be set in `flags`,
+	 * since this is required to ensure that the resulting file descriptor
+	 * will refer to a directory.
 	 **/
 	void open(const SysString path, const OpenMode mode, OpenFlags flags);
 
-	/// Open a directory by path relative to \c dir_fd using the given mode and default flags.
+	/// Open a directory by path relative to `dir_fd` using the given mode and default flags.
 	void open(const DirFD dir_fd, const SysString path, const OpenMode mode) {
 		open(dir_fd, path, mode, {OpenFlag::CLOEXEC});
 	}
 
-	/// Open a directory by path relative to \c dir_fd using the given mode and flags.
+	/// Open a directory by path relative to `dir_fd` using the given mode and flags.
 	void open(const DirFD dir_fd, const SysString path, const OpenMode mode,
 			const OpenFlags flags);
 
 	/// Takes the already open directory file descriptor fd and operators on it.
 	/**
-	 * The caller is responsible for invalidating \c fd, if desired, and
+	 * The caller is responsible for invalidating `fd`, if desired, and
 	 * that the file descriptor is not used in conflicting ways.
 	 *
-	 * The parameter \c auto_close determines whether the File object will
+	 * The parameter `auto_close` determines whether the File object will
 	 * take ownership of the file descriptor, or not. If so then the file
 	 * descriptor is closed on OS level if deemed necessary by the
 	 * implementation.

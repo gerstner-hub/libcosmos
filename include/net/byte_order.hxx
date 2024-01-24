@@ -78,7 +78,7 @@ inline constexpr uint64_t swap_byte_order(uint64_t value) {
 	return bswap_64(value);
 }
 
-/// Return the network byte order version of \c host.
+/// Return the network byte order version of `host`.
 template <typename T>
 inline T to_network_order(T host) {
 	if (our_endian == Endian::BIG) {
@@ -88,7 +88,7 @@ inline T to_network_order(T host) {
 	}
 }
 
-/// Return the host byte order version of \c network.
+/// Return the host byte order version of `network`.
 template <typename T>
 inline T to_host_order(T network) {
 	if (our_endian == Endian::BIG) {

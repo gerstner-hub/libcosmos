@@ -123,7 +123,7 @@ public: // functions
 
 	/// Parse received file descriptors from the given ControlMessage.
 	/**
-	 * If \c msg is not of the right type then an exception is thrown.
+	 * If `msg` is not of the right type then an exception is thrown.
 	 *
 	 * On success check `numFDs()` to learn of the amount of received file
 	 * descriptors and use `takeFDs()` to transfer ownership of them to

@@ -79,13 +79,13 @@ public: // types
 
 	/// Flags found in PollEvent that indicate the events that occured on a file descriptor.
 	enum class Event : uint32_t {
-		/// \c see MonitorFlag::INPUT
+		/// \see MonitorFlag::INPUT
 		INPUT_READY       = EPOLLIN,
-		/// \c see MonitorFlag::OUTPUT
+		/// \see MonitorFlag::OUTPUT
 		OUTPUT_READY      = EPOLLOUT,
-		/// \c see MonitorFlag::SOCKET_HANGUP
+		/// \see MonitorFlag::SOCKET_HANGUP
 		SOCKET_HANGUP     = EPOLLRDHUP,
-		/// \c see MonitorFlag::EXCEPTIONS
+		/// \see MonitorFlag::EXCEPTIONS
 		EXCEPTION_OCCURED = EPOLLPRI,
 		/// An error condition occured on the file descriptor (this is also reported for the write end of a pipe, if the read end is closed). This event is always reported independently of MonitorFlag.
 		ERROR_OCCURED     = EPOLLERR,

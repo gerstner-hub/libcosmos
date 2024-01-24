@@ -61,7 +61,7 @@ public: // functions
 
 	/// Reverse resolve the binary IP address and port into DNS and service names.
 	/**
-	 * \c host and \c service will be filled with the textual
+	 * `host` and `service` will be filled with the textual
 	 * representation of the currently stored binary IP address and port
 	 * number. The given flags influence the behaviour of this reverse
 	 * lookup.

@@ -15,7 +15,7 @@ public: // functions
 	/// Returns whether data is present in the object.
 	/**
 	 * If no corresponding entry was found during construction time then
-	 * this returns \c false.
+	 * this returns `false`.
 	 **/
 	bool valid() const { return m_valid; }
 

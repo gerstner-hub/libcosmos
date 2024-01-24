@@ -64,7 +64,7 @@ public:
 
 	/// Sends a stream of zero bits for a certain duration.
 	/**
-	 * If \c ms is zero then the stream will last between 0.25 and 0.50
+	 * If `ms` is zero then the stream will last between 0.25 and 0.50
 	 * seconds. If it is non-zero then the stream will last for an
 	 * implementation defined time (on Linux the given duration in
 	 * milliseconds).
@@ -76,7 +76,7 @@ public:
 	 * This only works if the current process is a session leader and does
 	 * not yet have a controlling terminal.
 	 *
-	 * If the caller has CAP_SYS_ADMIN capability and \c force is true
+	 * If the caller has CAP_SYS_ADMIN capability and `force` is true
 	 * then the terminal is "stolen" and all processes that had this
 	 * terminal as controlling terminal before, lose it.
 	 *

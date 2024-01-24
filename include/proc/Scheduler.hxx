@@ -48,7 +48,7 @@ public: // functions
 	/**
 	 * If the operation fails then an ApiError is thrown.
 	 *
-	 * If \c pid is zero then the settings are applied to the calling
+	 * If `pid` is zero then the settings are applied to the calling
 	 * process/thread.
 	 **/
 	void apply(ProcessID pid) const;

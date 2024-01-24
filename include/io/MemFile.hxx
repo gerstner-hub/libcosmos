@@ -52,7 +52,7 @@ public: // functions
 
 	MemFile() = default;
 
-	/// \c see create().
+	/// \see create().
 	explicit MemFile(const SysString name,
 			const OpenFlags flags = OpenFlags{OpenFlag::CLOEXEC},
 			const HugePageSize tlb_ps = HugePageSize::DEFAULT) {
@@ -62,7 +62,7 @@ public: // functions
 	/// Create a new MemFile using the given settings.
 	/**
 	 * Create a new memory file using the given flags and optional page
-	 * size. The \c name is only for debugging purposes and is used as an
+	 * size. The `name` is only for debugging purposes and is used as an
 	 * identifier in the /proc file system.
 	 **/
 	void create(const SysString name,

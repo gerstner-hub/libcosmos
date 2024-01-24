@@ -218,7 +218,7 @@ public: // functions
 	/// Sets the minimum size of input bytes to pass on to userspace.
 	/**
 	 * Settings this option causes all input operations on the socket to
-	 * block until at least \c bytes many bytes are available. This also
+	 * block until at least `bytes` many bytes are available. This also
 	 * affects `select()` and `poll()` APIs.
 	 **/
 	void setReceiveLowerBound(const int bytes) {

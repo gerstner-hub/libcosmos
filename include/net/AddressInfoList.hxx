@@ -35,27 +35,27 @@ public: // functions
 
 	/// Resolve addresses for the given node/service name combination.
 	/**
-	 * The given \c node name is either an internet host name to be
+	 * The given `node` name is either an internet host name to be
 	 * resolved, or a numerical IP address. If
 	 * AddressHints::Flag::NUMERIC_HOST is set then it is always expected
 	 * to be a numerical IP address string.
 	 *
-	 * If \c node is empty and AddressHints::Flag::PASSIVE is set then an
+	 * If `node` is empty and AddressHints::Flag::PASSIVE is set then an
 	 * address suitable for binding (listening) on is returned.
 	 *
-	 * If \c node is empty and AddressHints::Fag::PASSIVE is *not* set
+	 * If `node` is empty and AddressHints::Fag::PASSIVE is *not* set
 	 * then an address based on the loopback device suitable for
 	 * communication on the localhost is returned.
 	 *
-	 * The given \c service is either an IP service name as found in
+	 * The given `service` is either an IP service name as found in
 	 * /etc/services, or a numerical IP port number. If
 	 * AddressHints::Flag::NUMERIC_SERVICE is set then it is always
 	 * expected to be a numerical port string.
 	 *
-	 * If \c service is empty then the returned socket addresses will have
+	 * If `service` is empty then the returned socket addresses will have
 	 * no port portion set.
 	 *
-	 * Either \c node or \c service may be specified as empty, but not
+	 * Either `node` or `service` may be specified as empty, but not
 	 * both.
 	 *
 	 * If resolving the requested parameters fails then a specialized

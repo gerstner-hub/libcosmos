@@ -70,18 +70,18 @@ public: // functions
 	 **/
 	void updateFrom(const FileDescriptor fd);
 
-	/// Obtains stat data for the \c path relative to \c fd.
+	/// Obtains stat data for the `path` relative to `fd`.
 	/**
-	 * If \c path is an absolute path then this behaves like
-	 * updateFrom(const SysString, const FollowSymlinks) and \c fd
+	 * If `path` is an absolute path then this behaves like
+	 * updateFrom(const SysString, const FollowSymlinks) and `fd`
 	 * is ignored.
 	 *
-	 * If \c path is relative then it will be looked up relative to the
-	 * given dir \c fd. You can pass \c cosmos::AT_CWD as \c fd to lookup
-	 * \c path relative to the current working directory.
+	 * If `path` is relative then it will be looked up relative to the
+	 * given dir `fd`. You can pass cosmos::AT_CWD as `fd` to lookup
+	 * `path` relative to the current working directory.
 	 *
-	 * If \c path is an empty string then this behaves similar to
-	 * updateFrom(const FileDescriptor) and \c fd can be any type of file
+	 * If `path` is an empty string then this behaves similar to
+	 * updateFrom(const FileDescriptor) and `fd` can be any type of file
 	 * descriptor (but this usage is not encouraged due to libcosmos' type
 	 * modeling).
 	 **/

@@ -33,10 +33,10 @@ public: // functions
 	/// Creates a new coupling to the given process ID.
 	/**
 	 * Note that creating a PidFD this way is often subject to race
-	 * conditions i.e. the process with the given \c pid might be replaced
+	 * conditions i.e. the process with the given `pid` might be replaced
 	 * by a different one than you expect.
 	 *
-	 * It can be safe if \c pid is a child process of the calling process
+	 * It can be safe if `pid` is a child process of the calling process
 	 * and no other thread is calling any of the wait family of functions
 	 * to cleanup the child process in case it exits.
 	 **/
@@ -44,10 +44,10 @@ public: // functions
 
 	/// Wraps the givne PidFD and takes ownership of it.
 	/**
-	 * The given \c fd will be owned by the new ProcessFile object. This
+	 * The given `fd` will be owned by the new ProcessFile object. This
 	 * means that ProcessFile will close() it if it deems this necessary.
 	 *
-	 * The only way currently to obtain \c fd is via proc::clone().
+	 * The only way currently to obtain `fd` is via proc::clone().
 	 **/
 	explicit ProcessFile(const PidFD fd) :
 			m_fd{fd}
@@ -101,7 +101,7 @@ public: // functions
 	 * the same user as the current process, or the current process needs
 	 * to be privileged.
 	 *
-	 * \c targetfd is the file descriptor number in the target process
+	 * `targetfd` is the file descriptor number in the target process
 	 * that should be duplicated into the current process.
 	 *
 	 * The returned file descriptor will have the close-on-exec flag set.

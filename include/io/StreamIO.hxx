@@ -95,8 +95,8 @@ public: // functions
 	/// Write up to \p length bytes from \p buf into the underlying file.
 	/**
 	 * An attempt is made to write data from the given \p buf and pass it
-	 * to the underlying file object. \p buf needs to hold at least \c
-	 * length bytes of data. Short writes can occur in which case less
+	 * to the underlying file object. \p buf needs to hold at least
+	 * `length` bytes of data. Short writes can occur in which case less
 	 * bytes will be written. The number of bytes actually written is
 	 * returned from this function.
 	 *
@@ -112,12 +112,12 @@ public: // functions
 	/// Read *all* \p length bytes from the underlying file.
 	/**
 	 * This behaves just like read() with the exception that on short
-	 * reads the operation will be continued until all \c length bytes
+	 * reads the operation will be continued until all `length` bytes
 	 * have been obtained from the file.
 	 *
 	 * An End-of-File condition is considered an error in this context and
 	 * results in a RuntimeError exception. If the function returns
-	 * normally then all \c length bytes will have been obtained.
+	 * normally then all `length` bytes will have been obtained.
 	 **/
 	void readAll(void *buf, size_t length);
 
@@ -135,10 +135,10 @@ public: // functions
 	/// Write *all* \p length bytes into the underyling file.
 	/**
 	 * This behaves just like write() with the exception that on short
-	 * writes the operation will be continued until all \c length bytes
+	 * writes the operation will be continued until all `length` bytes
 	 * have been written to the file.
 	 *
-	 * If the function returns normally then all \c length bytes will have
+	 * If the function returns normally then all `length` bytes will have
 	 * been transferred.
 	 **/
 	void writeAll(const void *buf, size_t length);
@@ -150,7 +150,7 @@ public: // functions
 
 	/// Read data from file into a vector of data regions.
 	/**
-	 * The \c iovec specifies memory regions into which data from the file
+	 * The `iovec` specifies memory regions into which data from the file
 	 * should be written. The data will be filled sequentially starting
 	 * from the first memory region.
 	 *
@@ -169,7 +169,7 @@ public: // functions
 
 	/// Write data to file from a vector of data regions.
 	/**
-	 * The \c iovec specifies memory regions whoose data will be written
+	 * The `iovec` specifies memory regions whoose data will be written
 	 * to the file. The data will be written sequentially starting from
 	 * the first memory region.
 	 *
@@ -180,7 +180,7 @@ public: // functions
 	 **/
 	bool write(WriteIOVector &iovec);
 
-	/// Read into *all* data regions specified in \c iovec.
+	/// Read into *all* data regions specified in `iovec`.
 	/**
 	 * This is just like read(IOVector&) but it takes care of partial
 	 * reads and continues until all data of the IOVector has been filled
@@ -192,7 +192,7 @@ public: // functions
 		}
 	}
 
-	/// Write *all* data regions specified in \c iovec.
+	/// Write *all* data regions specified in `iovec`.
 	/**
 	 * This is just like write(const IOVector&) but it takes care of
 	 * partial writes and continues until all data of the IOVector has

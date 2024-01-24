@@ -153,7 +153,7 @@ public:
 	/**
 	 * After this function call the timer will be ready for operation.
 	 *
-	 * If there already is a valid timer fd (i.e. isOpen() == \c true) then
+	 * If there already is a valid timer fd (i.e. isOpen() == `true`) then
 	 * close() will be called first.
 	 *
 	 * This call can cause an ApiError to be thrown e.g. if the maximum
@@ -170,7 +170,7 @@ public:
 	 * file descriptor exist (dup'ed) then this will only happen after all
 	 * copies are closed.
 	 *
-	 * If isOpen() returns \c false then close() returns without doing
+	 * If isOpen() returns `false` then close() returns without doing
 	 * anything.
 	 **/
 	void close() override {

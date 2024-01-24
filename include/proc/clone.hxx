@@ -113,7 +113,7 @@ struct COSMOS_API CloneArgs :
 	/**
 	 * This instructs the kernel to use a specific process ID for the new
 	 * child process. If the process should have multiple specific PIDs in
-	 * multiple PID namespaces then an array of \c num_pids can be
+	 * multiple PID namespaces then an array of `num_pids` can be
 	 * specified. The first entry defines the PID in the most nested PID
 	 * namespaces and so on.
 	 *
@@ -137,7 +137,7 @@ struct COSMOS_API CloneArgs :
 
 namespace proc {
 
-/// Create a child thread or process according to \c args.
+/// Create a child thread or process according to `args`.
 /**
  * This is a lower level version of proc::fork() that allows detailed control
  * over the child properties. Among other it allows to create lightweight

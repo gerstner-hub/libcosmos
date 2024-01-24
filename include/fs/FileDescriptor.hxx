@@ -95,8 +95,8 @@ public: // functions
 	/// Get a duplicate file descriptor that will further be known as new_fd.
 	/**
 	 * The currently stored file descriptor will be duplicated and the
-	 * primitive file descriptor number set in \c new_fd will be used as
-	 * the duplicate representation. If \c new_fd is already an open file
+	 * primitive file descriptor number set in `new_fd` will be used as
+	 * the duplicate representation. If `new_fd` is already an open file
 	 * object then it will first be silently closed, errors ignored.
 	 *
 	 * \param[in] cloexec Denotes whether the duplicate file descriptor

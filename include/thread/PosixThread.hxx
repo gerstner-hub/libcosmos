@@ -68,7 +68,7 @@ public: // functions
 	/**
 	 * This will simply create an empty thread object without invoking any
 	 * system calls. Performing any operations on it will fail. joinable()
-	 * will return \c false.
+	 * will return `false`.
 	 **/
 	PosixThread() noexcept {}
 
@@ -108,7 +108,7 @@ public: // functions
 
 	/// Blocks until the associated thread returns.
 	/**
-	 * This call is only allowed if joinable() returns \c true i.e. if
+	 * This call is only allowed if joinable() returns `true` i.e. if
 	 * currently a joinable thread is attached to this object.
 	 *
 	 * The call will block forever until the target thread ends execution
@@ -137,7 +137,7 @@ public: // functions
 	 * blocks for a given time period before the operation fails and no
 	 * value is returned.
 	 *
-	 * \warning The clock used for \c ts is the RealTimeClock, although
+	 * \warning The clock used for `ts` is the RealTimeClock, although
 	 * the implementation (glibc) calculates an offset that will in turn
 	 * be measured against MonotonicClock. So the timeout will be
 	 * (somewhat) unaffected by discontinous changes to the realtime
@@ -147,7 +147,7 @@ public: // functions
 
 	/// Detach a joinable thread.
 	/**
-	 * This call is only allowed if joinable() returns \c true. Otherwise
+	 * This call is only allowed if joinable() returns `true`. Otherwise
 	 * a UsageError is thrown.
 	 *
 	 * On success the associated thread is converted into a detached
@@ -160,7 +160,7 @@ public: // functions
 
 	/// Returns a friendly name for the thread.
 	/**
-	 * If joinable() returns \c true then this returns a friendly name for
+	 * If joinable() returns `true` then this returns a friendly name for
 	 * the associated thread. Part of this will be the friendly name
 	 * passed at construction time, or an automatically generated name
 	 * otherwise.
@@ -171,7 +171,7 @@ public: // functions
 
 	/// Returns an opaque thread ID object for the thread represented by this object.
 	/**
-	 * This call is only allowed if joinable() returns \c true.
+	 * This call is only allowed if joinable() returns `true`.
 	 *
 	 * The returned object serves the purpose of comparing different
 	 * threads to each other. Any thread can obtain its own ID by calling

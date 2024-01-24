@@ -52,7 +52,7 @@ ID COSMOS_API get_id();
 
 /// Ends execution of the calling thread.
 /**
- * The calling thread will not return. The provided \c val will be available
+ * The calling thread will not return. The provided `val` will be available
  * for collection by other threads in the process by performing a join
  * operation on the pthread_t handle associated with the calling thread.
  *

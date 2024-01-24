@@ -30,7 +30,7 @@ public: // functions
 	File(const SysString path, const OpenMode mode) :
 			File{path, mode, OpenFlags{OpenFlag::CLOEXEC}} {}
 
-	/// Open a file using specific OpenFlags, potentially creating it first using the given \c fmode.
+	/// Open a file using specific OpenFlags, potentially creating it first using the given `fmode`.
 	/**
 	 * \warning If used for creating a file, then you need to specify
 	 * also the FileMode in that case. An exception will the thrown if
@@ -41,7 +41,7 @@ public: // functions
 		open(path, mode, flags, fmode);
 	}
 
-	/// Open the given path relative to the given directory file descriptor \c dir_fd.
+	/// Open the given path relative to the given directory file descriptor `dir_fd`.
 	/**
 	 * \see open(const DirFD, const SysString, const OpenFlags, const std::optional<FileMode>).
 	 **/
@@ -75,7 +75,7 @@ public: // functions
 		open(dir_fd, path, mode, {OpenFlag::CLOEXEC});
 	}
 
-	/// Open the given path relative to the given directory file descriptor \c dir_fd.
+	/// Open the given path relative to the given directory file descriptor `dir_fd`.
 	/**
 	 * \see fs::open_at().
 	 **/

@@ -41,7 +41,7 @@ public: // functions
 		open(fd);
 	}
 
-	/// Open the directory \c subpath relative to \c fd.
+	/// Open the directory `subpath` relative to `fd`.
 	DirStream(const DirFD fd, const SysString subpath) {
 		open(fd, subpath);
 	}
@@ -83,7 +83,7 @@ public: // functions
 	 **/
 	void open(const DirFD fd);
 
-	/// Open the directory \c subpath relative to \c fd.
+	/// Open the directory `subpath` relative to `fd`.
 	void open(const DirFD dir_fd, const SysString subpath);
 
 	/// Associate with the directory at the given file system path location.
@@ -125,7 +125,7 @@ public: // functions
 
 	/// Adjust the directory iterator to the given position.
 	/**
-	 * \c pos needs to be previously obtained from tell().
+	 * `pos` needs to be previously obtained from tell().
 	 **/
 	void seek(const DirEntry::DirPos pos) {
 		requireOpenStream("seek");
@@ -140,13 +140,13 @@ public: // functions
 
 	/// Returns the next entry in the associated directory.
 	/**
-	 * Calls to this function are only allowed if isOpen() returns \c
-	 * true. The validity of the returned object is tied to the lifetime
-	 * of the DirStream instance it came from. Also any call to
-	 * nextEntry() will invalidate previously returned DirEntry instances
-	 * returned from the same DirStream instance.
+	 * Calls to this function are only allowed if isOpen() returns `true`.
+	 * The validity of the returned object is tied to the lifetime of the
+	 * DirStream instance it came from. Also any call to nextEntry() will
+	 * invalidate previously returned DirEntry instances returned from the
+	 * same DirStream instance.
 	 *
-	 * When the end of the directory has been reached then \c nullopt is
+	 * When the end of the directory has been reached then `nullopt` is
 	 * returned.
 	 **/
 	std::optional<DirEntry> nextEntry();
