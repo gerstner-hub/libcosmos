@@ -1,8 +1,5 @@
 #pragma once
 
-// Linux
-#include <signal.h>
-
 // C++
 #include <optional>
 
