@@ -10,7 +10,7 @@
 
 namespace cosmos {
 
-/// Controls automatic EINTR retry behaviour
+/// Controls automatic EINTR retry behaviour.
 /**
  * This type is used in some system call wrappers to control the automatic
  * restart logic on EINTR error returns.
@@ -19,7 +19,22 @@ using RestartOnIntr = NamedBool<struct restart_on_intr_t, true>;
 
 extern RestartOnIntr auto_restart_syscalls;
 
-/// handle a fatal error condition in libcosmos
+/// Controls the use of clone3() vs. fork() in ChildCloner.
+/**
+ * The use of clone3() has the drawback that tools like Valgrind cannot deal
+ * yet with this newer system call. It allows for a more robust implementation
+ * of child processes, though.
+ *
+ * The cosmos init function tries to find out if Valgrind is running and then
+ * sets this to `true`, to prefer `fork()` over `clone3()` to make using
+ * Valgrind transparently possible (even if with slightly changed runtime
+ * behaviour).
+ **/
+using PreferClone = NamedBool<struct prefer_clone_t, true>;
+
+extern PreferClone prefer_clone;
+
+/// handle a fatal error condition in libcosmos.
 /**
  * This function will take care of a fatal error condition that occured in
  * libcosmos. This should only be used in situations where execution cannot be
@@ -40,7 +55,7 @@ extern RestartOnIntr auto_restart_syscalls;
 		const std::string_view msg,
 		const std::exception *ex = nullptr);
 
-/// handle a noncritical library error that cannot be turned into an exception
+/// handle a noncritical library error that cannot be turned into an exception.
 /**
  * This function will take care of recoverable error conditions that cannot be
  * expressed in form of exceptions, because they occur e.g. in an object's

@@ -11,7 +11,8 @@ namespace cosmos {
  * Initable needs to enter its individual priority here.
  **/
 enum class InitPrio : std::size_t {
-	MUTEX_ATTR
+	MUTEX_ATTR,
+	PREFER_CLONE_SETTING
 };
 
 /// Pure virtual base class for the library init system

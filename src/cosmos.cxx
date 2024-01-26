@@ -8,8 +8,9 @@
 
 // Cosmos
 #include "cosmos/cosmos.hxx"
-#include "cosmos/private/cosmos.hxx"
 #include "cosmos/private/Initable.hxx"
+#include "cosmos/private/cosmos.hxx"
+#include "cosmos/proc/process.hxx"
 
 namespace cosmos {
 
@@ -132,5 +133,46 @@ void noncritical_error(
 	std::cerr << "[libcosmos] WARNING: " << msg << "\n";
 	std::cerr << "Exception context:\n\n" << ex.what() << "\n";
 }
+
+
+PreferClone prefer_clone{false};
+
+namespace {
+
+/// Init helper that adjusts the prefer_clone setting, if necessary.
+class PreferCloneInit :
+		public Initable {
+public: // functions
+
+	PreferCloneInit() : Initable(InitPrio::PREFER_CLONE_SETTING) {
+	}
+
+protected: // functions
+
+	void libInit() override {
+		/* this is a heuristic to detect whether we are running in
+		 * Valgrind context. If LD_PRELOAD has references to valgrind
+		 * then it is most likely the case.
+		 *
+		 * For a proper check we'd need to include 'valgrind.h' which
+		 * entails a lot of other stuff like a configure checks and so
+		 * on.
+		 */
+		if (auto ld_preload = proc::get_env_var("LD_PRELOAD"); ld_preload) {
+			auto view = ld_preload->view();
+			if (view.find("valgrind") != view.npos) {
+				prefer_clone = PreferClone{false};
+			}
+		}
+	}
+
+	void libExit() override {
+		// no-op
+	}
+};
+
+PreferCloneInit g_prefer_clone_init;
+
+} // end anon ns
 
 } // end ns
