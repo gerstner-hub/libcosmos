@@ -23,7 +23,7 @@ void SchedulerSettings::apply(ProcessID pid) const {
 	// the POSIX interface sched_setscheduler is probably available, but
 	// only supports the priority property and FIFO/RR, nothing else.
 	if (::syscall(__NR_sched_setattr, pid, &attrs, 0) != 0) {
-		cosmos_throw (ApiError());
+		cosmos_throw (ApiError("sched_setattr()"));
 	}
 }
 
@@ -31,7 +31,7 @@ int RealTimeSchedulerSettings::minPriority() const {
 	auto ret = sched_get_priority_min(static_cast<int>(m_policy));
 
 	if (ret == -1) {
-		cosmos_throw (ApiError());
+		cosmos_throw (ApiError("sched_get_priority_min()"));
 	}
 
 	return ret;
@@ -41,7 +41,7 @@ int RealTimeSchedulerSettings::maxPriority() const {
 	auto ret = sched_get_priority_max(static_cast<int>(m_policy));
 
 	if (ret == -1) {
-		cosmos_throw (ApiError());
+		cosmos_throw (ApiError("sched_get_priority_max()"));
 	}
 
 	return ret;

@@ -1,8 +1,6 @@
 #pragma once
 
 // C++
-#include <iosfwd>
-#include <optional>
 #include <string>
 
 // cosmos
@@ -21,10 +19,10 @@ class COSMOS_API ApiError :
 public: // functions
 
 	/// Stores the current errno code in the exception
-	explicit ApiError(const std::string_view prefix = {});
+	explicit ApiError(const std::string_view prefix);
 
 	/// Stores the given errno code in the exception
-	explicit ApiError(const Errno err);
+	ApiError(const std::string_view prefix, const Errno err);
 
 	/// Returns the plain operating system error message
 	std::string msg() const { return msg(m_errno); }
@@ -47,5 +45,3 @@ protected: // data
 };
 
 } // end ns
-
-COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::Errno err);

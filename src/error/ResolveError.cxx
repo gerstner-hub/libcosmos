@@ -3,8 +3,8 @@
 #include <sstream>
 
 // cosmos
-#include "cosmos/error/ApiError.hxx"
 #include "cosmos/error/ResolveError.hxx"
+#include "cosmos/error/errno.hxx"
 #include "cosmos/utils.hxx"
 
 namespace cosmos {

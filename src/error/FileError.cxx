@@ -4,6 +4,7 @@
 namespace cosmos {
 
 FileError::FileError(const SysString path, const std::string_view operation) :
+		ApiError({}),
 		m_path{path}, m_operation{operation} {
 	setErrorClass("FileError");
 }

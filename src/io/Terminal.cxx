@@ -24,7 +24,7 @@ bool Terminal::isTTY() const {
 
 	switch (get_errno()) {
 		case Errno::NOT_A_TTY: break;
-		default: cosmos_throw (ApiError("isTTY:"));
+		default: cosmos_throw (ApiError("isatty:"));
 	}
 
 	return false;
@@ -71,7 +71,7 @@ std::pair<FileDescriptor, FileDescriptor> openPTY(const std::optional<TermDimens
 	const struct winsize *size = initial_size ? &(*initial_size) : nullptr;
 
 	if (::openpty(&master, &slave, nullptr, nullptr, size) < 0) {
-		cosmos_throw (ApiError("openpty failed"));
+		cosmos_throw (ApiError("openpty()"));
 	}
 
 	return {

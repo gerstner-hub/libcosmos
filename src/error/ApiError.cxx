@@ -9,17 +9,17 @@
 namespace cosmos {
 
 ApiError::ApiError(const std::string_view prefix) :
-		ApiError{Errno{errno}} {
+		ApiError{prefix, Errno{errno}} {
+}
+
+ApiError::ApiError(const std::string_view prefix, const Errno err) :
+		CosmosError{"ApiError"},
+		m_errno{err} {
 	if (!prefix.empty()) {
 		m_msg = prefix;
 		m_msg += ": ";
 	}
 }
-
-ApiError::ApiError(const Errno err) :
-		CosmosError{"ApiError"},
-		m_errno{err}
-{}
 
 void ApiError::generateMsg() const {
 	std::stringstream ss;
@@ -37,8 +37,3 @@ std::string ApiError::msg(const Errno err) {
 }
 
 } // end ns
-
-std::ostream& operator<<(std::ostream &o, const cosmos::Errno err) {
-	o << cosmos::ApiError::msg(err) << " (" << cosmos::to_integral(err) << ")";
-	return o;
-}

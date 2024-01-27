@@ -13,7 +13,7 @@ GroupInfo::GroupInfo(const SysString name) {
 				res);
 	};
 
-	m_valid = getInfo(call);
+	m_valid = getInfo(call, "getgrnam_r()");
 
 	if (!m_valid)
 		reset();
@@ -26,7 +26,7 @@ GroupInfo::GroupInfo(const GroupID gid) {
 				res);
 	};
 
-	m_valid = getInfo(call);
+	m_valid = getInfo(call, "getgrgid_r()");
 	if (!m_valid)
 		reset();
 }

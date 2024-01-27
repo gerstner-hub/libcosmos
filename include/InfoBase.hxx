@@ -29,7 +29,7 @@ public: // functions
 protected: // functions
 
 	/// Helper to drive the common getter function logic for getpw* and getgr*.
-	bool getInfo(std::function<int(DB_STRUCT**)> get_func);
+	bool getInfo(std::function<int(DB_STRUCT**)> get_func, const char *errlabel);
 
 protected: // data
 

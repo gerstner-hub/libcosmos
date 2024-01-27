@@ -75,7 +75,7 @@ void close_range(const FileNum first, const FileNum last, const CloseRangeFlags 
 	// inconsistent with all other system calls. Using FileNum::MAX_FD
 	// (int) as the maximum file descriptor should still work I guess.
 	if (::close_range(to_integral(first), to_integral(last), flags.raw()) != 0) {
-		cosmos_throw (ApiError("close_range"));
+		cosmos_throw (ApiError("close_range()"));
 	}
 }
 

@@ -117,7 +117,7 @@ public: // functions
 		auto ret = ::telldir(m_stream);
 
 		if (ret == -1) {
-			cosmos_throw (ApiError());
+			cosmos_throw (ApiError("telldir()"));
 		}
 
 		return DirEntry::DirPos{ret};

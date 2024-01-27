@@ -103,7 +103,7 @@ off_t StreamIO::seek(const SeekType type, off_t off) {
 	const auto res = ::lseek(to_integral(m_stream_fd.raw()), off, to_integral(type));
 
 	if (res == static_cast<off_t>(-1)) {
-		cosmos_throw (ApiError("seeking in file"));
+		cosmos_throw (ApiError("lseek()"));
 	}
 
 	return res;

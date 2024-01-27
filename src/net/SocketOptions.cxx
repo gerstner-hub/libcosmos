@@ -1,5 +1,4 @@
 // cosmos
-#include "cosmos/error/ApiError.hxx"
 #include "cosmos/error/RuntimeError.hxx"
 #include "cosmos/net/SocketOptions.hxx"
 #include "cosmos/private/sockopts.hxx"

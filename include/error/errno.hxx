@@ -1,7 +1,13 @@
 #pragma once
 
+// C++
+#include <iosfwd>
+
 // C
 #include <errno.h>
+
+// cosmos
+#include "cosmos/dso_export.h"
 
 /**
  * @file
@@ -111,3 +117,5 @@ inline void set_errno(const Errno err) { errno = static_cast<int>(err); }
 inline bool is_errno_set() { return get_errno() != Errno::NO_ERROR; }
 
 } // end ns
+
+COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::Errno err);

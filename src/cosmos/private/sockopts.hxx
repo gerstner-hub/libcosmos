@@ -45,7 +45,7 @@ namespace {
 				 */
 				cosmos_throw (RangeError("getsockopt", len));
 			} else {
-				cosmos_throw (ApiError("getsockopt"));
+				cosmos_throw (ApiError("getsockopt()"));
 			}
 		}
 
@@ -83,7 +83,7 @@ namespace {
 				&ptr_len);
 
 		if (res != 0) {
-			cosmos_throw (ApiError("getsockopt"));
+			cosmos_throw (ApiError("getsockopt()"));
 		}
 
 		return ptr_len;
@@ -104,7 +104,7 @@ namespace {
 				socklen_t{sizeof(T)});
 
 		if (res != 0) {
-			cosmos_throw (ApiError("setsockopt"));
+			cosmos_throw (ApiError("setsockopt()"));
 		}
 	}
 
@@ -121,7 +121,7 @@ namespace {
 				len);
 
 		if (res != 0) {
-			cosmos_throw (ApiError("setsockopt"));
+			cosmos_throw (ApiError("setsockopt()"));
 		}
 	}
 

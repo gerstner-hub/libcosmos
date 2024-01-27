@@ -29,7 +29,7 @@ public: // functions
 
 	RWLock() {
 		if (::pthread_rwlock_init( &m_prwlock, nullptr) != 0) {
-			cosmos_throw (ApiError("Error creating rwlock"));
+			cosmos_throw (ApiError("pthread_rwlock_init()"));
 		}
 	}
 
@@ -41,20 +41,20 @@ public: // functions
 
 	void readlock() const {
 		if (::pthread_rwlock_rdlock(&m_prwlock) != 0) {
-			cosmos_throw (ApiError("Error read-locking rwlock"));
+			cosmos_throw (ApiError("pthread_rwlock_rdlock()"));
 		}
 	}
 
 	void writelock() const {
 		if (::pthread_rwlock_wrlock(&m_prwlock) != 0) {
-			cosmos_throw (ApiError("Error write-locking rwlock"));
+			cosmos_throw (ApiError("pthread_rwlock_wrlock()"));
 		}
 	}
 
 	/// Unlock a previously obtained read or write lock
 	void unlock() const {
 		if (::pthread_rwlock_unlock(&m_prwlock) != 0) {
-			cosmos_throw (ApiError("Error unlocking rw-lock"));
+			cosmos_throw (ApiError("pthread_rwlock_unlock()"));
 		}
 	}
 

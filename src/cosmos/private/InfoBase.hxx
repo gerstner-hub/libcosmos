@@ -14,7 +14,7 @@ constexpr size_t BUF_INIT_SIZE = 512;
 constexpr size_t BUF_MAX_SIZE = 65535;
 
 template <typename DB_STRUCT>
-bool InfoBase<DB_STRUCT>::getInfo(std::function<int(DB_STRUCT**)> get_func) {
+bool InfoBase<DB_STRUCT>::getInfo(std::function<int(DB_STRUCT**)> get_func, const char *errlabel) {
 	DB_STRUCT *res;
 	m_buf.resize(BUF_INIT_SIZE);
 
@@ -24,7 +24,7 @@ bool InfoBase<DB_STRUCT>::getInfo(std::function<int(DB_STRUCT**)> get_func) {
 			case Errno::NO_ERROR:
 				return res != nullptr;
 			case Errno::RANGE: m_buf.resize(m_buf.size() << 1); break;
-			default: cosmos_throw(ApiError(Errno{err})); break;
+			default: cosmos_throw(ApiError(errlabel, Errno{err})); break;
 		}
 
 		if (m_buf.size() > BUF_MAX_SIZE) {

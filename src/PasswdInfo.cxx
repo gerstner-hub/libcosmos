@@ -12,7 +12,7 @@ PasswdInfo::PasswdInfo(const SysString name) {
 			res);
 	};
 
-	m_valid = getInfo(call);
+	m_valid = getInfo(call, "getpwnam_r()");
 
 	if (!m_valid)
 		reset();
@@ -25,7 +25,7 @@ PasswdInfo::PasswdInfo(const UserID uid) {
 			res);
 	};
 
-	m_valid = getInfo(call);
+	m_valid = getInfo(call, "getpwuid_r()");
 
 	if (!m_valid)
 		reset();

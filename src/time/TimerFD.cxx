@@ -2,7 +2,6 @@
 #include "cosmos/dso_export.h"
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/error/RuntimeError.hxx"
-#include "cosmos/error/WouldBlock.hxx"
 #include "cosmos/formatting.hxx"
 #include "cosmos/private/cosmos.hxx"
 #include "cosmos/time/TimerFD.hxx"
@@ -19,7 +18,7 @@ void TimerFD<CLOCK>::create(const TimerFD::CreateFlags flags) {
 		return;
 	}
 
-	cosmos_throw (ApiError());
+	cosmos_throw (ApiError("timerfd_create()"));
 }
 
 template <ClockType CLOCK>
@@ -27,7 +26,7 @@ typename TimerFD<CLOCK>::TimerSpec TimerFD<CLOCK>::getTime() const {
 	TimerSpec ret;
 
 	if (auto res = timerfd_gettime(to_integral(m_fd.raw()), &ret); res != 0) {
-		cosmos_throw (ApiError());
+		cosmos_throw (ApiError("timerfd_gettime()"));
 	}
 
 	return ret;
@@ -43,7 +42,7 @@ void TimerFD<CLOCK>::setTime(const TimerSpec spec, const StartFlags flags) {
 		return;
 	}
 
-	cosmos_throw (ApiError());
+	cosmos_throw (ApiError("timerfd_settime()"));
 }
 
 template <ClockType CLOCK>

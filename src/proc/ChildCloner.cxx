@@ -8,7 +8,6 @@
 #include <iostream>
 
 // cosmos
-#include "cosmos/error/ApiError.hxx"
 #include "cosmos/error/InternalError.hxx"
 #include "cosmos/error/UsageError.hxx"
 #include "cosmos/formatting.hxx"

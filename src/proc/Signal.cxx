@@ -5,13 +5,13 @@
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/formatting.hxx"
 #include "cosmos/fs/FileDescriptor.hxx"
-#include "cosmos/proc/pidfd.h"
-#include "cosmos/proc/Signal.hxx"
 #include "cosmos/proc/SigSet.hxx"
+#include "cosmos/proc/Signal.hxx"
+#include "cosmos/proc/pidfd.h"
 
 // Linux
 #include <signal.h>
-#include <string.h>
+#include <string.h> /* strsignal() */
 
 namespace cosmos {
 
@@ -23,7 +23,7 @@ namespace {
 		if (res == 0)
 			return;
 
-		cosmos_throw (ApiError());
+		cosmos_throw (ApiError("pthread_sigmask()"));
 	}
 
 } // end anon ns
@@ -36,13 +36,13 @@ namespace signal {
 
 void raise(const Signal s) {
 	if (::raise(to_integral(s.raw()))) {
-		cosmos_throw (ApiError());
+		cosmos_throw (ApiError("raise()"));
 	}
 }
 
 void send(const ProcessID proc, const Signal s) {
 	if (::kill(to_integral(proc), to_integral(s.raw()))) {
-		cosmos_throw (ApiError());
+		cosmos_throw (ApiError("kill()"));
 	}
 }
 
@@ -53,7 +53,7 @@ void send(const PidFD pidfd, const Signal s) {
 	// signal auxiliary data, but the defaults are just like kill(), so
 	// let's use them for now.
 	if (::pidfd_send_signal(to_integral(pidfd.raw()), to_integral(s.raw()), nullptr, 0) != 0) {
-		cosmos_throw (ApiError());
+		cosmos_throw (ApiError("pidfd_send_signal()"));
 	}
 }
 

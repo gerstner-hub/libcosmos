@@ -16,7 +16,7 @@ namespace {
 		int fds[2];
 		const auto res = ::socketpair(to_integral(family), to_integral(type) | flags.raw(), to_integral(protocol), fds);
 		if (res != 0) {
-			cosmos_throw(ApiError("socketpair"));
+			cosmos_throw(ApiError("socketpair()"));
 		}
 
 		return {FileDescriptor{FileNum{fds[0]}}, FileDescriptor{FileNum{fds[1]}}};
@@ -41,7 +41,7 @@ std::pair<UnixDatagramSocket, UnixDatagramSocket> create_dgram_socket_pair(const
 InterfaceIndex nameToIndex(const SysString name) {
 	const auto index = if_nametoindex(name.raw());
 	if (index == 0) {
-		cosmos_throw(ApiError("if_nametoindex"));
+		cosmos_throw(ApiError("if_nametoindex()"));
 	}
 	return InterfaceIndex{static_cast<int>(index)};
 }
@@ -50,7 +50,7 @@ std::string indexToName(const InterfaceIndex index) {
 	std::string ret;
 	ret.resize(IF_NAMESIZE);
 	if (!if_indextoname(to_integral(index), ret.data())) {
-		cosmos_throw(ApiError("if_indextoname"));
+		cosmos_throw(ApiError("if_indextoname()"));
 	}
 
 	ret.resize(std::strlen(ret.data()));

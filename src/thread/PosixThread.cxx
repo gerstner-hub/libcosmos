@@ -76,7 +76,7 @@ namespace {
 		);
 
 		if (error != 0) {
-			cosmos_throw (cosmos::ApiError("Unable to create pthread"));
+			cosmos_throw (cosmos::ApiError("pthread_create()"));
 		}
 
 	}
@@ -142,7 +142,7 @@ pthread::ExitValue PosixThread::join() {
 	const auto join_res = ::pthread_join(*m_pthread, &res);
 
 	if (join_res != 0) {
-		cosmos_throw (ApiError("Failed to join pthread"));
+		cosmos_throw (ApiError("pthread_join()"));
 	}
 
 	reset();
@@ -162,7 +162,7 @@ std::optional<pthread::ExitValue> PosixThread::tryJoin() {
 			return {};
 		}
 
-		cosmos_throw (ApiError(err));
+		cosmos_throw (ApiError("pthread_tryjoin_np()", err));
 	}
 
 	reset();
@@ -182,7 +182,7 @@ std::optional<pthread::ExitValue> PosixThread::joinTimed(const RealTime ts) {
 			return {};
 		}
 
-		cosmos_throw (ApiError("Failed to join pthread"));
+		cosmos_throw (ApiError("pthread_timedjoin_np()"));
 	}
 
 	reset();
@@ -200,7 +200,7 @@ void PosixThread::detach() {
 	const auto res = pthread_detach(*m_pthread);
 
 	if (res != 0) {
-		cosmos_throw (ApiError("Failed to detach pthread"));
+		cosmos_throw (ApiError("pthread_detach()"));
 	}
 
 	reset();

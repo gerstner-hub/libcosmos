@@ -13,7 +13,7 @@ const size_t Pipe::MAX_ATOMIC_WRITE = PIPE_BUF;
 Pipe::Pipe() {
 	int ends[2];
 	if (::pipe2(ends, O_CLOEXEC | O_DIRECT) != 0) {
-		cosmos_throw (ApiError());
+		cosmos_throw (ApiError("pipe2()"));
 	}
 
 	m_read_end.setFD(FileNum{ends[0]});

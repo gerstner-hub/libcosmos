@@ -12,7 +12,7 @@ static_assert(sizeof(InterfaceAddress) == sizeof(struct ifaddrs));
 void InterfaceAddressList::fetch() {
 	clear();
 	if (::getifaddrs(&m_addrs) != 0) {
-		cosmos_throw (ApiError("getifaddrs"));
+		cosmos_throw (ApiError("getifaddrs()"));
 	}
 }
 

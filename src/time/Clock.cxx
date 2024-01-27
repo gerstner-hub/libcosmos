@@ -2,7 +2,6 @@
 #include <type_traits>
 
 // Cosmos
-#include "cosmos/dso_export.h"
 #include "cosmos/error/ApiError.hxx"
 #include "cosmos/private/cosmos.hxx"
 #include "cosmos/time/Clock.hxx"
@@ -25,7 +24,7 @@ void Clock<CLOCK>::now(TimeSpec<CLOCK> &ts) const {
 	auto res = clock_gettime(to_integral(CLOCK), &ts);
 
 	if (res != 0) {
-		cosmos_throw (ApiError());
+		cosmos_throw (ApiError("clock_gettime()"));
 	}
 }
 
@@ -35,7 +34,7 @@ TimeSpec<CLOCK> Clock<CLOCK>::resolution() const {
 	auto res = clock_getres(to_integral(CLOCK), &ret);
 
 	if (res != 0) {
-		cosmos_throw (ApiError());
+		cosmos_throw (ApiError("clock_getres()"));
 	}
 
 	return ret;
@@ -46,7 +45,7 @@ void Clock<CLOCK>::setTime(const TimeSpec<CLOCK> t) {
 	auto res = clock_settime(to_integral(CLOCK), &t);
 
 	if (res != 0) {
-		cosmos_throw (ApiError());
+		cosmos_throw (ApiError("clock_settime()"));
 	}
 }
 
@@ -73,7 +72,7 @@ void Clock<CLOCK>::sleep(const TimeSpec<CLOCK> until) const {
 			}
 		}
 
-		cosmos_throw (ApiError(err));
+		cosmos_throw (ApiError("clock_nanosleep()", err));
 	}
 }
 

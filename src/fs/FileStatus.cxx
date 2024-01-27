@@ -2,7 +2,6 @@
 #include <utility>
 
 // cosmos
-#include "cosmos/error/ApiError.hxx"
 #include "cosmos/error/FileError.hxx"
 #include "cosmos/error/UsageError.hxx"
 #include "cosmos/formatting.hxx"
@@ -17,7 +16,7 @@ void FileStatus::throwBadType(const std::string_view context) const {
 
 void FileStatus::updateFrom(const FileDescriptor fd) {
 	if (fstat(to_integral(fd.raw()), &m_st) != 0) {
-		cosmos_throw (ApiError());
+		cosmos_throw (ApiError("fstat()"));
 	}
 }
 
