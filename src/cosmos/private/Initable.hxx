@@ -12,7 +12,8 @@ namespace cosmos {
  **/
 enum class InitPrio : std::size_t {
 	MUTEX_ATTR,
-	RUNNING_ON_VALGRIND
+	RUNNING_ON_VALGRIND,
+	CHECK_STDIO_TTYS
 };
 
 /// Pure virtual base class for the library init system

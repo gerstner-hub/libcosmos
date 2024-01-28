@@ -1,15 +1,33 @@
 // C++
 #include <cassert>
+#include <iostream>
 #include <ostream>
 #include <vector>
 
 // cosmos
 #include "cosmos/error/UsageError.hxx"
 #include "cosmos/io/colors.hxx"
+#include "cosmos/io/Terminal.hxx"
+#include "cosmos/private/Initable.hxx"
+#include "cosmos/proc/process.hxx"
 
 namespace cosmos::term {
 
 namespace {
+
+	bool stdout_is_tty = true;
+	bool stderr_is_tty = true;
+
+	bool isTTYStream(const std::ostream &o) {
+		auto rdbuf = o.rdbuf();
+
+		if (rdbuf == std::cout.rdbuf())
+			return stdout_is_tty;
+		else if (rdbuf == std::cerr.rdbuf())
+			return stderr_is_tty;
+
+		return false;
+	}
 
 	std::string build_ansi_command(const std::vector<ANSICode> &cmd_list) {
 		// the ASCII escape character for ANSI control sequences
@@ -51,6 +69,22 @@ namespace {
 
 } // end anon ns
 
+void refresh_tty_detection() {
+	if (proc::get_env_var("COSMOS_FORCE_COLOR_ON")) {
+		stdout_is_tty = stderr_is_tty = true;
+		return;
+	} else if (proc::get_env_var("COSMOS_FORCE_COLOR_OFF")) {
+		stdout_is_tty = stderr_is_tty = false;
+		return;
+	}
+
+	Terminal output{FileDescriptor{FileNum::STDOUT}};
+	Terminal error{FileDescriptor{FileNum::STDERR}};
+
+	stdout_is_tty = output.isTTY();
+	stderr_is_tty = error.isTTY();
+}
+
 ANSICode get_ansi_color_code(const ColorSpec &color) {
 	size_t code = color.isFrontColor() ? 30 : 40;
 	if (color.isBright())
@@ -69,21 +103,59 @@ TermControl get_off_control(const TermControl ctrl) {
 	}
 }
 
+namespace {
+
+/// Init helper that adjusts the running_on_valgrind setting, if necessary.
+class CheckStdioTTYsInit :
+		public Initable {
+public: // functions
+
+	CheckStdioTTYsInit() : Initable(InitPrio::CHECK_STDIO_TTYS) {
+	}
+
+protected: // functions
+
+	void libInit() override {
+		refresh_tty_detection();
+	}
+
+	void libExit() override {
+		// no-op
+	}
+};
+
+CheckStdioTTYsInit g_check_stdio_ttys;
+
+} // end anon ns
+
 } // end ns
 
 
 std::ostream& operator<<(std::ostream &o, const cosmos::term::ColorSpec &fc) {
+	if (!cosmos::term::isTTYStream(o))
+		return o;
 	const auto code = get_ansi_color_code(fc);
 
 	return o << cosmos::term::build_ansi_command(code);
 }
 
 std::ostream& operator<<(std::ostream &o, const cosmos::term::TermControl p) {
+	if (!cosmos::term::isTTYStream(o))
+		return o;
 	return o << cosmos::term::build_ansi_command(cosmos::term::ANSICode{cosmos::to_integral(p)});
 }
 
 std::ostream& operator<<(std::ostream &o, const cosmos::term::FeatureBase &fb) {
 	using namespace cosmos::term;
+
+	if (!cosmos::term::isTTYStream(o)) {
+		if (!fb.hasNextFeature())
+			return o << fb.getText();
+		else {
+			const auto features = get_features(fb);
+			return o << features.back()->getText();
+		}
+	}
 
 	// simple case without dynamic allocation
 	if (!fb.hasNextFeature()) {

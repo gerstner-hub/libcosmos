@@ -1,10 +1,12 @@
 #include <iostream>
 #include <utility>
 
+#include "cosmos/cosmos.hxx"
 #include "cosmos/io/colors.hxx"
 
 int main() {
 	using namespace cosmos::term;
+	cosmos::Init init;
 
 	std::cout << Inversed{"\ninversed text"};
 

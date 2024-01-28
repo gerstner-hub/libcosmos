@@ -19,6 +19,19 @@
  * This is in a separate namespace due to a lot of symbol pollution. Since a
  * lot of types are in here a `using namespace cosmos::term` can help making
  * code more compact by selectively importing this namespace.
+ *
+ * These ostream operators will only output ANSI escape sequences if the
+ * associated std::ostream is related to std::cout or std::cerr and if the
+ * corresponding backing file descriptor FileNum::STDOUT or FileNum::STDERR
+ * are TTY devices. This is checked during library initialization time. You
+ * can explicitly cause a reevaluation of these checks by calling
+ * `term::refresh_tty_detection()`.
+ *
+ * You can also override the detection by setting one of the following
+ * environment variables:
+ *
+ * COSMOS_FORCE_COLOR_ON: always output ANSI escape sequences on cout and cerr.
+ * COSMOS_FORCE_COLOR_OFF: never output ANSI escape sequences on cout and cerr.
  **/
 
 namespace cosmos::term {
@@ -120,6 +133,21 @@ enum class ANSICode : size_t {
 TermControl COSMOS_API get_off_control(const TermControl ctrl);
 /// Returns the actual ANSI escape code number for the given color specification.
 ANSICode COSMOS_API get_ansi_color_code(const ColorSpec &color);
+
+/// Reevaluate whether std::cout and std::cerr belong to a TTY.
+/**
+ * During libcosmos initialization time the color API checks whether
+ * std::cout and std::cerr are associated with terminal devices. If this is
+ * not the case then ANSI escape sequences are transparently disabled on these
+ * streams and only plain text is output.
+ *
+ * Should your program reassociate the stdout or stderr streams or their
+ * backing file descriptors during program execution then you can call this
+ * function explicitly to reevaluate them. This function is by nature not
+ * fully multithreading safe if threads are using the color I/O functions in
+ * parallel while changing the stdio properties.
+ **/
+COSMOS_API void refresh_tty_detection();
 
 /// Base class to build nested ANSI feature objects.
 /**
