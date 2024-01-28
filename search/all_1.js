@@ -1,0 +1,22 @@
+var searchData=
+[
+  ['backcolor_0',['BackColor',['../structcosmos_1_1term_1_1BackColor.html',1,'cosmos::term']]],
+  ['bad_5ffd_1',['BAD_FD',['../errno_8hxx.html#a5c1aef3a972b5a9a3bb6b3df1aa01939a8de4f1b1099d6e5c938889ebc1c05f8f',1,'cosmos']]],
+  ['bad_5fflags_2',['BAD_FLAGS',['../classcosmos_1_1ResolveError.html#a851732a967515704a58a6dcef8114cd9a2c9f3398ae9a67ac7de5c73178958974',1,'cosmos::ResolveError']]],
+  ['baseptr_3',['baseptr',['../classcosmos_1_1UnixAddress.html#aa28c62d25e647b6a20f2ca9d5c6a0a3d',1,'cosmos::UnixAddress::basePtr() override'],['../classcosmos_1_1UnixAddress.html#aeb3a03e9dcf632fcc4b35955137379bf',1,'cosmos::UnixAddress::basePtr() const override'],['../classcosmos_1_1SocketAddress.html#a61a69def1e62784bb00cd815eea94083',1,'cosmos::SocketAddress::basePtr() const =0'],['../classcosmos_1_1SocketAddress.html#abfae0306f8ac3132eb8c7ca34ddc718a',1,'cosmos::SocketAddress::basePtr()=0'],['../classcosmos_1_1LinkLayerAddress.html#a173f2bb6f5820be8adacec4937214357',1,'cosmos::LinkLayerAddress::basePtr() const override'],['../classcosmos_1_1LinkLayerAddress.html#a865142ae1832b0917da9f0e29f11678f',1,'cosmos::LinkLayerAddress::basePtr() override'],['../classcosmos_1_1IP6Address.html#a49cb154c4efe163dddc4dfe02978435d',1,'cosmos::IP6Address::basePtr()'],['../classcosmos_1_1IP4Address.html#a80a5d54ac0bcdf7fb94f96e51a6e5eb0',1,'cosmos::IP4Address::basePtr() const override'],['../classcosmos_1_1IP4Address.html#a430d766e5dbfb036a39f47071ac0f9dd',1,'cosmos::IP4Address::basePtr() override'],['../classcosmos_1_1IP6Address.html#a2a2a54778a18a021e68b510d9f8f551e',1,'cosmos::IP6Address::basePtr()']]],
+  ['big_4',['BIG',['../byte__order_8hxx.html#a5e672f0146772681e139ad3eae1d382baa60c6c694491d75b439073b8cb05b139',1,'cosmos::net']]],
+  ['bind_5',['bind',['../classcosmos_1_1UDPSocketT.html#a3b3599b9d9c00e66c3d0db6bde3154d1',1,'cosmos::UDPSocketT::bind()'],['../classcosmos_1_1UnixDatagramSocket.html#af7460ede1bc9cf031b8a0a4c86af5c09',1,'cosmos::UnixDatagramSocket::bind()'],['../classcosmos_1_1UnixClientSocket.html#a941a8fff8506d20057904cc12bfc188d',1,'cosmos::UnixClientSocket::bind()'],['../classcosmos_1_1TCPClientSocketT.html#acdb9258ca933b4d4f7de02fa62b8b2cf',1,'cosmos::TCPClientSocketT::bind()'],['../classcosmos_1_1Socket.html#a5fae5e44d29328d5c0866abe98d26059',1,'cosmos::Socket::bind()']]],
+  ['bindtodevice_6',['bindToDevice',['../classcosmos_1_1SocketOptions.html#aa2b7349fad7355e9d2e0397abbfc80ac',1,'cosmos::SocketOptions']]],
+  ['bitmask_7',['bitmask',['../classcosmos_1_1BitMask.html',1,'cosmos::BitMask&lt; ENUM &gt;'],['../classcosmos_1_1BitMask.html#aad07af299516c1ad5a7cdcf25e507dc6',1,'cosmos::BitMask::BitMask()'],['../classcosmos_1_1BitMask.html#acc73cbe762525ddb5b4ad6ac099726aa',1,'cosmos::BitMask::BitMask(const All a)'],['../classcosmos_1_1BitMask.html#ab214070c3919243741bf6f52af55b97f',1,'cosmos::BitMask::BitMask(const std::initializer_list&lt; ENUM &gt; &amp;init_list)'],['../classcosmos_1_1BitMask.html#adf89bce4a6d40bf6c8b77915c4f3dacf',1,'cosmos::BitMask::BitMask(const ENUM val)'],['../classcosmos_1_1BitMask.html#a46f9aae3156f937f51ea6a2acce00f3b',1,'cosmos::BitMask::BitMask(const EnumBaseType value)']]],
+  ['bitmask_3c_20filemodebit_20_3e_8',['BitMask&lt; FileModeBit &gt;',['../classcosmos_1_1BitMask.html',1,'cosmos']]],
+  ['bitmask_3c_20messageflag_20_3e_9',['BitMask&lt; MessageFlag &gt;',['../classcosmos_1_1BitMask.html',1,'cosmos']]],
+  ['blink_5fon_10',['BLINK_ON',['../colors_8hxx.html#a56401679f9b10e15adc2bc7d5bafff15ad69053971518d4446f2201d7238c9380',1,'cosmos::term']]],
+  ['blinking_11',['Blinking',['../colors_8hxx.html#a4b8d152a33fb1b1ba0f0638595fef4b5',1,'cosmos::term']]],
+  ['blocksize_12',['blockSize',['../classcosmos_1_1FileStatus.html#a85a952605612526e024823af10e76256',1,'cosmos::FileStatus']]],
+  ['boottime_13',['BOOTTIME',['../time_2types_8hxx.html#a64b3fa7658be66c2e15e48a336ed88dfaa0bb084304634f8cf8c9d41c5b87c0c3',1,'cosmos']]],
+  ['bounddevice_14',['boundDevice',['../classcosmos_1_1SocketOptions.html#a172e2a4412c36e6dc1885a54c34bb1de',1,'cosmos::SocketOptions']]],
+  ['broadcast_15',['broadcast',['../classcosmos_1_1Condition.html#aa81d7fc1d363bd9e5f2ef2f5db43cb6e',1,'cosmos::Condition']]],
+  ['broadcastasip4_16',['broadcastAsIP4',['../classcosmos_1_1InterfaceAddress.html#a02c6866e46147a58226a2d42d77457eb',1,'cosmos::InterfaceAddress']]],
+  ['busy_17',['BUSY',['../errno_8hxx.html#a5c1aef3a972b5a9a3bb6b3df1aa01939a802706a9238e2928077f97736854bad4',1,'cosmos']]],
+  ['byte_5forder_2ehxx_18',['byte_order.hxx',['../byte__order_8hxx.html',1,'']]]
+];
