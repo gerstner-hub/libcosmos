@@ -135,16 +135,16 @@ void noncritical_error(
 }
 
 
-PreferClone prefer_clone{false};
+RunningOnValgrind running_on_valgrind{false};
 
 namespace {
 
-/// Init helper that adjusts the prefer_clone setting, if necessary.
-class PreferCloneInit :
+/// Init helper that adjusts the running_on_valgrind setting, if necessary.
+class RunningOnValgrindInit :
 		public Initable {
 public: // functions
 
-	PreferCloneInit() : Initable(InitPrio::PREFER_CLONE_SETTING) {
+	RunningOnValgrindInit() : Initable(InitPrio::RUNNING_ON_VALGRIND) {
 	}
 
 protected: // functions
@@ -161,7 +161,7 @@ protected: // functions
 		if (auto ld_preload = proc::get_env_var("LD_PRELOAD"); ld_preload) {
 			auto view = ld_preload->view();
 			if (view.find("valgrind") != view.npos) {
-				prefer_clone = PreferClone{false};
+				running_on_valgrind = RunningOnValgrind{true};
 			}
 		}
 	}
@@ -171,7 +171,7 @@ protected: // functions
 	}
 };
 
-PreferCloneInit g_prefer_clone_init;
+RunningOnValgrindInit g_running_on_valgrind_init;
 
 } // end anon ns
 

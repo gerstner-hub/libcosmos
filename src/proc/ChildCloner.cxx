@@ -81,7 +81,7 @@ SubProc ChildCloner::run() {
 		));
 	}
 
-	if (cosmos::prefer_clone) {
+	if (!cosmos::running_on_valgrind) {
 		// use clone3() instead of fork():
 		//
 		// clone() allows us to get a pid fd for the child in a race free

@@ -19,20 +19,16 @@ using RestartOnIntr = NamedBool<struct restart_on_intr_t, true>;
 
 extern RestartOnIntr auto_restart_syscalls;
 
-/// Controls the use of clone3() vs. fork() in ChildCloner.
+/// Indicates whether a Valgrind virtual execution environment was detected.
 /**
- * The use of clone3() has the drawback that tools like Valgrind cannot deal
- * yet with this newer system call. It allows for a more robust implementation
- * of child processes, though.
- *
  * The cosmos init function tries to find out if Valgrind is running and then
- * sets this to `true`, to prefer `fork()` over `clone3()` to make using
- * Valgrind transparently possible (even if with slightly changed runtime
- * behaviour).
+ * sets this to `true`. This flag is used in some spots to enable fallback to
+ * some new system calls that are not supported by Valgrind yet, like
+ * `clone3()` in ChildCloner.
  **/
-using PreferClone = NamedBool<struct prefer_clone_t, true>;
+using RunningOnValgrind = NamedBool<struct running_on_valgrind_t, false>;
 
-extern PreferClone prefer_clone;
+extern RunningOnValgrind running_on_valgrind;
 
 /// handle a fatal error condition in libcosmos.
 /**
