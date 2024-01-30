@@ -79,7 +79,7 @@ public:
 		RUN_STEP("NameInfoFlag::NUMERIC_SERV", ip4.getServiceInfo({NameInfoFlag::NUMERIC_SERVICE}) == "22");
 
 		ip4.setIpFromString("123.124.125.126");
-		RUN_STEP("unknown-host-becomes-numeric", ip4.getHostInfo() == "123.124.125.126");
+		RUN_STEP("unknown-host-becomes-numeric", ip4.getHostInfo({cosmos::IP4Address::NameInfoFlag::NUMERIC_HOST}) == "123.124.125.126");
 		EXPECT_EXCEPTION("NameInfoFlag::NAME_REQUIRED", ip4.getHostInfo({NameInfoFlag::NAME_REQUIRED}));
 	}
 };
