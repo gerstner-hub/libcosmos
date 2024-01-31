@@ -38,7 +38,7 @@ std::pair<UnixDatagramSocket, UnixDatagramSocket> create_dgram_socket_pair(const
 	return {UnixDatagramSocket{fd1}, UnixDatagramSocket{fd2}};
 }
 
-InterfaceIndex nameToIndex(const SysString name) {
+InterfaceIndex name_to_index(const SysString name) {
 	const auto index = if_nametoindex(name.raw());
 	if (index == 0) {
 		cosmos_throw(ApiError("if_nametoindex()"));
@@ -46,7 +46,7 @@ InterfaceIndex nameToIndex(const SysString name) {
 	return InterfaceIndex{static_cast<int>(index)};
 }
 
-std::string indexToName(const InterfaceIndex index) {
+std::string index_to_name(const InterfaceIndex index) {
 	std::string ret;
 	ret.resize(IF_NAMESIZE);
 	if (!if_indextoname(to_integral(index), ret.data())) {

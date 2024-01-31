@@ -101,9 +101,9 @@ public:
 			}
 			std::cout << "\n";
 			std::cout << "Interface index: " << cosmos::to_integral(ll.ifindex()) << "\n";
-			const auto index = cosmos::net::nameToIndex(addr.ifname());
+			const auto index = cosmos::net::name_to_index(addr.ifname());
 			RUN_STEP("interface-index-resolve-works", index == ll.ifindex());
-			const auto name = cosmos::net::indexToName(ll.ifindex());
+			const auto name = cosmos::net::index_to_name(ll.ifindex());
 			RUN_STEP("interface-name-resolve-works", name == addr.ifname());
 		}
 	}

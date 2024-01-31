@@ -27,12 +27,12 @@ COSMOS_API std::pair<UnixDatagramSocket, UnixDatagramSocket> create_dgram_socket
  * human readable interface `name` this function returns the corresponding
  * index. On error an ApiError is thrown.
  **/
-COSMOS_API InterfaceIndex nameToIndex(const SysString name);
+COSMOS_API InterfaceIndex name_to_index(const SysString name);
 
 /// Translates an InterfaceIndex to a human readable network interface name.
 /**
- * This performs the reverse operation of nameToIndex().
+ * This performs the reverse operation of name_to_index().
  **/
-COSMOS_API std::string    indexToName(const InterfaceIndex index);
+COSMOS_API std::string    index_to_name(const InterfaceIndex index);
 
 } // end ns
