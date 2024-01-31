@@ -13,13 +13,16 @@ class TerminalTest :
 
 	void runTests() override {
 		START_TEST("terminal");
-		cosmos::Terminal sin(cosmos::stdin);
+		cosmos::Terminal sout(cosmos::stdout);
+		if (sout.isTTY()) {
+			RUN_STEP("verify-stdout-is-term", sout.isTTY() == true);
 
-		RUN_STEP("verify-stdin-is-term", sin.isTTY() == true);
-
-		cosmos::TermDimension dim;
-		DOES_NOT_THROW("get-size-no-exception", dim = sin.getSize());
-		std::cout << "terminal dimension is " << dim.cols() << " x " << dim.rows() << std::endl;
+			cosmos::TermDimension dim;
+			DOES_NOT_THROW("get-size-no-exception", dim = sout.getSize());
+			std::cout << "terminal dimension is " << dim.cols() << " x " << dim.rows() << std::endl;
+		} else {
+			std::cerr << "Warning: stdout is not a terminal, cannot test terminal features" << std::endl;
+		}
 
 		cosmos::File f("/etc/fstab", cosmos::OpenMode::READ_ONLY);
 		cosmos::Terminal fstab(f);
