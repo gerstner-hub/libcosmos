@@ -3,6 +3,7 @@
 
 // cosmos
 #include "cosmos/error/ApiError.hxx"
+#include "cosmos/error/RuntimeError.hxx"
 #include "cosmos/net/UnixConnection.hxx"
 #include "cosmos/net/network.hxx"
 #include "cosmos/utils.hxx"
@@ -54,6 +55,30 @@ std::string index_to_name(const InterfaceIndex index) {
 	}
 
 	ret.resize(std::strlen(ret.data()));
+	return ret;
+}
+
+std::string get_hostname() {
+	std::string ret;
+	// for gethosname the HOST_NAME_MAX constant is documented, but our
+	// MAX_HOSTNAME should be usable for this, too
+	ret.resize(MAX_HOSTNAME);
+	ret.back() = 0;
+
+	if (const auto res = ::gethostname(ret.data(), ret.size()); res != 0) {
+		// the semantics for this function are pretty strange. glibc
+		// doesn't even use the gethostname() system call but inspects
+		// the sytem's uname. It does report truncation via an error,
+		// while POSIX does not guarantee this.
+		cosmos_throw(ApiError("gethostname()"));
+	}
+
+	if (ret.back() != 0) {
+		cosmos_throw(RuntimeError("gethostname() truncation occured"));
+	}
+
+	ret.resize(std::strlen(ret.c_str()));
+
 	return ret;
 }
 

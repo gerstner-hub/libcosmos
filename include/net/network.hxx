@@ -35,4 +35,11 @@ COSMOS_API InterfaceIndex name_to_index(const SysString name);
  **/
 COSMOS_API std::string    index_to_name(const InterfaceIndex index);
 
+/// Returns the network hostname of the current process.
+/**
+ * On Linux this returns the hostname of the current UTS namespace, which can
+ * change within container environments.
+ **/
+COSMOS_API std::string get_hostname();
+
 } // end ns
