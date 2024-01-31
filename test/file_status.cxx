@@ -12,6 +12,7 @@
 #include "cosmos/fs/FileStatus.hxx"
 #include "cosmos/fs/filesystem.hxx"
 #include "cosmos/fs/File.hxx"
+#include "cosmos/net/UnixListenSocket.hxx"
 
 // Test
 #include "TestBase.hxx"
@@ -115,12 +116,27 @@ public:
 		RUN_STEP("check-fifo", status.type().isFIFO());
 
 		START_STEP("check-socket");
-		auto sockpath = findSocket();
+		{
+			auto sockpath = "/tmp/someaddr";
+			auto rmsocket = [sockpath]() {
+				try {
+					cosmos::fs::unlink_file(sockpath);
+				} catch(...) {}
+			};
 
-		EVAL_STEP(sockpath != std::nullopt);
-
-		status.updateFrom(*sockpath);
-		FINISH_STEP(status.type().isSocket());
+			try {
+				rmsocket();
+				cosmos::UnixStreamListenSocket listener;
+				const auto addr = cosmos::UnixAddress{sockpath, cosmos::UnixAddress::Abstract{false}};
+				listener.bind(addr);
+				status.updateFrom(sockpath);
+				rmsocket();
+				FINISH_STEP(status.type().isSocket());
+			} catch (...) {
+				rmsocket();
+				throw;
+			}
+		}
 	}
 
 	void checkFileModes() {
@@ -233,29 +249,6 @@ public:
 		cosmos::FileStatus parent{"."};
 		ss << parent.type() << parent.mode();
 		check("d", "x");
-	}
-
-	std::optional<std::string> findSocket() const {
-		auto systemd_sock = "/run/systemd/notify";
-
-		if (cosmos::fs::exists_file(systemd_sock))
-			return systemd_sock;
-
-		cosmos::DirStream run{"/run"};
-		for (auto &entry: run) {
-			if (entry.isDotEntry())
-				continue;
-
-			auto path = std::string{"/run/"} + entry.name();
-
-			cosmos::FileStatus status{path};
-
-			if (status.type().isSocket()) {
-				return path;
-			}
-		}
-
-		return {};
 	}
 
 	void checkStatAt() {
