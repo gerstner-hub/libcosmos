@@ -232,9 +232,15 @@ public:
 
 			RUN_STEP("content-retrieved-matches", content == "test");
 		} catch (const cosmos::ApiError &e) {
-			if (e.errnum() == cosmos::Errno::NO_SYS) {
-				// not available on this kernel
-				return;
+			switch (e.errnum()) {
+				default:
+					break;
+				case cosmos::Errno::NO_SYS:
+				case cosmos::Errno::INVALID_ARG:
+					// not available on this kernel
+					// (the latter is when the CLOEXEC flag is not supported)
+					std::cerr << "WARNING: memfd_secret not support on this platform. Skipping test." << std::endl;
+					return;
 			}
 
 			throw;

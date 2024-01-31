@@ -91,8 +91,24 @@ public:
 		status.updateFrom("/dev/null");
 		RUN_STEP("check-chardev", status.type().isCharDev());
 
-		status.updateFrom("/dev/loop0");
-		RUN_STEP("check-blockdev", status.type().isBlockDev());
+		bool found_dev = false;
+
+		for (const auto dev: {"loop0", "fd0", "ram0", "sda", "vda"}) {
+			try {
+				status.updateFrom(std::string{"/dev/"} + dev);
+			} catch (const cosmos::ApiError &ex) {
+				if (ex.errnum() == cosmos::Errno::NO_ENTRY)
+					continue;
+				throw;
+			}
+			RUN_STEP("check-blockdev", status.type().isBlockDev());
+			found_dev = true;
+			break;
+		}
+
+		if (!found_dev) {
+			std::cerr << "Warning: couldn't find block device for testing in /dev" << std::endl;
+		}
 
 		runTool({"mkfifo", "./fifo"});
 		status.updateFrom("./fifo");

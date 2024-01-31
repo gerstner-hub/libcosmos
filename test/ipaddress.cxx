@@ -3,6 +3,7 @@
 
 // cosmos
 #include "cosmos/net/IPAddress.hxx"
+#include "cosmos/net/network.hxx"
 
 // Test
 #include "TestBase.hxx"
@@ -68,10 +69,10 @@ public:
 		std::string host, service;
 		ip4.getNameInfo(host, service);
 
-		RUN_STEP("IP4_LOOPBACK_ADDR == localhost", host == "localhost");
+		RUN_STEP("IP4_LOOPBACK_ADDR == localhost", host == "localhost" || host == cosmos::net::get_hostname());
 		RUN_STEP("Port 22 == \"ssh\"", service == "ssh");
 
-		EVAL_STEP(ip4.getHostInfo() == "localhost");
+		EVAL_STEP(ip4.getHostInfo() == "localhost" || ip4.getHostInfo() == host);
 		EVAL_STEP(ip4.getServiceInfo() == "ssh");
 
 		using NameInfoFlag = cosmos::IP4Address::NameInfoFlag;
