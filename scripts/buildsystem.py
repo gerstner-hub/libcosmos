@@ -272,7 +272,7 @@ def initSCons(project, rtti=True):
         sys.exit(1)
 
     env.Append(CXXFLAGS = ["-std=c++17"])
-    env.Append(CCFLAGS = ["-g", "-flto=auto"])
+    env.Append(CCFLAGS = ["-g", "-flto=auto", "-D_FILE_OFFSET_BITS=64"])
     env.Append(LINKFLAGS = ["-Wl,--as-needed", "-flto=auto"])
 
     if ARGUMENTS.get('sanitizer', 0):
