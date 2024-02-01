@@ -77,7 +77,7 @@ struct COSMOS_API CloneArgs :
 	}
 
 	void setPidFD(PidFD &fd) {
-		this->pidfd = reinterpret_cast<uint64_t>(&fd.m_fd);
+		this->pidfd = reinterpret_cast<uintptr_t>(&fd.m_fd);
 	}
 
 	void setChildTID(ProcessID *pid) {
