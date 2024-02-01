@@ -110,10 +110,16 @@ public: // functions
 	 * necessary. It is best to turn it into some object that manages file
 	 * descriptor lifetime automatically.
 	 *
+	 * \param[in] lowest From which file descriptor to start looking for a
+	 * free entry. By default zero, i.e. the lowest available free file
+	 * descriptor number will be used.
+	 *
 	 * \param[in] cloexec Denotes whether the duplicate file descriptor
 	 * will have the close-on-exec flag set.
 	 **/
-	FileDescriptor duplicate(const CloseOnExec cloexec = CloseOnExec{true}) const;
+	FileDescriptor duplicate(
+			const FileNum lowest = FileNum{0},
+			const CloseOnExec cloexec = CloseOnExec{true}) const;
 
 	/// Retrieves the current file descriptor flags.
 	DescFlags getFlags() const;

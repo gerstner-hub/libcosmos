@@ -32,8 +32,8 @@ void FileDescriptor::duplicate(const FileDescriptor new_fd, const CloseOnExec cl
 	}
 }
 
-FileDescriptor FileDescriptor::duplicate(const CloseOnExec cloexec) const {
-	const auto fd = ::fcntl(to_integral(m_fd), cloexec ? F_DUPFD_CLOEXEC : F_DUPFD);
+FileDescriptor FileDescriptor::duplicate(const FileNum lowest, const CloseOnExec cloexec) const {
+	const auto fd = ::fcntl(to_integral(m_fd), cloexec ? F_DUPFD_CLOEXEC : F_DUPFD, to_integral(lowest));
 
 	if (fd == -1) {
 		cosmos_throw (ApiError("fcntl(F_DUPFD)"));
