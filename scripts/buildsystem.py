@@ -318,6 +318,10 @@ def initSCons(project, rtti=True):
         # add user specified flags
         env.Append(CCFLAGS = [os.environ["CFLAGS"]])
 
+    if "LDFLAGS" in os.environ:
+        # add user specified linker flags
+        env.Append(LINKFLAGS = [os.environ["LDFLAGS"]])
+
     buildroot = Dir(getBuildroot()).srcnode().abspath + "/"
 
     env.VariantDir(buildroot, ".", duplicate=False)
