@@ -2,6 +2,7 @@
 #include <stdarg.h>
 
 // C++
+#include <cstdint>
 #include <climits>
 #include <string>
 
@@ -95,4 +96,7 @@ template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::Format
 // on 32-bit archs these can be the same, causing a duplicate instantiation
 #if SIZE_MAX != UINT_MAX
 template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::FormattedNumber<size_t>&);
+// similarly this ull definition is then missing on 32-bit archs, provide it
+#else
+template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::FormattedNumber<unsigned long long>&);
 #endif
