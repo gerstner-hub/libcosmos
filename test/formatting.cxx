@@ -61,7 +61,7 @@ class FormattingTest :
 
 	void testSprintf() {
 		START_TEST("sprintf");
-		auto printed = cosmos::sprintf("this is a test string: %s %zd\n", "varstring", 50UL);
+		auto printed = cosmos::sprintf("this is a test string: %s %ld\n", "varstring", 50UL);
 
 		START_STEP("sprintf-with-args");
 		check(printed, "this is a test string: varstring 50\n");
