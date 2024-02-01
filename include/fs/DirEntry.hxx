@@ -32,7 +32,7 @@ public: // types
 	 * this class. It is only obtained from tell() and passed back into
 	 * seek().
 	 **/
-	enum class DirPos : long {};
+	enum class DirPos : off_t {};
 
 	/// Strong enum type expressing the dir entry file type.
 	enum class Type : unsigned char {
