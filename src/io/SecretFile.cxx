@@ -14,15 +14,16 @@ void SecretFile::create(const CloseOnExec cloexec) {
 	// existence
 #ifdef SYS_memfd_secret
 	auto fd = ::syscall(SYS_memfd_secret, cloexec ? FD_CLOEXEC : 0);
-#else
-	cosmos_throw (ApiError(Errno::NO_SYS));
-#endif
 
 	if (fd == -1) {
 		cosmos_throw (ApiError("memfd_secret()"));
 	}
 
 	m_fd.setFD(FileNum{static_cast<int>(fd)});
+#else
+	(void)cloexec;
+	cosmos_throw (ApiError("memfd_secret()", Errno::NO_SYS));
+#endif
 }
 
 } // end ns
