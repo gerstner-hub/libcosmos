@@ -99,6 +99,16 @@ def configureRunForLib(self, name):
         paths.append(libdir)
     self['ENV']['LD_LIBRARY_PATH'] = ':'.join(paths)
 
+def configureForLibOrPackage(self, name, sources):
+    """Depending on the use-system-pkgs setting either setup the environment
+    for linking against a locally built library, or a library installed in the
+    system."""
+
+    if self['use_system_pkgs']:
+        self.ConfigureForPackage(name)
+    else:
+        self.ConfigureForLib(name, sources)
+
 def existsPackage(self, seq):
     """This helper checks whether the given package exists according to the
     pkg-config utility."""
@@ -148,6 +158,7 @@ def enhanceEnv(env):
     env.AddMethod(gatherSources, "GatherSources")
     env.AddMethod(registerLibConfig, "RegisterLibConfig")
     env.AddMethod(configureForLib, "ConfigureForLib")
+    env.AddMethod(configureForLibOrPackage, "ConfigureForLibOrPackage")
     env.AddMethod(configureRunForLib, "ConfigureRunForLib")
     env.AddMethod(configureForPackage, "ConfigureForPackage")
     env.AddMethod(existsPackage, "ExistsPackage")
@@ -270,6 +281,14 @@ def initSCons(project, rtti=True):
     if env['libtype'] not in ("shared", "static"):
         print(f"Invalid libtype {env['libtype']}: use 'shared' or 'static'", file=sys.stderr)
         sys.exit(1)
+
+    # this switch control whether projects depending e.g. on libcosmos should
+    # build a local libcosmos in a Git submodule via SCons or whether the
+    # build system should look for these packages globally in the system
+    # instead.
+    # this is useful for distibution packaging where the necessary
+    # dependencies are already installed in the OS.
+    env['use_system_pkgs'] = evalBool(ARGUMENTS.get('use-system-pkgs', "0"))
 
     env.Append(CXXFLAGS = ["-std=c++17"])
     env.Append(CCFLAGS = ["-g", "-flto=auto", "-D_FILE_OFFSET_BITS=64"])
