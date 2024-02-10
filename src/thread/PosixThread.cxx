@@ -85,16 +85,22 @@ namespace {
 PosixThread::PosixThread(PosixEntry entry, pthread::ThreadArg arg, const std::string_view name) :
 		m_name{buildName(name, ++num_threads)} {
 
-	pthread_t thread;
-	create_thread(thread, new Context{entry, arg});
-	m_pthread = thread;
+	m_pthread = pthread_t{};
+	try {
+		create_thread(m_pthread.value(), new Context{entry, arg});
+	} catch(...) {
+		m_pthread.reset();
+	}
 }
 
 PosixThread::PosixThread(Entry entry, const std::string_view name) :
 		m_name{buildName(name, ++num_threads)} {
-	pthread_t thread;
-	create_thread(thread, new Context{entry, pthread::ThreadArg{0}});
-	m_pthread = thread;
+	m_pthread = pthread_t{};
+	try {
+		create_thread(m_pthread.value(), new Context{entry, pthread::ThreadArg{0}});
+	} catch(...) {
+		m_pthread.reset();
+	}
 }
 
 PosixThread::PosixThread(PosixThread &&other) noexcept {
