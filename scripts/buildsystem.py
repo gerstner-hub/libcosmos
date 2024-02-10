@@ -165,7 +165,7 @@ def enhanceEnv(env):
     env.AddMethod(existsLib, "ExistsLib")
     env.AddMethod(installHeaders, "InstallHeaders")
 
-def initSCons(project, rtti=True):
+def initSCons(project, rtti=True, deflibtype="shared"):
     """Initializes a generic C++ oriented SCons build environment.
 
     If the SCons environment is already setup then that one is returned.
@@ -275,7 +275,7 @@ def initSCons(project, rtti=True):
     env['libflags'] = {}
     env['project'] = project
     env['use_rpath'] = use_rpath
-    env['libtype'] = ARGUMENTS.get("libtype", "shared")
+    env['libtype'] = ARGUMENTS.get("libtype", deflibtype)
     env['compiler'] = 'clang' if use_clang else 'gcc'
 
     if env['libtype'] not in ("shared", "static"):
