@@ -1,9 +1,9 @@
-from SCons.Script import *
+from SCons.Script import Dir, File, SConscript, ARGUMENTS, Environment, Export
 import os
-import shutil
 import subprocess
 import sys
 from pathlib import Path
+
 
 def sequencify(arg):
     for _type in (tuple, list):
@@ -11,6 +11,7 @@ def sequencify(arg):
             return arg
 
     return [arg,]
+
 
 def gatherSources(self, suffixes, path='.', recursive=True):
     """Recursively walks through the given path (by default the current
@@ -38,7 +39,7 @@ def gatherSources(self, suffixes, path='.', recursive=True):
             else:
                 continue
 
-            relpath = os.path.join(root, file)[len(srcdir)+1:]
+            relpath = os.path.join(root, file)[len(srcdir) + 1:]
 
             # maintain a sorted list of sources for determinism
             bisect.insort(sources, relpath)
@@ -47,6 +48,7 @@ def gatherSources(self, suffixes, path='.', recursive=True):
             break
 
     return sources
+
 
 def registerLibConfig(self, name, node, flags, config={}):
     """This helper takes care of recording the given library in the root
@@ -68,8 +70,10 @@ def registerLibConfig(self, name, node, flags, config={}):
         env['libflags'][name] = flags
         env['libconfigs'][name] = config
 
+
 def existsLib(self, name):
     return name in self['libs']
+
 
 def configureForLib(self, name, sources):
     """This helper adds flags and other requirements to the environment to
@@ -86,6 +90,7 @@ def configureForLib(self, name, sources):
     for pkg in config.get('pkgs', []):
         self.ConfigureForPackage(pkg)
 
+
 def configureRunForLib(self, name):
     """This helper adjust the runtime environment of the environment so that
     the given library is found for executing e.g. test programs."""
@@ -99,6 +104,7 @@ def configureRunForLib(self, name):
         paths.append(libdir)
     self['ENV']['LD_LIBRARY_PATH'] = ':'.join(paths)
 
+
 def configureForLibOrPackage(self, name, sources):
     """Depending on the use-system-pkgs setting either setup the environment
     for linking against a locally built library, or a library installed in the
@@ -108,6 +114,7 @@ def configureForLibOrPackage(self, name, sources):
         self.ConfigureForPackage(name)
     else:
         self.ConfigureForLib(name, sources)
+
 
 def existsPackage(self, seq):
     """This helper checks whether the given package exists according to the
@@ -119,6 +126,7 @@ def existsPackage(self, seq):
 
     return res == 0
 
+
 def configureForPackage(self, seq):
     """This helper adds flags obtained from the pkg-config utility for the
     given system package."""
@@ -129,7 +137,7 @@ def configureForPackage(self, seq):
         # cache pkg-config results in the environment to avoid multiple
         # pkg-config invocations for the same package
         pkgs = self['pkgs']
-        flags = self['pkgs'].get(name, None)
+        flags = pkgs.get(name, None)
 
         if not flags:
             flags = subprocess.check_output(["pkg-config", "--cflags", "--libs", name])
@@ -137,6 +145,7 @@ def configureForPackage(self, seq):
             rootenv['pkgs'][name] = flags
 
         self.MergeFlags(flags)
+
 
 def installHeaders(self, subdir):
     incdir = self.Dir('include').srcnode().abspath
@@ -154,6 +163,7 @@ def installHeaders(self, subdir):
             node = self.Install(target, src)
             self.Alias("install", node)
 
+
 def addLocalLibrary(self, name):
     if self.ExistsLib(name) or self['use_system_pkgs']:
         # either already registered or we rely on system wide libs for this
@@ -164,6 +174,7 @@ def addLocalLibrary(self, name):
     SConscript(f'{name}/SConstruct', duplicate=0,
                variant_dir=self['buildroot'] + f"{name}/",
                exports={"env": lib_env})
+
 
 def enhanceEnv(env):
     env.AddMethod(gatherSources, "GatherSources")
@@ -176,6 +187,7 @@ def enhanceEnv(env):
     env.AddMethod(existsLib, "ExistsLib")
     env.AddMethod(installHeaders, "InstallHeaders")
     env.AddMethod(addLocalLibrary, "AddLocalLibrary")
+
 
 def initSCons(project, rtti=True, deflibtype="shared"):
     """Initializes a generic C++ oriented SCons build environment.
@@ -251,14 +263,13 @@ def initSCons(project, rtti=True, deflibtype="shared"):
     use_rpath = evalBool(ARGUMENTS.get("use-rpath", "1"))
 
     env_options = {
-            "ENV": {
-                # this is needed to get color output support in programs that
-                # SCons calls
-                "TERM": os.environ["TERM"],
-                "PATH": os.environ["PATH"],
-                "HOME": os.environ["HOME"]
-            },
-            "tools": ['default']
+        "ENV": {
+            # this is needed to get color output support in programs that SCons calls
+            "TERM": os.environ["TERM"],
+            "PATH": os.environ["PATH"],
+            "HOME": os.environ["HOME"]
+        },
+        "tools": ['default']
     }
 
     if gcc_prefix:
@@ -302,26 +313,26 @@ def initSCons(project, rtti=True, deflibtype="shared"):
     # dependencies are already installed in the OS.
     env['use_system_pkgs'] = evalBool(ARGUMENTS.get('use-system-pkgs', "0"))
 
-    env.Append(CXXFLAGS = ["-std=c++17"])
-    env.Append(CCFLAGS = ["-g", "-flto=auto", "-D_FILE_OFFSET_BITS=64"])
-    env.Append(LINKFLAGS = ["-Wl,--as-needed", "-flto=auto"])
+    env.Append(CXXFLAGS=["-std=c++17"])
+    env.Append(CCFLAGS=["-g", "-flto=auto", "-D_FILE_OFFSET_BITS=64"])
+    env.Append(LINKFLAGS=["-Wl,--as-needed", "-flto=auto"])
 
     if ARGUMENTS.get('sanitizer', 0):
         sanitizers = ["address", "return", "undefined", "leak"]
         sanitizers = ["-fsanitize={}".format(f) for f in sanitizers]
-        env.Append(CXXFLAGS = sanitizers)
-        env.Append(LINKFLAGS = sanitizers)
-        env.Append(LIBS = ["asan", "ubsan"])
+        env.Append(CXXFLAGS=sanitizers)
+        env.Append(LINKFLAGS=sanitizers)
+        env.Append(LIBS=["asan", "ubsan"])
 
     if evalBool(ARGUMENTS.get('debug', "0")):
-        env.Append(CXXFLAGS = ["-O0"])
+        env.Append(CXXFLAGS=["-O0"])
     elif evalBool(ARGUMENTS.get('optforsize', "0")):
-        env.Append(CXXFLAGS = ["-Os"])
+        env.Append(CXXFLAGS=["-Os"])
     else:
-        env.Append(CXXFLAGS = ["-O2"])
+        env.Append(CXXFLAGS=["-O2"])
 
     if not rtti:
-        env.Append(CXXFLAGS = ["-fno-rtti"])
+        env.Append(CXXFLAGS=["-fno-rtti"])
 
     warnings = [
         "all", "extra", "shadow", "format=2",
@@ -339,19 +350,19 @@ def initSCons(project, rtti=True, deflibtype="shared"):
             "logical-op",
         ])
 
-    env.Append(CCFLAGS = [f"-W{warning}" for warning in warnings])
+    env.Append(CCFLAGS=[f"-W{warning}" for warning in warnings])
 
     if "CXXFLAGS" in os.environ:
         # add user specified flags
-        env.Append(CXXFLAGS = [os.environ["CXXFLAGS"]])
+        env.Append(CXXFLAGS=[os.environ["CXXFLAGS"]])
 
     if "CFLAGS" in os.environ:
         # add user specified flags
-        env.Append(CCFLAGS = [os.environ["CFLAGS"]])
+        env.Append(CCFLAGS=[os.environ["CFLAGS"]])
 
     if "LDFLAGS" in os.environ:
         # add user specified linker flags
-        env.Append(LINKFLAGS = [os.environ["LDFLAGS"]])
+        env.Append(LINKFLAGS=[os.environ["LDFLAGS"]])
 
     buildroot = Dir(getBuildroot()).srcnode().abspath + "/"
 

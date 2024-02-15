@@ -6,8 +6,8 @@ import shutil
 import subprocess
 import tempfile
 
-GH_PAGES_BRANCH="gh-pages"
-GH_PAGES_BRANCH_NEW=f"{GH_PAGES_BRANCH}.new"
+GH_PAGES_BRANCH = "gh-pages"
+GH_PAGES_BRANCH_NEW = f"{GH_PAGES_BRANCH}.new"
 
 parser = ArgumentParser(description=f"builds doxygen apidoc HTML and publishes it on the {GH_PAGES_BRANCH} branch")
 
@@ -16,7 +16,7 @@ parser.add_argument("REPOPATH", help="path to the repository where to build and 
 args = parser.parse_args()
 
 os.chdir(args.REPOPATH)
-DOXYGEN_HTML_OUT="build/doc/doxygen/html"
+DOXYGEN_HTML_OUT = "build/doc/doxygen/html"
 shutil.rmtree(DOXYGEN_HTML_OUT, ignore_errors=True)
 print("Building doxygen")
 print("-" * 80)
@@ -45,6 +45,6 @@ with tempfile.TemporaryDirectory() as worktree:
         subprocess.check_call(["git", "branch", "-m", GH_PAGES_BRANCH_NEW, GH_PAGES_BRANCH], cwd=worktree)
 
         print(f"Run 'git push --force {GH_PAGES_BRANCH}' to publish")
-    except:
+    except Exception:
         subprocess.check_call(["git", "worktree", "remove", worktree])
         raise

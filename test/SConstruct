@@ -1,5 +1,5 @@
-Import('env')
 import os
+Import('env')
 
 tests = env.GatherSources(suffixes=[".cxx"], recursive=False)
 
@@ -36,10 +36,12 @@ env.Alias("run_tests", "run_cosmos_tests")
 # setup compilation tests for each individual header to make sure no includes
 # are missing anywhere and everything compiles.
 
+
 def inc_test_builder(env, target, source):
     inc = str(source[0]).split("include/")[1]
     with open(str(target[0]), 'w') as fd:
         fd.write(f'#include "{str(inc)}"\n\nint main() {{ return 0; }}')
+
 
 srcroot = '/'.join(Dir(".").srcnode().abspath.split("/")[:-1])
 incroot = srcroot + "/include/cosmos"
