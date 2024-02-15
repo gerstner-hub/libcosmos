@@ -47,7 +47,7 @@ def flakePython():
 
 
 def buildConfig(config, env=None, label=""):
-    cmdline = ["scons", "-j5"] + config.split() + ["run_tests", "samples"]
+    cmdline = ["scons", "-j5"] + config.split() + ["docs=0", "/"]
     print(f"[{label}] " if label else "", "Running ", ' '.join(cmdline), sep='')
     subprocess.check_call(cmdline, stdout=subprocess.DEVNULL, env=env)
 
