@@ -282,14 +282,6 @@ def initSCons(project, rtti=True, deflibtype="shared"):
         })
     elif use_clang:
         env_options['tools'].extend(["clang", "clangxx"])
-    # use colorgcc wrapper if available
-    elif shutil.which("colorgcc"):
-        # TODO: how can we find out where exactly the symlinks are located
-        # independently of the distribution?
-        env_options.update({
-            "CC"    : "/usr/lib/colorgcc/bin/gcc",
-            "CXX"   : "/usr/lib/colorgcc/bin/g++"
-        })
 
     env = Environment(**env_options)
     # this entry can be used to add global entries visible by all other cloned
@@ -314,7 +306,7 @@ def initSCons(project, rtti=True, deflibtype="shared"):
     env['use_system_pkgs'] = evalBool(ARGUMENTS.get('use-system-pkgs', "0"))
 
     env.Append(CXXFLAGS=["-std=c++17"])
-    env.Append(CCFLAGS=["-g", "-flto=auto", "-D_FILE_OFFSET_BITS=64"])
+    env.Append(CCFLAGS=["-g", "-flto=auto", "-D_FILE_OFFSET_BITS=64", "-fdiagnostics-color=auto"])
     env.Append(LINKFLAGS=["-Wl,--as-needed", "-flto=auto"])
 
     if ARGUMENTS.get('sanitizer', 0):
