@@ -99,4 +99,5 @@ template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::Format
 // similarly this ull definition is then missing on 32-bit archs, provide it
 #else
 template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::FormattedNumber<unsigned long long>&);
+template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::FormattedNumber<unsigned long>&);
 #endif
