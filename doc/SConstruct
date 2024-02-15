@@ -1,5 +1,8 @@
 Import('env')
 
+if not env['build_docs']:
+    Return()
+
 doc_env = env.Clone()
 
 doxy_cmd = doc_env.Command(

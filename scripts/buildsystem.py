@@ -304,6 +304,7 @@ def initSCons(project, rtti=True, deflibtype='shared'):
     # this is useful for distibution packaging where the necessary
     # dependencies are already installed in the OS.
     env['use_system_pkgs'] = evalBool(ARGUMENTS.get('use-system-pkgs', '0'))
+    env['build_docs'] = evalBool(ARGUMENTS.get('docs', '1'))
 
     env.Append(CXXFLAGS=['-std=c++17'])
     env.Append(CCFLAGS=['-g', '-flto=auto', '-D_FILE_OFFSET_BITS=64', '-fdiagnostics-color=auto'])
