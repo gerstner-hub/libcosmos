@@ -29,7 +29,7 @@ def gatherSources(self, suffixes, path='.', recursive=True):
     sources = []
     for root, _, files in os.walk(srcdir):
         for file in files:
-            if file.startswith("_"):
+            if file.startswith('_'):
                 # skip leading underscores, these are headers included based
                 # on #ifdef checks
                 continue
@@ -56,14 +56,14 @@ def registerLibConfig(self, name, node, flags, config={}):
     project being able to successfully build and link against it."""
     rootenv = self['rootenv']
 
-    if self['libtype'] == "shared":
-        libs = flags.setdefault("LIBS", [])
+    if self['libtype'] == 'shared':
+        libs = flags.setdefault('LIBS', [])
         libs.append(name)
-        libdir = Dir(".").abspath
-        flags["LIBPATH"] = [libdir]
+        libdir = Dir('.').abspath
+        flags['LIBPATH'] = [libdir]
 
-        if self["use_rpath"]:
-            flags["RPATH"] = [libdir]
+        if self['use_rpath']:
+            flags['RPATH'] = [libdir]
 
     for env in (rootenv, self):
         env['libs'][name] = node
@@ -83,7 +83,7 @@ def configureForLib(self, name, sources):
     self.Append(**libflags)
     config = self['libconfigs'][name]
 
-    if self['libtype'] == "static":
+    if self['libtype'] == 'static':
         # for static linking, link the archive like an object file
         sources.append(self['libs'][name])
 
@@ -122,7 +122,7 @@ def existsPackage(self, seq):
 
     packages = sequencify(seq)
 
-    res = subprocess.call(["pkg-config", "--exists"] + packages)
+    res = subprocess.call(['pkg-config', '--exists'] + packages)
 
     return res == 0
 
@@ -140,7 +140,7 @@ def configureForPackage(self, seq):
         flags = pkgs.get(name, None)
 
         if not flags:
-            flags = subprocess.check_output(["pkg-config", "--cflags", "--libs", name])
+            flags = subprocess.check_output(['pkg-config', '--cflags', '--libs', name])
             flags = flags.decode('utf8').strip().split()
             rootenv['pkgs'][name] = flags
 
@@ -152,16 +152,16 @@ def installHeaders(self, subdir):
     instroot = self['instroot']
     for root, _, files in os.walk(incdir):
         parts = root.split(os.path.sep)
-        while parts.pop(0) != "include":
+        while parts.pop(0) != 'include':
             pass
 
-        parts = [instroot, "include", subdir] + parts
+        parts = [instroot, 'include', subdir] + parts
         target = os.path.sep.join(parts)
 
         for fil in files:
             src = os.path.join(root, fil)
             node = self.Install(target, src)
-            self.Alias("install", node)
+            self.Alias('install', node)
 
 
 def addLocalLibrary(self, name):
@@ -170,26 +170,26 @@ def addLocalLibrary(self, name):
         return
 
     lib_env = self.Clone()
-    lib_env['buildroot'] = ""
+    lib_env['buildroot'] = ''
     SConscript(f'{name}/SConstruct', duplicate=0,
-               variant_dir=self['buildroot'] + f"{name}/",
-               exports={"env": lib_env})
+               variant_dir=self['buildroot'] + f'{name}/',
+               exports={'env': lib_env})
 
 
 def enhanceEnv(env):
-    env.AddMethod(gatherSources, "GatherSources")
-    env.AddMethod(registerLibConfig, "RegisterLibConfig")
-    env.AddMethod(configureForLib, "ConfigureForLib")
-    env.AddMethod(configureForLibOrPackage, "ConfigureForLibOrPackage")
-    env.AddMethod(configureRunForLib, "ConfigureRunForLib")
-    env.AddMethod(configureForPackage, "ConfigureForPackage")
-    env.AddMethod(existsPackage, "ExistsPackage")
-    env.AddMethod(existsLib, "ExistsLib")
-    env.AddMethod(installHeaders, "InstallHeaders")
-    env.AddMethod(addLocalLibrary, "AddLocalLibrary")
+    env.AddMethod(gatherSources, 'GatherSources')
+    env.AddMethod(registerLibConfig, 'RegisterLibConfig')
+    env.AddMethod(configureForLib, 'ConfigureForLib')
+    env.AddMethod(configureForLibOrPackage, 'ConfigureForLibOrPackage')
+    env.AddMethod(configureRunForLib, 'ConfigureRunForLib')
+    env.AddMethod(configureForPackage, 'ConfigureForPackage')
+    env.AddMethod(existsPackage, 'ExistsPackage')
+    env.AddMethod(existsLib, 'ExistsLib')
+    env.AddMethod(installHeaders, 'InstallHeaders')
+    env.AddMethod(addLocalLibrary, 'AddLocalLibrary')
 
 
-def initSCons(project, rtti=True, deflibtype="shared"):
+def initSCons(project, rtti=True, deflibtype='shared'):
     """Initializes a generic C++ oriented SCons build environment.
 
     If the SCons environment is already setup then that one is returned.
@@ -200,58 +200,58 @@ def initSCons(project, rtti=True, deflibtype="shared"):
     """
 
     def evalBool(arg):
-        return arg.lower() in ["1", "true", "yes"]
+        return arg.lower() in ['1', 'true', 'yes']
 
     def getBuildroot():
         # support parallel (default) buildroots for certain different configurations
         if use_clang:
-            flavour = "clang"
+            flavour = 'clang'
         elif gcc_prefix:
-            flavour = f"{gcc_prefix}"
+            flavour = f'{gcc_prefix}'
         else:
             flavour = None
 
-        defbuildroot = "build"
+        defbuildroot = 'build'
 
         if flavour:
-            defbuildroot += f".{flavour}"
-        return ARGUMENTS.get("buildroot", defbuildroot)
+            defbuildroot += f'.{flavour}'
+        return ARGUMENTS.get('buildroot', defbuildroot)
 
     def getInstroot():
-        definstroot = "install"
+        definstroot = 'install'
 
-        ret = ARGUMENTS.get("instroot", definstroot)
+        ret = ARGUMENTS.get('instroot', definstroot)
 
         if ret.startswith('/'):
             return ret
 
         # relative to the src root
-        return f"#{ret}"
+        return f'#{ret}'
 
     def getLibBaseDir():
 
-        ret = "lib"
+        ret = 'lib'
 
         # trying to determine whether the compiler we use uses /lib64 lib dirs
         # or only /lib
-        for line in subprocess.check_output([env["CC"], "-print-search-dirs"]).splitlines():
+        for line in subprocess.check_output([env['CC'], '-print-search-dirs']).splitlines():
             line = line.decode()
-            if not line.startswith("libraries:"):
+            if not line.startswith('libraries:'):
                 continue
 
-            if line.find("/lib64/") != -1:
-                ret = "lib64"
+            if line.find('/lib64/') != -1:
+                ret = 'lib64'
                 break
 
         return ret
 
-    compiler = ARGUMENTS.get("compiler", "")
-    if compiler.endswith("-gcc") or compiler.endswith("-g++"):
+    compiler = ARGUMENTS.get('compiler', '')
+    if compiler.endswith('-gcc') or compiler.endswith('-g++'):
         # some basic cross compilation support using GCC
         gcc_prefix = compiler[:-4]
     else:
         gcc_prefix = None
-    use_clang = compiler in ("clang", "clang++")
+    use_clang = compiler in ('clang', 'clang++')
 
     if compiler and not (gcc_prefix or use_clang):
         print(f"Unrecognized compiler '{compiler}': use `clang` or `some-arch-gcc`", file=sys.stderr)
@@ -260,28 +260,28 @@ def initSCons(project, rtti=True, deflibtype="shared"):
     # Whether we should add an rpath entry during linking executables to
     # automatically find shared libraries. This eases running executables
     # directly from the build tree, not so great for an install tree though.
-    use_rpath = evalBool(ARGUMENTS.get("use-rpath", "1"))
+    use_rpath = evalBool(ARGUMENTS.get('use-rpath', '1'))
 
     env_options = {
-        "ENV": {
+        'ENV': {
             # this is needed to get color output support in programs that SCons calls
-            "TERM": os.environ["TERM"],
-            "PATH": os.environ["PATH"],
-            "HOME": os.environ["HOME"]
+            'TERM': os.environ['TERM'],
+            'PATH': os.environ['PATH'],
+            'HOME': os.environ['HOME']
         },
-        "tools": ['default']
+        'tools': ['default']
     }
 
     if gcc_prefix:
         env_options.update({
-            "CC"    : f"{gcc_prefix}-gcc",
-            "CXX"   : f"{gcc_prefix}-g++",
-            "LD"    : f"{gcc_prefix}-g++",
-            "AR"    : f"{gcc_prefix}-ar",
-            "STRIP" : f"{gcc_prefix}-strip",
+            'CC'    : f'{gcc_prefix}-gcc',
+            'CXX'   : f'{gcc_prefix}-g++',
+            'LD'    : f'{gcc_prefix}-g++',
+            'AR'    : f'{gcc_prefix}-ar',
+            'STRIP' : f'{gcc_prefix}-strip',
         })
     elif use_clang:
-        env_options['tools'].extend(["clang", "clangxx"])
+        env_options['tools'].extend(['clang', 'clangxx'])
 
     env = Environment(**env_options)
     # this entry can be used to add global entries visible by all other cloned
@@ -290,10 +290,10 @@ def initSCons(project, rtti=True, deflibtype="shared"):
     env['libflags'] = {}
     env['project'] = project
     env['use_rpath'] = use_rpath
-    env['libtype'] = ARGUMENTS.get("libtype", deflibtype)
+    env['libtype'] = ARGUMENTS.get('libtype', deflibtype)
     env['compiler'] = 'clang' if use_clang else 'gcc'
 
-    if env['libtype'] not in ("shared", "static"):
+    if env['libtype'] not in ('shared', 'static'):
         print(f"Invalid libtype {env['libtype']}: use 'shared' or 'static'", file=sys.stderr)
         sys.exit(1)
 
@@ -303,67 +303,67 @@ def initSCons(project, rtti=True, deflibtype="shared"):
     # instead.
     # this is useful for distibution packaging where the necessary
     # dependencies are already installed in the OS.
-    env['use_system_pkgs'] = evalBool(ARGUMENTS.get('use-system-pkgs', "0"))
+    env['use_system_pkgs'] = evalBool(ARGUMENTS.get('use-system-pkgs', '0'))
 
-    env.Append(CXXFLAGS=["-std=c++17"])
-    env.Append(CCFLAGS=["-g", "-flto=auto", "-D_FILE_OFFSET_BITS=64", "-fdiagnostics-color=auto"])
-    env.Append(LINKFLAGS=["-Wl,--as-needed", "-flto=auto"])
+    env.Append(CXXFLAGS=['-std=c++17'])
+    env.Append(CCFLAGS=['-g', '-flto=auto', '-D_FILE_OFFSET_BITS=64', '-fdiagnostics-color=auto'])
+    env.Append(LINKFLAGS=['-Wl,--as-needed', '-flto=auto'])
 
     if ARGUMENTS.get('sanitizer', 0):
-        sanitizers = ["address", "return", "undefined", "leak"]
-        sanitizers = ["-fsanitize={}".format(f) for f in sanitizers]
+        sanitizers = ['address', 'return', 'undefined', 'leak']
+        sanitizers = ['-fsanitize={}'.format(f) for f in sanitizers]
         env.Append(CXXFLAGS=sanitizers)
         env.Append(LINKFLAGS=sanitizers)
-        env.Append(LIBS=["asan", "ubsan"])
+        env.Append(LIBS=['asan', 'ubsan'])
 
-    if evalBool(ARGUMENTS.get('debug', "0")):
-        env.Append(CXXFLAGS=["-O0"])
-    elif evalBool(ARGUMENTS.get('optforsize', "0")):
-        env.Append(CXXFLAGS=["-Os"])
+    if evalBool(ARGUMENTS.get('debug', '0')):
+        env.Append(CXXFLAGS=['-O0'])
+    elif evalBool(ARGUMENTS.get('optforsize', '0')):
+        env.Append(CXXFLAGS=['-Os'])
     else:
-        env.Append(CXXFLAGS=["-O2"])
+        env.Append(CXXFLAGS=['-O2'])
 
     if not rtti:
-        env.Append(CXXFLAGS=["-fno-rtti"])
+        env.Append(CXXFLAGS=['-fno-rtti'])
 
     warnings = [
-        "all", "extra", "shadow", "format=2",
-        "double-promotion", "null-dereference"
+        'all', 'extra', 'shadow', 'format=2',
+        'double-promotion', 'null-dereference'
     ]
 
     if use_clang:
         warnings.extend([
-            "no-deprecated-copy"
+            'no-deprecated-copy'
         ])
     else:
         warnings.extend([
-            "duplicated-cond",
-            "duplicated-branches",
-            "logical-op",
+            'duplicated-cond',
+            'duplicated-branches',
+            'logical-op',
         ])
 
-    env.Append(CCFLAGS=[f"-W{warning}" for warning in warnings])
+    env.Append(CCFLAGS=[f'-W{warning}' for warning in warnings])
 
-    if "CXXFLAGS" in os.environ:
+    if 'CXXFLAGS' in os.environ:
         # add user specified flags
-        env.Append(CXXFLAGS=[os.environ["CXXFLAGS"]])
+        env.Append(CXXFLAGS=[os.environ['CXXFLAGS']])
 
-    if "CFLAGS" in os.environ:
+    if 'CFLAGS' in os.environ:
         # add user specified flags
-        env.Append(CCFLAGS=[os.environ["CFLAGS"]])
+        env.Append(CCFLAGS=[os.environ['CFLAGS']])
 
-    if "LDFLAGS" in os.environ:
+    if 'LDFLAGS' in os.environ:
         # add user specified linker flags
-        env.Append(LINKFLAGS=[os.environ["LDFLAGS"]])
+        env.Append(LINKFLAGS=[os.environ['LDFLAGS']])
 
-    buildroot = Dir(getBuildroot()).srcnode().abspath + "/"
+    buildroot = Dir(getBuildroot()).srcnode().abspath + '/'
 
-    env.VariantDir(buildroot, ".", duplicate=False)
+    env.VariantDir(buildroot, '.', duplicate=False)
 
     env['buildroot'] = buildroot
     env['instroot'] = getInstroot()
     env['lib_base_dir'] = getLibBaseDir()
-    env['pkg_config_dir'] = getLibBaseDir() + "/pkgconfig"
+    env['pkg_config_dir'] = getLibBaseDir() + '/pkgconfig'
     env['libs'] = dict()
     env['bins'] = dict()
     env['pkgs'] = dict()
@@ -375,6 +375,6 @@ def initSCons(project, rtti=True, deflibtype="shared"):
 
     enhanceEnv(env)
 
-    Export("env")
+    Export('env')
 
     return env

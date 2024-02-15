@@ -1,6 +1,6 @@
 Import('env')
 
-samples = env.GatherSources(suffixes=[".cxx"], recursive=False)
+samples = env.GatherSources(suffixes=['.cxx'], recursive=False)
 
 sample_env = env.Clone()
 sources = []
@@ -13,15 +13,15 @@ if sample_env['compiler'] == 'gcc':
     # it's complaining deep within std::vector STL implementation about the
     # vector returned from cosmos::Poller::wait(). There's nothing special
     # there memory management wise though.
-    sample_env.Append(LINKFLAGS=["-Wno-free-nonheap-object"])
+    sample_env.Append(LINKFLAGS=['-Wno-free-nonheap-object'])
 
 for sample in samples:
 
     label = '.'.join(sample.split('.')[:-1])
-    sample_prog_out = f"sample_{label}"
+    sample_prog_out = f'sample_{label}'
 
     sample_bin = sample_env.Program(sample_prog_out, [sample] + sources)
 
-    env.Alias("cosmos_samples", sample_prog_out)
+    env.Alias('cosmos_samples', sample_prog_out)
 
-env.Alias("samples", "cosmos_samples")
+env.Alias('samples', 'cosmos_samples')

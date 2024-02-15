@@ -1,22 +1,22 @@
 Import('env')
 
 libenv = env.Clone()
-public_includes = Dir(".").srcnode().abspath + "/../include"
-libenv.Append(LINKFLAGS="-pthread")
-libenv.Append(CPPPATH=["."])
+public_includes = Dir('.').srcnode().abspath + '/../include'
+libenv.Append(LINKFLAGS='-pthread')
+libenv.Append(CPPPATH=['.'])
 libenv.Append(CPPPATH=public_includes)
 
-libcosmos_srcs = env.GatherSources(suffixes=[".cxx"])
+libcosmos_srcs = env.GatherSources(suffixes=['.cxx'])
 
 if env['libtype'] == 'static':
     libcosmos = libenv.StaticLibrary(
-        "cosmos",
+        'cosmos',
         libcosmos_srcs
     )
 else:
 
-    libenv.Append(CCFLAGS="-fvisibility=hidden")
-    libenv.Append(CCFLAGS="-DCOSMOS_EXPORT")
+    libenv.Append(CCFLAGS='-fvisibility=hidden')
+    libenv.Append(CCFLAGS='-DCOSMOS_EXPORT')
 
     # the SONAME and SHLIBVERSION are the knobs to tune for ABI versioning, but
     # libcosmos currently doesn't really have a concept for that.
@@ -27,15 +27,15 @@ else:
     # the new lib version.
 
     libcosmos = libenv.SharedLibrary(
-        "cosmos",
+        'cosmos',
         libcosmos_srcs,
-        SHLIBVERSION="0.2.0",
-        SONAME="libcosmos.so.0"
+        SHLIBVERSION='0.2.0',
+        SONAME='libcosmos.so.0'
     )
 
 env.RegisterLibConfig('libcosmos', libcosmos, {
-    "CPPPATH": [public_includes],
-    "LINKFLAGS": ["-pthread"]
+    'CPPPATH': [public_includes],
+    'LINKFLAGS': ['-pthread']
 })
 
 Return('env')
