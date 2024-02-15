@@ -154,6 +154,17 @@ def installHeaders(self, subdir):
             node = self.Install(target, src)
             self.Alias("install", node)
 
+def addLocalLibrary(self, name):
+    if self.ExistsLib(name) or self['use_system_pkgs']:
+        # either already registered or we rely on system wide libs for this
+        return
+
+    lib_env = self.Clone()
+    lib_env['buildroot'] = ""
+    SConscript(f'{name}/SConstruct', duplicate=0,
+               variant_dir=self['buildroot'] + f"{name}/",
+               exports={"env": lib_env})
+
 def enhanceEnv(env):
     env.AddMethod(gatherSources, "GatherSources")
     env.AddMethod(registerLibConfig, "RegisterLibConfig")
@@ -164,6 +175,7 @@ def enhanceEnv(env):
     env.AddMethod(existsPackage, "ExistsPackage")
     env.AddMethod(existsLib, "ExistsLib")
     env.AddMethod(installHeaders, "InstallHeaders")
+    env.AddMethod(addLocalLibrary, "AddLocalLibrary")
 
 def initSCons(project, rtti=True, deflibtype="shared"):
     """Initializes a generic C++ oriented SCons build environment.
