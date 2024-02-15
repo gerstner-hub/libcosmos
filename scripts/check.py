@@ -11,6 +11,14 @@ from pathlib import Path
 # error.
 
 root_dir = Path(os.path.realpath(__file__)).parent.parent
+while True:
+    next_parent = root_dir.parent
+    if os.path.exists(next_parent / "SConstruct"):
+        root_dir = next_parent
+    else:
+        break
+
+print("Running in top project directory", root_dir)
 os.chdir(root_dir)
 
 
