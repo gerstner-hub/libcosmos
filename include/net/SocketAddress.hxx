@@ -37,7 +37,7 @@ public: // functions
 
 	virtual ~SocketAddress() {}
 
-	//// Returns the concrete SocketFamily for the implementation address type.
+	/// Returns the concrete SocketFamily for the implementation address type.
 	virtual SocketFamily family() const = 0;
 
 	/// Returns the size of the socket address in bytes found at basePtr().
