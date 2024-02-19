@@ -2,10 +2,14 @@
 #include <iostream>
 
 // cosmos
+#include "cosmos/formatting.hxx"
 #include "cosmos/io/StdLogger.hxx"
+#include "cosmos/proc/process.hxx"
 
 int main() {
 	auto logger = cosmos::StdLogger();
+	const auto pid = cosmos::to_integral(cosmos::proc::get_own_pid());
+	logger.setPrefix(cosmos::sprintf("[%d] ", pid));
 
 	logger.setChannels(true, true, true, true);
 

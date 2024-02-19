@@ -51,6 +51,10 @@ public: // functions
 		m_debug.enabled = debug;
 	}
 
+	void setPrefix(const std::string_view prefix) {
+		m_common_prefix = prefix;
+	}
+
 protected: // types
 
 	/// Internal state for each channel's stream.
@@ -74,6 +78,8 @@ protected: // functions
 
 		if (state.is_tty)
 			out << state.color;
+
+		out << m_common_prefix;
 
 		out << state.prefix;
 
@@ -108,13 +114,14 @@ protected: // functions
 
 protected: // data
 
-	/// A noop stream object to write to if a channel is disabled
-	std::stringstream m_null;
+	std::stringstream m_null; ///< A noop stream object to write to if a channel is disabled
 
 	StreamState m_err;
 	StreamState m_warn;
 	StreamState m_info;
 	StreamState m_debug;
+
+	std::string m_common_prefix; ///< a common prefix to prepend to each message
 };
 
 } // end ns
