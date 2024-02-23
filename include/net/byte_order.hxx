@@ -159,6 +159,9 @@ public: // types
 
 public: // functions
 
+	// TODO: leave member undefined e.g. for use with placement new or performance, or zero-initialize?
+	constexpr EndianNumber() = default;
+
 	/// Construct the number from a raw integer in the correct byte order.
 	constexpr EndianNumber(const RawInt rint) :
 		m_egg{to_integral(rint)} {
