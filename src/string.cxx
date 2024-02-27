@@ -38,7 +38,15 @@ void strip(std::string &s) {
 	while (!s.empty() && std::isspace(s[0]))
 		s.erase(s.begin());
 
-	while (!s.empty() && std::isspace(s[s.length()-1]))
+	while (!s.empty() && std::isspace(s.back()))
+		s.pop_back();
+}
+
+void strip(std::wstring &s) {
+	while (!s.empty() && std::iswspace(s[0]))
+		s.erase(s.begin());
+
+	while (!s.empty() && std::iswspace(s.back()))
 		s.pop_back();
 }
 

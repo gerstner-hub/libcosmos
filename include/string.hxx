@@ -52,6 +52,16 @@ inline std::string stripped(const std::string_view s) {
 	return ret;
 }
 
+/// Wide string variant of strip(std::string &s)
+void COSMOS_API strip(std::wstring &s);
+
+/// Wide string variant of stripped(const std::string_view)
+inline std::wstring stripped(const std::wstring_view s) {
+	std::wstring ret{s};
+	strip(ret);
+	return ret;
+}
+
 /// Returns whether `prefix` is a prefix of `s`.
 inline bool is_prefix(const std::string_view s, const std::string_view prefix) {
 	// TODO: in C++20 string_view has a starts_with() member
