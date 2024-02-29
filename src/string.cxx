@@ -34,6 +34,32 @@ std::string to_upper(const std::string_view s) {
 	return ret;
 }
 
+std::wstring to_lower(const std::wstring_view s) {
+	std::wstring ret;
+	ret.resize(s.size());
+	// put it all to lower case
+	std::transform(
+		s.begin(), s.end(),
+		ret.begin(),
+		std::towlower
+	);
+
+	return ret;
+}
+
+std::wstring to_upper(const std::wstring_view s) {
+	std::wstring ret;
+	ret.resize(s.size());
+	// put it all to lower case
+	std::transform(
+		s.begin(), s.end(),
+		ret.begin(),
+		std::towupper
+	);
+
+	return ret;
+}
+
 void strip(std::string &s) {
 	while (!s.empty() && std::isspace(s[0]))
 		s.erase(s.begin());

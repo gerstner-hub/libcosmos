@@ -3,6 +3,7 @@
 
 // cosmos
 #include "cosmos/string.hxx"
+#include "cosmos/locale.hxx"
 
 // Test
 #include "TestBase.hxx"
@@ -29,6 +30,12 @@ class StringTest :
 		auto upper_string = cosmos::to_upper(m_test_string);
 
 		RUN_STEP("upper-is-upper", upper_string == "A TEST STRING. HAVE A NICE DAY!");
+
+		auto wide_lower_string = cosmos::to_lower(L"TrÖte");
+		RUN_STEP("wlower-is-lower", wide_lower_string == L"tröte");
+
+		auto wide_upper_string = cosmos::to_upper(L"Tröte");
+		RUN_STEP("wupper-is-upper", wide_upper_string == L"TRÖTE");
 	}
 
 	void testStrip() {
@@ -100,6 +107,7 @@ class StringTest :
 };
 
 int main(const int argc, const char **argv) {
+	cosmos::locale::set(cosmos::locale::Category::ALL, "en_US.utf8");
 	StringTest test;
 	return test.run(argc, argv);
 }

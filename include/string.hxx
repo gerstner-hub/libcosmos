@@ -42,6 +42,11 @@ std::string COSMOS_API to_lower(const std::string_view s);
 /// Returns an all upper case veersion of `s`.
 std::string COSMOS_API to_upper(const std::string_view s);
 
+/// Returns an all lower case version of `s`.
+std::wstring COSMOS_API to_lower(const std::wstring_view s);
+/// Returns an all upper case veersion of `s`.
+std::wstring COSMOS_API to_upper(const std::wstring_view s);
+
 /// Strips leading and trailing whitespace from the given string in-place.
 void COSMOS_API strip(std::string &s);
 
