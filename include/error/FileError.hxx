@@ -4,8 +4,8 @@
 #include <string>
 
 // cosmos
-#include "cosmos/error/ApiError.hxx"
-#include "cosmos/SysString.hxx"
+#include <cosmos/error/ApiError.hxx>
+#include <cosmos/SysString.hxx>
 
 namespace cosmos {
 

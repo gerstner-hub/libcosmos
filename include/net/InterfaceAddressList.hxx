@@ -1,9 +1,9 @@
 #pragma once
 
 // cosmos
-#include "cosmos/dso_export.h"
-#include "cosmos/net/InterfaceAddress.hxx"
-#include "cosmos/net/InterfaceAddressIterator.hxx"
+#include <cosmos/dso_export.h>
+#include <cosmos/net/InterfaceAddress.hxx>
+#include <cosmos/net/InterfaceAddressIterator.hxx>
 
 namespace cosmos {
 

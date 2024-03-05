@@ -6,13 +6,13 @@
 #include <string_view>
 
 // cosmos
-#include "cosmos/SysString.hxx"
-#include "cosmos/error/ApiError.hxx"
-#include "cosmos/error/UsageError.hxx"
-#include "cosmos/fs/DirEntry.hxx"
-#include "cosmos/fs/DirFD.hxx"
-#include "cosmos/fs/filesystem.hxx"
-#include "cosmos/utils.hxx"
+#include <cosmos/SysString.hxx>
+#include <cosmos/error/ApiError.hxx>
+#include <cosmos/error/UsageError.hxx>
+#include <cosmos/fs/DirEntry.hxx>
+#include <cosmos/fs/DirFD.hxx>
+#include <cosmos/fs/filesystem.hxx>
+#include <cosmos/utils.hxx>
 
 namespace cosmos {
 
@@ -169,4 +169,4 @@ protected: // data
 } // end ns
 
 // make DirIterator available for range based for loops
-#include "cosmos/fs/DirIterator.hxx"
+#include <cosmos/fs/DirIterator.hxx>

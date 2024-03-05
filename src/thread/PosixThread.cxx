@@ -6,11 +6,11 @@
 #include <variant>
 
 // cosmos
-#include "cosmos/error/ApiError.hxx"
-#include "cosmos/error/UsageError.hxx"
-#include "cosmos/formatting.hxx"
-#include "cosmos/private/cosmos.hxx"
-#include "cosmos/thread/PosixThread.hxx"
+#include <cosmos/error/ApiError.hxx>
+#include <cosmos/error/UsageError.hxx>
+#include <cosmos/formatting.hxx>
+#include <cosmos/private/cosmos.hxx>
+#include <cosmos/thread/PosixThread.hxx>
 
 using namespace cosmos::pthread;
 

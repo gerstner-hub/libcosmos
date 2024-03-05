@@ -6,11 +6,11 @@
 #include <type_traits>
 
 // cosmos
-#include "cosmos/dso_export.h"
-#include "cosmos/cosmos.hxx"
-#include "cosmos/proc/types.hxx"
-#include "cosmos/string.hxx"
-#include "cosmos/utils.hxx"
+#include <cosmos/dso_export.h>
+#include <cosmos/cosmos.hxx>
+#include <cosmos/proc/types.hxx>
+#include <cosmos/string.hxx>
+#include <cosmos/utils.hxx>
 
 namespace cosmos {
 

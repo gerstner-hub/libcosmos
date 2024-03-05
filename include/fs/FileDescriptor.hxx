@@ -7,9 +7,9 @@
 #include <fcntl.h>
 
 // cosmos
-#include "cosmos/BitMask.hxx"
-#include "cosmos/fs/types.hxx"
-#include "cosmos/utils.hxx"
+#include <cosmos/BitMask.hxx>
+#include <cosmos/fs/types.hxx>
+#include <cosmos/utils.hxx>
 
 namespace cosmos {
 

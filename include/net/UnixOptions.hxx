@@ -4,8 +4,8 @@
 #include <chrono>
 
 // cosmos
-#include "cosmos/net/SockOptBase.hxx"
-#include "cosmos/net/unix_aux.hxx"
+#include <cosmos/net/SockOptBase.hxx>
+#include <cosmos/net/unix_aux.hxx>
 
 namespace cosmos {
 

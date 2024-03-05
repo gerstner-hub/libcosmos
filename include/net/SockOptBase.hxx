@@ -1,10 +1,10 @@
 #pragma once
 
 // cosmos
-#include "cosmos/SysString.hxx"
-#include "cosmos/dso_export.h"
-#include "cosmos/fs/FileDescriptor.hxx"
-#include "cosmos/net/types.hxx"
+#include <cosmos/SysString.hxx>
+#include <cosmos/dso_export.h>
+#include <cosmos/fs/FileDescriptor.hxx>
+#include <cosmos/net/types.hxx>
 
 namespace cosmos {
 

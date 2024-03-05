@@ -1,8 +1,8 @@
 #pragma once
 
 // cosmos
-#include "cosmos/error/RuntimeError.hxx"
-#include "cosmos/net/AddressInfo.hxx"
+#include <cosmos/error/RuntimeError.hxx>
+#include <cosmos/net/AddressInfo.hxx>
 
 namespace cosmos {
 

@@ -8,12 +8,12 @@
 #include <string>
 
 // cosmos
-#include "cosmos/BitMask.hxx"
-#include "cosmos/SysString.hxx"
-#include "cosmos/dso_export.h"
-#include "cosmos/net/SocketAddress.hxx"
-#include "cosmos/net/byte_order.hxx"
-#include "cosmos/utils.hxx"
+#include <cosmos/BitMask.hxx>
+#include <cosmos/SysString.hxx>
+#include <cosmos/dso_export.h>
+#include <cosmos/net/SocketAddress.hxx>
+#include <cosmos/net/byte_order.hxx>
+#include <cosmos/utils.hxx>
 
 namespace cosmos {
 

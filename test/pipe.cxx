@@ -3,10 +3,10 @@
 #include <string>
 
 // Cosmos
-#include "cosmos/io/Pipe.hxx"
-#include "cosmos/io/StreamAdaptor.hxx"
-#include "cosmos/proc/SubProc.hxx"
-#include "cosmos/cosmos.hxx"
+#include <cosmos/io/Pipe.hxx>
+#include <cosmos/io/StreamAdaptor.hxx>
+#include <cosmos/proc/SubProc.hxx>
+#include <cosmos/cosmos.hxx>
 
 // Test
 #include "TestBase.hxx"

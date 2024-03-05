@@ -7,8 +7,8 @@
 #	include <fcntl.h>
 
 // cosmos
-#	include "cosmos/dso_export.h"
-#	include "cosmos/proc/types.hxx"
+#	include <cosmos/dso_export.h>
+#	include <cosmos/proc/types.hxx>
 
 #	ifndef PIDFD_NONBLOCK
 #		define PIDFD_NONBLOCK O_NONBLOCK

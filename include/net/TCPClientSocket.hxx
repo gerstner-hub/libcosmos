@@ -1,10 +1,10 @@
 #pragma once
 
 // cosmos
-#include "cosmos/net/IPAddress.hxx"
-#include "cosmos/net/IPSocket.hxx"
-#include "cosmos/net/TCPConnection.hxx"
-#include "cosmos/net/TCPOptions.hxx"
+#include <cosmos/net/IPAddress.hxx>
+#include <cosmos/net/IPSocket.hxx>
+#include <cosmos/net/TCPConnection.hxx>
+#include <cosmos/net/TCPOptions.hxx>
 
 namespace cosmos {
 

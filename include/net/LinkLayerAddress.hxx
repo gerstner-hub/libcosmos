@@ -5,11 +5,11 @@
 #include <net/ethernet.h>
 
 // cosmos
-#include "cosmos/dso_export.h"
-#include "cosmos/net/byte_order.hxx"
-#include "cosmos/net/network.hxx"
-#include "cosmos/net/SocketAddress.hxx"
-#include "cosmos/utils.hxx"
+#include <cosmos/dso_export.h>
+#include <cosmos/net/byte_order.hxx>
+#include <cosmos/net/network.hxx>
+#include <cosmos/net/SocketAddress.hxx>
+#include <cosmos/utils.hxx>
 
 namespace cosmos {
 

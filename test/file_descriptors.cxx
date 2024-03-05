@@ -2,8 +2,8 @@
 #include <iostream>
 
 // cosmos
-#include "cosmos/fs/FileDescriptor.hxx"
-#include "cosmos/fs/File.hxx"
+#include <cosmos/fs/FileDescriptor.hxx>
+#include <cosmos/fs/File.hxx>
 
 // Test
 #include "TestBase.hxx"

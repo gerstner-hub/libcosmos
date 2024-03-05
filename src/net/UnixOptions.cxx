@@ -1,6 +1,6 @@
 // cosmos
-#include "cosmos/net/UnixOptions.hxx"
-#include "cosmos/private/sockopts.hxx"
+#include <cosmos/net/UnixOptions.hxx>
+#include <cosmos/private/sockopts.hxx>
 
 namespace cosmos {
 

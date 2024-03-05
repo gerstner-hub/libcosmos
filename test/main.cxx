@@ -1,5 +1,5 @@
 //  cosmos
-#include "cosmos/main.hxx"
+#include <cosmos/main.hxx>
 
 // Test
 #include "TestBase.hxx"

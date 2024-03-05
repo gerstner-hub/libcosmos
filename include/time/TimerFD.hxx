@@ -4,9 +4,9 @@
 #include <sys/timerfd.h>
 
 // cosmos
-#include "cosmos/BitMask.hxx"
-#include "cosmos/fs/FDFile.hxx"
-#include "cosmos/time/Clock.hxx"
+#include <cosmos/BitMask.hxx>
+#include <cosmos/fs/FDFile.hxx>
+#include <cosmos/time/Clock.hxx>
 
 namespace cosmos {
 

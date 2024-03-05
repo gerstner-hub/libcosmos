@@ -4,13 +4,13 @@
 #include <optional>
 
 // cosmos
-#include "cosmos/fs/DirFD.hxx"
-#include "cosmos/proc/PidFD.hxx"
-#include "cosmos/proc/types.hxx"
-#include "cosmos/proc/WaitRes.hxx"
-#include "cosmos/string.hxx"
-#include "cosmos/SysString.hxx"
-#include "cosmos/types.hxx"
+#include <cosmos/fs/DirFD.hxx>
+#include <cosmos/proc/PidFD.hxx>
+#include <cosmos/proc/types.hxx>
+#include <cosmos/proc/WaitRes.hxx>
+#include <cosmos/string.hxx>
+#include <cosmos/SysString.hxx>
+#include <cosmos/types.hxx>
 
 /**
  * @file

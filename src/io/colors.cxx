@@ -5,11 +5,11 @@
 #include <vector>
 
 // cosmos
-#include "cosmos/error/UsageError.hxx"
-#include "cosmos/io/colors.hxx"
-#include "cosmos/io/Terminal.hxx"
-#include "cosmos/private/Initable.hxx"
-#include "cosmos/proc/process.hxx"
+#include <cosmos/error/UsageError.hxx>
+#include <cosmos/io/colors.hxx>
+#include <cosmos/io/Terminal.hxx>
+#include <cosmos/private/Initable.hxx>
+#include <cosmos/proc/process.hxx>
 
 namespace cosmos::term {
 

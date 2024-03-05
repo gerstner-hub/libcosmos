@@ -9,8 +9,8 @@
 #include <optional>
 
 // Cosmos
-#include "cosmos/fs/FileBase.hxx"
-#include "cosmos/fs/FileDescriptor.hxx"
+#include <cosmos/fs/FileBase.hxx>
+#include <cosmos/fs/FileDescriptor.hxx>
 
 /**
  * @file

@@ -1,6 +1,6 @@
 // cosmos
-#include "cosmos/net/AddressInfo.hxx"
-#include "cosmos/net/AddressHints.hxx"
+#include <cosmos/net/AddressInfo.hxx>
+#include <cosmos/net/AddressHints.hxx>
 
 namespace cosmos {
 

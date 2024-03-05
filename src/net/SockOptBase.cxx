@@ -1,7 +1,7 @@
 // cosmos
-#include "cosmos/limits.hxx"
-#include "cosmos/net/SockOptBase.hxx"
-#include "cosmos/private/sockopts.hxx"
+#include <cosmos/limits.hxx>
+#include <cosmos/net/SockOptBase.hxx>
+#include <cosmos/private/sockopts.hxx>
 
 namespace cosmos {
 

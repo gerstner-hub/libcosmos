@@ -1,8 +1,8 @@
 #pragma once
 
 // cosmos
-#include "cosmos/net/types.hxx"
-#include "cosmos/SysString.hxx"
+#include <cosmos/net/types.hxx>
+#include <cosmos/SysString.hxx>
 
 namespace cosmos {
 

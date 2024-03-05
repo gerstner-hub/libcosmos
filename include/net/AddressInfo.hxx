@@ -7,8 +7,8 @@
 #include <netdb.h>
 
 // cosmos
-#include "cosmos/net/IPAddress.hxx"
-#include "cosmos/net/types.hxx"
+#include <cosmos/net/IPAddress.hxx>
+#include <cosmos/net/types.hxx>
 
 namespace cosmos {
 

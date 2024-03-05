@@ -7,8 +7,8 @@
 #include <string>
 
 // cosmos
-#include "cosmos/dso_export.h"
-#include "cosmos/SysString.hxx"
+#include <cosmos/dso_export.h>
+#include <cosmos/SysString.hxx>
 
 namespace cosmos::locale {
 

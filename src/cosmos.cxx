@@ -7,10 +7,10 @@
 #include <map>
 
 // Cosmos
-#include "cosmos/cosmos.hxx"
-#include "cosmos/private/Initable.hxx"
-#include "cosmos/private/cosmos.hxx"
-#include "cosmos/proc/process.hxx"
+#include <cosmos/cosmos.hxx>
+#include <cosmos/private/Initable.hxx>
+#include <cosmos/private/cosmos.hxx>
+#include <cosmos/proc/process.hxx>
 
 namespace cosmos {
 

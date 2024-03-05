@@ -2,11 +2,11 @@
 #include <iostream>
 
 // cosmos
-#include "cosmos/string.hxx"
-#include "cosmos/formatting.hxx"
-#include "cosmos/GroupInfo.hxx"
-#include "cosmos/PasswdInfo.hxx"
-#include "cosmos/proc/process.hxx"
+#include <cosmos/string.hxx>
+#include <cosmos/formatting.hxx>
+#include <cosmos/GroupInfo.hxx>
+#include <cosmos/PasswdInfo.hxx>
+#include <cosmos/proc/process.hxx>
 
 // Test
 #include "TestBase.hxx"

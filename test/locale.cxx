@@ -2,7 +2,7 @@
 #include <iostream>
 
 // cosmos
-#include "cosmos/locale.hxx"
+#include <cosmos/locale.hxx>
 
 // Test
 #include "TestBase.hxx"

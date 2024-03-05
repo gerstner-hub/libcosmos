@@ -1,8 +1,8 @@
 #pragma once
 
 // cosmos
-#include "cosmos/dso_export.h"
-#include "cosmos/fs/FileBase.hxx"
+#include <cosmos/dso_export.h>
+#include <cosmos/fs/FileBase.hxx>
 
 namespace cosmos {
 

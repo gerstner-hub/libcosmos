@@ -2,7 +2,7 @@
 #include <sstream>
 
 // cosmos
-#include "cosmos/error/CosmosError.hxx"
+#include <cosmos/error/CosmosError.hxx>
 
 namespace cosmos {
 

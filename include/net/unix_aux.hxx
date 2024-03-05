@@ -4,11 +4,11 @@
 #include <vector>
 
 // Cosmos
-#include "cosmos/dso_export.h"
-#include "cosmos/fs/types.hxx"
-#include "cosmos/net/message_header.hxx"
-#include "cosmos/net/types.hxx"
-#include "cosmos/proc/process.hxx"
+#include <cosmos/dso_export.h>
+#include <cosmos/fs/types.hxx>
+#include <cosmos/net/message_header.hxx>
+#include <cosmos/net/types.hxx>
+#include <cosmos/proc/process.hxx>
 
 namespace cosmos {
 

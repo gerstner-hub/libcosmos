@@ -2,8 +2,8 @@
 #include <iostream>
 
 // cosmos
-#include "cosmos/net/IPAddress.hxx"
-#include "cosmos/net/network.hxx"
+#include <cosmos/net/IPAddress.hxx>
+#include <cosmos/net/network.hxx>
 
 // Test
 #include "TestBase.hxx"

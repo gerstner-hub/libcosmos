@@ -10,7 +10,7 @@
 #include <vector>
 
 // Cosmos
-#include "cosmos/dso_export.h"
+#include <cosmos/dso_export.h>
 
 /**
  * @file

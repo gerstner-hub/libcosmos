@@ -1,6 +1,6 @@
 // cosmos
-#include "cosmos/error/ResolveError.hxx"
-#include "cosmos/net/AddressInfoList.hxx"
+#include <cosmos/error/ResolveError.hxx>
+#include <cosmos/net/AddressInfoList.hxx>
 
 namespace cosmos {
 

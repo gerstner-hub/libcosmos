@@ -3,12 +3,12 @@
 #include <iostream>
 
 // cosmos
-#include "cosmos/error/ApiError.hxx"
-#include "cosmos/formatting.hxx"
-#include "cosmos/io/Poller.hxx"
-#include "cosmos/private/cosmos.hxx"
-#include "cosmos/time/types.hxx"
-#include "cosmos/utils.hxx"
+#include <cosmos/error/ApiError.hxx>
+#include <cosmos/formatting.hxx>
+#include <cosmos/io/Poller.hxx>
+#include <cosmos/private/cosmos.hxx>
+#include <cosmos/time/types.hxx>
+#include <cosmos/utils.hxx>
 
 namespace cosmos {
 

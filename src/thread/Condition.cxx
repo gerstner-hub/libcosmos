@@ -1,6 +1,6 @@
 // Cosmos
-#include "cosmos/thread/Condition.hxx"
-#include "cosmos/utils.hxx"
+#include <cosmos/thread/Condition.hxx>
+#include <cosmos/utils.hxx>
 
 namespace cosmos {
 

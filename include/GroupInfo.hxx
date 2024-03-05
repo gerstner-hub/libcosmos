@@ -7,10 +7,10 @@
 #include <string_view>
 
 // cosmos
-#include "cosmos/InfoBase.hxx"
-#include "cosmos/string.hxx"
-#include "cosmos/types.hxx"
-#include "cosmos/utils.hxx"
+#include <cosmos/InfoBase.hxx>
+#include <cosmos/string.hxx>
+#include <cosmos/types.hxx>
+#include <cosmos/utils.hxx>
 
 namespace cosmos {
 

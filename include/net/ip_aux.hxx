@@ -5,9 +5,9 @@
 #include <vector>
 
 // Cosmos
-#include "cosmos/dso_export.h"
-#include "cosmos/net/message_header.hxx"
-#include "cosmos/net/SocketError.hxx"
+#include <cosmos/dso_export.h>
+#include <cosmos/net/message_header.hxx>
+#include <cosmos/net/SocketError.hxx>
 
 namespace cosmos {
 

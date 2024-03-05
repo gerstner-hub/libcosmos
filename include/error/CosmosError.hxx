@@ -6,8 +6,8 @@
 #include <string_view>
 
 // cosmos
-#include "cosmos/dso_export.h"
-#include "cosmos/error/macros.hxx"
+#include <cosmos/dso_export.h>
+#include <cosmos/error/macros.hxx>
 
 namespace cosmos {
 

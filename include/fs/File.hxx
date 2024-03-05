@@ -4,9 +4,9 @@
 #include <optional>
 
 // cosmos
-#include "cosmos/SysString.hxx"
-#include "cosmos/fs/DirFD.hxx"
-#include "cosmos/fs/FDFile.hxx"
+#include <cosmos/SysString.hxx>
+#include <cosmos/fs/DirFD.hxx>
+#include <cosmos/fs/FDFile.hxx>
 
 namespace cosmos {
 

@@ -1,7 +1,7 @@
 #pragma once
 
 // cosmos
-#include "cosmos/cosmos.hxx"
+#include <cosmos/cosmos.hxx>
 
 namespace cosmos {
 

@@ -6,7 +6,7 @@
 #include <string_view>
 
 // cosmos
-#include "cosmos/io/colors.hxx"
+#include <cosmos/io/colors.hxx>
 
 namespace cosmos {
 

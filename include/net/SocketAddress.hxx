@@ -4,8 +4,8 @@
 #include <cstring>
 
 // cosmos
-#include "cosmos/dso_export.h"
-#include "cosmos/net/types.hxx"
+#include <cosmos/dso_export.h>
+#include <cosmos/net/types.hxx>
 
 namespace cosmos {
 

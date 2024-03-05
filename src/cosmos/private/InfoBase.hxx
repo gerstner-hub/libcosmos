@@ -4,9 +4,9 @@
 #include <cstring>
 
 // cosmos
-#include "cosmos/error/ApiError.hxx"
-#include "cosmos/error/RuntimeError.hxx"
-#include "cosmos/memory.hxx"
+#include <cosmos/error/ApiError.hxx>
+#include <cosmos/error/RuntimeError.hxx>
+#include <cosmos/memory.hxx>
 
 namespace cosmos {
 

@@ -3,8 +3,8 @@
 #include <unistd.h>
 
 // cosmos
-#include "cosmos/proc/process.hxx"
-#include "cosmos/thread/thread.hxx"
+#include <cosmos/proc/process.hxx>
+#include <cosmos/thread/thread.hxx>
 
 namespace cosmos::thread {
 

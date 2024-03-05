@@ -2,10 +2,10 @@
 #include <sys/syscall.h>
 
 // Cosmos
-#include "cosmos/error/ApiError.hxx"
-#include "cosmos/memory.hxx"
-#include "cosmos/proc/clone.hxx"
-#include "cosmos/proc/Signal.hxx"
+#include <cosmos/error/ApiError.hxx>
+#include <cosmos/memory.hxx>
+#include <cosmos/proc/clone.hxx>
+#include <cosmos/proc/Signal.hxx>
 
 namespace {
 

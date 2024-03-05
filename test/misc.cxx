@@ -3,7 +3,7 @@
 #include <cassert>
 
 // cosmos
-#include "cosmos/utils.hxx"
+#include <cosmos/utils.hxx>
 
 // Test
 #include "TestBase.hxx"

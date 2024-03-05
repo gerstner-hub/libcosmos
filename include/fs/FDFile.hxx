@@ -1,7 +1,7 @@
 #pragma once
 
 // cosmos
-#include "cosmos/fs/FileBase.hxx"
+#include <cosmos/fs/FileBase.hxx>
 
 namespace cosmos {
 

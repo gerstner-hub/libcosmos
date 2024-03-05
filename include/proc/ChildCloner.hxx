@@ -7,11 +7,11 @@
 #include <string_view>
 
 // cosmos
-#include "cosmos/error/UsageError.hxx"
-#include "cosmos/fs/FileDescriptor.hxx"
-#include "cosmos/proc/Scheduler.hxx"
-#include "cosmos/proc/SubProc.hxx"
-#include "cosmos/string.hxx"
+#include <cosmos/error/UsageError.hxx>
+#include <cosmos/fs/FileDescriptor.hxx>
+#include <cosmos/proc/Scheduler.hxx>
+#include <cosmos/proc/SubProc.hxx>
+#include <cosmos/string.hxx>
 
 namespace cosmos {
 

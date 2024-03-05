@@ -1,8 +1,8 @@
 #pragma once
 
 // cosmos
-#include "cosmos/dso_export.h"
-#include "cosmos/proc/types.hxx"
+#include <cosmos/dso_export.h>
+#include <cosmos/proc/types.hxx>
 
 /**
  * @file

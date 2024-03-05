@@ -2,9 +2,9 @@
 #include <iostream>
 
 // cosmos
-#include "cosmos/fs/FDFile.hxx"
-#include "cosmos/io/Poller.hxx"
-#include "cosmos/io/Pipe.hxx"
+#include <cosmos/fs/FDFile.hxx>
+#include <cosmos/io/Poller.hxx>
+#include <cosmos/io/Pipe.hxx>
 
 // Test
 #include "TestBase.hxx"

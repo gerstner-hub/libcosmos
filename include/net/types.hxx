@@ -15,8 +15,8 @@
 #include <sys/socket.h>
 
 // cosmos
-#include "cosmos/BitMask.hxx"
-#include "cosmos/net/byte_order.hxx"
+#include <cosmos/BitMask.hxx>
+#include <cosmos/net/byte_order.hxx>
 
 /**
  * @file

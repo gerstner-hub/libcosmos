@@ -10,9 +10,9 @@
 #include <string>
 
 // cosmos
-#include "cosmos/BitMask.hxx"
-#include "cosmos/dso_export.h"
-#include "cosmos/utils.hxx"
+#include <cosmos/BitMask.hxx>
+#include <cosmos/dso_export.h>
+#include <cosmos/utils.hxx>
 
 /**
  * @file

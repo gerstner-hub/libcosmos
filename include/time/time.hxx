@@ -4,7 +4,7 @@
 #include <chrono>
 
 // cosmos
-#include "cosmos/time/Clock.hxx"
+#include <cosmos/time/Clock.hxx>
 
 /**
  * @file

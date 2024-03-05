@@ -1,8 +1,8 @@
 #pragma once
 
 // cosmos
-#include "cosmos/dso_export.h"
-#include "cosmos/io/ILogger.hxx"
+#include <cosmos/dso_export.h>
+#include <cosmos/io/ILogger.hxx>
 
 namespace cosmos {
 

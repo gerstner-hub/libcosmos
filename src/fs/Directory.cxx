@@ -1,9 +1,9 @@
 // cosmos
-#include "cosmos/error/FileError.hxx"
-#include "cosmos/formatting.hxx"
-#include "cosmos/fs/Directory.hxx"
-#include "cosmos/fs/filesystem.hxx"
-#include "cosmos/private/cosmos.hxx"
+#include <cosmos/error/FileError.hxx>
+#include <cosmos/formatting.hxx>
+#include <cosmos/fs/Directory.hxx>
+#include <cosmos/fs/filesystem.hxx>
+#include <cosmos/private/cosmos.hxx>
 
 namespace cosmos {
 

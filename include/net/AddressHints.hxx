@@ -7,9 +7,9 @@
 #include <cstring>
 
 // cosmos
-#include "cosmos/BitMask.hxx"
-#include "cosmos/net/types.hxx"
-#include "cosmos/utils.hxx"
+#include <cosmos/BitMask.hxx>
+#include <cosmos/net/types.hxx>
+#include <cosmos/utils.hxx>
 
 namespace cosmos {
 

@@ -2,8 +2,8 @@
 #include <iostream>
 
 // cosmos
-#include "cosmos/string.hxx"
-#include "cosmos/locale.hxx"
+#include <cosmos/string.hxx>
+#include <cosmos/locale.hxx>
 
 // Test
 #include "TestBase.hxx"

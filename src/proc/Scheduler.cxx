@@ -1,9 +1,9 @@
 // Cosmos
-#include "cosmos/error/ApiError.hxx"
-#include "cosmos/error/UsageError.hxx"
-#include "cosmos/private/Scheduler.hxx"
-#include "cosmos/proc/Scheduler.hxx"
-#include "cosmos/memory.hxx"
+#include <cosmos/error/ApiError.hxx>
+#include <cosmos/error/UsageError.hxx>
+#include <cosmos/private/Scheduler.hxx>
+#include <cosmos/proc/Scheduler.hxx>
+#include <cosmos/memory.hxx>
 
 // Linux
 #include <sys/syscall.h>

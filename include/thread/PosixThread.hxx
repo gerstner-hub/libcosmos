@@ -7,8 +7,8 @@
 #include <string_view>
 
 // cosmos
-#include "cosmos/thread/pthread.hxx"
-#include "cosmos/time/types.hxx"
+#include <cosmos/thread/pthread.hxx>
+#include <cosmos/time/types.hxx>
 
 namespace cosmos {
 

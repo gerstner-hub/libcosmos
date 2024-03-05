@@ -8,9 +8,9 @@
 #include <vector>
 
 // cosmos
-#include "cosmos/dso_export.h"
-#include "cosmos/BitMask.hxx"
-#include "cosmos/SysString.hxx"
+#include <cosmos/dso_export.h>
+#include <cosmos/BitMask.hxx>
+#include <cosmos/SysString.hxx>
 
 namespace cosmos {
 

@@ -1,8 +1,8 @@
 // cosmos
-#include "cosmos/formatting.hxx"
-#include "cosmos/fs/FileBase.hxx"
-#include "cosmos/private/cosmos.hxx"
-#include "cosmos/utils.hxx"
+#include <cosmos/formatting.hxx>
+#include <cosmos/fs/FileBase.hxx>
+#include <cosmos/private/cosmos.hxx>
+#include <cosmos/utils.hxx>
 
 namespace cosmos {
 

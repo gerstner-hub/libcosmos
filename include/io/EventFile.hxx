@@ -4,8 +4,8 @@
 #include <sys/eventfd.h>
 
 // cosmos
-#include "cosmos/BitMask.hxx"
-#include "cosmos/fs/FDFile.hxx"
+#include <cosmos/BitMask.hxx>
+#include <cosmos/fs/FDFile.hxx>
 
 namespace cosmos {
 

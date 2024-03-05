@@ -3,7 +3,7 @@
 #include <cassert>
 
 // Cosmos
-#include "cosmos/BitMask.hxx"
+#include <cosmos/BitMask.hxx>
 
 // Test
 #include "TestBase.hxx"

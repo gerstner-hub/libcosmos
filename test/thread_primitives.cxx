@@ -2,10 +2,10 @@
 #include <iostream>
 
 // Cosmos
-#include "cosmos/cosmos.hxx"
-#include "cosmos/thread/Mutex.hxx"
-#include "cosmos/thread/Condition.hxx"
-#include "cosmos/time/Clock.hxx"
+#include <cosmos/cosmos.hxx>
+#include <cosmos/thread/Mutex.hxx>
+#include <cosmos/thread/Condition.hxx>
+#include <cosmos/time/Clock.hxx>
 
 // Test
 #include "TestBase.hxx"

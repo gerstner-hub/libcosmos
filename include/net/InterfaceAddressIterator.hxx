@@ -1,8 +1,8 @@
 #pragma once
 
 // cosmos
-#include "cosmos/error/RuntimeError.hxx"
-#include "cosmos/net/InterfaceAddress.hxx"
+#include <cosmos/error/RuntimeError.hxx>
+#include <cosmos/net/InterfaceAddress.hxx>
 
 namespace cosmos {
 

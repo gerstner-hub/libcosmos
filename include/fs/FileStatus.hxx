@@ -8,13 +8,13 @@
 #include <string_view>
 
 // cosmos
-#include "cosmos/SysString.hxx"
-#include "cosmos/dso_export.h"
-#include "cosmos/fs/DirFD.hxx"
-#include "cosmos/fs/FileDescriptor.hxx"
-#include "cosmos/fs/types.hxx"
-#include "cosmos/time/types.hxx"
-#include "cosmos/types.hxx"
+#include <cosmos/SysString.hxx>
+#include <cosmos/dso_export.h>
+#include <cosmos/fs/DirFD.hxx>
+#include <cosmos/fs/FileDescriptor.hxx>
+#include <cosmos/fs/types.hxx>
+#include <cosmos/time/types.hxx>
+#include <cosmos/types.hxx>
 
 namespace cosmos {
 

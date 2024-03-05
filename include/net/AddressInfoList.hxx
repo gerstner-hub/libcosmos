@@ -1,10 +1,10 @@
 #pragma once
 
 // cosmos
-#include "cosmos/dso_export.h"
-#include "cosmos/net/AddressHints.hxx"
-#include "cosmos/net/AddressInfo.hxx"
-#include "cosmos/net/AddressInfoIterator.hxx"
+#include <cosmos/dso_export.h>
+#include <cosmos/net/AddressHints.hxx>
+#include <cosmos/net/AddressInfo.hxx>
+#include <cosmos/net/AddressInfoIterator.hxx>
 
 namespace cosmos {
 

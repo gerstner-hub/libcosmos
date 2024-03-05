@@ -1,10 +1,10 @@
 #pragma once
 
 // cosmos
-#include "cosmos/dso_export.h"
-#include "cosmos/net/InterfaceInfo.hxx"
-#include "cosmos/net/InterfaceIterator.hxx"
-#include "cosmos/net/types.hxx"
+#include <cosmos/dso_export.h>
+#include <cosmos/net/InterfaceInfo.hxx>
+#include <cosmos/net/InterfaceIterator.hxx>
+#include <cosmos/net/types.hxx>
 
 namespace cosmos {
 

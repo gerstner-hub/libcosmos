@@ -4,12 +4,12 @@
 #include <chrono>
 
 // cosmos
-#include "cosmos/cosmos.hxx"
-#include "cosmos/error/UsageError.hxx"
-#include "cosmos/thread/PosixThread.hxx"
-#include "cosmos/thread/pthread.hxx"
-#include "cosmos/thread/thread.hxx"
-#include "cosmos/time/Clock.hxx"
+#include <cosmos/cosmos.hxx>
+#include <cosmos/error/UsageError.hxx>
+#include <cosmos/thread/PosixThread.hxx>
+#include <cosmos/thread/pthread.hxx>
+#include <cosmos/thread/thread.hxx>
+#include <cosmos/time/Clock.hxx>
 
 // Test
 #include "TestBase.hxx"

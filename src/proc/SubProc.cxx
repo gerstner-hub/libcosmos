@@ -1,8 +1,8 @@
 // cosmos
-#include "cosmos/io/Poller.hxx"
-#include "cosmos/private/cosmos.hxx"
-#include "cosmos/proc/process.hxx"
-#include "cosmos/proc/SubProc.hxx"
+#include <cosmos/io/Poller.hxx>
+#include <cosmos/private/cosmos.hxx>
+#include <cosmos/proc/process.hxx>
+#include <cosmos/proc/SubProc.hxx>
 
 namespace cosmos {
 

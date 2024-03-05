@@ -1,9 +1,9 @@
 #pragma once
 
 // cosmos
-#include "cosmos/fs/DirFD.hxx"
-#include "cosmos/fs/types.hxx"
-#include "cosmos/SysString.hxx"
+#include <cosmos/fs/DirFD.hxx>
+#include <cosmos/fs/types.hxx>
+#include <cosmos/SysString.hxx>
 
 namespace cosmos {
 
@@ -153,7 +153,7 @@ protected: // data
 } // end ns
 
 // only include this here, because of dependency issues
-#include "cosmos/fs/filesystem.hxx"
+#include <cosmos/fs/filesystem.hxx>
 
 namespace cosmos {
 

@@ -2,9 +2,9 @@
 #include <iostream>
 #include <string>
 
-#include "cosmos/formatting.hxx"
-#include "cosmos/io/StreamAdaptor.hxx"
-#include "cosmos/proc/process.hxx"
+#include <cosmos/formatting.hxx>
+#include <cosmos/io/StreamAdaptor.hxx>
+#include <cosmos/proc/process.hxx>
 
 int main() {
 	// helper program for subproc test RedirectExtraTest()

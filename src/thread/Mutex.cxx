@@ -1,7 +1,7 @@
 // cosmos
-#include "cosmos/error/UsageError.hxx"
-#include "cosmos/private/Initable.hxx"
-#include "cosmos/thread/Mutex.hxx"
+#include <cosmos/error/UsageError.hxx>
+#include <cosmos/private/Initable.hxx>
+#include <cosmos/thread/Mutex.hxx>
 
 namespace cosmos {
 

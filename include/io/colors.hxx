@@ -6,8 +6,8 @@
 #include <variant>
 
 // cosmos
-#include "cosmos/dso_export.h"
-#include "cosmos/utils.hxx"
+#include <cosmos/dso_export.h>
+#include <cosmos/utils.hxx>
 
 /**
  * @file

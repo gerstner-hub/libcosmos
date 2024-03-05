@@ -1,7 +1,7 @@
 #pragma once
 
 // cosmos
-#include "cosmos/compiler.hxx"
+#include <cosmos/compiler.hxx>
 
 /**
  * @file

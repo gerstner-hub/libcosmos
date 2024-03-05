@@ -1,5 +1,5 @@
 // cosmos
-#include "cosmos/string.hxx"
+#include <cosmos/string.hxx>
 
 // C++
 #include <algorithm>

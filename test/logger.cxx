@@ -2,9 +2,9 @@
 #include <iostream>
 
 // cosmos
-#include "cosmos/formatting.hxx"
-#include "cosmos/io/StdLogger.hxx"
-#include "cosmos/proc/process.hxx"
+#include <cosmos/formatting.hxx>
+#include <cosmos/io/StdLogger.hxx>
+#include <cosmos/proc/process.hxx>
 
 int main() {
 	auto logger = cosmos::StdLogger();

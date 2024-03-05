@@ -4,10 +4,10 @@
 #include <utility>
 
 // cosmos
-#include "cosmos/SysString.hxx"
-#include "cosmos/net/UnixConnection.hxx"
-#include "cosmos/net/UnixDatagramSocket.hxx"
-#include "cosmos/net/types.hxx"
+#include <cosmos/SysString.hxx>
+#include <cosmos/net/UnixConnection.hxx>
+#include <cosmos/net/UnixDatagramSocket.hxx>
+#include <cosmos/net/types.hxx>
 
 namespace cosmos::net {
 

@@ -7,8 +7,8 @@
 #include <cassert>
 
 // cosmos
-#include "cosmos/thread/Mutex.hxx"
-#include "cosmos/time/types.hxx"
+#include <cosmos/thread/Mutex.hxx>
+#include <cosmos/time/types.hxx>
 
 namespace cosmos {
 

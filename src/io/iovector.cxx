@@ -1,6 +1,6 @@
 // Cosmos
-#include "cosmos/error/RuntimeError.hxx"
-#include "cosmos/io/iovector.hxx"
+#include <cosmos/error/RuntimeError.hxx>
+#include <cosmos/io/iovector.hxx>
 
 namespace cosmos {
 

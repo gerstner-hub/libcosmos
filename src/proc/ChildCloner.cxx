@@ -8,21 +8,21 @@
 #include <iostream>
 
 // cosmos
-#include "cosmos/error/InternalError.hxx"
-#include "cosmos/error/UsageError.hxx"
-#include "cosmos/formatting.hxx"
-#include "cosmos/fs/filesystem.hxx"
-#include "cosmos/io/EventFile.hxx"
-#include "cosmos/private/Scheduler.hxx"
-#include "cosmos/private/cosmos.hxx"
-#include "cosmos/proc/ChildCloner.hxx"
-#include "cosmos/proc/ProcessFile.hxx"
-#include "cosmos/proc/SigSet.hxx"
-#include "cosmos/proc/Signal.hxx"
-#include "cosmos/proc/SubProc.hxx"
-#include "cosmos/proc/clone.hxx"
-#include "cosmos/proc/process.hxx"
-#include "cosmos/utils.hxx"
+#include <cosmos/error/InternalError.hxx>
+#include <cosmos/error/UsageError.hxx>
+#include <cosmos/formatting.hxx>
+#include <cosmos/fs/filesystem.hxx>
+#include <cosmos/io/EventFile.hxx>
+#include <cosmos/private/Scheduler.hxx>
+#include <cosmos/private/cosmos.hxx>
+#include <cosmos/proc/ChildCloner.hxx>
+#include <cosmos/proc/ProcessFile.hxx>
+#include <cosmos/proc/SigSet.hxx>
+#include <cosmos/proc/Signal.hxx>
+#include <cosmos/proc/SubProc.hxx>
+#include <cosmos/proc/clone.hxx>
+#include <cosmos/proc/process.hxx>
+#include <cosmos/utils.hxx>
 
 namespace cosmos {
 

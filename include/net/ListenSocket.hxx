@@ -1,7 +1,7 @@
 #pragma once
 
 // cosmos
-#include "cosmos/net/Socket.hxx"
+#include <cosmos/net/Socket.hxx>
 
 namespace cosmos {
 

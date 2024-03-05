@@ -1,4 +1,4 @@
-#include "cosmos/thread/RWLock.hxx"
+#include <cosmos/thread/RWLock.hxx>
 
 int main() {
 	cosmos::RWLock rwl;

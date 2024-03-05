@@ -10,13 +10,13 @@
 #include <utility>
 
 // cosmos
-#include "cosmos/SysString.hxx"
-#include "cosmos/dso_export.h"
-#include "cosmos/error/errno.hxx"
-#include "cosmos/fs/DirFD.hxx"
-#include "cosmos/fs/FileDescriptor.hxx"
-#include "cosmos/fs/types.hxx"
-#include "cosmos/types.hxx"
+#include <cosmos/SysString.hxx>
+#include <cosmos/dso_export.h>
+#include <cosmos/error/errno.hxx>
+#include <cosmos/fs/DirFD.hxx>
+#include <cosmos/fs/FileDescriptor.hxx>
+#include <cosmos/fs/types.hxx>
+#include <cosmos/types.hxx>
 
 /**
  * @file

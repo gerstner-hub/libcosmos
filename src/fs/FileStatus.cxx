@@ -2,11 +2,11 @@
 #include <utility>
 
 // cosmos
-#include "cosmos/error/FileError.hxx"
-#include "cosmos/error/UsageError.hxx"
-#include "cosmos/formatting.hxx"
-#include "cosmos/fs/FileStatus.hxx"
-#include "cosmos/utils.hxx"
+#include <cosmos/error/FileError.hxx>
+#include <cosmos/error/UsageError.hxx>
+#include <cosmos/formatting.hxx>
+#include <cosmos/fs/FileStatus.hxx>
+#include <cosmos/utils.hxx>
 
 namespace cosmos {
 

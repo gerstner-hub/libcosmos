@@ -4,7 +4,7 @@
 #include <string>
 
 // cosmos
-#include "cosmos/formatting.hxx"
+#include <cosmos/formatting.hxx>
 
 // Test
 #include "TestBase.hxx"

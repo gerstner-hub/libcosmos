@@ -4,7 +4,7 @@
 #include <netinet/udp.h>
 
 // cosmos
-#include "cosmos/net/SockOptBase.hxx"
+#include <cosmos/net/SockOptBase.hxx>
 
 namespace cosmos {
 

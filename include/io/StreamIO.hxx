@@ -8,8 +8,8 @@
 #include <string_view>
 
 // cosmos
-#include "cosmos/fs/FileDescriptor.hxx"
-#include "cosmos/io/iovector.hxx"
+#include <cosmos/fs/FileDescriptor.hxx>
+#include <cosmos/io/iovector.hxx>
 
 namespace cosmos {
 

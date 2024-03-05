@@ -9,13 +9,13 @@
 #include <type_traits>
 
 // cosmos
-#include "cosmos/compiler.hxx"
-#include "cosmos/dso_export.h"
-#include "cosmos/fs/types.hxx"
-#include "cosmos/proc/types.hxx"
-#include "cosmos/types.hxx"
-#include "cosmos/utils.hxx"
-#include "cosmos/string.hxx"
+#include <cosmos/compiler.hxx>
+#include <cosmos/dso_export.h>
+#include <cosmos/fs/types.hxx>
+#include <cosmos/proc/types.hxx>
+#include <cosmos/types.hxx>
+#include <cosmos/utils.hxx>
+#include <cosmos/string.hxx>
 
 /**
  * @file

@@ -1,6 +1,6 @@
 // Cosmos
-#include "cosmos/error/RuntimeError.hxx"
-#include "cosmos/net/message_header.hxx"
+#include <cosmos/error/RuntimeError.hxx>
+#include <cosmos/net/message_header.hxx>
 
 namespace cosmos {
 

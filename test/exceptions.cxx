@@ -4,11 +4,11 @@
 #include <string>
 
 // Cosmos
-#include "cosmos/error/ApiError.hxx"
-#include "cosmos/error/UsageError.hxx"
-#include "cosmos/error/RuntimeError.hxx"
-#include "cosmos/fs/File.hxx"
-#include "cosmos/cosmos.hxx"
+#include <cosmos/error/ApiError.hxx>
+#include <cosmos/error/UsageError.hxx>
+#include <cosmos/error/RuntimeError.hxx>
+#include <cosmos/fs/File.hxx>
+#include <cosmos/cosmos.hxx>
 
 void testFileError() {
 	cosmos::File f;

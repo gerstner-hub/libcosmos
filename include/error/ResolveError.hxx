@@ -8,8 +8,8 @@
 #include <string_view>
 
 // cosmos
-#include "cosmos/error/CosmosError.hxx"
-#include "cosmos/error/errno.hxx"
+#include <cosmos/error/CosmosError.hxx>
+#include <cosmos/error/errno.hxx>
 
 // see errno.hxx for the reason for this
 #ifdef NO_DATA

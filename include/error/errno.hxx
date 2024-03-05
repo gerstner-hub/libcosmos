@@ -7,7 +7,7 @@
 #include <errno.h>
 
 // cosmos
-#include "cosmos/dso_export.h"
+#include <cosmos/dso_export.h>
 
 /**
  * @file

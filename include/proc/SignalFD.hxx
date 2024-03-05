@@ -4,9 +4,9 @@
 #include <sys/signalfd.h>
 
 // cosmos
-#include "cosmos/fs/FileDescriptor.hxx"
-#include "cosmos/proc/Signal.hxx"
-#include "cosmos/proc/SigSet.hxx"
+#include <cosmos/fs/FileDescriptor.hxx>
+#include <cosmos/proc/Signal.hxx>
+#include <cosmos/proc/SigSet.hxx>
 
 namespace cosmos {
 

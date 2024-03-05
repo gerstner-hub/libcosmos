@@ -2,8 +2,8 @@
 #include <iostream>
 
 // cosmos
-#include "cosmos/fs/File.hxx"
-#include "cosmos/io/Terminal.hxx"
+#include <cosmos/fs/File.hxx>
+#include <cosmos/io/Terminal.hxx>
 
 // Test
 #include "TestBase.hxx"

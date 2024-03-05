@@ -4,10 +4,10 @@
 #include <sys/types.h>
 
 // Cosmos
-#include "cosmos/formatting.hxx"
-#include "cosmos/private/cosmos.hxx"
-#include "cosmos/fs/filesystem.hxx"
-#include "cosmos/fs/DirStream.hxx"
+#include <cosmos/formatting.hxx>
+#include <cosmos/private/cosmos.hxx>
+#include <cosmos/fs/filesystem.hxx>
+#include <cosmos/fs/DirStream.hxx>
 
 namespace cosmos {
 

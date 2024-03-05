@@ -1,9 +1,9 @@
 #pragma once
 
 // cosmos
-#include "cosmos/net/IPSocket.hxx"
-#include "cosmos/net/TCPOptions.hxx"
-#include "cosmos/net/types.hxx"
+#include <cosmos/net/IPSocket.hxx>
+#include <cosmos/net/TCPOptions.hxx>
+#include <cosmos/net/types.hxx>
 
 namespace cosmos {
 

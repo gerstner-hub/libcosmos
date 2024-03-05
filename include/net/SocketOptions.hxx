@@ -4,11 +4,11 @@
 #include <chrono>
 
 // cosmos
-#include "cosmos/dso_export.h"
-#include "cosmos/error/errno.hxx"
-#include "cosmos/fs/FileDescriptor.hxx"
-#include "cosmos/net/SockOptBase.hxx"
-#include "cosmos/net/types.hxx"
+#include <cosmos/dso_export.h>
+#include <cosmos/error/errno.hxx>
+#include <cosmos/fs/FileDescriptor.hxx>
+#include <cosmos/net/SockOptBase.hxx>
+#include <cosmos/net/types.hxx>
 
 namespace cosmos {
 

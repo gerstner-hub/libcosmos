@@ -1,7 +1,7 @@
 #pragma once
 
 // cosmos
-#include "cosmos/net/types.hxx"
+#include <cosmos/net/types.hxx>
 
 /**
  * @file

@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 // cosmos
-#include "cosmos/fs/FileDescriptor.hxx"
+#include <cosmos/fs/FileDescriptor.hxx>
 
 namespace cosmos {
 

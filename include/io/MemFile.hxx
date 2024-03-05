@@ -4,10 +4,10 @@
 #include <sys/mman.h>
 
 // cosmos
-#include "cosmos/BitMask.hxx"
-#include "cosmos/dso_export.h"
-#include "cosmos/fs/FileBase.hxx"
-#include "cosmos/SysString.hxx"
+#include <cosmos/BitMask.hxx>
+#include <cosmos/dso_export.h>
+#include <cosmos/fs/FileBase.hxx>
+#include <cosmos/SysString.hxx>
 
 namespace cosmos {
 

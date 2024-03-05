@@ -9,8 +9,8 @@
 #include <stddef.h>
 
 // cosmos
-#include "cosmos/dso_export.h"
-#include "cosmos/fs/types.hxx"
+#include <cosmos/dso_export.h>
+#include <cosmos/fs/types.hxx>
 
 namespace cosmos {
 

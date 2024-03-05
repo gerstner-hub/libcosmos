@@ -2,7 +2,7 @@
 #include <iostream>
 
 // cosmos
-#include "cosmos/io/StdLogger.hxx"
+#include <cosmos/io/StdLogger.hxx>
 
 namespace cosmos {
 

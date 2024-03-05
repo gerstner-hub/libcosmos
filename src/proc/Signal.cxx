@@ -4,15 +4,15 @@
 #include <string>
 
 // cosmos
-#include "cosmos/error/ApiError.hxx"
-#include "cosmos/error/RuntimeError.hxx"
-#include "cosmos/formatting.hxx"
-#include "cosmos/fs/FileDescriptor.hxx"
-#include "cosmos/private/cosmos.hxx"
-#include "cosmos/proc/pidfd.h"
-#include "cosmos/proc/Signal.hxx"
-#include "cosmos/proc/SigSet.hxx"
-#include "cosmos/string.hxx"
+#include <cosmos/error/ApiError.hxx>
+#include <cosmos/error/RuntimeError.hxx>
+#include <cosmos/formatting.hxx>
+#include <cosmos/fs/FileDescriptor.hxx>
+#include <cosmos/private/cosmos.hxx>
+#include <cosmos/proc/pidfd.h>
+#include <cosmos/proc/Signal.hxx>
+#include <cosmos/proc/SigSet.hxx>
+#include <cosmos/string.hxx>
 
 // Linux
 #include <signal.h>

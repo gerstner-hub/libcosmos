@@ -1,7 +1,7 @@
 #pragma once
 
 // cosmos
-#include "cosmos/fs/DirStream.hxx"
+#include <cosmos/fs/DirStream.hxx>
 
 namespace cosmos {
 

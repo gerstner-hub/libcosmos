@@ -1,7 +1,7 @@
 #pragma once
 
 // cosmos
-#include "cosmos/error/ApiError.hxx"
+#include <cosmos/error/ApiError.hxx>
 
 namespace cosmos {
 

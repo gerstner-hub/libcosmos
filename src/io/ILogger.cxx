@@ -2,9 +2,9 @@
 #include <iostream>
 
 // Cosmos
-#include "cosmos/fs/FileDescriptor.hxx"
-#include "cosmos/io/ILogger.hxx"
-#include "cosmos/io/Terminal.hxx"
+#include <cosmos/fs/FileDescriptor.hxx>
+#include <cosmos/io/ILogger.hxx>
+#include <cosmos/io/Terminal.hxx>
 
 namespace cosmos {
 

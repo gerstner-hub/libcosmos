@@ -2,7 +2,7 @@
 #include <iostream>
 
 // cosmos
-#include "cosmos/io/EventFile.hxx"
+#include <cosmos/io/EventFile.hxx>
 
 // Test
 #include "TestBase.hxx"

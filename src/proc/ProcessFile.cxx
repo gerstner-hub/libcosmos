@@ -2,10 +2,10 @@
 #include <sys/syscall.h>
 
 // libcosmos
-#include "cosmos/error/ApiError.hxx"
-#include "cosmos/formatting.hxx"
-#include "cosmos/private/cosmos.hxx"
-#include "cosmos/proc/ProcessFile.hxx"
+#include <cosmos/error/ApiError.hxx>
+#include <cosmos/formatting.hxx>
+#include <cosmos/private/cosmos.hxx>
+#include <cosmos/proc/ProcessFile.hxx>
 
 /*
  * sys/pidfd.h contains the declarations for these system calls by now, but

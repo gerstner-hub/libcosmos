@@ -7,8 +7,8 @@
 #include <variant>
 
 // Cosmos
-#include "cosmos/dso_export.h"
-#include "cosmos/proc/types.hxx"
+#include <cosmos/dso_export.h>
+#include <cosmos/proc/types.hxx>
 
 namespace cosmos {
 

@@ -4,8 +4,8 @@
 #include <string>
 
 // cosmos
-#include "cosmos/error/CosmosError.hxx"
-#include "cosmos/error/errno.hxx"
+#include <cosmos/error/CosmosError.hxx>
+#include <cosmos/error/errno.hxx>
 
 namespace cosmos {
 

@@ -5,14 +5,14 @@
 #include <sstream>
 
 // cosmos
-#include "cosmos/formatting.hxx"
-#include "cosmos/fs/Directory.hxx"
-#include "cosmos/fs/DirIterator.hxx"
-#include "cosmos/fs/DirStream.hxx"
-#include "cosmos/fs/FileStatus.hxx"
-#include "cosmos/fs/filesystem.hxx"
-#include "cosmos/fs/File.hxx"
-#include "cosmos/net/UnixListenSocket.hxx"
+#include <cosmos/formatting.hxx>
+#include <cosmos/fs/Directory.hxx>
+#include <cosmos/fs/DirIterator.hxx>
+#include <cosmos/fs/DirStream.hxx>
+#include <cosmos/fs/FileStatus.hxx>
+#include <cosmos/fs/filesystem.hxx>
+#include <cosmos/fs/File.hxx>
+#include <cosmos/net/UnixListenSocket.hxx>
 
 // Test
 #include "TestBase.hxx"

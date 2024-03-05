@@ -8,21 +8,21 @@
 #include <vector>
 
 // Cosmos
-#include "cosmos/cosmos.hxx"
-#include "cosmos/error/ApiError.hxx"
-#include "cosmos/error/CosmosError.hxx"
-#include "cosmos/error/InternalError.hxx"
-#include "cosmos/formatting.hxx"
-#include "cosmos/fs/FileDescriptor.hxx"
-#include "cosmos/fs/filesystem.hxx"
-#include "cosmos/fs/TempFile.hxx"
-#include "cosmos/io/Pipe.hxx"
-#include "cosmos/io/StreamAdaptor.hxx"
-#include "cosmos/proc/ChildCloner.hxx"
-#include "cosmos/proc/process.hxx"
-#include "cosmos/proc/SubProc.hxx"
-#include "cosmos/string.hxx"
-#include "cosmos/utils.hxx"
+#include <cosmos/cosmos.hxx>
+#include <cosmos/error/ApiError.hxx>
+#include <cosmos/error/CosmosError.hxx>
+#include <cosmos/error/InternalError.hxx>
+#include <cosmos/formatting.hxx>
+#include <cosmos/fs/FileDescriptor.hxx>
+#include <cosmos/fs/filesystem.hxx>
+#include <cosmos/fs/TempFile.hxx>
+#include <cosmos/io/Pipe.hxx>
+#include <cosmos/io/StreamAdaptor.hxx>
+#include <cosmos/proc/ChildCloner.hxx>
+#include <cosmos/proc/process.hxx>
+#include <cosmos/proc/SubProc.hxx>
+#include <cosmos/string.hxx>
+#include <cosmos/utils.hxx>
 
 // Test
 #include "TestBase.hxx"

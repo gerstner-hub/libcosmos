@@ -13,7 +13,7 @@
 #include <sys/ptrace.h>
 
 // cosmos
-#include "cosmos/BitMask.hxx"
+#include <cosmos/BitMask.hxx>
 
 namespace cosmos {
 

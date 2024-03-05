@@ -9,8 +9,8 @@
 #include <sys/epoll.h>
 
 // cosmos
-#include "cosmos/BitMask.hxx"
-#include "cosmos/fs/FileDescriptor.hxx"
+#include <cosmos/BitMask.hxx>
+#include <cosmos/fs/FileDescriptor.hxx>
 
 namespace cosmos {
 
