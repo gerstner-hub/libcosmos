@@ -252,10 +252,8 @@ def initSCons(project, rtti=True, deflibtype='shared'):
     else:
         gcc_prefix = None
     use_clang = compiler in ('clang', 'clang++')
-
-    if compiler and not (gcc_prefix or use_clang):
-        print(f"Unrecognized compiler '{compiler}': use `clang` or `some-arch-gcc`", file=sys.stderr)
-        sys.exit(1)
+    use_gcc = not compiler or gcc_prefix
+    clang_like = use_clang or compiler and compiler.find('clang') != -1
 
     # Whether we should add an rpath entry during linking executables to
     # automatically find shared libraries. This eases running executables
@@ -282,6 +280,12 @@ def initSCons(project, rtti=True, deflibtype='shared'):
         })
     elif use_clang:
         env_options['tools'].extend(['clang', 'clangxx'])
+    elif compiler:
+        print(f"Warning: Unrecognized compiler '{compiler}'. Trying my best to continue anyway. Known values are `clang` or `some-arch-gcc`", file=sys.stderr)
+        env_options.update({
+            'CXX': compiler,
+            'CC' : compiler
+        })
 
     env = Environment(**env_options)
     # this entry can be used to add global entries visible by all other cloned
@@ -332,11 +336,11 @@ def initSCons(project, rtti=True, deflibtype='shared'):
         'double-promotion', 'null-dereference'
     ]
 
-    if use_clang:
+    if clang_like:
         warnings.extend([
             'no-deprecated-copy'
         ])
-    else:
+    elif use_gcc:
         warnings.extend([
             'duplicated-cond',
             'duplicated-branches',
