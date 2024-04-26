@@ -37,6 +37,7 @@ public: // functions
 		const auto destroy_res = ::pthread_rwlock_destroy(&m_prwlock);
 
 		assert (!destroy_res);
+		(void)destroy_res;
 	}
 
 	void readlock() const {

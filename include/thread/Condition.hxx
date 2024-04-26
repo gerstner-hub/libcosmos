@@ -58,6 +58,7 @@ public: // functions
 		const auto destroy_res = ::pthread_cond_destroy(&m_pcond);
 
 		assert (!destroy_res);
+		(void)destroy_res;
 	}
 
 	/// Wait for the Condition to be signaled.

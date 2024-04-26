@@ -43,6 +43,7 @@ public: // functions
 		const auto destroy_res = ::pthread_mutex_destroy(&m_pmutex);
 
 		assert (!destroy_res);
+		(void)destroy_res;
 	}
 
 	void lock() const {
