@@ -328,6 +328,9 @@ def initSCons(project, rtti=True, deflibtype='shared'):
     else:
         env.Append(CXXFLAGS=['-O2'])
 
+    if evalBool(ARGUMENTS.get('release', '0')):
+        env.Append(CCFLAGS='-DNDEBUG')
+
     if not rtti:
         env.Append(CXXFLAGS=['-fno-rtti'])
 
