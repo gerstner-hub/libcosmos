@@ -73,6 +73,9 @@ public: // functions
 	/// Allows access to the underlying fd with const semantics.
 	FileDescriptor fd() const { return m_fd; }
 
+	/// \see cosmos::fs::truncate().
+	void truncate(const off_t length);
+
 protected: // data
 
 	FileDescriptor m_fd;
