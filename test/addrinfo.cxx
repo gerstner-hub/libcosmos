@@ -61,11 +61,11 @@ public:
 		hints.setFamily(cosmos::SocketFamily::INET);
 		hints.setType(cosmos::SocketType::DGRAM);
 
-		al.resolve("", "http");
+		al.resolve("", "tftp");
 		for (auto &address: al) {
 			RUN_STEP("result-addr-is-ipv4", address.isV4());
 			RUN_STEP("result-type-is-dgram", address.type() == cosmos::SocketType::DGRAM);
-			RUN_STEP("result-port-matches", address.asIP4().value().port() == 80);
+			RUN_STEP("result-port-matches", address.asIP4().value().port() == 69);
 		}
 
 		auto flags = hints.flags();
