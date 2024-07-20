@@ -60,10 +60,16 @@ enum class EthernetProtocol : unsigned short {
 	LINK_CTL    = ETH_P_LINK_CTL,  ///< HPNA, wlan link local tunnel
 	ATMFATE     = ETH_P_ATMFATE,   ///< Frame-based ATM Transport over Ethernet
 	PAE         = ETH_P_PAE,       ///< Port Access Entity (IEEE 802.1X)
+#ifdef ETH_P_PROFINET
 	PROFINET    = ETH_P_PROFINET,  ///< PROFINET
+#endif
+#ifdef ETH_P_REALTEK
 	REALTEK     = ETH_P_REALTEK,   ///< Multiple proprietary protocols
+#endif
 	AOE         = ETH_P_AOE,       ///< ATA over Ethernet
+#ifdef ETH_P_ETHERCAT
 	ETHERCAT    = ETH_P_ETHERCAT,  ///< EtherCAT
+#endif
 	VLAN_8021AD = ETH_P_8021AD,    ///< 802.1ad Service VLAN
 	EX1_802     = ETH_P_802_EX1,   ///< 802.1 Local Experimental 1
 	PREAUTH     = ETH_P_PREAUTH,   ///< 802.11 Preauthentication
@@ -90,7 +96,9 @@ enum class EthernetProtocol : unsigned short {
 	QINQ3       = ETH_P_QINQ3,     ///< deprecated QinQ VLAN
 	EDSA        = ETH_P_EDSA,      ///< Ethertype DSA
 	DSA_8021Q   = ETH_P_DSA_8021Q, ///< Fake VLAN Header for DSA
+#ifdef ETH_PDSA_A5PSW
 	DSA_A5PSW   = ETH_P_DSA_A5PSW, ///< A5PSW Tag Value
+#endif
 	IFE         = ETH_P_IFE,       ///< ForCES inter-FE LFB type
 	IUCV        = ETH_P_AF_IUCV,   ///< IBM af_iucv
 };
