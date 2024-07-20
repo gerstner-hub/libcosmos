@@ -199,7 +199,7 @@ using ProtectFlags = BitMask<ProtectFlag>;
  *   * Bad `flags` encountered.
  *   * AccessFlag::SAO was requested, but the hardware does not support it
  *     (only on PowerPC).
- *  - Errno::NO_MEMORY:
+ * - Errno::NO_MEMORY:
  *   * internal kernel data structures could not be allocated.
  *   * the given address range is in valid or not mapped in the process.
  *   * changing the protection of part of larger mapping would result in
@@ -342,7 +342,7 @@ using LockFlags = BitMask<LockFlag>;
  *   distinct mappings in the process.
  *   * The RLIMIT_MEMLOCK soft limit would be exceeded for non-privileged
  *   processes.
- *  - Errno::PERMISSION: the caller is not privileged to lock pages
+ * - Errno::PERMISSION: the caller is not privileged to lock pages
  *    (CAP_IPC_LOCK).
  **/
 COSMOS_API void lock(void *addr, const size_t length, const LockFlags flags = {});
