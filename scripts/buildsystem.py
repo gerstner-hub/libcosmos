@@ -263,7 +263,7 @@ def initSCons(project, rtti=True, deflibtype='shared'):
     env_options = {
         'ENV': {
             # this is needed to get color output support in programs that SCons calls
-            'TERM': os.environ['TERM'],
+            'TERM': os.environ.get('TERM', 'dumb'),
             'PATH': os.environ['PATH'],
             'HOME': os.environ['HOME']
         },
