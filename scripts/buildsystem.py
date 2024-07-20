@@ -10,7 +10,7 @@ def sequencify(arg):
         if isinstance(arg, _type):
             return arg
 
-    return [arg,]
+    return [arg, ]
 
 
 def gatherSources(self, suffixes, path='.', recursive=True):
