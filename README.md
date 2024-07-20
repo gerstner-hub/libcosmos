@@ -227,8 +227,7 @@ Future Directions
 =================
 
 The Linux API is rich and a lot of stuff can still be modeled and added as the
-need arises. One aspect that I intent to tackle is memory mappings, for
-example.
+need arises.
 
 Contributing
 ============
