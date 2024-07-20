@@ -49,11 +49,13 @@ using AccessFlags = BitMask<AccessFlag>;
 
 /// Flags that influence properties of memory mappings.
 enum class MapFlag : int {
+#ifdef MAP_32BIT // this is not defined on non-x86 architectures?
 	/// put the mapping into the first 2 GiB of the address space.
 	/**
 	 * This was needed performance reasons on some early x86-64 processors.
 	 **/
 	INTO_32BIT      = MAP_32BIT,
+#endif
 	/// Create a mapping that is not backed by a file, contents are initialized to zero.
 	/**
 	 * The offset should be zero and the file descriptor invalid.
