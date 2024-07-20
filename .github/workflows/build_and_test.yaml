@@ -1,0 +1,35 @@
+name: Build libcosmos and run unit tests
+on: [push, pull_request]
+jobs:
+  build_libcosmos:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "The job was automatically triggered by a ${{ github.event_name }} event."
+      - name: Check image version
+        run: |
+          cat /etc/os-release
+      - run: echo "The name of your branch is ${{ github.ref }}"
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - run: echo "Cloned repository"
+      - name: Install build tools
+        run: sudo apt-get install -y scons build-essential clang g++-arm-linux-gnueabi doxygen flake8
+      - name: Compile and test various native build configurations
+        # skip 32-bit and static linking builds
+        # the GitHub Ubuntu runner image uses some strange repository
+        # configuration, so that g++-multilib cannot be installed.
+        #
+        # the clang toolchain has some strangeness in it which breaks the
+        # static linking build, but it works on vanilla Ubuntu 24.04
+        #
+        # it is hard to come by the images used by GH runner to test it
+        # locally, thus I did not investigate this more deeply
+        run: |
+          ./scripts/check.py --skip-32bit --skip-static
+      - name: Cross-build for arm
+        run: |
+          scons buildroot=build.arm compiler=arm-linux-gnueabi-gcc install tests
+      # the runner's doxygen for some reason doesn't support a -q switch
+      #- name: build doxygen
+      #  run: |
+      #    scons doxygen
