@@ -27,7 +27,7 @@ def flakePython():
     python_sources = []
     scons_sources = []
 
-    for line in subprocess.check_output(['git', 'ls-tree', '--name-only', '-r', 'master']).splitlines():
+    for line in subprocess.check_output(['git', 'ls-tree', '--name-only', '-r', 'HEAD']).splitlines():
         line = line.decode()
         if line.endswith('.py'):
             python_sources.append(line)
