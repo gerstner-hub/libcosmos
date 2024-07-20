@@ -48,7 +48,7 @@ public:
 
 		auto ret = cosmos::fs::canonicalize_path(tempdir.path() + "/some_link");
 
-		RUN_STEP("verify-canoncalize", ret == "/dev/null");
+		RUN_STEP("verify-canonicalize", ret == "/dev/null");
 	}
 };
 

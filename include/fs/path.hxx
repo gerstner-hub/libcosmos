@@ -26,7 +26,7 @@ namespace cosmos::fs {
  * potential system call performed by this function.
  *
  * Symbolic links will *not* be resolved. If you want this you can use
- * canoncalize_path() instead.
+ * canonicalize_path() instead.
  **/
 COSMOS_API std::string normalize_path(const std::string_view path);
 

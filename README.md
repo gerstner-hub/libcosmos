@@ -148,7 +148,7 @@ Common Pitfalls
 ### Valgrind fails with `ApiError: clone3(): Function not implemented` or similar
 
 *libcosmos* currently uses some newer systems calls like the `clone3()` system
-call for creating child processes, which aren'it yet fully supported neither
+call for creating child processes, which aren't yet fully supported neither
 by `glibc` nor by `valgrind`. For this reason running *libcosmos* programs in
 `valgrind` that use these features will fail. You can still try a build with
 address sanitizer to achieve similar runtime error checking as with valgrind.

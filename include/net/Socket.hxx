@@ -145,7 +145,7 @@ protected: // functions
 	/// Send the given data over the socket, using specific send flags.
 	/**
 	 * This is like a regular write() call but allows to specify socket
-	 * specific MessageFlags to adjust various behavour.
+	 * specific MessageFlags to adjust various behaviour.
 	 **/
 	size_t send(const void *buf, size_t length, const MessageFlags flags = MessageFlags{});
 

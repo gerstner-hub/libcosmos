@@ -104,10 +104,10 @@ COSMOS_API std::optional<WaitRes> wait(const ProcessGroupID pgid, const WaitFlag
  **/
 COSMOS_API std::optional<WaitRes> wait(const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED});
 
-/// Wait for the process refered to by the given pidfd.
+/// Wait for the process referred to by the given pidfd.
 /**
  * This is just like wait(const ProcessID, const WaitFlags) only that it waits
- * for the process refered to by the given pidfd.
+ * for the process referred to by the given pidfd.
  *
  * The process represented by `fd` needs to be a child process of the calling
  * process, otherwise an ApiError with Errno::CHILD is thrown.
@@ -173,7 +173,7 @@ COSMOS_API void exec_at(const DirFD dir_fd, const SysString path,
 		const CStringVector *args = nullptr, const CStringVector *env = nullptr,
 		const FollowSymlinks follow_symlinks = FollowSymlinks{false});
 
-/// Variant of exec() that executes the program refered to by the given file descriptor.
+/// Variant of exec() that executes the program referred to by the given file descriptor.
 /**
  * This behaves just like exec(), except that a program is not looked up by
  * path but the already open file descriptor `fd` is used. Also file

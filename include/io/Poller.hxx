@@ -20,7 +20,7 @@ namespace cosmos {
  * descriptor monitoring API. The API operates on a file descriptor of its own
  * that references a set of monitored file descriptors.
  *
- * A peculiarity of the API is that it can operate in a level triggerred or an
+ * A peculiarity of the API is that it can operate in a level triggered or an
  * edge triggered fashion. The level triggered mode is the one known from
  * classical APIs like select(). It means that a file descriptor will always
  * be signaled as ready if currently one of the monitoring conditions is
@@ -48,7 +48,7 @@ namespace cosmos {
  * be blocking for example in case of networking sockets, e.g. if a received
  * packet has an invalid checksum and therefore nothing to return to
  * userspace. To avoid such scenarios the application should use non-blocking
- * file desciptors and react to EAGAIN results upon read/write.
+ * file descriptors and react to EAGAIN results upon read/write.
  *
  * The Poller FD is created, as usual, with the O_CLOEXEC flag set. Explicitly
  * re-enable the flag should you require inheritance to unrelated sub
@@ -77,7 +77,7 @@ public: // types
 
 	using MonitorFlags = BitMask<MonitorFlag>;
 
-	/// Flags found in PollEvent that indicate the events that occured on a file descriptor.
+	/// Flags found in PollEvent that indicate the events that occurred on a file descriptor.
 	enum class Event : uint32_t {
 		/// \see MonitorFlag::INPUT
 		INPUT_READY       = EPOLLIN,
@@ -87,7 +87,7 @@ public: // types
 		SOCKET_HANGUP     = EPOLLRDHUP,
 		/// \see MonitorFlag::EXCEPTIONS
 		EXCEPTION_OCCURED = EPOLLPRI,
-		/// An error condition occured on the file descriptor (this is also reported for the write end of a pipe, if the read end is closed). This event is always reported independently of MonitorFlag.
+		/// An error condition occurred on the file descriptor (this is also reported for the write end of a pipe, if the read end is closed). This event is always reported independently of MonitorFlag.
 		ERROR_OCCURED     = EPOLLERR,
 		/// Socket or pipe peer has hung up. Data may still be pending though. This event is always reported independently of MonitorFlags.
 		HANGUP_OCCURED    = EPOLLHUP
@@ -182,8 +182,8 @@ public: // functions
 	 * call will return even if no events are ready. An empty vector is
 	 * returned in the timeout case.
 	 *
-	 * \return The range of events that occured, or an empty vector if the
-	 * timeout occured.
+	 * \return The range of events that occurred, or an empty vector if the
+	 * timeout occurred.
 	 **/
 	std::vector<PollEvent> wait(const std::optional<std::chrono::milliseconds> timeout = {});
 

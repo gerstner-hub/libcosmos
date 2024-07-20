@@ -12,7 +12,7 @@ namespace cosmos {
 /// A bitset of signal numbers for use in system calls.
 /**
  * This type is needed to e.g. change a process's signal mask. It helps
- * specifing a number of signals that should be operated on.
+ * specifying a number of signals that should be operated on.
  **/
 class SigSet {
 public: // types

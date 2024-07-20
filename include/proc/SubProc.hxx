@@ -67,7 +67,7 @@ public: // functions
 	/// Wait for sub process exit within a timeout in milliseconds.
 	/**
 	 * \return The exit status if the child exited. Nothing if the timeout
-	 * occured.
+	 * occurred.
 	 **/
 	std::optional<WaitRes> waitTimed(const std::chrono::milliseconds max);
 
@@ -77,7 +77,7 @@ public: // functions
 	/// Returns the PID of the currently running child process or ProcessID::INVALID.
 	ProcessID pid() const { return m_pid; }
 
-	/// Returns a pidfd refering to the currently running child.
+	/// Returns a pidfd referring to the currently running child.
 	/**
 	 * This file descriptor can be used for efficiently waiting for child
 	 * exit using poll() or select() APIs, see `man pidfd_open`. This
@@ -103,7 +103,7 @@ protected: // data
 	/// The pid of the child process, if any
 	ProcessID m_pid = ProcessID::INVALID;
 
-	/// Pidfd refering to the active child, if any
+	/// Pidfd referring to the active child, if any
 	PidFD m_child_fd;
 };
 

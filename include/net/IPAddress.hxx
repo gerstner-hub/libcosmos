@@ -212,7 +212,7 @@ public: // functions
 
 	/// Returns the currently set scope ID.
 	/**
-	 * This ID allows to link a local adddress to a local network device
+	 * This ID allows to link a local address to a local network device
 	 * via an InterfaceIndex. It is only supported for link-local
 	 * addresses.
 	 **/

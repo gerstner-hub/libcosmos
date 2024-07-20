@@ -77,7 +77,7 @@ enum class Errno : int { // errnos are distinct positive `int` values says `man 
 	NO_MESSAGE            = ENOMSG,          ///< no message of the desired type
 	NO_PROTO_OPT          = ENOPROTOOPT,     ///< protocol (option) not available
 	NO_SPACE              = ENOSPC,          ///< no space left on device
-	NO_STREAM_RESOURCES   = ENOSR,           ///< no stream reasources
+	NO_STREAM_RESOURCES   = ENOSR,           ///< no stream resources
 	NO_STREAM             = ENOSTR,          ///< not a STREAM
 	NO_SYS                = ENOSYS,          ///< function not available (e.g. unimplemented system call)
 	NOT_CONNECTED         = ENOTCONN,        ///< socket is not connected

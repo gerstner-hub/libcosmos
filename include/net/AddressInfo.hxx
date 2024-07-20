@@ -81,7 +81,7 @@ protected: // data
 		return reinterpret_cast<const AddressInfo*>(ai_next);
 	}
 
-	// this should only be constructed for special purposes, otherise this
+	// this should only be constructed for special purposes, otherwise this
 	// type is just used for casting libc allocated struct addrinfo into.
 	AddressInfo() = delete;
 };

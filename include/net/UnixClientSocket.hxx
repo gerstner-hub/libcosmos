@@ -62,7 +62,7 @@ public: // functions
 	 * non-blocking mode, though.
 	 *
 	 * After a successful return the ownership of the socket file
-	 * descriptor is transfered to the connection instance, and the client
+	 * descriptor is transferred to the connection instance, and the client
 	 * socket will no longer be valid for use.
 	 *
 	 * \see Socket::connect()

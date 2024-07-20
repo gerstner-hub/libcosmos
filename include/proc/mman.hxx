@@ -248,7 +248,7 @@ using RemapFlags = BitMask<RemapFlag>;
  *   * `new_size` was zero.
  *   * `new_size` or `new_addr` are invalid.
  *   * the range [`new_addr`, `new_addr` + `new_size`] overlap with the range
- *     of [`old_adrr`, `old_addr` + `old_size`].
+ *     of [`old_addr`, `old_addr` + `old_size`].
  *   * RemapFlag::FIXED or RemapFlag::DONTUNMAP was specified in `flags`
  *     without RemapFlag::MAYMOVE being set as well.
  *   * RemapFlag::DONTUNMAP was specified in `flags`, but one or more pages in

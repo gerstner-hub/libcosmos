@@ -305,7 +305,7 @@ def initSCons(project, rtti=True, deflibtype='shared'):
     # build a local libcosmos in a Git submodule via SCons or whether the
     # build system should look for these packages globally in the system
     # instead.
-    # this is useful for distibution packaging where the necessary
+    # this is useful for distribution packaging where the necessary
     # dependencies are already installed in the OS.
     env['use_system_pkgs'] = evalBool(ARGUMENTS.get('use-system-pkgs', '0'))
     env['build_docs'] = evalBool(ARGUMENTS.get('docs', '1'))

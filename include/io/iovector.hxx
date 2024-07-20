@@ -50,7 +50,7 @@ struct IOMemoryRegion :
 		protected IOVEC {
 public: // types
 
-	// only allow the specialized IOVector to access th raw data fields.
+	// only allow the specialized IOVector to access the raw data fields.
 	template <typename ENTRY_TYPE>
 	friend class IOVector;
 

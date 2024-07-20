@@ -502,7 +502,7 @@ namespace {
 				return ret;
 			} else {
 				// man page says: if len equals size then truncation
-				// may have occured. Thus use one byte extra to avoid
+				// may have occurred. Thus use one byte extra to avoid
 				// ambiguity.
 				ret.resize(len+1);
 				continue;

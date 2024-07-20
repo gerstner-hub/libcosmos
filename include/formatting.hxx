@@ -148,7 +148,7 @@ struct OctNum :
  **/
 template <typename T>
 auto to_printable_integer(T num) -> decltype(+num) {
-	// using the uniary + operator promotes the number to a printable type
+	// using the unary + operator promotes the number to a printable type
 	return +num;
 }
 

@@ -32,7 +32,7 @@ extern RunningOnValgrind running_on_valgrind;
 
 /// handle a fatal error condition in libcosmos.
 /**
- * This function will take care of a fatal error condition that occured in
+ * This function will take care of a fatal error condition that occurred in
  * libcosmos. This should only be used in situations where execution cannot be
  * continued, not even with the use of exceptions. These are mostly the
  * following situations:

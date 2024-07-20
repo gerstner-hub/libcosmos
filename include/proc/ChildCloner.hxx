@@ -50,7 +50,7 @@ public: // functions
 
 	/// Creates an instance configured with the provided arguments.
 	/**
-	 * This is a convienence constructor for simple execution of child
+	 * This is a convenience constructor for simple execution of child
 	 * processes without special settings. The executable path is taken
 	 * from `args[0]`.
 	 **/

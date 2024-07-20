@@ -68,13 +68,13 @@ std::string get_hostname() {
 	if (const auto res = ::gethostname(ret.data(), ret.size()); res != 0) {
 		// the semantics for this function are pretty strange. glibc
 		// doesn't even use the gethostname() system call but inspects
-		// the sytem's uname. It does report truncation via an error,
+		// the system's uname. It does report truncation via an error,
 		// while POSIX does not guarantee this.
 		cosmos_throw(ApiError("gethostname()"));
 	}
 
 	if (ret.back() != 0) {
-		cosmos_throw(RuntimeError("gethostname() truncation occured"));
+		cosmos_throw(RuntimeError("gethostname() truncation occurred"));
 	}
 
 	ret.resize(std::strlen(ret.c_str()));

@@ -82,9 +82,9 @@ public: // functions
 	 * has been reached.
 	 *
 	 * Upon return the Mutex will again be owned by the caller, regardless
-	 * of whether the condition was signaled or a timeout occured.
+	 * of whether the condition was signaled or a timeout occurred.
 	 *
-	 * \return Whether a timeout or a signal occured.
+	 * \return Whether a timeout or a signal occurred.
 	 **/
 	WaitTimedRes waitTimed(const MonotonicTime ts) const {
 		auto res = ::pthread_cond_timedwait(&m_pcond, &(m_lock.m_pmutex), &ts);

@@ -453,7 +453,7 @@ protected: // data
  * This base class keeps some common logic that is shared between ancillary
  * socket message types. More importantly this type is here to allow access to
  * the API of SendMessageHeader::ControlMessage without adding a lot of friend
- * declerations for each type of ancillary message.
+ * declarations for each type of ancillary message.
  **/
 template <OptLevel level, typename MSG_TYPE>
 class AncillaryMessage {

@@ -80,7 +80,7 @@ public: // functions
 	/**
 	 * The nice value provides some basic CPU time prioritization for
 	 * processes. It doesn't offer any hard guarantees but provides some
-	 * general tendency for prefering or disregarding a process when it
+	 * general tendency for preferring or disregarding a process when it
 	 * comes to scheduling CPU time.
 	 *
 	 * Currently this setting only affects newly created child processes,
@@ -106,7 +106,7 @@ protected: // functions
 
 protected: // data
 
-	/// A constant denoting an invalide nice value
+	/// A constant denoting an invalid nice value
 	static const int INVALID_NICE_PRIO;
 	/// The nice priority to apply to the child process, if any
 	int m_nice_prio = INVALID_NICE_PRIO;
@@ -116,7 +116,7 @@ protected: // data
 /**
  * Realtime scheduling uses priorities between an integer min priority and an
  * integer max priority. These boundaries are determines during runtime but
- * are currently set on Linux to 1 .. 99. Higher values mean hihger
+ * are currently set on Linux to 1 .. 99. Higher values mean higher
  * priorities.
  *
  * A thread with realtime scheduling always has a higher priority than threads
@@ -151,7 +151,7 @@ protected: // data
 /// FIFO Scheduling Policy Settings.
 /**
  * FIFO realtime scheduling means that a process will only be preempted with
- * another process with higher priority is avilable. If multiple processes
+ * another process with higher priority is available. If multiple processes
  * share the same (highest) priority then one of them is selected for running
  * and it is only preempted by another thread with the same priority if the
  * running thread * becomes blocked.

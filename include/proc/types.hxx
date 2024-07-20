@@ -31,11 +31,11 @@ enum class ExitStatus : int {
 	FAILURE = EXIT_FAILURE,
 };
 
-/// A primitive signal nr specification.
+/// A primitive signal number specification.
 enum class SignalNr : int {
 	// using some longer identifiers here to avoid symbol clashes with C library preprocessor defines
-	// ins ome cases also for better readability
-	NONE          = 0,         // it's unclear from docs what a good invalid signal nr might be, but 0 is not used ATM
+	// in some cases also for better readability
+	NONE          = 0,         // it's unclear from docs what a good invalid signal number might be, but 0 is not used ATM
 	HANGUP        = SIGHUP,    ///< hangup on controlling process or controlling process died
 	INTERRUPT     = SIGINT,    ///< interrupt from keyboard
 	QUIT          = SIGQUIT,   ///< quit from keyboard

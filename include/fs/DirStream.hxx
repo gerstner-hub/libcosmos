@@ -89,7 +89,7 @@ public: // functions
 	/// Associate with the directory at the given file system path location.
 	/**
 	 * If the object is already associated with another directory then this
-	 * previous associaton will be implicitly close()'d.
+	 * previous association will be implicitly close()'d.
 	 **/
 	void open(const SysString path, const FollowSymlinks follow_links = FollowSymlinks{false});
 

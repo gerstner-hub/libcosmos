@@ -67,7 +67,7 @@ COSMOS_API FileDescriptor open_at(
 enum class CloseRangeFlag : unsigned int {
 	/// Instead of closing, mark all matching file descriptors as CLOEXEC
 	CLOEXEC = CLOSE_RANGE_CLOEXEC,
-	/// Unshare specified file descriptors beforce closing to avoid race conditions with other threads.
+	/// Unshare specified file descriptors before closing to avoid race conditions with other threads.
 	UNSHARE = CLOSE_RANGE_UNSHARE
 };
 
@@ -102,7 +102,7 @@ COSMOS_API void close_range(const FileNum first,
  * directory where the temporary file will be created in. The template also
  * needs to contain a basename on which the actual file path will be based.
  * You can place a pair of "{}" in the basename to mark the position in the
- * path where a unique random still will be inserted. The last occurence of
+ * path where a unique random still will be inserted. The last occurrence of
  * "{}" will be used for this. If no such substring is found in the basename
  * then the unique random still will be added as a suffix to the basename.
  *
@@ -152,7 +152,7 @@ COSMOS_API std::string make_tempdir(const SysString _template);
  * this way.
  *
  * The file system entry carries the usual UNIX permissions that will be
- * initialized by combinding `mode` with the calling process's umask.
+ * initialized by combining `mode` with the calling process's umask.
  *
  * Opening named pipes will block both for reading and writing as long as no
  * communication partner exists. When opening a named pipe in non-blocking
@@ -193,7 +193,7 @@ COSMOS_API void make_fifo_at(const DirFD dir_fd, const SysString path,
  * set to zero during file creation.
  *
  * Since this is a process wide attribute it will affect all threads in the
- * process and can thus cause race conditions. If necessary you should the the
+ * process and can thus cause race conditions. If necessary, you should set the
  * umask in the main thread of a program early on.
  *
  * Only the lower 9 bits of `mode` will be taken into account (i.e.

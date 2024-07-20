@@ -52,7 +52,7 @@ namespace cosmos {
  *
  * Overall to implement this feature maybe implementing parts of it on foot
  * using existing code snippets from libbacktrace & friends could be
- * investiaged. Currently the problems seem not worth the gain.
+ * investigated. Currently the problems seem not worth the gain.
  */
 
 /// Base class for libcosmos exceptions.
@@ -113,7 +113,7 @@ protected: // functions
 	/// Append type specific error information to m_msg.
 	/**
 	 * This function is called by the implementation when error specific
-	 * information needs to be appened to the the `m_msg` string.
+	 * information needs to be appended to the `m_msg` string.
 	 *
 	 * At entry into this function `m_msg` can already contain data that
 	 * must not be discarded.

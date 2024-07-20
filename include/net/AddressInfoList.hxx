@@ -14,7 +14,7 @@ namespace cosmos {
  * SocketAddress types suitable for binding a socket on or for connecting a
  * socket to.
  *
- * This API is restricted to IP based porotocols. By default it reports socket
+ * This API is restricted to IP based protocols. By default it reports socket
  * addresses for all available combinations socket families
  * (SocketFamily::INET and SocketFamily::INET6) and socket types (e.g.
  * SocketType::STREAM and SocketType::DGRAM). To filter the result list the

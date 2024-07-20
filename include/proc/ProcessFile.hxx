@@ -42,7 +42,7 @@ public: // functions
 	 **/
 	explicit ProcessFile(const ProcessID pid, const OpenFlags flags = OpenFlags{});
 
-	/// Wraps the givne PidFD and takes ownership of it.
+	/// Wraps the given PidFD and takes ownership of it.
 	/**
 	 * The given `fd` will be owned by the new ProcessFile object. This
 	 * means that ProcessFile will close() it if it deems this necessary.

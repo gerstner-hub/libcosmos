@@ -34,7 +34,7 @@ protected: // functions
 	friend int main(const int argc, const char **argv);
 };
 
-/// Clsas based main() entry point that passes STL style command line arguments.
+/// Class based main() entry point that passes STL style command line arguments.
 class MainContainerArgs {
 protected: // functions
 
@@ -44,7 +44,7 @@ protected: // functions
 	friend int main(const int argc, const char **argv);
 };
 
-/// C++ wrapper for the main() application entry pont.
+/// C++ wrapper for the main() application entry point.
 /**
  * This wrapper can be used to invoke a class member function to gain a
  * libcosmos C++ style entry point into the program along with automatic
@@ -58,7 +58,7 @@ protected: // functions
  * These classes use the cosmos::ExitStatus strong type instead of the plain
  * `int` exit code. This offers improved readability and less room for
  * mistakes. To allow quick exit paths in the application you can throw a
- * plain cosmos::ExitStatus which will be catched in the wrapper and results
+ * plain cosmos::ExitStatus, which will be catched in the wrapper and results
  * in a regular return of the integer value from the actual `main()` entry
  * point.
  *

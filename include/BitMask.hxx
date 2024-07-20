@@ -30,7 +30,7 @@ public: // functions
 	/// Sets all bits to zero.
 	constexpr BitMask() {}
 
-	/// Sets all bits zo one.
+	/// Sets all bits to one.
 	explicit BitMask(const All a) {
 		set(a);
 	}

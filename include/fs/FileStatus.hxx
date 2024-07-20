@@ -26,7 +26,7 @@ namespace cosmos {
  *
  * The latter is the preferred method if you have to open the file anyway
  * since it is race-free. Otherwise the file you obtained the status from and
- * the file you're opening might end up refering to two different objects if
+ * the file you're opening might end up referring to two different objects if
  * the files on disk are changed (e.g. by an attacker). The file descriptor
  * method is also faster, since the path doesn't have to be parsed and
  * followed once again.
@@ -148,7 +148,7 @@ public: // functions
 	 * The size only has meaning for the following file types:
 	 *
 	 * - REGULAR: net size of the file in bytes
-	 * - LINK: number of characters in the symlink, exclusing '\0' terminator
+	 * - LINK: number of characters in the symlink, excluding '\0' terminator
 	 * - DIRECTORY: the size the directory entries uses (depends on file
 	 *   system internal details, does not include sizes of contained
 	 *   files).

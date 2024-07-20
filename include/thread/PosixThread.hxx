@@ -19,7 +19,7 @@ namespace cosmos {
  * state beyond the joined state.
  *
  * A PosixThread can either be empty or in a joinable state. An empty thread
- * has no reasources associated and no operations can be performed on it. Only
+ * has no resources associated and no operations can be performed on it. Only
  * in the joinable state can another thread perform a join operation which
  * will block until the other thread exits. After the join operation is
  * complete the state of the object will become empty again. A thread that
@@ -46,7 +46,7 @@ namespace cosmos {
  *   a lambda with captures or similar.
  *
  * PosixThread is a move-only type. It cannot be copied. The ownership can be
- * transfer via std::move but be carefuly that a thread that is not yet joined
+ * transfer via std::move but be carefully that a thread that is not yet joined
  * cannot be moved into, this will cause std::abort() to be called.
  **/
 class COSMOS_API PosixThread {
@@ -74,7 +74,7 @@ public: // functions
 
 	/// Creates a thread running in the provided PosixEntry function.
 	/**
-	 * All necessary ressources will be allocated and the thread will
+	 * All necessary resources will be allocated and the thread will
 	 * enter the given entry function.
 	 *
 	 * On error cosmos::ApiError will be thrown.
@@ -116,7 +116,7 @@ public: // functions
 	 * function of by the thread calling pthread::exit().
 	 *
 	 * The returned value is the one returned from a PosixEntry style
-	 * entry function, the vaule provided to pthread::exit() or
+	 * entry function, the value provided to pthread::exit() or
 	 * ExitValue{0} in any other cases.
 	 **/
 	pthread::ExitValue join();

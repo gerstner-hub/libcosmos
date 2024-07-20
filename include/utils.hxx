@@ -43,7 +43,7 @@ namespace cosmos {
  *     // will be called with a false value
  *     myfunc(MySetting(false));
  *
- * By providing the bool cast operator the type wille behave like a regular
+ * By providing the bool cast operator the type will behave like a regular
  * bool when querying its value.
  **/
 template <typename _, bool def>

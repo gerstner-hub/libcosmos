@@ -15,6 +15,9 @@ namespace cosmos {
 /// Completely overwrites the given object with zeroes.
 /**
  * This is typically used in C-APIs to get a defined object state.
+ *
+ * This is _not_ an optimization-safe function to remove sensitive data from
+ * memory.
  **/
 template <typename T>
 void zero_object(T &obj) {

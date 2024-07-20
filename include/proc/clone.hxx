@@ -37,7 +37,7 @@ enum class CloneFlag : uint64_t {
 	NEW_IPC        = CLONE_NEWIPC,          ///< Create the child in a new IPC namespace (requires CAP_SYS_ADMIN).
 	NEW_NET        = CLONE_NEWNET,          ///< Create the child in a new network namespace (requires CAP_SYS_ADMIN).
 	NEW_MOUNT      = CLONE_NEWNS,           ///< Create the child in a new mount namespace (requires CAP_SYS_ADMIN).
-	NEW_NS         = CLONE_NEWNS,           // just a synonym using the old compatiblity name
+	NEW_NS         = CLONE_NEWNS,           // just a synonym using the old compatibility name
 	NEW_PID        = CLONE_NEWPID,          ///< Create the child in a new PID namespace (requires CAP_SYS_ADMIN).
 	NEW_USER       = CLONE_NEWUSER,         ///< Create the child in a new user namespace.
 	NEW_UTS        = CLONE_NEWUTS,          ///< Create the child in a new UTS namespace (requires CAP_SYS_ADMIN).
@@ -93,7 +93,7 @@ struct COSMOS_API CloneArgs :
 	 * This should be set to signal::CHILD by default. If set to
 	 * Signal::NONE then no signal at all will be sent. If set to a
 	 * non-default value then special precautions needs to be taken when
-	 * performin a proc::wait() on the child.
+	 * performing a proc::wait() on the child.
 	 **/
 	void setExitSignal(const Signal sig) {
 		this->exit_signal = static_cast<uint64_t>(to_integral(sig.raw()));

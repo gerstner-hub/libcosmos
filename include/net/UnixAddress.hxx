@@ -23,7 +23,7 @@ namespace cosmos {
  * - path based: an actual file system path is used. The application has to
  *   manage the possibility that the path already exists, and has to remove
  *   the file system entry when the socket is no longer needed.
- * - abstract: this is a Linux extension. The path starts with a nul
+ * - abstract: this is a Linux extension. The path starts with a null
  *   terminator '\0' (in strings often displayed using a leading '@' character).
  *   These sockets don't show up in the file system and are always reference
  *   counted i.e. if no process remains using it, the socket is cleaned up

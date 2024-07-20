@@ -28,7 +28,7 @@ enum class Endian {
 };
 
 // TODO: in C++20 the <bits> header provides language builtin support for
-// checking the endiannes during compile time, so the preprocessor defines
+// checking the endianness during compile time, so the preprocessor defines
 // will no longer be necessary.
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN
@@ -148,7 +148,7 @@ struct RawIntTraits<uint64_t, Endian::BIG> {
  * This type stores an unsigned primitive integer in the given byte order
  * endianness. The interface takes host byte order on input and returns host
  * byte order on output. Only the raw() function returns the unmodified value,
- * possibily in a foreign byte order, as a strong enum type obtained from
+ * possibly in a foreign byte order, as a strong enum type obtained from
  * RawIntTraits.
  **/
 template <typename T, Endian endianness>
@@ -172,7 +172,7 @@ public: // functions
 		m_egg{toTargetEndianness(egg)} {
 	}
 
-	/// Constructs the number from a an EndianNumber of differing Endian type.
+	/// Constructs the number from an EndianNumber of differing Endian type.
 	constexpr EndianNumber(const EndianNumber<T, EndianTraits<endianness>::other> other) :
 		m_egg{toTargetEndianness(other.toHost())} {
 	}

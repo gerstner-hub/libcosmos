@@ -36,7 +36,7 @@ std::string sprintf_v(const char *fmt, va_list orig_args) {
 			break;
 		} else if (static_cast<size_t>(written) <= ret.size()) {
 			// the return value is excluding the null terminator
-			// so it's just rigth for resize()
+			// so it's just right for resize()
 			ret.resize(written);
 			break;
 		}
@@ -96,7 +96,7 @@ template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::Format
 // on 32-bit archs these can be the same, causing a duplicate instantiation
 #if SIZE_MAX != UINT_MAX
 template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::FormattedNumber<size_t>&);
-// similarly this ull definition is then missing on 32-bit archs, provide it
+// similarly this ULL definition is then missing on 32-bit archs, provide it
 #else
 template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::FormattedNumber<unsigned long long>&);
 template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::FormattedNumber<unsigned long>&);

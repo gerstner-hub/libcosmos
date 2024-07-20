@@ -16,7 +16,7 @@ namespace cosmos {
  * that controls the event operation.
  *
  * This type manages creation and the lifetime of the underlying file
- * descriptor and provides an I/O API tailored towards the speical event file
+ * descriptor and provides an I/O API tailored towards the special event file
  * semantics.
  *
  * The event semantics are as follows:

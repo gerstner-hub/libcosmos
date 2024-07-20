@@ -18,7 +18,7 @@ enum class InitPrio : std::size_t {
 
 /// Pure virtual base class for the library init system
 /**
- * Each library facility in need of library pre-initizalization can inherit
+ * Each library facility in need of library pre-initialization can inherit
  * from this base class and instantiate a globally statically initialized
  * object from it.
  *

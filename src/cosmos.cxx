@@ -15,7 +15,7 @@
 namespace cosmos {
 
 // maintain a map with a priority value as key and the Initable as a value.
-// the priority value allows to give a defined intialization order.
+// the priority value allows to give a defined initialization order.
 // lower priority value means earlier initialization.
 typedef std::map<InitPrio, Initable*> InitableMap;
 

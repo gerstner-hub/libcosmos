@@ -71,7 +71,7 @@ public: // functions
 	 * options like TCPOptions::setFastOpenConnect() are enabled.
 	 *
 	 * After a successful return the ownership of the socket file
-	 * descriptor is transfered to the connection instance, and the
+	 * descriptor is transferred to the connection instance, and the
 	 * original client socket will no longer be valid for use.
 	 *
 	 * \see Socket::connect

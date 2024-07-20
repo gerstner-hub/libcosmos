@@ -71,7 +71,7 @@ struct COSMOS_API UnixCredentials :
  * For receiving setup a `ReceiveMessageHeader` for use with a UNIX domain
  * socket, call setControlBufferSize() on it to allow reception of ancillary
  * data. On successful reception check for a ControlMessage on
- * OptLevel::SOCKEt and of type UnixMessage::RIGHTS. Once this message
+ * OptLevel::SOCKET and of type UnixMessage::RIGHTS. Once this message
  * arrives, pass it to the `deserialize()` function to parse the file
  * descriptor numbers that have been received. At this point the file
  * descriptors will be allocated in the receiving process and ownership of

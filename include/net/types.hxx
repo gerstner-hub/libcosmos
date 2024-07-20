@@ -131,7 +131,7 @@ class IP4RawAddress : public net::NetInt32 {
 	using net::NetInt32::EndianNumber;
 };
 
-/// The loopback IPv4 address refering to the localhost.
+/// The loopback IPv4 address referring to the localhost.
 constexpr net::HostInt32 IP4_LOOPBACK_ADDR{INADDR_LOOPBACK};
 /// The any IPv4 address specifying all possible addresses or a "don't care" address for automatic assignment, depending on context.
 constexpr net::HostInt32 IP4_ANY_ADDR{INADDR_ANY};
@@ -154,9 +154,9 @@ struct IP6RawAddress :
  * struct handling.
  */
 
-/// The binary loopback IPv6 address `::1` refering to the localhost.
+/// The binary loopback IPv6 address `::1` referring to the localhost.
 constexpr IP6RawAddress IP6_LOOPBACK{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1};
-/// The binary IPv6 "any" address `::` specifying all possible addresses or a "don't care" address for automatic assignment, dependingo n context.
+/// The binary IPv6 "any" address `::` specifying all possible addresses or a "don't care" address for automatic assignment, depending on context.
 constexpr IP6RawAddress IP6_ANY_ADDR{};
 
 /// A 48-bit ethernet 802.3 MAC address.
@@ -183,7 +183,7 @@ enum class MessageFlag : int {
 	/**
 	 * This is similar to setting OpenFlag::NONBLOCK on the file
 	 * descriptor, but only affects a single I/O call as opposed to all
-	 * calls refering to the same open file description.
+	 * calls referring to the same open file description.
 	 **/
 	DONT_WAIT = MSG_DONTWAIT,
 	/// Terminates a record.

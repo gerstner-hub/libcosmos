@@ -53,7 +53,7 @@ struct Init {
  * libcosmos does not use asynchronous signal handling by itself since this
  * involves many complexities that are difficult to manage. Since other
  * components in the process might use asynchronous signal handling though,
- * this libraray setting allows you to choose libcosmos's behaviour should an
+ * this library setting allows you to choose libcosmos's behaviour should an
  * EINTR error occur. The default is to transparently ignore EINTR returns and
  * restart the system call in question. If an application wants to explicitly
  * deal with EINTR returns you can call change this setting to `false`

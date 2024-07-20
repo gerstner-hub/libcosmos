@@ -109,7 +109,7 @@ enum class ModeT : mode_t {
 	MODE_MASK = ~static_cast<mode_t>(S_IFMT) ///< masks all mode bits
 };
 
-/// Support bit masking operations on ModeT for extracing type and mode parts.
+/// Support bit masking operations on ModeT for extracting type and mode parts.
 inline ModeT operator&(const ModeT a, const ModeT b) {
 	auto ret = static_cast<mode_t>(a) & static_cast<mode_t>(b);
 	return static_cast<ModeT>(ret);
@@ -230,7 +230,7 @@ public:
 	 * - can be used to specify a literal: FileMode{ModeT{0751}}
 	 * - or to pass in a mode_t received from a system call (struct stat)
 	 *
-	 * This constructor is concsiously not `explicit` to allow simpler use
+	 * This constructor is consciously not `explicit` to allow simpler use
 	 * of octal literals.
 	 **/
 	FileMode(const ModeT raw = ModeT::NONE) :
@@ -308,5 +308,5 @@ protected: // data
 COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::FileMode mode);
 /// Outputs a symbolic type character onto the stream.
 COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::FileType type);
-/// Outputs a friendly versino of the OpenFlags bitmask onto the stream.
+/// Outputs a friendly version of the OpenFlags bitmask onto the stream.
 COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::OpenFlags flags);

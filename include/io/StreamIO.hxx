@@ -132,7 +132,7 @@ public: // functions
 		}
 	}
 
-	/// Write *all* \p length bytes into the underyling file.
+	/// Write *all* \p length bytes into the underlying file.
 	/**
 	 * This behaves just like write() with the exception that on short
 	 * writes the operation will be continued until all `length` bytes
@@ -157,7 +157,7 @@ public: // functions
 	 * Partial reads can occur, thus on return the length and base fields
 	 * of each vector entry will be updated to reflect this. The return
 	 * value is a flag indicating whether the complete vector has been
-	 * filled, or whether a partial read occured.
+	 * filled, or whether a partial read occurred.
 	 *
 	 * These vector I/O operations are useful when structured binary of
 	 * fixed size is transferred e.g. in network protocols for the
@@ -169,14 +169,14 @@ public: // functions
 
 	/// Write data to file from a vector of data regions.
 	/**
-	 * The `iovec` specifies memory regions whoose data will be written
+	 * The `iovec` specifies memory regions whose data will be written
 	 * to the file. The data will be written sequentially starting from
 	 * the first memory region.
 	 *
 	 * Partial writes can occur, thus on return the length and base fields
 	 * of each vector entry will be updated to reflect this. The return
 	 * value is a flag indicating whether the complete vector has been
-	 * written out, or whether a partial write occured.
+	 * written out, or whether a partial write occurred.
 	 **/
 	bool write(WriteIOVector &iovec);
 

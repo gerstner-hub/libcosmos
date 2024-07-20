@@ -20,7 +20,7 @@ using StringVector     = std::vector<std::string>;
 using StringViewVector = std::vector<std::string_view>;
 /// A vector of plain `const char*`.
 using CStringVector    = std::vector<const char*>;
-/// A vector of CString wrappers.
+/// A vector of c-string wrappers.
 using SysStringVector  = std::vector<SysString>;
 
 /**
@@ -39,12 +39,12 @@ struct CompareCString {
 
 /// Returns an all lower case version of `s`.
 std::string COSMOS_API to_lower(const std::string_view s);
-/// Returns an all upper case veersion of `s`.
+/// Returns an all upper case version of `s`.
 std::string COSMOS_API to_upper(const std::string_view s);
 
 /// Returns an all lower case version of `s`.
 std::wstring COSMOS_API to_lower(const std::wstring_view s);
-/// Returns an all upper case veersion of `s`.
+/// Returns an all upper case version of `s`.
 std::wstring COSMOS_API to_upper(const std::wstring_view s);
 
 /// Strips leading and trailing whitespace from the given string in-place.
@@ -115,10 +115,10 @@ using SplitFlags = BitMask<SplitFlag>;
 
 /// Split a string at separator boundaries.
 /**
- * The input string `str` will be split up at every occurence of the `sep`
+ * The input string `str` will be split up at every occurrence of the `sep`
  * substring. The resulting parts are returned as a vector. By default
- * subsequent occurences of `sep` are ignored. If SplitFlag::KEEP_EMPTY is
- * set in `flags` then empty elements will be returned for these occurences
+ * subsequent occurrences of `sep` are ignored. If SplitFlag::KEEP_EMPTY is
+ * set in `flags` then empty elements will be returned for these occurrences
  * instead.
  **/
 template <typename CHAR>

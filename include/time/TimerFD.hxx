@@ -90,7 +90,7 @@ public: // types
 		/**
 		 * This is a relative time value that controls if and how
 		 * quickly the timer will tick again after the initial tick
-		 * occured. If set to all zeroes then the timer will tick only
+		 * occurred. If set to all zeroes then the timer will tick only
 		 * once.
 		 **/
 		TimeSpec<CLOCK>& interval() {
@@ -200,15 +200,15 @@ public:
 	/**
 	 * This operation will read() on the associated timer fd.
 	 *
-	 * If no timer tick occured yet then this will block the caller until
+	 * If no timer tick occurred yet then this will block the caller until
 	 * a timer tick or an error occurs (e.g. ApiError with
 	 * Errno::CANCELED, if StartFlag::CANCEL_ON_SET is active).
 	 *
-	 * If one or more timer ticks already occured then this call will not
+	 * If one or more timer ticks already occurred then this call will not
 	 * block and returns the number of ticks that happened.
 	 *
 	 * If NONBLOCK mode was specified during creation and no timer tick
-	 * occured yet then this will throw a WouldBlock exception.
+	 * occurred yet then this will throw a WouldBlock exception.
 	 *
 	 * On successful return the tick count associated with the timer will
 	 * be reset to zero, so a subsequent wait() can block again until a

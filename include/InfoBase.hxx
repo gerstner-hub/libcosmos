@@ -22,7 +22,7 @@ public: // functions
 	/// Zeroes out all data.
 	void reset();
 
-	/// Grants access to the raw underlying datastructure.
+	/// Grants access to the raw underlying data structure.
 	const DB_STRUCT* raw() const { return &m_info; }
 	DB_STRUCT* raw() { return &m_info; }
 

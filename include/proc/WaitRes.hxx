@@ -80,7 +80,7 @@ public: // functions
 	 **/
 	bool trapped() const { return si_code == CLD_TRAPPED; }
 
-	/// Checks whether the given trace event occured.
+	/// Checks whether the given trace event occurred.
 	/**
 	 * These events only occur if the corresponding TraceFlags have been
 	 * set on the tracee

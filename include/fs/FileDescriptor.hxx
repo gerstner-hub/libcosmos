@@ -150,8 +150,8 @@ public: // functions
 	 * Kernel buffering may cause written data to stay in memory until it
 	 * is deemed necessary to actually write to disk. Use this function to
 	 * make sure that any writes that happened on the file descriptor will
-	 * actually be transferred to the underyling disk device. This covers
-	 * not only the actual file data but also the metdata (inode data).
+	 * actually be transferred to the underlying disk device. This covers
+	 * not only the actual file data but also the metadata (inode data).
 	 *
 	 * This operation ensures that the data is on disk even if the system
 	 * is hard reset, crashes or loses power. The call blocks until the
@@ -165,7 +165,7 @@ public: // functions
 	 * This call can cause an ApiError to be thrown e.g. if:
 	 *
 	 * - the file descriptor is invalid (Errno::BAD_FD)
-	 * - a device level I/O error occured (Errno::IO_ERROR)
+	 * - a device level I/O error occurred (Errno::IO_ERROR)
 	 * - space is exhausted on the file system (Errno::NO_SPACE)
 	 * - the file descriptor does not support syncing, because it is a
 	 *   special file that does not support it (Errno::INVALID_ARG)
@@ -183,10 +183,10 @@ public: // functions
 
 	/// Add a seal for memory file descriptors.
 	/**
-	 * This is only supported for file descriptors refering to a "memfd"
+	 * This is only supported for file descriptors referring to a "memfd"
 	 * as it is created by MemFile. It allows to restrict what operations
 	 * can be performed on the file in the future (this affects all open
-	 * file descriptions refering to the file).
+	 * file descriptions referring to the file).
 	 **/
 	void addSeals(const SealFlags flags);
 
