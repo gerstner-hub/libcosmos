@@ -265,7 +265,8 @@ def initSCons(project, rtti=True, deflibtype='shared'):
             # this is needed to get color output support in programs that SCons calls
             'TERM': os.environ.get('TERM', 'dumb'),
             'PATH': os.environ['PATH'],
-            'HOME': os.environ['HOME']
+            'HOME': os.environ['HOME'],
+            'ASAN_OPTIONS': os.environ.get('ASAN_OPTIONS', '')
         },
         'tools': ['default']
     }
