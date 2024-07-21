@@ -20,7 +20,7 @@ for test in tests:
     run_test_key = f'run_cosmos_test_{label}'
     logfile = Dir('.').abspath + '/' + run_test_key + '.log'
     binary = test_bin[0].abspath
-    test_action = run_env.Action(f'{binary} >{logfile} 2>&1 || (cat {logfile} && exit 1)')
+    test_action = run_env.Action(f'{binary} >{logfile} 2>&1 || (cat {logfile} 1>&2 && exit 1)')
     run_cmd = run_env.Command(f'{run_test_key}.command', test_bin, test_action)
 
     env.Alias(run_test_key, run_cmd)
