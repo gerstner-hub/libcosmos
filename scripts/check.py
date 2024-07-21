@@ -5,11 +5,21 @@ import platform
 import shutil
 import subprocess
 import sys
+import argparse
 from pathlib import Path
 
 # this script checks the current code base for regressions.
 # it compiles and runs tests in different configurations and stop on first
 # error.
+
+parser = argparse.ArgumentParser(description='build and test various compiler configurations')
+parser.add_argument('--skip-static', action='store_true', help='don\'t build static linking configurations')
+parser.add_argument('--skip-32bit', action='store_true', help='don\'t build x86 32-bit configurations on x86_64')
+parser.add_argument('--skip-clang', action='store_true', help='don\'t build clang configurations')
+parser.add_argument('--skip-flake', nargs='*', action='append', help='skip flake8 check on Python source files')
+parser.add_argument('--extra-compiler', nargs='*', action='append', help='build configurations with additional custom compilers')
+
+args = parser.parse_args()
 
 BUILDROOT = "build.check"
 root_dir = Path(os.path.realpath(__file__)).parent.parent
@@ -58,24 +68,41 @@ def buildConfig(config, env=None, label=''):
     subprocess.check_call(cmdline, stdout=subprocess.DEVNULL, env=env)
 
 
-if not flakePython():
+if not args.skip_flake and not flakePython():
     print('There are Python flake8 errors. Stopping check.', file=sys.stderr)
     sys.exit(1)
 
-configurations = (
-    'libtype=shared',
-    'libtype=static',
-    'libtype=shared compiler=clang',
-    'libtype=static compiler=clang',
-    'sanitizer=1'
-)
+compilers = [None]
+if not args.skip_clang:
+    compilers.append('clang')
+
+if args.extra_compiler:
+    compilers.extend(args.extra_compiler)
+
+configurations = []
+
+
+def addConfig(config):
+    for compiler in compilers:
+        this_config = config
+        if compiler:
+            this_config += f' compiler={compiler}'
+        configurations.append(this_config)
+
+
+addConfig('libtype=shared')
+
+if not args.skip_static:
+    addConfig('libtype=static')
+
+configurations.append('sanitizer=1')
 
 for config in configurations:
     buildConfig(config)
 
-if platform.uname().machine == 'x86_64':
+if not args.skip_32bit and platform.uname().machine == 'x86_64':
     env32 = os.environ.copy()
     for var in ('CFLAGS', 'CXXFLAGS', 'LDFLAGS'):
         env32[var] = '-m32'
-    for config in configurations[0:2]:
+    for config in ('libtype=shared', 'libtype=static'):
         buildConfig(config, env32, '32bit')
