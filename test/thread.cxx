@@ -6,6 +6,7 @@
 // cosmos
 #include <cosmos/cosmos.hxx>
 #include <cosmos/error/UsageError.hxx>
+#include <cosmos/thread/Mutex.hxx>
 #include <cosmos/thread/PosixThread.hxx>
 #include <cosmos/thread/pthread.hxx>
 #include <cosmos/thread/thread.hxx>
@@ -84,8 +85,13 @@ protected: // functions
 
 	void normalEntryTest() {
 		START_TEST("normal thread");
+		// we need this mutex so that the thread entering
+		// normalEntry() only continues to check it's ID once the
+		// object is fully constructed
+		m_lock.lock();
 		m_normal_thread = cosmos::PosixThread{
 			{std::bind(&ThreadTest::normalEntry, this)}, "normal-thread"};
+		m_lock.unlock();
 
 		auto res = m_normal_thread.join();
 
@@ -155,12 +161,14 @@ protected: // functions
 	}
 
 	void normalEntry() {
+		cosmos::MutexGuard g{m_lock};
 		RUN_STEP("thread-is-caller-thread", m_normal_thread.isCallerThread());
 	}
 
 protected:
 	bool m_was_running = false;
 	cosmos::PosixThread m_normal_thread;
+	cosmos::Mutex m_lock;
 };
 
 int main(const int argc, const char **argv) {
