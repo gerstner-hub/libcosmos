@@ -2,6 +2,7 @@
 
 import os
 import platform
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -10,6 +11,7 @@ from pathlib import Path
 # it compiles and runs tests in different configurations and stop on first
 # error.
 
+BUILDROOT = "build.check"
 root_dir = Path(os.path.realpath(__file__)).parent.parent
 while True:
     next_parent = root_dir.parent
@@ -47,7 +49,11 @@ def flakePython():
 
 
 def buildConfig(config, env=None, label=''):
-    cmdline = ['scons', '-j5'] + config.split() + ['docs=0', '/']
+    try:
+        shutil.rmtree(BUILDROOT)
+    except FileNotFoundError:
+        pass
+    cmdline = ['scons', '-j5'] + config.split() + ['docs=0', f'buildroot={BUILDROOT}', '/']
     print(f'[{label}] ' if label else '', 'Running ', ' '.join(cmdline), sep='')
     subprocess.check_call(cmdline, stdout=subprocess.DEVNULL, env=env)
 
