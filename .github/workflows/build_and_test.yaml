@@ -25,6 +25,9 @@ jobs:
         # it is hard to come by the images used by GH runner to test it
         # locally, thus I did not investigate this more deeply
         run: |
+          # the subproc test sometimes fails with what looks like a finding in
+          # the libc itself regarding the one-definition-rule. Ignore that.
+          export ASAN_OPTIONS="detect_odr_violation=0"
           ./scripts/check.py --skip-32bit --skip-static
       - name: Cross-build for arm
         run: |
