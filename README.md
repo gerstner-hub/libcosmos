@@ -213,6 +213,12 @@ tests there is only limited real world integration testing of *libcosmos*,
 yet. Thus a range of bugs is sure still to be found. At least nothing should
 break just from looking at it.
 
+There is also some automated test coverage by way of a GitHub action that
+verifies that a couple of combinations build and test successfully. For
+verifying yourself you can run the `scripts/check.py` script which builds
+shared and static linking configurations, using the native gcc, clang and also
+an address sanitizer build.
+
 API History
 ===========
 
@@ -222,6 +228,8 @@ TCP, UDP, Unix domain sockets and various infrastructure that allows to
 integrate more socket types in the future. The `sendmsg()` and `recvmsg()` is
 also supported and some more common ancillary message types like file
 descriptor passing over UNIX domain sockets is implemented.
+
+Furthermore memory mapping support has been added since library version 2.1.
 
 Future Directions
 =================
