@@ -2,6 +2,9 @@
 #include <iostream>
 #include <vector>
 
+// libc
+#include <sys/resource.h>
+
 // Test
 #include "TestBase.hxx"
 
@@ -104,6 +107,12 @@ class MappingTest :
 			RUN_STEP("child-was-signaled", wait_res && wait_res->signaled());
 			RUN_STEP("child-segfaulted", wait_res->termSignal() == cosmos::signal::SEGV);
 		} else {
+			// make sure we don't create a core file from this
+			// test which would clutter the CWD unnecessarily and
+			// confusingly.
+			struct rlimit limit{0,0};
+			::setrlimit(RLIMIT_CORE, &limit);
+
 			cosmos::Mapping mapping{1024, cosmos::mem::MapSettings{
 				cosmos::mem::MapType::PRIVATE,
 				cosmos::mem::AccessFlags{cosmos::mem::AccessFlag::READ},
