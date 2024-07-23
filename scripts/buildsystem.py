@@ -355,15 +355,15 @@ def initSCons(project, rtti=True, deflibtype='shared'):
 
     if 'CXXFLAGS' in os.environ:
         # add user specified flags
-        env.Append(CXXFLAGS=[os.environ['CXXFLAGS']])
+        env.MergeFlags({'CXXFLAGS': os.environ['CXXFLAGS']}, False)
 
     if 'CFLAGS' in os.environ:
         # add user specified flags
-        env.Append(CCFLAGS=[os.environ['CFLAGS']])
+        env.MergeFlags({'CCFLAGS': os.environ['CFLAGS']}, False)
 
     if 'LDFLAGS' in os.environ:
         # add user specified linker flags
-        env.Append(LINKFLAGS=[os.environ['LDFLAGS']])
+        env.MergeFlags({'LINKFLAGS': os.environ['LDFLAGS']}, False)
 
     buildroot = Dir(getBuildroot()).srcnode().abspath + '/'
 
