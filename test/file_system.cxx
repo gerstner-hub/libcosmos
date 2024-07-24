@@ -248,22 +248,33 @@ class FileSystemTest :
 			cosmos::FileMode{cosmos::ModeT{0600}}
 		};
 
+		constexpr auto basename = "libcosmos_file_system_test.tmp";
+		const auto full_path = std::string{"/tmp/"} + basename;
+
+		try {
+			// remove a potential leftover file
+			cosmos::fs::unlink_file(full_path);
+		} catch(...) {}
+
 		if (cosmos::proc::get_effective_user_id() == cosmos::UserID::ROOT) {
-			cosmos::fs::linkat_fd(tmpfile.fd(), tmp.fd(), "my_tmp_file.txt");
-			RUN_STEP("linked-fd-exists", cosmos::fs::exists_file("/tmp/my_tmp_file.txt"));
+			cosmos::fs::linkat_fd(tmpfile.fd(), tmp.fd(), basename);
+			RUN_STEP("linked-fd-exists", cosmos::fs::exists_file(full_path));
 		} else {
 			try {
-				cosmos::fs::linkat_fd(tmpfile.fd(), tmp.fd(), "my_tmp_file.txt");
+				cosmos::fs::linkat_fd(tmpfile.fd(), tmp.fd(), basename);
+				// this can succeed on newer kernels >= 6.10
+				RUN_STEP("linked-fd-exists", cosmos::fs::exists_file(full_path));
 			} catch (const cosmos::ApiError &e) {
+				// if it fails, it should be ENOENT as per man page
 				RUN_STEP("linkat_fd denied with ENOENT", e.errnum() == cosmos::Errno::NO_ENTRY);
+				// then let's try with linkat_proc_fd instead
+				cosmos::fs::linkat_proc_fd(tmpfile.fd(), tmp.fd(), basename);
+				RUN_STEP("linked-fd-exists", cosmos::fs::exists_file(full_path));
 			}
 
-			// then let's try with linkat_proc_fd instead
-			cosmos::fs::linkat_proc_fd(tmpfile.fd(), tmp.fd(), "my_tmp_file.txt");
-			RUN_STEP("linked-fd-exists", cosmos::fs::exists_file("/tmp/my_tmp_file.txt"));
 		}
 
-		cosmos::fs::unlink_file("/tmp/my_tmp_file.txt");
+		cosmos::fs::unlink_file(full_path);
 	}
 
 	void testChmod() {

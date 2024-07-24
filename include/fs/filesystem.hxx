@@ -583,8 +583,13 @@ COSMOS_API void linkat(const DirFD old_dir, const SysString old_path,
  * As a special case this *does* work for file descriptors opened with
  * OpenFlag::PATH and for temporary files opened with
  * OpenFlag::TMPFILE but without OpenFlag::EXCLUSIVE (in this case a
- * link count of 0 is accepted). Note, however, that this call requires the
- * CAP_DAC_READ_SEARCH capability, for security reasons.
+ * link count of 0 is accepted).
+ *
+ * Note, however, that this call requires the CAP_DAC_READ_SEARCH capability,
+ * for security reasons. Starting with kernel version 6.10 the requirements
+ * are relaxed. If \c fd has been opened by the same process using the same
+ * credentials as the caller has, then the linkat will succeed. The
+ * credentials must not have been changed (and changed back) in the meantime.
  *
  * An alternative is to use regular linkat() and the /proc file system, see
  * `man 2 linkat`.
