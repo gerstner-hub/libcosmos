@@ -29,7 +29,7 @@ else:
     libcosmos = libenv.SharedLibrary(
         'cosmos',
         libcosmos_srcs,
-        SHLIBVERSION='0.2.1',
+        SHLIBVERSION='0.2.2',
         SONAME='libcosmos.so.0'
     )
 
