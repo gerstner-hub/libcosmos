@@ -64,7 +64,7 @@ def registerLibConfig(self, name, node, flags, config={}):
     if self['libtype'] == 'shared':
         libs = flags.setdefault('LIBS', [])
         libs.append(name)
-        libdir = Dir('.').abspath
+        libdir = Dir('.')
         flags['LIBPATH'] = [libdir]
 
         if self['use_rpath']:
