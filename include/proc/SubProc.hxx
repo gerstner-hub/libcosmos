@@ -62,14 +62,29 @@ public: // functions
 	auto running() const { return m_child_fd.valid(); }
 
 	/// Performs a blocking wait until the child process exits.
-	WaitRes wait();
+	/**
+	 * The caller can pass special `flags` in order to collect also other
+	 * child process state changes. If the child process actually exits,
+	 * and WaitFlag::LEAVE_INFO is not set in `flags`, then the binding of
+	 * the SubProc instance to the child process is released and running()
+	 * will return `false`. Further `wait()` calls will not be allowed in
+	 * that case.
+	 *
+	 * WaitFlag::NO_HANG is not allowed to be passed to this function,
+	 * otherwise a UsageError is thrown. To test for child state changes
+	 * without blocking, use `waitTimed()` with a zero wait time.
+	 **/
+	WaitRes wait(const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED});
 
 	/// Wait for sub process exit within a timeout in milliseconds.
 	/**
 	 * \return The exit status if the child exited. Nothing if the timeout
 	 * occurred.
+	 *
+	 * \see wait()
 	 **/
-	std::optional<WaitRes> waitTimed(const std::chrono::milliseconds max);
+	std::optional<WaitRes> waitTimed(const std::chrono::milliseconds max,
+			const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED});
 
 	/// Send the specified signal to the child process.
 	void kill(const Signal signal);

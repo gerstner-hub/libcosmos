@@ -1,4 +1,6 @@
 // cosmos
+#include <cosmos/error/ApiError.hxx>
+#include <cosmos/error/UsageError.hxx>
 #include <cosmos/io/Poller.hxx>
 #include <cosmos/private/cosmos.hxx>
 #include <cosmos/proc/process.hxx>
@@ -16,23 +18,36 @@ void SubProc::kill(const Signal s) {
 	signal::send(m_child_fd, s);
 }
 
-WaitRes SubProc::wait() {
+WaitRes SubProc::wait(const WaitFlags flags) {
 	m_pid = ProcessID::INVALID;
 
+	if (flags[WaitFlag::NO_HANG]) {
+		cosmos_throw (UsageError("cannot use NO_HANG with SubProc, use waitTimed() instead"));
+	}
+
 	try {
-		auto wr = proc::wait(m_child_fd);
-		m_child_fd.close();
-		return *wr;
-	} catch (const std::exception &) {
-		try {
+		auto wr = proc::wait(m_child_fd, flags);
+		if (!flags[WaitFlag::LEAVE_INFO] && wr->exited()) {
 			m_child_fd.close();
-		} catch(...) {}
+		}
+		return *wr;
+	} catch (const ApiError &err) {
+		// for some reason the child was already collected, invalidate
+		// our state to prevent infinite loops / uncleanable SubProc
+		// objects
+		if (err.errnum() == Errno::NO_CHILD) {
+			try {
+				m_child_fd.close();
+			} catch(...) {
+				// FileDescriptor will be invalidated already in this case
+			}
+		}
 
 		throw;
 	}
 }
 
-std::optional<WaitRes> SubProc::waitTimed(const std::chrono::milliseconds max) {
+std::optional<WaitRes> SubProc::waitTimed(const std::chrono::milliseconds max, const WaitFlags flags) {
 	Poller poller(8);
 
 	poller.addFD(m_child_fd, {Poller::MonitorFlag::INPUT});
@@ -41,7 +56,7 @@ std::optional<WaitRes> SubProc::waitTimed(const std::chrono::milliseconds max) {
 		return std::nullopt;
 	}
 
-	return wait();
+	return wait(flags);
 }
 
 SubProc& SubProc::operator=(SubProc &&other) noexcept {
