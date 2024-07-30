@@ -44,6 +44,10 @@ public: // functions
 	/// Returns a human readable label for the currently stored signal number.
 	std::string name() const;
 
+	bool valid() const {
+		return m_sig != SignalNr::NONE;
+	}
+
 protected: // data
 
 	/// The raw signal number
