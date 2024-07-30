@@ -13,10 +13,10 @@ def sequencify(arg):
     return [arg, ]
 
 
-def gatherSources(self, suffixes, path='.', recursive=True):
-    """Recursively walks through the given path (by default the current
-    SConscript directory) and returns relative paths to
-    matching sources that end in one of the given suffixes.
+def gatherSources(self, suffixes, subpath=None, recursive=True):
+    """Recursively walks through the given subpath below the current
+    SConscript directory and returns relative paths to matching sources that
+    end in one of the given suffixes.
 
     If @param recursive is False then only the directory found in @param path
     itself is considered.
@@ -24,10 +24,13 @@ def gatherSources(self, suffixes, path='.', recursive=True):
     import bisect
 
     srcdir = self.Dir('.').srcnode().abspath
+    subdir = srcdir
+    if subpath:
+        subdir += f"/{subpath}"
 
     # dynamically determine source list
     sources = []
-    for root, _, files in os.walk(srcdir):
+    for root, _, files in os.walk(subdir):
         for file in files:
             if file.startswith('_'):
                 # skip leading underscores, these are headers included based
@@ -47,6 +50,8 @@ def gatherSources(self, suffixes, path='.', recursive=True):
         if not recursive:
             break
 
+    if not sources:
+        raise Exception(f"no sources gathered in {srcdir} looking for suffixes {suffixes}")
     return sources
 
 
