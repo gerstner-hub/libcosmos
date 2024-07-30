@@ -181,6 +181,31 @@ def addLocalLibrary(self, name):
                exports={'env': lib_env})
 
 
+def getSharedLibVersionInfo(self, libbase):
+    """This returns a tuple of (shlibversion, soname) to be used for a version
+    SharedLibrary. The current library version will be derived from the most
+    recent Git tag on the current branch. The soname can be provided on the
+    command line as {libbase}-soname=custom-soname. The latter is for
+    packaging customization."""
+    current_tag = subprocess.check_output('git describe --abbrev=0 --tags'.split())
+    current_version = current_tag.decode().lstrip('v')
+
+    custom_soname = ARGUMENTS.get(f'{libbase}-soname', None)
+
+    if custom_soname:
+        soname = custom_soname
+    else:
+        # the soname version should only be a single number suffix that
+        # increases for each new ABI. The '0.' tag initial number stays, then
+        # comes the soname version, then the minor version which stays
+        # compatible to other versions like 0.2.1 will be compatible with
+        # 0.2.3 but 0.3.0 won't be compatible to 0.2.*.
+        soname_version = current_version.split('.')[1]
+        soname = f'{libbase}.so.{soname_version}'
+
+    return current_version, soname
+
+
 def enhanceEnv(env):
     env.AddMethod(gatherSources, 'GatherSources')
     env.AddMethod(registerLibConfig, 'RegisterLibConfig')
@@ -192,6 +217,7 @@ def enhanceEnv(env):
     env.AddMethod(existsLib, 'ExistsLib')
     env.AddMethod(installHeaders, 'InstallHeaders')
     env.AddMethod(addLocalLibrary, 'AddLocalLibrary')
+    env.AddMethod(getSharedLibVersionInfo, 'GetSharedLibVersionInfo')
 
 
 def initSCons(project, rtti=True, deflibtype='shared'):

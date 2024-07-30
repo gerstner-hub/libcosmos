@@ -171,9 +171,9 @@ ABI Stability
 *libcosmos* currently has not concept of ABI stability or versioning. Commonly
 providing ABI stability means that all implementation details are hidden from
 headers and all object data is dynamically allocated on the heap. I want to
-avoid this unnecessary heap usage. The same can be achieved using abstract
-stack storage these days, but it still increases the complexity of the library
-implementation. More importantly it also means that most if not all of the
+avoid this heap usage. The same can be achieved using abstract stack storage
+these days, but it still increases the complexity of the library
+implementation. More importantly, it also means that most if not all of the
 inline code in headers cannot stay, reducing a lot of the available
 optimization potential.
 
@@ -188,6 +188,11 @@ prevent programs from using incompatible shared library versions of *libcosmos*.
 When using `libtype=shared` (the default) then the SCons build system
 currently installs a versioned library involving some symlinks. This version
 can be changed in `src/SConstruct`.
+
+Starting with library version 0.3.0 the buildsystem now derives an SONAME from
+the most recent Git tag. Micro versions are supposed to be compatible with
+each other like 0.3.0 and 0.3.1. New minor versions get an incremented SONAME
+so any `0.3.*` versions are not compatible with `0.4.*` versions.
 
 Build System
 ------------

@@ -26,11 +26,13 @@ else:
     # avoids inconsistencies, but breaks application that aren't rebuild against
     # the new lib version.
 
+    version, soname = libenv.GetSharedLibVersionInfo('libcosmos')
+
     libcosmos = libenv.SharedLibrary(
         'cosmos',
         libcosmos_srcs,
-        SHLIBVERSION='0.2.2',
-        SONAME='libcosmos.so.0'
+        SHLIBVERSION=version,
+        SONAME=soname
     )
 
 env.RegisterLibConfig('libcosmos', libcosmos, {
