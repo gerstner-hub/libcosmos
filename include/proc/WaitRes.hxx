@@ -30,9 +30,14 @@ enum class WaitFlag : int {
 
 using WaitFlags = BitMask<WaitFlag>;
 
-/// Represents the result from a waitid() call.
+/// Represents the result from a `waitid()` call.
 /**
- * An instance of this type is returned from SubProc::wait().
+ * An instance of this type is returned from `SubProc::wait()` and from
+ * the `proc::wait()` family of functions.
+ *
+ * \note When using `waitid()` and the `siginfo_t` struct, the `WEXITSTATUS()`
+ * and related macros are not necessary, the data can be used as is, depending
+ * on the `si_code` field.
  **/
 class WaitRes :
 		siginfo_t {
@@ -50,6 +55,9 @@ public: // functions
 
 	/// Returns whether the child was terminated by a signal.
 	bool signaled() const { return si_code == CLD_KILLED || si_code == CLD_DUMPED; }
+
+	/// Returns true if the child entered a trace trap.
+	bool trapped() const { return si_code == CLD_TRAPPED; }
 
 	/// Returns the exit status of the child.
 	/**
@@ -74,11 +82,13 @@ public: // functions
 		return signaled() ? Signal{SignalNr{si_status}} : signal::NONE;
 	}
 
-	/// Returns true if the child stopped due to syscall tracing.
+	/// Returns whether the process stopped due to a syscall tracing trap (enter/exit)
 	/**
-	 * \note This only works if the TRACESYSGOOD option was set
+	 * \note This only works if the tracer has set the TraceFlag::TRACESYSGOOD option.
 	 **/
-	bool trapped() const { return si_code == CLD_TRAPPED; }
+	bool isSyscallTrap() const {
+		return trapped() && (si_status == (SIGTRAP | 0x80));
+	}
 
 	/// Checks whether the given trace event occurred.
 	/**
