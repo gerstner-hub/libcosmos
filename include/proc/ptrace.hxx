@@ -43,7 +43,7 @@ enum class TraceFlag : intptr_t { /* is a void* in ptrace(2), so we need pointer
 	TRACEVFORK     = PTRACE_O_TRACEVFORK,
 	/// Stop tracee at completion of the next vfork(2)
 	TRACEVFORKDONE = PTRACE_O_TRACEVFORKDONE,
-	/// On system call traps the bit 7 in sig number (SIGTRAP|0x80)
+	/// On system call traps, sets bit 7 in the `si_code` field (SIGTRAP|0x80)
 	TRACESYSGOOD   = PTRACE_O_TRACESYSGOOD
 };
 
