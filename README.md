@@ -54,6 +54,7 @@ settings are supported:
 |   `debug=<bool>`            | Whether to build without compiler optimizations for simplified debugging. |
 |   `optforsize=<bool>`       | Optimize for size instead for speed. |
 |   `libtype=[shared\|static]` | Whether to build a shared or a static library. |
+|   `libcosmos-soname=<soname>| Specify a custom SONAME for the shared library. |
 
 You can also specify the `CXXFLAGS` environment variable to add additional
 compiler switches to the build process.
