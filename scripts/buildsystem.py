@@ -187,7 +187,9 @@ def getSharedLibVersionInfo(self, libbase):
     recent Git tag on the current branch. The soname can be provided on the
     command line as {libbase}-soname=custom-soname. The latter is for
     packaging customization."""
-    current_tag = subprocess.check_output('git describe --abbrev=0 --tags'.split())
+    # run Git in the actual source tree directory so that we get the correct tag
+    srcdir = Dir('.').srcnode().abspath
+    current_tag = subprocess.check_output('git describe --abbrev=0 --tags'.split(), cwd=srcdir)
     current_version = current_tag.decode().lstrip('v')
 
     custom_soname = ARGUMENTS.get(f'{libbase}-soname', None)
