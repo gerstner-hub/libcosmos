@@ -1,1 +1,2 @@
 .git* export-ignore
+scripts/update-doxygen-gh-pages.py export-ignore
