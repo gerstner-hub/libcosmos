@@ -188,17 +188,24 @@ def getSharedLibVersionInfo(self, libbase):
     command line as {libbase}-soname=custom-soname. The latter is for
     packaging customization."""
     # run Git in the actual source tree directory so that we get the correct tag
+    version_file = File(f'#/.{libbase}.soname')
     have_git = os.path.exists(str(Dir('#/.git')))
 
     if have_git:
         srcdir = Dir('.').srcnode().abspath
-        current_tag = subprocess.check_output('git describe --abbrev=0 --tags'.split(), cwd=srcdir).decode()
+        current_tag = subprocess.check_output('git describe --abbrev=0 --tags'.split(), cwd=srcdir).decode().strip()
+
+        # this target can be called to generate the version files used in
+        # source tarballs, see else branch below
+        version_file_target = self.Command(version_file, None,
+                                           action=f'echo -n "{current_tag}" >"$TARGET"')
+        self.AlwaysBuild(version_file_target)
+        self.Alias('create-version-files', version_file_target)
     else:
-        pkg_version = File(f'#/.{libbase}.soname')
         try:
-            current_tag = open(str(pkg_version)).read()
+            current_tag = open(str(version_file)).read().strip()
         except FileNotFoundError:
-            raise Exception(f"Couldn't find {libbase} SONAME information. Not a Git repository and {pkg_version} not existing")
+            raise Exception(f"Couldn't find {libbase} SONAME information. Not a Git repository and {version_file} not existing")
 
     current_version = current_tag.lstrip('v')
 
