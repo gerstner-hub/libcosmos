@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import argparse
+import glob
 import os
 import subprocess
 import sys
@@ -23,9 +24,12 @@ version = subprocess.check_output("git describe --abbrev=0 --tags".split()).deco
 prjbase = f"{project}-{version}"
 tarball = Path(args.outdir) / f"{prjbase}.tar"
 
-if os.path.exists(tarball):
+if os.path.exists(tarball) or os.path.exists(f"{tarball}.xz"):
     print(tarball, "already exists. Refusing to overwrite")
     sys.exit(1)
+
+print("Building SONAME version files for source tarballs")
+subprocess.check_call(["scons", "create-version-files"])
 
 submodules = []
 
@@ -47,8 +51,13 @@ if args.include_submodules:
                 continue
             submodules.append(parts[1])
 
+cmdline = ["git", "archive", "--prefix", f"{prjbase}/", "-o", tarball]
+for version_file in glob.glob(f"{args.root}/.lib*.soname"):
+    cmdline.append("--add-file=" + version_file)
+cmdline.append("HEAD")
+
 print("Creating main archive")
-subprocess.check_call(["git", "archive", "--prefix", f"{prjbase}/", "-o", tarball, "HEAD"])
+subprocess.check_call(cmdline)
 
 for module in submodules:
     module_root = f"{args.root}/{module}"
