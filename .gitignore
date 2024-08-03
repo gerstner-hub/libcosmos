@@ -8,4 +8,4 @@ install.*
 *.swo
 __pycache__
 doc/todo
-.lib*.soname
+.lib*.tag
