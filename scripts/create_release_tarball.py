@@ -52,7 +52,7 @@ if args.include_submodules:
             submodules.append(parts[1])
 
 cmdline = ["git", "archive", "--prefix", f"{prjbase}/", "-o", tarball]
-for version_file in glob.glob(f"{args.root}/.lib*.tag"):
+for version_file in glob.glob(f"{args.root}/.*.tag"):
     cmdline.append("--add-file=" + version_file)
 cmdline.append("HEAD")
 
