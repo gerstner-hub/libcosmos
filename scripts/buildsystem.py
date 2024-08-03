@@ -84,7 +84,7 @@ def registerLibConfig(self, name, node, flags, config={}):
             raise Exception(f"Missing library version information for setup of {pkg_config_in} installation")
 
         instpath = Path(self['instroot']) / self['pkg_config_dir'] / f"{name}.pc"
-        target = self.Command(instpath, pkg_config_in,
+        target = self.Command(str(instpath), pkg_config_in,
                               action=f'sed \'s/@LIB_VERSION@/{version}/\' "$SOURCE" >"$TARGET"')
         self.Alias('install', target)
 
