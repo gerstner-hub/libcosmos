@@ -76,7 +76,7 @@ def registerLibConfig(self, name, node, flags, config={}):
         env['libconfigs'][name] = config
 
     pkg_config_in = str(File(f'#/data/{name}.pc.in'))
-    if os.path.exists(pkg_config_in):
+    if self['install_dev_files'] and os.path.exists(pkg_config_in):
         version = config.get('version', None)
         if not version:
             raise Exception(f"Missing library version information for setup of {pkg_config_in} installation")
