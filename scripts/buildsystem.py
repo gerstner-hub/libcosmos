@@ -194,32 +194,50 @@ def addLocalLibrary(self, name):
                exports={'env': lib_env})
 
 
+def addVersionFileTarget(self, basename, version):
+    """This adds a target for generating a tag version file in the SCons root
+    directory for `basename` containing the data found in `version`. A
+    cummulative alias "create-version-files" is used for building all
+    registered version files. These version files are used for archiving
+    release source tarballs."""
+    version_file = File(f'#/.{basename}.tag')
+    # this target can be called to generate the version files used in
+    # source tarballs, see else branch below
+    version_file_target = self.Command(version_file, None,
+                                       action=f'echo -n "{version}" >"$TARGET"')
+    self.AlwaysBuild(version_file_target)
+    self.Alias('create-version-files', version_file_target)
+
+
+def getCurrentGitTag(self, basename):
+    """This returns the most recent Git tag found in the Git repository where
+    the current SConstruct file is located. If there is not Git repository
+    around (e.g. building from a release source tarball) then a version tag
+    stored in the SCons root directory is looked for. I nothing is found, an
+    exception is raised."""
+    if os.path.exists(str(Dir('#/.git'))):  # we have git
+        srcdir = Dir('.').srcnode().abspath
+        # run Git in the actual source tree directory so that we get the correct tag (e.g. for sub-modules)
+        current_tag = subprocess.check_output('git describe --abbrev=0 --tags'.split(), cwd=srcdir).decode().strip()
+    else:
+        version_file = File(f'#/.{basename}.tag')
+
+        try:
+            current_tag = open(str(version_file)).read().strip()
+        except FileNotFoundError:
+            raise Exception(f"Couldn't find {basename} version information. Not a Git repository and {version_file} not existing")
+
+    return current_tag
+
+
 def getSharedLibVersionInfo(self, libbase):
     """This returns a tuple of (shlibversion, soname) to be used for a version
     SharedLibrary. The current library version will be derived from the most
     recent Git tag on the current branch. The soname can be provided on the
     command line as {libbase}-soname=custom-soname. The latter is for
     packaging customization."""
-    # run Git in the actual source tree directory so that we get the correct tag
-    version_file = File(f'#/.{libbase}.tag')
-    have_git = os.path.exists(str(Dir('#/.git')))
 
-    if have_git:
-        srcdir = Dir('.').srcnode().abspath
-        current_tag = subprocess.check_output('git describe --abbrev=0 --tags'.split(), cwd=srcdir).decode().strip()
-
-        # this target can be called to generate the version files used in
-        # source tarballs, see else branch below
-        version_file_target = self.Command(version_file, None,
-                                           action=f'echo -n "{current_tag}" >"$TARGET"')
-        self.AlwaysBuild(version_file_target)
-        self.Alias('create-version-files', version_file_target)
-    else:
-        try:
-            current_tag = open(str(version_file)).read().strip()
-        except FileNotFoundError:
-            raise Exception(f"Couldn't find {libbase} SONAME information. Not a Git repository and {version_file} not existing")
-
+    current_tag = self.GetCurrentGitTag(libbase)
     current_version = current_tag.lstrip('v')
 
     custom_soname = ARGUMENTS.get(f'{libbase}-soname', None)
@@ -235,7 +253,7 @@ def getSharedLibVersionInfo(self, libbase):
         soname_version = current_version.split('.')[1]
         soname = f'{libbase}.so.{soname_version}'
 
-    return current_version, soname
+    return current_version, soname, current_tag
 
 
 def enhanceEnv(env):
@@ -250,6 +268,8 @@ def enhanceEnv(env):
     env.AddMethod(installHeaders, 'InstallHeaders')
     env.AddMethod(addLocalLibrary, 'AddLocalLibrary')
     env.AddMethod(getSharedLibVersionInfo, 'GetSharedLibVersionInfo')
+    env.AddMethod(getCurrentGitTag, 'GetCurrentGitTag')
+    env.AddMethod(addVersionFileTarget, 'AddVersionFileTarget')
 
 
 def initSCons(project, rtti=True, deflibtype='shared'):

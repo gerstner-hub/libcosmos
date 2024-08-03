@@ -17,7 +17,8 @@ libcosmos_srcs = env.GatherSources(suffixes=['.cxx'])
 # avoids inconsistencies, but breaks applications that aren't rebuilt against
 # the new lib version.
 
-version, soname = libenv.GetSharedLibVersionInfo('libcosmos')
+version, soname, tag = libenv.GetSharedLibVersionInfo('libcosmos')
+libenv.AddVersionFileTarget('libcosmos', tag)
 
 if env['libtype'] == 'static':
     libcosmos = libenv.StaticLibrary(
