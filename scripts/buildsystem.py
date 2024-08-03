@@ -75,6 +75,17 @@ def registerLibConfig(self, name, node, flags, config={}):
         env['libflags'][name] = flags
         env['libconfigs'][name] = config
 
+    pkg_config_in = str(File(f'#/data/{name}.pc.in'))
+    if os.path.exists(pkg_config_in):
+        version = config.get('version', None)
+        if not version:
+            raise Exception(f"Missing library version information for setup of {pkg_config_in} installation")
+
+        instpath = Path(env['instroot']) / env['pkg_config_dir'] / f"{name}.pc"
+        target = self.Command(instpath, pkg_config_in,
+                              action=f'sed \'s/@LIB_VERSION@/{version}/\' "$SOURCE" >"$TARGET"')
+        env.Alias('install', target)
+
 
 def existsLib(self, name):
     return name in self['libs']

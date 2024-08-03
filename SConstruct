@@ -34,7 +34,4 @@ if install_dev_files or env['libtype'] == 'shared':
     env.Alias('install', node)
 
 if install_dev_files:
-    node = env.Install(Path(instroot) / env['pkg_config_dir'], 'data/libcosmos.pc')
-    env.Alias('install', node)
-
     env.InstallHeaders('cosmos')

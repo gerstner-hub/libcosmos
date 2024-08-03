@@ -8,6 +8,17 @@ libenv.Append(CPPPATH=public_includes)
 
 libcosmos_srcs = env.GatherSources(suffixes=['.cxx'])
 
+
+# the SONAME and SHLIBVERSION are the knobs to tune for ABI versioning, but
+# libcosmos currently doesn't really have a concept for that.
+#
+# For packaging you can consider using an SONAME matching the exact library
+# release version resulting in a new ABI for each release. This at least
+# avoids inconsistencies, but breaks applications that aren't rebuilt against
+# the new lib version.
+
+version, soname = libenv.GetSharedLibVersionInfo('libcosmos')
+
 if env['libtype'] == 'static':
     libcosmos = libenv.StaticLibrary(
         'cosmos',
@@ -18,16 +29,6 @@ else:
     libenv.Append(CCFLAGS='-fvisibility=hidden')
     libenv.Append(CCFLAGS='-DCOSMOS_EXPORT')
 
-    # the SONAME and SHLIBVERSION are the knobs to tune for ABI versioning, but
-    # libcosmos currently doesn't really have a concept for that.
-    #
-    # For packaging you can consider using an SONAME matching the exact library
-    # release version resulting in a new ABI for each release. This at least
-    # avoids inconsistencies, but breaks application that aren't rebuild against
-    # the new lib version.
-
-    version, soname = libenv.GetSharedLibVersionInfo('libcosmos')
-
     libcosmos = libenv.SharedLibrary(
         'cosmos',
         libcosmos_srcs,
@@ -35,9 +36,16 @@ else:
         SONAME=soname
     )
 
-env.RegisterLibConfig('libcosmos', libcosmos, {
-    'CPPPATH': [public_includes],
-    'LINKFLAGS': ['-pthread']
-})
+env.RegisterLibConfig(
+    'libcosmos',
+    libcosmos,
+    {
+        'CPPPATH': [public_includes],
+        'LINKFLAGS': ['-pthread']
+    },
+    {
+        'version': version
+    }
+)
 
 Return('env')
