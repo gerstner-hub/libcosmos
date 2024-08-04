@@ -119,10 +119,12 @@ enum class TraceRequest {
 	// When in syscall-enter-stop, change the number of the system call to execute (only supported on arm)
 	// (it seems this has been removed from system headers by now)
 	//SET_SYSCALL = PTRACE_SET_SYSCALL,
-	/// Like SYSCALL, but do not execute the system call. Used for emulation applications like user-mode-Linux.
+#ifdef PTRACE_SYSEMU
+	/// Like SYSCALL, but do not execute the system call. Used for emulation applications like user-mode-Linux - only on x86.
 	SYSEMU      = PTRACE_SYSEMU,
 	/// Like SYSEMU, but if there's no system call, then singlestep.
 	SYSEMU_SINGLESTEP = PTRACE_SYSEMU_SINGLESTEP,
+#endif
 	/// Restart a stopped tracee, but let it enter a SIGSTOP like state. Works only for SEIZE'd tracees.
 	LISTEN      = PTRACE_LISTEN,
 	/// Send a SIGKILL to the tracee (this is buggy, don't use it).
