@@ -141,8 +141,10 @@ enum class TraceRequest {
 	DETACH      = PTRACE_DETACH,
 	/// Performs an operation similar to `get_thread_area()`.
 	GET_THREAD_AREA = PTRACE_GET_THREAD_AREA,
+#if PTRACE_SET_THREAD_AREA
 	/// Performs an operation similar to `set_thread_area()`.
 	SET_THREAD_AREA = PTRACE_SET_THREAD_AREA,
+#endif
 	/// Retrieve information about the system call that cause the stop.
 	GET_SYSCALL_INFO = PTRACE_GET_SYSCALL_INFO,
 };
