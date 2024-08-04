@@ -11,6 +11,7 @@
 
 // Linux
 #include <sys/ptrace.h>
+#include <elf.h>
 
 // cosmos
 #include <cosmos/BitMask.hxx>
@@ -65,6 +66,12 @@ enum class TraceEvent {
 	EXIT       = PTRACE_EVENT_EXIT,
 	/// Initial tracee stop after SEIZE or on new child creations
 	STOP       = PTRACE_EVENT_STOP
+};
+
+/// Denotes different types of register sets that can be read from a tracee.
+enum class RegisterType {
+	GENERAL_PURPOSE = NT_PRSTATUS,
+	FLOATING_POINT  = NT_FPREGSET
 };
 
 /// Basic request types that can be passed to the ptrace() system call
