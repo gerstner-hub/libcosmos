@@ -32,12 +32,12 @@ protected: // functions
 	// slicing. derived classes need to provide their own move
 	// ctors/operators that invoke the base class ones.
 
-	FileBase(FileBase &&other) :
+	FileBase(FileBase &&other) noexcept :
 			StreamIO{m_fd} {
 		*this = std::move(other);
 	}
 
-	FileBase& operator=(FileBase &&other) {
+	FileBase& operator=(FileBase &&other) noexcept {
 		m_fd = other.m_fd;
 		other.m_fd.reset();
 

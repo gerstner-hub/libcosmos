@@ -23,11 +23,11 @@ public: // functions
 		open(fd, auto_close);
 	}
 
-	FDFile(FDFile &&other) {
+	FDFile(FDFile &&other) noexcept {
 		*this = std::move(other);
 	}
 
-	FDFile& operator=(FDFile &&other) {
+	FDFile& operator=(FDFile &&other) noexcept {
 		m_auto_close = other.m_auto_close;
 		other.m_auto_close = AutoCloseFD{true};
 

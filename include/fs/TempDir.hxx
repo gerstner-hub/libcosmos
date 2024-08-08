@@ -27,11 +27,11 @@ public: // functions
 	TempDir(const TempDir&) = delete;
 	TempDir& operator=(const TempDir&) = delete;
 
-	TempDir(TempDir &&other) {
+	TempDir(TempDir &&other) noexcept {
 		*this = std::move(other);
 	}
 
-	TempDir& operator=(TempDir &&other) {
+	TempDir& operator=(TempDir &&other) noexcept {
 		m_tmp_path = other.m_tmp_path;
 		other.m_tmp_path.clear();
 		return *this;

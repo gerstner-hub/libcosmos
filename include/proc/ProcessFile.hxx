@@ -56,11 +56,11 @@ public: // functions
 	ProcessFile(const ProcessFile&) = delete;
 	ProcessFile& operator=(const ProcessFile&) = delete;
 
-	ProcessFile(ProcessFile &&other) {
+	ProcessFile(ProcessFile &&other) noexcept {
 		*this = std::move(other);
 	}
 
-	ProcessFile& operator=(ProcessFile &&other) {
+	ProcessFile& operator=(ProcessFile &&other) noexcept {
 		m_fd = other.m_fd;
 		other.m_fd.reset();
 		return *this;

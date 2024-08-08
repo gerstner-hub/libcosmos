@@ -29,11 +29,11 @@ public: // functions
 
 	// move semantics
 
-	Mapping(Mapping &&other) {
+	Mapping(Mapping &&other) noexcept {
 		*this = std::move(other);
 	}
 
-	Mapping& operator=(Mapping &&other) {
+	Mapping& operator=(Mapping &&other) noexcept {
 		m_addr = other.m_addr;
 		m_size = other.m_size;
 		other.invalidate();

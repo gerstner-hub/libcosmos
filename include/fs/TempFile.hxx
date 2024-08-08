@@ -29,7 +29,7 @@ public: // functions
 
 	~TempFile();
 
-	TempFile& operator=(TempFile &&other) {
+	TempFile& operator=(TempFile &&other) noexcept {
 		m_tmp_path = other.m_tmp_path;
 		other.m_tmp_path.clear();
 

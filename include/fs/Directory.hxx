@@ -53,11 +53,11 @@ public: // functions
 	Directory(const Directory&) = delete;
 	Directory& operator=(const Directory&) = delete;
 
-	Directory(Directory &&other) {
+	Directory(Directory &&other) noexcept {
 		*this = std::move(other);
 	}
 
-	Directory& operator=(Directory &&other) {
+	Directory& operator=(Directory &&other) noexcept {
 		m_auto_close = other.m_auto_close;
 		m_fd = other.m_fd;
 

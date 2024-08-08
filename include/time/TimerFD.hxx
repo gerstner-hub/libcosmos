@@ -136,11 +136,11 @@ public:
 		create();
 	}
 
-	TimerFD(TimerFD &&other) {
+	TimerFD(TimerFD &&other) noexcept {
 		*this = std::move(other);
 	}
 
-	TimerFD& operator=(TimerFD &&other) {
+	TimerFD& operator=(TimerFD &&other) noexcept {
 		static_cast<FDFile&>(*this) = std::move(other);
 		return *this;
 	}
