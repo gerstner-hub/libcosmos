@@ -165,6 +165,14 @@ def configureForPackage(self, seq):
         self.MergeFlags(flags)
 
 
+def addGeneratedHeader(self, headers):
+    """Adds one or more generated headers and mark them for installation with
+    InstallHeaders()."""
+    rootenv = self['rootenv']
+    for header in headers:
+        rootenv['generated_headers'].append(header)
+
+
 def installHeaders(self, subdir):
     incdir = self.Dir('include').srcnode().abspath
     instroot = self['instroot']
@@ -180,6 +188,11 @@ def installHeaders(self, subdir):
             src = os.path.join(root, fil)
             node = self.Install(target, src)
             self.Alias('install', node)
+
+    for header in self['generated_headers']:
+        target = os.path.sep.join([instroot, 'include', subdir])
+        node = self.Install(target, header)
+        self.Alias('install', node)
 
 
 def addLocalLibrary(self, name):
@@ -266,6 +279,7 @@ def enhanceEnv(env):
     env.AddMethod(existsPackage, 'ExistsPackage')
     env.AddMethod(existsLib, 'ExistsLib')
     env.AddMethod(installHeaders, 'InstallHeaders')
+    env.AddMethod(addGeneratedHeader, 'AddGeneratedHeader')
     env.AddMethod(addLocalLibrary, 'AddLocalLibrary')
     env.AddMethod(getSharedLibVersionInfo, 'GetSharedLibVersionInfo')
     env.AddMethod(getCurrentGitTag, 'GetCurrentGitTag')
@@ -454,6 +468,7 @@ def initSCons(project, rtti=True, deflibtype='shared'):
 
     env['buildroot'] = buildroot
     env['instroot'] = getInstroot()
+    env['generated_headers'] = []
     env['lib_base_dir'] = getLibBaseDir()
     env['pkg_config_dir'] = getLibBaseDir() + '/pkgconfig'
     env['libs'] = dict()
