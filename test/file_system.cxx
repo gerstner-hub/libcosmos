@@ -42,6 +42,7 @@ class FileSystemTest :
 		testMakeFIFO();
 		testCloseRange();
 		testCopyFileRange();
+		testAccess();
 	}
 
 	std::pair<std::filesystem::path, cosmos::TempDir> getTestDir() {
@@ -626,6 +627,41 @@ class FileSystemTest :
 		RUN_STEP("verify-offset-copy-file-size-matches", true);
 	}
 
+	void testAccess() {
+		START_TEST("access() API test");
+
+		cosmos::SysString path{"/etc/fstab"};
+
+		try {
+			cosmos::fs::check_access(path);
+			RUN_STEP("access(F_OK)", true);
+		} catch (const cosmos::ApiError &err) {
+			RUN_STEP("access(F_OK)", false);
+		}
+
+		try {
+			cosmos::fs::check_access(path, cosmos::fs::AccessChecks{cosmos::fs::AccessCheck::READ_OK});
+			RUN_STEP("access(R_OK)", true);
+		} catch (const cosmos::ApiError &err) {
+			RUN_STEP("access(R_OK)", false);
+		}
+
+		const auto expected_write_res = (cosmos::proc::get_effective_user_id() == cosmos::UserID::ROOT);
+
+		try {
+			cosmos::fs::check_access(path, cosmos::fs::AccessChecks{cosmos::fs::AccessCheck::WRITE_OK});
+			RUN_STEP("access(W_OK)", expected_write_res ? true : false);
+		} catch (const cosmos::ApiError &err) {
+			RUN_STEP("access(W_OK)", expected_write_res ? false : true);
+		}
+
+		try {
+			cosmos::fs::check_access(path, cosmos::fs::AccessChecks{cosmos::fs::AccessCheck::EXEC_OK});
+			RUN_STEP("access(X_OK)", false);
+		} catch (const cosmos::ApiError &err) {
+			RUN_STEP("access(X_OK)", true);
+		}
+	}
 };
 
 int main(const int argc, const char **argv) {

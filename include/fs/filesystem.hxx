@@ -677,4 +677,38 @@ COSMOS_API size_t copy_file_range(CopyFileRangeParameters &pars);
 COSMOS_API size_t copy_file_range(
 		const FileDescriptor fd_in, const FileDescriptor fd_out, const size_t len);
 
+/// Different access checks that can be performed in check_access().
+enum class AccessCheck : int {
+	 READ_OK = R_OK, ///< Read access is allowed.
+	WRITE_OK = W_OK, ///< Write access is allowed.
+	 EXEC_OK = X_OK  ///< Execution is allowed.
+};
+
+using AccessChecks = BitMask<AccessCheck>;
+
+/// Check file access permissions of `path`.
+/**
+ * This checks whether `path` can be accessed by the calling process,
+ * depending on the provided `checks` bitmask. If `checks` has no bits set,
+ * then this only checks for file existence. Otherwise it is checked whether
+ * `path` is accessible for read, write and/or execution, depending on the
+ * bits set in `checks`.
+ *
+ * For determining access permissions the caller's real UID and GID are used.
+ *
+ * If the check succeeds, then call returns normally. Otherwise a FileError is
+ * thrown, containing the specific error reason. Typical errors will be one of
+ * the following:
+ *
+ * - Errno::ACCESS: either the requested `checks` would be denied to the file,
+ *   or search permission is denied for one of the components of the prefix of
+ *   `path`.
+ * - Errno::NO_ENTRY: a component of `path` does not exist or is a dangling
+ *   symbolic link.
+ *
+ * Note that this call is often better replaced by direct open of a path, to
+ * prevent any time-of-check/time-of-use race conditions.
+ **/
+COSMOS_API void check_access(const SysString path, const AccessChecks checks = {});
+
 } // end ns

@@ -619,4 +619,16 @@ size_t copy_file_range(CopyFileRangeParameters &pars) {
 	return copied;
 }
 
+// the API we use in check_access & friends depends on the fact that F_OK is
+// zero (empty AccessChecks mask).
+static_assert(F_OK == 0, "F_OK is non-zero, breaking check_access()");
+
+void check_access(const SysString path, const AccessChecks checks) {
+	if (::access(path.raw(), checks.raw()) == 0) {
+		return;
+	}
+
+	cosmos_throw (ApiError("access()"));
+}
+
 } // end ns
