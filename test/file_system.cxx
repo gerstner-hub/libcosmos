@@ -626,8 +626,6 @@ class FileSystemTest :
 		RUN_STEP("verify-offset-copy-file-size-matches", true);
 	}
 
-protected:
-	std::string m_test_dir;
 };
 
 int main(const int argc, const char **argv) {
