@@ -631,4 +631,23 @@ void check_access(const SysString path, const AccessChecks checks) {
 	cosmos_throw (ApiError("access()"));
 }
 
+void check_access_at(const DirFD dir_fd, const SysString path,
+		const AccessChecks checks, const AccessFlags flags) {
+	if (::faccessat(to_integral(dir_fd.raw()), path.raw(), checks.raw(), flags.raw()) == 0) {
+		return;
+	}
+
+	cosmos_throw (ApiError("faccessat()"));
+}
+
+COSMOS_API void check_access_fd(const FileDescriptor fd, const AccessChecks checks,
+		const AccessFlags flags) {
+
+	if (::faccessat(to_integral(fd.raw()), "", checks.raw(), flags.raw() | AT_EMPTY_PATH) == 0) {
+		return;
+	}
+
+	cosmos_throw (ApiError("faccessat()"));
+}
+
 } // end ns

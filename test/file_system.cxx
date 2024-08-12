@@ -630,36 +630,107 @@ class FileSystemTest :
 	void testAccess() {
 		START_TEST("access() API test");
 
-		cosmos::SysString path{"/etc/fstab"};
+		{
+			cosmos::SysString path{"/etc/fstab"};
 
-		try {
-			cosmos::fs::check_access(path);
-			RUN_STEP("access(F_OK)", true);
-		} catch (const cosmos::ApiError &err) {
-			RUN_STEP("access(F_OK)", false);
+			try {
+				cosmos::fs::check_access(path);
+				RUN_STEP("access(F_OK)", true);
+			} catch (const cosmos::ApiError &err) {
+				RUN_STEP("access(F_OK)", false);
+			}
+
+			try {
+				cosmos::fs::check_access(path, cosmos::fs::AccessChecks{cosmos::fs::AccessCheck::READ_OK});
+				RUN_STEP("access(R_OK)", true);
+			} catch (const cosmos::ApiError &err) {
+				RUN_STEP("access(R_OK)", false);
+			}
+
+			const auto expected_write_res = (cosmos::proc::get_effective_user_id() == cosmos::UserID::ROOT);
+
+			try {
+				cosmos::fs::check_access(path, cosmos::fs::AccessChecks{cosmos::fs::AccessCheck::WRITE_OK});
+				RUN_STEP("access(W_OK)", expected_write_res ? true : false);
+			} catch (const cosmos::ApiError &err) {
+				RUN_STEP("access(W_OK)", expected_write_res ? false : true);
+			}
+
+			try {
+				cosmos::fs::check_access(path, cosmos::fs::AccessChecks{cosmos::fs::AccessCheck::EXEC_OK});
+				RUN_STEP("access(X_OK)", false);
+			} catch (const cosmos::ApiError &err) {
+				RUN_STEP("access(X_OK)", true);
+			}
 		}
 
-		try {
-			cosmos::fs::check_access(path, cosmos::fs::AccessChecks{cosmos::fs::AccessCheck::READ_OK});
-			RUN_STEP("access(R_OK)", true);
-		} catch (const cosmos::ApiError &err) {
-			RUN_STEP("access(R_OK)", false);
+		{
+			cosmos::Directory etc{"/etc"};
+			cosmos::SysString path{"fstab"};
+
+			try {
+				cosmos::fs::check_access_at(etc.fd(), path);
+				RUN_STEP("facessat(F_OK)", true);
+			} catch (const cosmos::ApiError &err) {
+				RUN_STEP("facessat(F_OK)", false);
+			}
+
+			try {
+				cosmos::fs::check_access_at(etc.fd(), path, cosmos::fs::AccessChecks{cosmos::fs::AccessCheck::READ_OK});
+				RUN_STEP("facessat(R_OK)", true);
+			} catch (const cosmos::ApiError &err) {
+				RUN_STEP("facessat(R_OK)", false);
+			}
+
+			const auto expected_write_res = (cosmos::proc::get_effective_user_id() == cosmos::UserID::ROOT);
+
+			try {
+				cosmos::fs::check_access_at(etc.fd(), path, cosmos::fs::AccessChecks{cosmos::fs::AccessCheck::WRITE_OK});
+				RUN_STEP("facessat(W_OK)", expected_write_res ? true : false);
+			} catch (const cosmos::ApiError &err) {
+				RUN_STEP("facessat(W_OK)", expected_write_res ? false : true);
+			}
+
+			try {
+				cosmos::fs::check_access_at(etc.fd(), path, cosmos::fs::AccessChecks{cosmos::fs::AccessCheck::EXEC_OK});
+				RUN_STEP("facessat(X_OK)", false);
+			} catch (const cosmos::ApiError &err) {
+				RUN_STEP("facessat(X_OK)", true);
+			}
 		}
 
-		const auto expected_write_res = (cosmos::proc::get_effective_user_id() == cosmos::UserID::ROOT);
+		{
+			cosmos::File file{"/etc/fstab", cosmos::OpenMode::READ_ONLY, cosmos::OpenFlags{cosmos::OpenFlag::PATH}};
+			try {
+				cosmos::fs::check_access_fd(file.fd());
+				RUN_STEP("facessat(fd, F_OK)", true);
+			} catch (const cosmos::ApiError &err) {
+				RUN_STEP("facessat(fd, F_OK)", false);
+			}
 
-		try {
-			cosmos::fs::check_access(path, cosmos::fs::AccessChecks{cosmos::fs::AccessCheck::WRITE_OK});
-			RUN_STEP("access(W_OK)", expected_write_res ? true : false);
-		} catch (const cosmos::ApiError &err) {
-			RUN_STEP("access(W_OK)", expected_write_res ? false : true);
-		}
+			try {
+				cosmos::fs::check_access_fd(file.fd(), cosmos::fs::AccessChecks{cosmos::fs::AccessCheck::READ_OK});
+				RUN_STEP("facessat(fd, R_OK)", true);
+			} catch (const cosmos::ApiError &err) {
+				RUN_STEP("facessat(fd, R_OK)", false);
+			}
 
-		try {
-			cosmos::fs::check_access(path, cosmos::fs::AccessChecks{cosmos::fs::AccessCheck::EXEC_OK});
-			RUN_STEP("access(X_OK)", false);
-		} catch (const cosmos::ApiError &err) {
-			RUN_STEP("access(X_OK)", true);
+			const auto expected_write_res = (cosmos::proc::get_effective_user_id() == cosmos::UserID::ROOT);
+
+			try {
+				cosmos::fs::check_access_fd(file.fd(), cosmos::fs::AccessChecks{cosmos::fs::AccessCheck::WRITE_OK});
+				RUN_STEP("facessat(fd, W_OK)", expected_write_res ? true : false);
+			} catch (const cosmos::ApiError &err) {
+				RUN_STEP("facessat(fd, W_OK)", expected_write_res ? false : true);
+			}
+
+			try {
+				cosmos::fs::check_access_fd(file.fd(), cosmos::fs::AccessChecks{cosmos::fs::AccessCheck::EXEC_OK});
+				RUN_STEP("facessat(fd, X_OK)", false);
+			} catch (const cosmos::ApiError &err) {
+				RUN_STEP("facessat(fd, X_OK)", true);
+			}
+
 		}
 	}
 };

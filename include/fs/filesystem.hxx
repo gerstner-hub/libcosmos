@@ -711,4 +711,35 @@ using AccessChecks = BitMask<AccessCheck>;
  **/
 COSMOS_API void check_access(const SysString path, const AccessChecks checks = {});
 
+/// Extra flags that influence the behaviour of check_access_at(), and check_access_fd().
+enum class AccessFlag : int {
+	EFFECTIVE_CREDS = AT_EACCESS, ///< use the caller's effective UID and GID for the access check.
+	NO_FOLLOW = AT_SYMLINK_NOFOLLOW ///< don't resolve symlinks in `path` but check access to the link itself.
+};
+
+using AccessFlags = BitMask<AccessFlag>;
+
+/// Check file access permissions of `path` relative to `dir_fd`.
+/**
+ * This behaves similar to `check_access()` with the following differences:
+ *
+ * - if `path` is a relative path, then it is interpreted relative to
+ *   `dir_fd`, instead of relative to the caller's CWD.
+ * - if `path` is absolute then `dir_fd` is ignored.
+ * - if `dir_fd` is cosmos::AT_CWD, then `path` is again interpreted relative
+ *   to the caller's CWD, like check_access() does.
+ *
+ * The `flags` argument further influences the behaviour of the check.
+ **/
+COSMOS_API void check_access_at(const DirFD dir_fd, const SysString path,
+		const AccessChecks checks = {}, const AccessFlags flags = {});
+
+/// Check file access permissions of the already open file descriptor `fd`.
+/**
+ * This call may be used on a file descriptor opened with OpenFlag::PATH,
+ * which is likely also the main purpose of this variant of `check_access()`.
+ **/
+COSMOS_API void check_access_fd(const FileDescriptor fd, const AccessChecks check = {},
+		const AccessFlags flags = {});
+
 } // end ns
