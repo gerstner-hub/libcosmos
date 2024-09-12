@@ -29,6 +29,42 @@
 
 using ExitStatus = cosmos::ExitStatus;
 
+class BasicTest :
+		public cosmos::TestBase {
+public:
+
+	void runTests() override {
+		START_TEST("basic test");
+		cosmos::ChildCloner cloner;
+		cloner.setExe("true");
+		auto proc = cloner.run();
+
+		auto res = proc.wait();
+
+		RUN_STEP("true-exited-successfully", res.exitedSuccessfully());
+		RUN_STEP("proc-not-running", !proc.running());
+
+		cloner.setExe("false");
+		proc = cloner.run();
+
+		res = proc.wait();
+		RUN_STEP("false-exited-erroneously", res.exited() && res.exitStatus() == cosmos::ExitStatus::FAILURE);
+		RUN_STEP("proc-not-running", !proc.running());
+
+		cloner.setExe("sleep");
+		cloner << "1d";
+		proc = cloner.run();
+		auto optres = proc.waitTimed(std::chrono::seconds{1});
+		RUN_STEP("sleep doesn't exit quickly", !optres);
+		RUN_STEP("proc-still-running", proc.running());
+
+		proc.kill(cosmos::signal::KILL);
+		res = proc.wait();
+		RUN_STEP("kill-killed-sleep", res.signaled() && res.termSignal() == cosmos::signal::KILL);
+		RUN_STEP("proc-not-running", !proc.running());
+	}
+};
+
 class RedirectOutputBase :
 		public cosmos::TestBase {
 public:
@@ -663,6 +699,7 @@ void runTest(const int argc, const char **argv) {
 
 int main(const int argc, const char **argv) {
 	try {
+		runTest<BasicTest>(argc, argv);
 		runTest<RedirectStdoutTest>(argc, argv);
 		runTest<RedirectStderrTest>(argc, argv);
 		runTest<PipeInTest>(argc, argv);

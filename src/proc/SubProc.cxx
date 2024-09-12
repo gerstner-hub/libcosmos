@@ -27,7 +27,7 @@ WaitRes SubProc::wait(const WaitFlags flags) {
 
 	try {
 		auto wr = proc::wait(m_child_fd, flags);
-		if (!flags[WaitFlag::LEAVE_INFO] && wr->exited()) {
+		if (!flags[WaitFlag::LEAVE_INFO] && (wr->exited() || wr->signaled())) {
 			m_child_fd.close();
 		}
 		return *wr;
