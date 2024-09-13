@@ -113,6 +113,8 @@ protected: // functions
 		m_pid{pid}, m_child_fd{pidfd}
 	{}
 
+	void reset();
+
 protected: // data
 
 	/// The pid of the child process, if any

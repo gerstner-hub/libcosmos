@@ -18,8 +18,12 @@ void SubProc::kill(const Signal s) {
 	signal::send(m_child_fd, s);
 }
 
-WaitRes SubProc::wait(const WaitFlags flags) {
+void SubProc::reset() {
 	m_pid = ProcessID::INVALID;
+	m_child_fd.close();
+}
+
+WaitRes SubProc::wait(const WaitFlags flags) {
 
 	if (flags[WaitFlag::NO_HANG]) {
 		cosmos_throw (UsageError("cannot use NO_HANG with SubProc, use waitTimed() instead"));
@@ -28,7 +32,7 @@ WaitRes SubProc::wait(const WaitFlags flags) {
 	try {
 		auto wr = proc::wait(m_child_fd, flags);
 		if (!flags[WaitFlag::LEAVE_INFO] && (wr->exited() || wr->signaled())) {
-			m_child_fd.close();
+			reset();
 		}
 		return *wr;
 	} catch (const ApiError &err) {
@@ -37,7 +41,7 @@ WaitRes SubProc::wait(const WaitFlags flags) {
 		// objects
 		if (err.errnum() == Errno::NO_CHILD) {
 			try {
-				m_child_fd.close();
+				reset();
 			} catch(...) {
 				// FileDescriptor will be invalidated already in this case
 			}

@@ -34,6 +34,7 @@ class BasicTest :
 public:
 
 	void runTests() override {
+		using cosmos::ProcessID;
 		START_TEST("basic test");
 		cosmos::ChildCloner cloner;
 		cloner.setExe("true");
@@ -47,9 +48,16 @@ public:
 		cloner.setExe("false");
 		proc = cloner.run();
 
+		RUN_STEP("pid-valid", proc.pid() != ProcessID::INVALID);
+		res = proc.wait(cosmos::WaitFlags{cosmos::WaitFlag::LEAVE_INFO, cosmos::WaitFlag::WAIT_FOR_EXITED});
+		RUN_STEP("false-exited-erroneously", res.exited() && res.exitStatus() == cosmos::ExitStatus::FAILURE);
+		RUN_STEP("proc-still-running (left-info)", proc.running());
+		RUN_STEP("pid-still-valid (left-info)", proc.pid() != ProcessID::INVALID);
+
 		res = proc.wait();
 		RUN_STEP("false-exited-erroneously", res.exited() && res.exitStatus() == cosmos::ExitStatus::FAILURE);
-		RUN_STEP("proc-not-running", !proc.running());
+		RUN_STEP("proc-not-running (consumed-info)", !proc.running());
+		RUN_STEP("pid-now-invalid (consumed-info)", proc.pid() == ProcessID::INVALID);
 
 		cloner.setExe("sleep");
 		cloner << "1d";
@@ -57,11 +65,13 @@ public:
 		auto optres = proc.waitTimed(std::chrono::seconds{1});
 		RUN_STEP("sleep doesn't exit quickly", !optres);
 		RUN_STEP("proc-still-running", proc.running());
+		RUN_STEP("pid-still-valid", proc.pid() != ProcessID::INVALID);
 
 		proc.kill(cosmos::signal::KILL);
 		res = proc.wait();
 		RUN_STEP("kill-killed-sleep", res.signaled() && res.termSignal() == cosmos::signal::KILL);
 		RUN_STEP("proc-not-running", !proc.running());
+		RUN_STEP("pid-now-invalid", proc.pid() == ProcessID::INVALID);
 	}
 };
 
