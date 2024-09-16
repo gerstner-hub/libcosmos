@@ -713,8 +713,8 @@ COSMOS_API void check_access(const SysString path, const AccessChecks checks = {
 
 /// Extra flags that influence the behaviour of check_access_at(), and check_access_fd().
 enum class AccessFlag : int {
-	EFFECTIVE_CREDS = AT_EACCESS, ///< use the caller's effective UID and GID for the access check.
-	NO_FOLLOW = AT_SYMLINK_NOFOLLOW ///< don't resolve symlinks in `path` but check access to the link itself.
+	EFFECTIVE_CREDS = AT_EACCESS,         ///< use the caller's effective UID and GID for the access check.
+	NO_FOLLOW       = AT_SYMLINK_NOFOLLOW ///< don't resolve symlinks in `path` but check access to the link itself.
 };
 
 using AccessFlags = BitMask<AccessFlag>;
