@@ -43,6 +43,7 @@ class FileSystemTest :
 		testCloseRange();
 		testCopyFileRange();
 		testAccess();
+		testLock();
 	}
 
 	std::pair<std::filesystem::path, cosmos::TempDir> getTestDir() {
@@ -733,6 +734,17 @@ class FileSystemTest :
 
 		}
 	}
+
+	void testLock() {
+		START_TEST("flock() API test");
+
+		cosmos::File file{"/etc/fstab", cosmos::OpenMode::READ_ONLY};
+		cosmos::fs::flock(file.fd(), cosmos::fs::LockOperation::LOCK_EXCLUSIVE);
+		RUN_STEP("flock(fd, LOCK_EX)", true);
+		cosmos::fs::flock(file.fd(), cosmos::fs::LockOperation::UNLOCK);
+		RUN_STEP("flock(fd, LOCK_UN)", true);
+	}
+
 };
 
 int main(const int argc, const char **argv) {

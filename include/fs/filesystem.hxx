@@ -742,4 +742,51 @@ COSMOS_API void check_access_at(const DirFD dir_fd, const SysString path,
 COSMOS_API void check_access_fd(const FileDescriptor fd, const AccessChecks check = {},
 		const AccessFlags flags = {});
 
+/// Flags used with flock().
+enum class LockOperation : int {
+	LOCK_SHARED    = LOCK_SH, ///< place a shared lock of which multiple may exist at the same time (for reading)
+	LOCK_EXCLUSIVE = LOCK_EX, ///< place an exclusive lock of which only one may exist at the same time (for writing)
+	UNLOCK         = LOCK_UN  ///< remove an existing lock (regardless of shared or exclusive)
+};
+
+enum class LockFlag : int {
+	LOCK_NONBLOCK = LOCK_NB ///< don't block if a lock cannot be placed, throw ApiError with Errno::WOULD_BLOCK instead.
+};
+
+/// Additional flags influencing flock behaviour.
+using LockFlags = BitMask<LockFlag>;
+
+/// Apply or remove an advisory lock on the given file descriptor.
+/**
+ * This type of locking is advisory only i.e. the participating processes need
+ * to cooperate with each other. A process with sufficient privileges can
+ * still modify the file without owning a lock.
+ *
+ * The lock is associated with the open file description, which means the
+ * lock is inherited to child processes via fork() and to duplicated file
+ * descriptors. Only once all file descriptors referring to the lock have been
+ * closed, will the lock automatically be released. An UNLOCK operation on any
+ * file descriptor referring to the open file description will release the
+ * lock for all the other file descriptors as well.
+ *
+ * A process may only hold one type of lock on a file. If the file is already
+ * locked, then a subsequent lock can be used to convert the lock type into a
+ * different one (i.e. shared to exclusive and vice versa).
+ *
+ * Locks from this call are preserved across execve() (if a file descriptor
+ * referring to the lock is passed through execve()).
+ *
+ * The OpenMode of the file descriptor is not relevant for locking the file
+ * using this API.
+ *
+ * This API has restrictions and side effects on network file systems like
+ * CIFS and NFS:
+ *
+ * - on older kernels the locking happened only for the local machine
+ * - on newer kernels the lock can be transparently implemented via the
+ *   `fcntl()` byte-range locking, which has different semantics (e.g. for
+ *   placing write locks, the file descriptor has to be open for writing).
+ **/
+COSMOS_API void flock(const FileDescriptor fd, const LockOperation operation, const LockFlags flags = {});
+
 } // end ns

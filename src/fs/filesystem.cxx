@@ -1,6 +1,7 @@
 // Linux
 #include <errno.h>
 #include <limits.h>
+#include <sys/file.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -648,6 +649,12 @@ COSMOS_API void check_access_fd(const FileDescriptor fd, const AccessChecks chec
 	}
 
 	cosmos_throw (ApiError("faccessat()"));
+}
+
+COSMOS_API void flock(const FileDescriptor fd, const LockOperation operation, const LockFlags flags) {
+	if (::flock(to_integral(fd.raw()), cosmos::to_integral(operation) | flags.raw()) != 0) {
+		cosmos_throw (ApiError("flock()"));
+	}
 }
 
 } // end ns
