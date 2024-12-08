@@ -25,7 +25,7 @@ void FileDescriptor::close() {
 }
 
 void FileDescriptor::duplicate(const FileDescriptor new_fd, const CloseOnExec cloexec) const {
-	auto res = ::dup3(to_integral(m_fd), to_integral(new_fd.raw()), cloexec ? O_CLOEXEC : 0);
+	const auto res = ::dup3(to_integral(m_fd), to_integral(new_fd.raw()), cloexec ? O_CLOEXEC : 0);
 
 	if (res == -1) {
 		cosmos_throw (ApiError("dup3()"));
@@ -53,7 +53,7 @@ FileDescriptor::DescFlags FileDescriptor::getFlags() const {
 }
 
 void FileDescriptor::setFlags(const DescFlags flags) {
-	auto res = ::fcntl(to_integral(m_fd), F_SETFD, flags.raw());
+	const auto res = ::fcntl(to_integral(m_fd), F_SETFD, flags.raw());
 
 	if (res != 0) {
 		cosmos_throw (ApiError("fcntl(F_SETFD)"));
@@ -61,7 +61,7 @@ void FileDescriptor::setFlags(const DescFlags flags) {
 }
 
 std::tuple<OpenMode, OpenFlags> FileDescriptor::getStatusFlags() const {
-	auto flags = ::fcntl(to_integral(m_fd), F_GETFL);
+	const auto flags = ::fcntl(to_integral(m_fd), F_GETFL);
 
 	if (flags == -1) {
 		cosmos_throw (ApiError("fcntl(F_GETFL)"));
@@ -74,10 +74,9 @@ std::tuple<OpenMode, OpenFlags> FileDescriptor::getStatusFlags() const {
 }
 
 void FileDescriptor::setStatusFlags(const OpenFlags flags) {
+	const auto res = ::fcntl(to_integral(m_fd), F_SETFL, flags.raw());
 
-	auto res = ::fcntl(to_integral(m_fd), F_SETFL, flags.raw());
-
-	if (res == -1) {
+	if (res != 0) {
 		cosmos_throw (ApiError("fcntl(F_SETFL)"));
 	}
 }
@@ -115,7 +114,7 @@ void FileDescriptor::dataSync() {
 }
 
 void FileDescriptor::addSeals(const SealFlags flags) {
-	auto res = ::fcntl(to_integral(m_fd), F_ADD_SEALS, flags.raw());
+	const auto res = ::fcntl(to_integral(m_fd), F_ADD_SEALS, flags.raw());
 
 	if (res != 0) {
 		cosmos_throw (ApiError("fcntl(F_ADD_SEALS)"));
@@ -123,9 +122,9 @@ void FileDescriptor::addSeals(const SealFlags flags) {
 }
 
 FileDescriptor::SealFlags FileDescriptor::getSeals() const {
-	auto res = ::fcntl(to_integral(m_fd), F_GET_SEALS);
+	const auto res = ::fcntl(to_integral(m_fd), F_GET_SEALS);
 
-	if (res == -1) {
+	if (res != 0) {
 		cosmos_throw (ApiError("fcntl(F_GET_SEALS)"));
 	}
 
@@ -133,9 +132,9 @@ FileDescriptor::SealFlags FileDescriptor::getSeals() const {
 }
 
 int FileDescriptor::getPipeSize() const {
-	auto res = ::fcntl(to_integral(m_fd), F_GETPIPE_SZ);
+	const auto res = ::fcntl(to_integral(m_fd), F_GETPIPE_SZ);
 
-	if (res == -1) {
+	if (res != 0) {
 		cosmos_throw (ApiError("fcntl(F_GETPIP_SZ)"));
 	}
 
@@ -143,9 +142,9 @@ int FileDescriptor::getPipeSize() const {
 }
 
 int FileDescriptor::setPipeSize(const int new_size) {
-	auto res = ::fcntl(to_integral(m_fd), F_SETPIPE_SZ, new_size);
+	const auto res = ::fcntl(to_integral(m_fd), F_SETPIPE_SZ, new_size);
 
-	if (res == -1) {
+	if (res != 0) {
 		cosmos_throw (ApiError("fcntl(F_SETPIP_SZ)"));
 	}
 
