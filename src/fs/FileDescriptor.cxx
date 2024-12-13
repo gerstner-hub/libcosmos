@@ -6,7 +6,9 @@
 
 // cosmos
 #include <cosmos/error/ApiError.hxx>
+#include <cosmos/error/UsageError.hxx>
 #include <cosmos/fs/FileDescriptor.hxx>
+#include <cosmos/fs/FileLock.hxx>
 #include <cosmos/private/cosmos.hxx>
 #include <cosmos/utils.hxx>
 
@@ -149,6 +151,82 @@ int FileDescriptor::setPipeSize(const int new_size) {
 	}
 
 	return res;
+}
+
+bool FileDescriptor::getLock(FileLock &lock) const {
+	const auto res = ::fcntl(to_integral(m_fd), F_GETLK, &lock);
+
+	if (res != 0) {
+		cosmos_throw (ApiError("fcntl(F_GETLK)"));
+	}
+
+	return lock.type() == FileLock::Type::UNLOCK;
+}
+
+bool FileDescriptor::setLock(const FileLock &lock) const {
+	const auto res = ::fcntl(to_integral(m_fd), F_SETLK, &lock);
+
+	if (res != 0) {
+		switch (get_errno()) {
+			case Errno::AGAIN:
+			case Errno::ACCESS:
+				return false;
+			default:
+				cosmos_throw (ApiError("fcntl(F_SETLK)"));
+		}
+	}
+
+	return true;
+}
+
+void FileDescriptor::setLockWait(const FileLock &lock) const {
+	const auto res = ::fcntl(to_integral(m_fd), F_SETLKW, &lock);
+
+	if (res != 0) {
+		cosmos_throw (ApiError("fcntl(F_SETLKW)"));
+	}
+}
+
+bool FileDescriptor::getOFDLock(FileLock &lock) const {
+	const auto res = ::fcntl(to_integral(m_fd), F_OFD_GETLK, &lock);
+
+	if (res != 0) {
+		cosmos_throw (ApiError("fcntl(F_OFD_GETLK)"));
+	}
+
+	return lock.type() == FileLock::Type::UNLOCK;
+}
+
+bool FileDescriptor::setOFDLock(const FileLock &lock) const {
+	if (lock.pid() != ProcessID{0}) {
+		// provide better diagnostics, the kernel would just return EINVAL in this case
+		cosmos_throw (UsageError("attempt to set OFD lock with l_pid != 0"));
+	}
+	const auto res = ::fcntl(to_integral(m_fd), F_OFD_SETLK, &lock);
+
+	if (res != 0) {
+		switch (get_errno()) {
+			case Errno::AGAIN:
+			case Errno::ACCESS:
+				return false;
+			default:
+				cosmos_throw (ApiError("fcntl(F_OFD_SETLK)"));
+		}
+	}
+
+	return true;
+}
+
+void FileDescriptor::setOFDLockWait(const FileLock &lock) const {
+	if (lock.pid() != ProcessID{0}) {
+		// provide better diagnostics, the kernel would just return EINVAL in this case
+		cosmos_throw (UsageError("attempt to set OFD lock with l_pid != 0"));
+	}
+	const auto res = ::fcntl(to_integral(m_fd), F_OFD_SETLKW, &lock);
+
+	if (res != 0) {
+		cosmos_throw (ApiError("fcntl(F_OFD_SETLKW)"));
+	}
 }
 
 FileDescriptor stdout(FileNum::STDOUT);

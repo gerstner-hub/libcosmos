@@ -13,6 +13,8 @@
 
 namespace cosmos {
 
+class FileLock;
+
 /// Strong boolean to indicate CloseOnExec behaviour on file descriptors.
 using CloseOnExec = NamedBool<struct cloexec_t, true>;
 
@@ -22,9 +24,9 @@ using CloseOnExec = NamedBool<struct cloexec_t, true>;
  * operations to perform on it. This is mostly kept on a generic level without
  * knowledge about the actual object represented by the file descriptor.
  *
- * Instances of this type are not intended to be used directly, they should
- * only be used as building blocks to provide more abstract mechanisms. In
- * particular this type does not automatically close the associate file
+ * Instances of this type are not intended to be used on their own, they
+ * should only be used as building blocks to provide more abstract mechanisms.
+ * In particular this type does not automatically close the associated file
  * descriptor during destruction. This has to be done explicitly instead.
  **/
 class COSMOS_API FileDescriptor {
@@ -50,6 +52,8 @@ public: // types
 
 	/// Collection flags for applying seals in addSeals().
 	using SealFlags = BitMask<SealFlag>;
+
+
 
 public: // functions
 
@@ -214,6 +218,56 @@ public: // functions
 	bool operator!=(const FileDescriptor &other) const {
 		return !(*this == other);
 	}
+
+	/// Check lock availability for traditional process-wide POSIX locks.
+	/**
+	 * On input the `lock` data structure describes a lock that the caller
+	 * would like to place on the file. On output, if placing the lock
+	 * would be possible, `lock.type()` will be
+	 * `FileLock::Type::UNLOCK`. Otherwise `lock` will describe the
+	 * conflicting lock that prevents placing the lock. More than one lock
+	 * can be conflicting, but only the information for a single lock will
+	 * be returned.
+	 *
+	 * This check is subject to race conditions and cannot guarantee
+	 * that a later call to `setLock()` will succeed. If `true` is
+	 * returned, then placing the lock is currently possible (i.e.
+	 * `lock.type() == FileLock::Type::UNLOCK`).
+	 **/
+	bool getLock(FileLock &lock) const;
+
+	/// Release, or attempt to obtain, a traditional process-wide POSIX lock.
+	/**
+	 * `lock` describes a lock to be released or to be placed on the file.
+	 *
+	 * For unlocking set `lock.type()` to `FileLock::Type::UNLOCK`. Unlock
+	 * operations always return `true` or throw an `ApiError`.
+	 *
+	 * For unlocking this always returns `true`. For locking, if placing
+	 * the lock succeeds, `true` is returned, `false` otherwise. This
+	 * call will not block if the lock cannot be obtained. On error
+	 * conditions an `ApiError` is thrown.
+	 **/
+	bool setLock(const FileLock &lock) const;
+
+	/// Blocking version of setLock().
+	/**
+	 * This call will block until the described `lock` is placed on the
+	 * file. On error conditions an `ApiError` is thrown.
+	 *
+	 * There is some basic deadlock detection for this operation which can
+	 * result in an `ApiError` with Errno::DEADLOCK to be thrown.
+	 **/
+	void setLockWait(const FileLock &lock) const;
+
+	/// Just like getLock() but using open-file-description locks.
+	bool getOFDLock(FileLock &lock) const;
+
+	/// Just like setLock() but using open-file-description locks.
+	bool setOFDLock(const FileLock &lock) const;
+
+	/// Just like setLockWait() but using open-file-description locks.
+	void setOFDLockWait(const FileLock &lock) const;
 
 protected: // data
 

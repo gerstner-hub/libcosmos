@@ -4,6 +4,9 @@
 // cosmos
 #include <cosmos/fs/FileDescriptor.hxx>
 #include <cosmos/fs/File.hxx>
+#include <cosmos/fs/FileLock.hxx>
+#include <cosmos/fs/TempFile.hxx>
+#include <cosmos/proc/process.hxx>
 
 // Test
 #include "TestBase.hxx"
@@ -18,6 +21,7 @@ public:
 		testStdinFD();
 		testDup();
 		testStatusFlags();
+		testFileLocks();
 	}
 
 	void testStdinFD() {
@@ -84,7 +88,69 @@ public:
 
 		RUN_STEP("mode-still-matches", mode == mode2);
 		RUN_STEP("flags-have-nonblock", flags[cosmos::OpenFlag::NONBLOCK]);
+	}
 
+	void testFileLocks() {
+		START_TEST("Testing FileLock / flock API");
+		cosmos::TempFile file{"/tmp/file_lock_test.{}"};
+		file.writeAll(std::string_view{"some data"});
+		auto fd = file.fd();
+		using Lock = cosmos::FileLock;
+		// lock the first few bytes of the file
+		Lock lock{Lock::Type::WRITE_LOCK};
+		lock.setLength(4);
+
+		bool can_place = fd.getLock(lock);
+
+		RUN_STEP("initial-write-lock-possible", can_place && lock.type() == Lock::Type::UNLOCK);
+		lock.setType(Lock::Type::WRITE_LOCK);
+		// now actually place the lock
+		fd.setLockWait(lock);
+
+		lock.setLength(0);
+		can_place = fd.getOFDLock(lock);
+		RUN_STEP("busy-ofd-write-lock-fails", !can_place &&
+				lock.type() == Lock::Type::WRITE_LOCK &&
+				lock.length() == 4 &&
+				lock.pid() == cosmos::proc::get_own_pid() &&
+				!lock.isOFDLock());
+
+		lock.setType(Lock::Type::UNLOCK);
+		fd.setLockWait(lock);
+
+		lock.clear(Lock::Type::WRITE_LOCK);
+		fd.setOFDLockWait(lock);
+
+		lock.setType(Lock::Type::UNLOCK);
+		fd.setOFDLockWait(lock);
+
+		// for testing conflicting looks we need a second open file description for the file
+		cosmos::File file2{file.path(), cosmos::OpenMode::READ_WRITE};
+		auto fd2 = file2.fd();
+
+		lock.setType(Lock::Type::READ_LOCK);
+		lock.setLength(4);
+		{
+			cosmos::FileLockGuard fl_guard{fd, lock};
+			lock.setType(Lock::Type::WRITE_LOCK);
+			can_place = fd2.getOFDLock(lock);
+			RUN_STEP("cannot-write-lock-due-to-read-lock", !can_place &&
+					lock.type() == Lock::Type::READ_LOCK &&
+					lock.isOFDLock() &&
+					lock.length() == 4 &&
+					lock.start() == 0);
+
+			lock.clear(Lock::Type::READ_LOCK);
+			const auto placed = fd2.setOFDLock(lock);
+			RUN_STEP("double-read-lock-possible", placed == true);
+
+			lock.setType(Lock::Type::UNLOCK);
+			fd2.setOFDLockWait(lock);
+		}
+
+		lock.setType(Lock::Type::WRITE_LOCK);
+		can_place = fd2.getOFDLock(lock);
+		RUN_STEP("write-lock-possible-after-guard-destroyed", can_place == true);
 	}
 protected: // data
 
