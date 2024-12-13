@@ -269,6 +269,13 @@ public: // functions
 	/// Just like setLockWait() but using open-file-description locks.
 	void setOFDLockWait(const FileLock &lock) const;
 
+protected: // functions
+
+	int fcntl(int cmd) const;
+
+	template <typename T>
+	int fcntl(int cmd, T val) const;
+
 protected: // data
 
 	FileNum m_fd = FileNum::INVALID;

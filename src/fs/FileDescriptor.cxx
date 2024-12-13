@@ -26,6 +26,15 @@ void FileDescriptor::close() {
 	cosmos_throw (ApiError("close()"));
 }
 
+int FileDescriptor::fcntl(int cmd) const {
+	return ::fcntl(to_integral(m_fd), cmd);
+}
+
+template <typename T>
+int FileDescriptor::fcntl(int cmd, T val) const {
+	return ::fcntl(to_integral(m_fd), cmd, val);
+}
+
 void FileDescriptor::duplicate(const FileDescriptor new_fd, const CloseOnExec cloexec) const {
 	const auto res = ::dup3(to_integral(m_fd), to_integral(new_fd.raw()), cloexec ? O_CLOEXEC : 0);
 
@@ -35,7 +44,7 @@ void FileDescriptor::duplicate(const FileDescriptor new_fd, const CloseOnExec cl
 }
 
 FileDescriptor FileDescriptor::duplicate(const FileNum lowest, const CloseOnExec cloexec) const {
-	const auto fd = ::fcntl(to_integral(m_fd), cloexec ? F_DUPFD_CLOEXEC : F_DUPFD, to_integral(lowest));
+	const auto fd = this->fcntl(cloexec ? F_DUPFD_CLOEXEC : F_DUPFD, to_integral(lowest));
 
 	if (fd == -1) {
 		cosmos_throw (ApiError("fcntl(F_DUPFD)"));
@@ -45,7 +54,7 @@ FileDescriptor FileDescriptor::duplicate(const FileNum lowest, const CloseOnExec
 }
 
 FileDescriptor::DescFlags FileDescriptor::getFlags() const {
-	const auto flags = ::fcntl(to_integral(m_fd), F_GETFD);
+	const auto flags = this->fcntl(F_GETFD);
 
 	if (flags == -1) {
 		cosmos_throw (ApiError("fcntl(F_GETFD)"));
@@ -55,7 +64,7 @@ FileDescriptor::DescFlags FileDescriptor::getFlags() const {
 }
 
 void FileDescriptor::setFlags(const DescFlags flags) {
-	const auto res = ::fcntl(to_integral(m_fd), F_SETFD, flags.raw());
+	const auto res = this->fcntl(F_SETFD, flags.raw());
 
 	if (res != 0) {
 		cosmos_throw (ApiError("fcntl(F_SETFD)"));
@@ -63,7 +72,7 @@ void FileDescriptor::setFlags(const DescFlags flags) {
 }
 
 std::tuple<OpenMode, OpenFlags> FileDescriptor::getStatusFlags() const {
-	const auto flags = ::fcntl(to_integral(m_fd), F_GETFL);
+	const auto flags = this->fcntl(F_GETFL);
 
 	if (flags == -1) {
 		cosmos_throw (ApiError("fcntl(F_GETFL)"));
@@ -76,7 +85,7 @@ std::tuple<OpenMode, OpenFlags> FileDescriptor::getStatusFlags() const {
 }
 
 void FileDescriptor::setStatusFlags(const OpenFlags flags) {
-	const auto res = ::fcntl(to_integral(m_fd), F_SETFL, flags.raw());
+	const auto res = this->fcntl(F_SETFL, flags.raw());
 
 	if (res != 0) {
 		cosmos_throw (ApiError("fcntl(F_SETFL)"));
@@ -116,7 +125,7 @@ void FileDescriptor::dataSync() {
 }
 
 void FileDescriptor::addSeals(const SealFlags flags) {
-	const auto res = ::fcntl(to_integral(m_fd), F_ADD_SEALS, flags.raw());
+	const auto res = this->fcntl(F_ADD_SEALS, flags.raw());
 
 	if (res != 0) {
 		cosmos_throw (ApiError("fcntl(F_ADD_SEALS)"));
@@ -124,7 +133,7 @@ void FileDescriptor::addSeals(const SealFlags flags) {
 }
 
 FileDescriptor::SealFlags FileDescriptor::getSeals() const {
-	const auto res = ::fcntl(to_integral(m_fd), F_GET_SEALS);
+	const auto res = this->fcntl(F_GET_SEALS);
 
 	if (res != 0) {
 		cosmos_throw (ApiError("fcntl(F_GET_SEALS)"));
@@ -134,7 +143,7 @@ FileDescriptor::SealFlags FileDescriptor::getSeals() const {
 }
 
 int FileDescriptor::getPipeSize() const {
-	const auto res = ::fcntl(to_integral(m_fd), F_GETPIPE_SZ);
+	const auto res = this->fcntl(F_GETPIPE_SZ);
 
 	if (res != 0) {
 		cosmos_throw (ApiError("fcntl(F_GETPIP_SZ)"));
@@ -144,7 +153,7 @@ int FileDescriptor::getPipeSize() const {
 }
 
 int FileDescriptor::setPipeSize(const int new_size) {
-	const auto res = ::fcntl(to_integral(m_fd), F_SETPIPE_SZ, new_size);
+	const auto res = this->fcntl(F_SETPIPE_SZ, new_size);
 
 	if (res != 0) {
 		cosmos_throw (ApiError("fcntl(F_SETPIP_SZ)"));
@@ -154,7 +163,7 @@ int FileDescriptor::setPipeSize(const int new_size) {
 }
 
 bool FileDescriptor::getLock(FileLock &lock) const {
-	const auto res = ::fcntl(to_integral(m_fd), F_GETLK, &lock);
+	const auto res = this->fcntl(F_GETLK, &lock);
 
 	if (res != 0) {
 		cosmos_throw (ApiError("fcntl(F_GETLK)"));
@@ -164,7 +173,7 @@ bool FileDescriptor::getLock(FileLock &lock) const {
 }
 
 bool FileDescriptor::setLock(const FileLock &lock) const {
-	const auto res = ::fcntl(to_integral(m_fd), F_SETLK, &lock);
+	const auto res = this->fcntl(F_SETLK, &lock);
 
 	if (res != 0) {
 		switch (get_errno()) {
@@ -180,7 +189,7 @@ bool FileDescriptor::setLock(const FileLock &lock) const {
 }
 
 void FileDescriptor::setLockWait(const FileLock &lock) const {
-	const auto res = ::fcntl(to_integral(m_fd), F_SETLKW, &lock);
+	const auto res = this->fcntl(F_SETLKW, &lock);
 
 	if (res != 0) {
 		cosmos_throw (ApiError("fcntl(F_SETLKW)"));
@@ -188,7 +197,7 @@ void FileDescriptor::setLockWait(const FileLock &lock) const {
 }
 
 bool FileDescriptor::getOFDLock(FileLock &lock) const {
-	const auto res = ::fcntl(to_integral(m_fd), F_OFD_GETLK, &lock);
+	const auto res = this->fcntl(F_OFD_GETLK, &lock);
 
 	if (res != 0) {
 		cosmos_throw (ApiError("fcntl(F_OFD_GETLK)"));
@@ -202,7 +211,7 @@ bool FileDescriptor::setOFDLock(const FileLock &lock) const {
 		// provide better diagnostics, the kernel would just return EINVAL in this case
 		cosmos_throw (UsageError("attempt to set OFD lock with l_pid != 0"));
 	}
-	const auto res = ::fcntl(to_integral(m_fd), F_OFD_SETLK, &lock);
+	const auto res = this->fcntl(F_OFD_SETLK, &lock);
 
 	if (res != 0) {
 		switch (get_errno()) {
@@ -222,7 +231,7 @@ void FileDescriptor::setOFDLockWait(const FileLock &lock) const {
 		// provide better diagnostics, the kernel would just return EINVAL in this case
 		cosmos_throw (UsageError("attempt to set OFD lock with l_pid != 0"));
 	}
-	const auto res = ::fcntl(to_integral(m_fd), F_OFD_SETLKW, &lock);
+	const auto res = this->fcntl(F_OFD_SETLKW, &lock);
 
 	if (res != 0) {
 		cosmos_throw (ApiError("fcntl(F_OFD_SETLKW)"));
