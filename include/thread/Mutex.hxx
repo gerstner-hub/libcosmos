@@ -76,7 +76,7 @@ struct MutexGuard :
 		public ResourceGuard<const Mutex&> {
 
 	explicit MutexGuard(const Mutex &m) :
-			ResourceGuard(m, [](const Mutex &_m) { _m.unlock(); }) {
+			ResourceGuard{m, [](const Mutex &_m) { _m.unlock(); }} {
 		m.lock();
 	}
 };
@@ -86,7 +86,7 @@ struct MutexReverseGuard :
 		public ResourceGuard<const Mutex&> {
 
 	explicit MutexReverseGuard(const Mutex &m) :
-			ResourceGuard(m, [](const Mutex &_m) { _m.lock(); }) {
+			ResourceGuard{m, [](const Mutex &_m) { _m.lock(); }} {
 		m.unlock();
 	}
 };
