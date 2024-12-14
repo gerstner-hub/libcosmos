@@ -238,6 +238,43 @@ void FileDescriptor::setOFDLockWait(const FileLock &lock) const {
 	}
 }
 
+void FileDescriptor::getOwner(Owner &owner) const {
+	const auto res = this->fcntl(F_GETOWN_EX, owner.raw());
+
+	if (res != 0) {
+		cosmos_throw (ApiError("fcntl(F_GETOWN_EX)"));
+	}
+}
+
+void FileDescriptor::setOwner(const Owner owner) {
+	const auto res = this->fcntl(F_SETOWN_EX, owner.raw());
+
+	if (res != 0) {
+		cosmos_throw (ApiError("fcntl(F_SETOWN_EX)"));
+	}
+}
+
+std::optional<Signal> FileDescriptor::getSignal() const {
+	const auto res = this->fcntl(F_GETSIG);
+
+	if (res == -1) {
+		cosmos_throw (ApiError("fcntl(F_GETSIG)"));
+	}
+
+	if (res == 0)
+		return {};
+
+	return Signal{SignalNr{res}};
+}
+
+void FileDescriptor::setSignal(std::optional<Signal> sig) {
+	const auto res = this->fcntl(F_SETSIG, sig ? to_integral(sig->raw()) : 0);
+
+	if (res != 0) {
+		cosmos_throw (ApiError("fcntl(F_SETSIG)"));
+	}
+}
+
 FileDescriptor stdout(FileNum::STDOUT);
 FileDescriptor stderr(FileNum::STDERR);
 FileDescriptor stdin(FileNum::STDIN);

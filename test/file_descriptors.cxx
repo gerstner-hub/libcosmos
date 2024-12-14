@@ -6,7 +6,10 @@
 #include <cosmos/fs/File.hxx>
 #include <cosmos/fs/FileLock.hxx>
 #include <cosmos/fs/TempFile.hxx>
+#include <cosmos/io/Pipe.hxx>
 #include <cosmos/proc/process.hxx>
+#include <cosmos/proc/signal.hxx>
+#include <cosmos/thread/thread.hxx>
 
 // Test
 #include "TestBase.hxx"
@@ -22,6 +25,8 @@ public:
 		testDup();
 		testStatusFlags();
 		testFileLocks();
+		testFileOwner();
+		testSignalSettings();
 	}
 
 	void testStdinFD() {
@@ -151,6 +156,51 @@ public:
 		lock.setType(Lock::Type::WRITE_LOCK);
 		can_place = fd2.getOFDLock(lock);
 		RUN_STEP("write-lock-possible-after-guard-destroyed", can_place == true);
+	}
+
+	void testFileOwner() {
+		START_TEST("Testing file owner type");
+
+		cosmos::FileDescriptor::Owner owner_info;
+		RUN_STEP("default-owner-ctor-invalid",
+				!owner_info.valid() &&
+				!owner_info.isTID() &&
+				!owner_info.isPID() &&
+				!owner_info.isPGID());
+		owner_info.set(cosmos::thread::get_tid());
+		RUN_STEP("owner-thread-id-valid", owner_info.valid() && owner_info.isTID());
+		owner_info.set(cosmos::proc::get_own_pid());
+		RUN_STEP("owner-process-id-valid", owner_info.valid() && owner_info.isPID());
+		owner_info.set(cosmos::proc::get_own_process_group());
+		RUN_STEP("owner-process-group-id-valid", owner_info.valid() && owner_info.isPGID());
+		owner_info.invalidate();
+		RUN_STEP("invalidate-invalidates",
+				!owner_info.valid() &&
+				!owner_info.isTID() &&
+				!owner_info.isPID() &&
+				!owner_info.isPGID());
+	}
+
+	void testSignalSettings() {
+		START_TEST("Testing file owner and signal settings");
+		cosmos::FileDescriptor::Owner owner_info;
+		cosmos::Pipe pip;
+		auto fd = pip.readEnd();
+		fd.getOwner(owner_info);
+		RUN_STEP("no-initial-owner", !owner_info.valid());
+		fd.setOwner(cosmos::FileDescriptor::Owner{cosmos::proc::get_own_pid()});
+		fd.getOwner(owner_info);
+		RUN_STEP("setting-owner-to-us-works", owner_info.valid() &&
+				owner_info.isPID() && *owner_info.asPID() == cosmos::proc::get_own_pid());
+
+		auto cursig = fd.getSignal();
+		RUN_STEP("default-sigio-configured", !cursig);
+		fd.setSignal(cosmos::signal::TERMINATE);
+		cursig = fd.getSignal();
+		RUN_STEP("configured-signal-is-stored", cursig && *cursig == cosmos::signal::TERMINATE);
+		fd.setSignal({});
+		cursig = fd.getSignal();
+		RUN_STEP("restoring-default-works", !cursig);
 	}
 protected: // data
 

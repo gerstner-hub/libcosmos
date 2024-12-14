@@ -1,6 +1,7 @@
 #pragma once
 
 // C++
+#include <optional>
 #include <tuple>
 
 // Linux
@@ -9,6 +10,8 @@
 // cosmos
 #include <cosmos/BitMask.hxx>
 #include <cosmos/fs/types.hxx>
+#include <cosmos/proc/Signal.hxx>
+#include <cosmos/thread/thread.hxx>
 #include <cosmos/utils.hxx>
 
 namespace cosmos {
@@ -53,7 +56,121 @@ public: // types
 	/// Collection flags for applying seals in addSeals().
 	using SealFlags = BitMask<SealFlag>;
 
+	/// Information about file owner settings.
+	/**
+	 * This type holds either a ProcessID, ProcessGroupID or ThreadID.
+	 * Only type safe operations are provided, for low level access the
+	 * raw system call data structure can be accesses via the `raw()`
+	 * member.
+	 *
+	 * The file owner defines which process, thread or process group gets
+	 * notified about asynchronous file I/O events via signals.
+	 **/
+	struct Owner {
 
+		/*
+		 * Contrary to what the man page says this is not an int, but
+		 * an enum in the system headers.
+		 *
+		 * The type field being an old school enum complicates things
+		 * for us here, we cannot use to_integral() to assign. Instead
+		 * perform a static cast to the declaration type to make this
+		 * work.
+		 */
+		using RawType = decltype(f_owner_ex::type);
+
+	public: // types
+
+		/// Strong owner type differentation.
+		enum class Type : std::underlying_type<RawType>::type {
+			THREAD  = F_OWNER_TID,
+			PROCESS = F_OWNER_PID,
+			GROUP   = F_OWNER_PGRP
+		};
+
+	public: // functions
+
+		Owner() {
+			invalidate();
+		}
+
+		explicit Owner(ProcessID pid) {
+			set(pid);
+		}
+
+		explicit Owner(ProcessGroupID pgid) {
+			set(pgid);
+		}
+
+		explicit Owner(ThreadID tid) {
+			set(tid);
+		}
+
+		Type type() const {
+			return Type{m_raw.type};
+		}
+
+		bool isTID() const {
+			return type() == Type::THREAD;
+		}
+
+		bool isPID() const {
+			return type() == Type::PROCESS;
+		}
+
+		bool isPGID() const {
+			return type() == Type::GROUP;
+		}
+
+		bool valid() const {
+			// if not owner was ever set then the PID will be zero
+			return m_raw.pid != 0 && (isTID() || isPID() || isPGID());
+		}
+
+		void invalidate() {
+			m_raw.type = (RawType)-1;
+			m_raw.pid = -1;
+		}
+
+		void set(ProcessID pid) {
+			m_raw.type = static_cast<RawType>(Type::PROCESS);
+			m_raw.pid = to_integral(pid);
+		}
+
+		void set(ProcessGroupID pgid) {
+			m_raw.type = static_cast<RawType>(Type::GROUP);
+			m_raw.pid = to_integral(pgid);
+		}
+
+		void set(ThreadID tid) {
+			m_raw.type = static_cast<RawType>(Type::THREAD);
+			m_raw.pid = to_integral(tid);
+		}
+
+		std::optional<ProcessID> asPID() const {
+			return isPID() ? std::make_optional(ProcessID{m_raw.pid}) : std::nullopt;
+		}
+
+		std::optional<ProcessGroupID> asPGID() const {
+			return isPGID() ? std::make_optional(ProcessGroupID{m_raw.pid}) : std::nullopt;
+		}
+
+		std::optional<ThreadID> asTID() const {
+			return isTID() ? std::make_optional(ThreadID{m_raw.pid}) : std::nullopt;
+		}
+
+		auto raw() {
+			return &m_raw;
+		}
+
+		auto raw() const {
+			return &m_raw;
+		}
+
+	protected: // data
+
+		f_owner_ex m_raw;
+	};
 
 public: // functions
 
@@ -268,6 +385,48 @@ public: // functions
 
 	/// Just like setLockWait() but using open-file-description locks.
 	void setOFDLockWait(const FileLock &lock) const;
+
+	/// Returns the current file descriptor owner settings.
+	/**
+	 * If no owner has been set previously, then the call will succeed but
+	 * `owner.valid()` will return `false`. This is no fully specified in
+	 * `fcntl(2)` but practical tests show that in this case
+	 * Owner::Type::THREAD with a ThreadID of zero is returned by the
+	 * kernel.
+	 **/
+	void getOwner(Owner &owner) const;
+
+	/// Change the current file descriptor owner settings.
+	/**
+	 * The credentials at the time of this call will be associated with
+	 * the file descriptor and will be used for permission checks when an
+	 * asynchronous I/O signal needs to be delivered.
+	 **/
+	void setOwner(const Owner owner);
+
+	/// Returns the currently configured signal for asynchronous I/O.
+	/**
+	 * If std::nullopt is returned, then the default SIGIO signal
+	 * (cosmos::signal::IO_EVENT) is configured. Otherwise the returned
+	 * signal will be delivered together with extra information if
+	 * SA_SIGINFO handler is setup for it. This extra information allows
+	 * to identify the file descriptor for which the event was sent.
+	 *
+	 * There exists a corner case, though, if the file descriptor for
+	 * which the event was configured is closed but a copy of the file
+	 * descriptor is still around. Then the signal will report the
+	 * original now closed file descriptor.
+	 **/
+	std::optional<Signal> getSignal() const;
+
+	/// Configure the signal to be used for asynchronous I/O.
+	/**
+	 * If std::nullopt is passed then the default SIGIO signal will be
+	 * configured and no extra information is provided to the signal
+	 * handler. Otherwise the supplied signal is used and the extra
+	 * information is supplied as described at `getSignal()`.
+	 **/
+	void setSignal(std::optional<Signal> sig);
 
 protected: // functions
 
