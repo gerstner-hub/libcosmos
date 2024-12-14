@@ -80,8 +80,8 @@ struct COSMOS_API CloneArgs :
 		this->pidfd = reinterpret_cast<uintptr_t>(&fd.m_fd);
 	}
 
-	void setChildTID(ProcessID *pid) {
-		this->child_tid = reinterpret_cast<uint64_t>(pid);
+	void setChildTID(ThreadID *tid) {
+		this->child_tid = reinterpret_cast<uint64_t>(tid);
 	}
 
 	void setParentTID(ProcessID *pid) {
@@ -109,21 +109,21 @@ struct COSMOS_API CloneArgs :
 		this->stack = reinterpret_cast<uint64_t>(p_stack);
 	}
 
-	/// Allows to set an explicit process ID to use for the child.
+	/// Allows to set an explicit thread ID to use for the child.
 	/**
-	 * This instructs the kernel to use a specific process ID for the new
-	 * child process. If the process should have multiple specific PIDs in
-	 * multiple PID namespaces then an array of `num_pids` can be
-	 * specified. The first entry defines the PID in the most nested PID
-	 * namespaces and so on.
+	 * This instructs the kernel to use a specific thread ID for the new
+	 * child process. If the process should have multiple specific TIDs in
+	 * multiple PID namespaces then an array of `num_tids` can be
+	 * specified. The first entry defines the TID in the most nested PID
+	 * namespace and so on.
 	 *
 	 * This requires CAP_CHECKPOINT_RESTORE. The feature is meant for
 	 * reconstructing a certain system state e.g. from a container
 	 * snapshot.
 	 **/
-	void setTIDs(const ProcessID *pids, size_t num_pids) {
-		this->set_tid = reinterpret_cast<uint64_t>(pids);
-		this->set_tid_size = num_pids;
+	void setTIDs(const ThreadID *tids, size_t num_tids) {
+		this->set_tid = reinterpret_cast<uint64_t>(tids);
+		this->set_tid_size = num_tids;
 	}
 
 	/// Sets the cgroup2 file descriptor of which the child should become a member.

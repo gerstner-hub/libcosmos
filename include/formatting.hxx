@@ -13,9 +13,10 @@
 #include <cosmos/dso_export.h>
 #include <cosmos/fs/types.hxx>
 #include <cosmos/proc/types.hxx>
+#include <cosmos/string.hxx>
+#include <cosmos/thread/thread.hxx>
 #include <cosmos/types.hxx>
 #include <cosmos/utils.hxx>
-#include <cosmos/string.hxx>
 
 /**
  * @file
@@ -33,6 +34,12 @@ inline std::ostream& operator<<(std::ostream &o, const cosmos::ProcessID &pid) {
 	// we could also think about using a consistent annotation of process
 	// ids in the output like @1234 or <pid: 1234> something like that.
 	o << cosmos::to_integral(pid);
+	return o;
+}
+
+inline std::ostream& operator<<(std::ostream &o, const cosmos::ThreadID &tid) {
+	// similarly we could use special annotation here
+	o << cosmos::to_integral(tid);
 	return o;
 }
 

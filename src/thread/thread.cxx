@@ -8,13 +8,13 @@
 
 namespace cosmos::thread {
 
-ProcessID get_tid() {
+ThreadID get_tid() {
 	// glibc doesn't come with a wrapper for this
-	return static_cast<ProcessID>(syscall(SYS_gettid));
+	return static_cast<ThreadID>(syscall(SYS_gettid));
 }
 
 bool is_main_thread() {
-	return get_tid() == proc::get_own_pid();
+	return as_pid(get_tid()) == proc::get_own_pid();
 }
 
 } // end ns

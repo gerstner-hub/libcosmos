@@ -38,7 +38,7 @@ protected: // functions
 		START_TEST("thread ids");
 		auto mytid = cosmos::thread::get_tid();
 
-		std::cout << "my TID is " << static_cast<pid_t>(mytid) << std::endl;
+		std::cout << "my TID is " << cosmos::to_integral(mytid) << std::endl;
 		RUN_STEP("verify-main-thread", cosmos::thread::is_main_thread());
 
 		RUN_STEP("pthread-id-equals", cosmos::pthread::get_id() == cosmos::pthread::get_id());
