@@ -5,7 +5,7 @@
 #include <cosmos/error/ApiError.hxx>
 #include <cosmos/memory.hxx>
 #include <cosmos/proc/clone.hxx>
-#include <cosmos/proc/Signal.hxx>
+#include <cosmos/proc/signal.hxx>
 
 namespace {
 

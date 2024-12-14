@@ -9,7 +9,7 @@
 
 // cosmos
 #include <cosmos/BitMask.hxx>
-#include <cosmos/proc/Signal.hxx>
+#include <cosmos/proc/signal.hxx>
 #include <cosmos/proc/ptrace.hxx>
 
 namespace cosmos {
