@@ -3,9 +3,12 @@
 
 // cosmos
 #include <cosmos/formatting.hxx>
+#include <cosmos/memory.hxx>
+#include <cosmos/proc/process.hxx>
 #include <cosmos/proc/SignalFD.hxx>
 #include <cosmos/proc/SigSet.hxx>
-#include <cosmos/proc/process.hxx>
+#include <cosmos/thread/PosixThread.hxx>
+#include <cosmos/thread/thread.hxx>
 
 // Test
 #include "TestBase.hxx"
@@ -19,6 +22,7 @@ class SignalTest :
 		testSets();
 		testSigmask();
 		testIgnore();
+		testPause();
 	}
 
 	void testSets() {
@@ -80,6 +84,34 @@ class SignalTest :
 		signal::raise(signal::TERMINATE);
 
 		RUN_STEP("did-not-terminate", true);
+	}
+
+	static void handle_signal(int sig) {
+		(void)sig;
+	}
+
+	void testPause() {
+		START_TEST("pause and wake thread via thread-directed signal");
+
+		// TODO: use libcosmos API for this in the future (not yet available)
+		struct sigaction action;
+		cosmos::zero_object(action);
+		action.sa_handler = &SignalTest::handle_signal;
+		const auto res = ::sigaction(SIGUSR1, &action, nullptr);
+
+		RUN_STEP("sigaction-succeeds", res == 0);
+
+		const auto tid_to_signal = cosmos::thread::get_tid();
+
+		cosmos::PosixThread thread{[tid_to_signal]() {
+			cosmos::signal::send(cosmos::proc::get_own_pid(), tid_to_signal, cosmos::signal::USR1);
+		}};
+
+		cosmos::signal::pause();
+
+		RUN_STEP("pause-returns-due-to-USR1", true);
+
+		thread.join();
 	}
 };
 

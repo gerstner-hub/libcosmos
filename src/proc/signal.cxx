@@ -96,6 +96,11 @@ void send(const PidFD pidfd, const Signal s) {
 	}
 }
 
+void pause() {
+	// this call always returns -1 with errno set to EINT
+	::pause();
+}
+
 void block(const SigSet &s, std::optional<SigSet*> old) {
 	set_signal_mask(SIG_BLOCK, s.raw(), old ? old.value()->raw() : nullptr);
 }

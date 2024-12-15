@@ -92,6 +92,14 @@ COSMOS_API void send(const PidFD pidfd, const Signal s);
  **/
 COSMOS_API void send(const ProcessID proc, const ThreadID thread, const Signal s);
 
+/// Suspend execution of the calling thread until an asynchronous signal occurs.
+/**
+ * The calling thread will be blocked until a signal is delivered that either
+ * terminates the process or causes the execution of an asynchronous signal
+ * catching function.
+ **/
+COSMOS_API void pause();
+
 /// Blocks the given set of signals in the current process's signal mask.
 /**
  * Blocked signals won't be delivered asynchronously to the process
