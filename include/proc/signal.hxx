@@ -12,6 +12,7 @@
 // cosmos
 #include <cosmos/proc/PidFD.hxx>
 #include <cosmos/proc/Signal.hxx>
+#include <cosmos/thread/thread.hxx>
 #include <cosmos/utils.hxx>
 
 namespace cosmos {
@@ -81,6 +82,15 @@ COSMOS_API void send(const ProcessID proc, const Signal s);
  * \exception Throws an ApiError on error.
  **/
 COSMOS_API void send(const PidFD pidfd, const Signal s);
+
+/// Sends a signal to a specific thread of a process.
+/**
+ * Linux differentiates between process-directed and thread-directed signals.
+ * If a (multi-threaded) process is the target of a signal, then an arbitrary
+ * thread in that process will receive the signal. To target a specific thread
+ * this call can be used, which specifies a specific thread within a process.
+ **/
+COSMOS_API void send(const ProcessID proc, const ThreadID thread, const Signal s);
 
 /// Blocks the given set of signals in the current process's signal mask.
 /**

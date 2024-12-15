@@ -43,6 +43,12 @@ void send(const ProcessID proc, const Signal s) {
 	}
 }
 
+void send(const ProcessID proc, const ThreadID thread, const Signal s) {
+	if (::tgkill(to_integral(proc), to_integral(thread), to_integral(s.raw()))) {
+		cosmos_throw (ApiError("tgkill()"));
+	}
+}
+
 void send(const PidFD pidfd, const Signal s) {
 	if (!running_on_valgrind) {
 		// there's no glibc wrapper for this yet
