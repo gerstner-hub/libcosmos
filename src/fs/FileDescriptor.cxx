@@ -275,6 +275,24 @@ void FileDescriptor::setSignal(std::optional<Signal> sig) {
 	}
 }
 
+FileDescriptor::LeaseType FileDescriptor::getLease() const {
+	const auto res = this->fcntl(F_GETLEASE);
+
+	if (res == -1) {
+		cosmos_throw (ApiError("fcntl(F_GETLEASE)"));
+	}
+
+	return LeaseType{res};
+}
+
+void FileDescriptor::setLease(const LeaseType lease) {
+	const auto res = this->fcntl(F_SETLEASE, to_integral(lease));
+
+	if (res != 0) {
+		cosmos_throw (ApiError("fcntl(F_SETLEASE)"));
+	}
+}
+
 FileDescriptor stdout(FileNum::STDOUT);
 FileDescriptor stderr(FileNum::STDERR);
 FileDescriptor stdin(FileNum::STDIN);

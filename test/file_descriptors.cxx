@@ -2,13 +2,17 @@
 #include <iostream>
 
 // cosmos
+#include <cosmos/formatting.hxx>
 #include <cosmos/fs/FileDescriptor.hxx>
 #include <cosmos/fs/File.hxx>
 #include <cosmos/fs/FileLock.hxx>
 #include <cosmos/fs/TempFile.hxx>
 #include <cosmos/io/Pipe.hxx>
 #include <cosmos/proc/process.hxx>
+#include <cosmos/proc/SignalFD.hxx>
 #include <cosmos/proc/signal.hxx>
+#include <cosmos/proc/SigSet.hxx>
+#include <cosmos/thread/PosixThread.hxx>
 #include <cosmos/thread/thread.hxx>
 
 // Test
@@ -27,6 +31,7 @@ public:
 		testFileLocks();
 		testFileOwner();
 		testSignalSettings();
+		testFileLeases();
 	}
 
 	void testStdinFD() {
@@ -201,6 +206,62 @@ public:
 		fd.setSignal({});
 		cursig = fd.getSignal();
 		RUN_STEP("restoring-default-works", !cursig);
+	}
+
+	void testFileLeases() {
+		START_TEST("Testing file leases");
+		// we need a file opened read-only to fully test this, thus
+		// don't use TempFile, but a custom File setup.
+		const auto path = cosmos::sprintf(
+				"/tmp/file_lease_test.%d",
+				cosmos::to_integral(cosmos::proc::get_own_pid()));
+		cosmos::File file{path,
+				cosmos::OpenMode::READ_ONLY,
+				cosmos::OpenFlags{cosmos::OpenFlag::CLOEXEC,
+					cosmos::OpenFlag::CREATE,
+					cosmos::OpenFlag::EXCLUSIVE,
+					cosmos::OpenFlag::NOFOLLOW},
+				cosmos::FileMode{cosmos::ModeT{0600}}};
+		auto fd = file.fd();
+
+		fd.setSignal(cosmos::signal::USR1);
+
+		auto lease = fd.getLease();
+
+		RUN_STEP("no-lease-by-default", lease == cosmos::FileDescriptor::LeaseType::UNLOCK);
+
+		fd.setLease(cosmos::FileDescriptor::LeaseType::WRITE);
+
+		lease = fd.getLease();
+
+		RUN_STEP("seeing-write-lease-after-setting-it", lease == cosmos::FileDescriptor::LeaseType::WRITE);
+
+		cosmos::SigSet ss;
+		ss.set(cosmos::signal::USR1);
+		cosmos::signal::block(ss);
+		cosmos::SignalFD sfd{{cosmos::signal::USR1}};
+
+		cosmos::PosixThread thread{[path]() {
+			cosmos::File f{path, cosmos::OpenMode::READ_ONLY};
+		}};
+
+		cosmos::SignalFD::SigInfo info;
+
+		sfd.readEvent(info);
+
+		RUN_STEP("received-sigusr1", info.signal() == cosmos::signal::USR1);
+
+		lease = fd.getLease();
+
+		RUN_STEP("seeing-read-lease-after-break", lease == cosmos::FileDescriptor::LeaseType::READ);
+
+		try {
+			fd.setLease(cosmos::FileDescriptor::LeaseType::READ);
+		} catch (const cosmos::ApiError &e) {
+			std::cerr << e.what() << std::endl;
+		}
+
+		thread.join();
 	}
 protected: // data
 

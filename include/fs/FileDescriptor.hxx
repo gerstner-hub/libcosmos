@@ -56,6 +56,18 @@ public: // types
 	/// Collection flags for applying seals in addSeals().
 	using SealFlags = BitMask<SealFlag>;
 
+	/// Different request types for managing file leases.
+	/**
+	 * The basic constants are the same as for FileLock::Type, but the
+	 * underlying type is different. Semantically is also not quite the
+	 * same, thus a distinct type is used here for file leases.
+	 **/
+	enum class LeaseType : int {
+		READ   = F_RDLCK,
+		WRITE  = F_WRLCK,
+		UNLOCK = F_UNLCK
+	};
+
 	/// Information about file owner settings.
 	/**
 	 * This type holds either a ProcessID, ProcessGroupID or ThreadID.
@@ -416,6 +428,10 @@ public: // functions
 	 * which the event was configured is closed but a copy of the file
 	 * descriptor is still around. Then the signal will report the
 	 * original now closed file descriptor.
+	 *
+	 * To keep track of multiple file descriptor events occurring in
+	 * parallel it is recommended to use a realtime signal, which is
+	 * queued in the kernel up to a certain limit.
 	 **/
 	std::optional<Signal> getSignal() const;
 
@@ -425,8 +441,87 @@ public: // functions
 	 * configured and no extra information is provided to the signal
 	 * handler. Otherwise the supplied signal is used and the extra
 	 * information is supplied as described at `getSignal()`.
+	 *
+	 * This signal is also used to notify a process of file lease events,
+	 * see `setLease()`.
 	 **/
 	void setSignal(std::optional<Signal> sig);
+
+	/// Gets the lease type currently set, or required to resolve a lease break.
+	/**
+	 * For an overview of file leases, see `setLease()`.
+	 *
+	 * The semantics for `getLease()` are somewhat confusing. As long as
+	 * there is no lease break in progress it returns the lease that is
+	 * currently held on the file, or LeaseType::UNLOCK if no lease is
+	 * currently present.
+	 * As soon as a lease break happens and the lease holder is notified
+	 * of it, `getLease()` returns the new target lease type that is
+	 * necessary to resolve the lease break situation, which can be
+	 * LeaseType::READ, if the lease breaker wants to open the file
+	 * read-only and the lease can be downgraded, or LeaseType::UNLOCK if
+	 * the lease breaker wants to open the file for writing and the lease
+	 * has to be removed.
+	 **/
+	LeaseType getLease() const;
+
+	/// Sets a new lease type on the file descriptor.
+	/**
+	 * A file lease is a mechanism that allows the lease holder to act on
+	 * the file before another process (the lease breaker) accesses it. It
+	 * has some similarity to a mandatory file lock in so far as the lease
+	 * breaker will be blocked (in `open()` or `truncate()`) until the
+	 * lease holder unlocks or downgrades the lease. The kernel puts a
+	 * limit on the maximum block time in seconds until the lease holder
+	 * has to resolve the situation, otherwise the lease will be forcibly
+	 * removed. This time is configured in the sys.fs.lease-break-time
+	 * sysctl.
+	 *
+	 * The lease holder is informed of a lease break situation by a
+	 * signal, which is configured via `setSignal()`. See also
+	 * `getSignal()`.
+	 *
+	 * Leases are associated with the open file description and thus
+	 * shared by copies of the file descriptor, can be inherited to child
+	 * processes and will be automatically released once all copies of the
+	 * file descriptor are closed.
+	 *
+	 * File leases are only supported on regular files. A process may only
+	 * acquire a lease for files it owns, or if the process has the
+	 * `CAP_LEASE` capability, otherwise an ApiError with Errno::ACCESS is
+	 * thrown.
+	 *
+	 * This call is used to establish, remove or change an existing lease.
+	 * To remove an existing lease pass LeaseType::UNLOCK to this
+	 * function.
+	 *
+	 * A lease of LeaseType::READ can only be placed on a file
+	 * descriptor opened read-only. In this case the lease holder will be
+	 * notified when the file is opened for writing or is truncated.
+	 *
+	 * A lease of LeaseType::WRITE can only be placed if there are
+	 * currently no other open file descriptors for the file (otherwise
+	 * the lease would already be broken). The lease holder will be
+	 * notified when the file is opened for reading, writing or is
+	 * truncated. The file descriptor can be open for reading and writing.
+	 *
+	 * A lease can be downgraded from LeaseType::WRITE to LeaseType::READ,
+	 * which will allow lease breakers, that want to open the file for
+	 * reading, to be unblocked. This only works if the file descriptor
+	 * has been opened read-only, though.
+	 *
+	 * If a conflicting lease is currently set on the file, or the file's
+	 * OpenMode is not compatible with the requested lease, an ApiError
+	 * with Errno::AGAIN is thrown.
+	 *
+	 * Another process can open a file on which a lease is held in
+	 * non-blocking mode, which will result in Errno::WOULD_BLOCK error.
+	 * Even this attempt to open the file will trigger the lease breaker
+	 * logic. The same is true if the lease breaker's system call is
+	 * interrupted by a signal, or the lease breaker gets killed while
+	 * blocking on the lease.
+	 **/
+	void setLease(const LeaseType lease);
 
 protected: // functions
 
