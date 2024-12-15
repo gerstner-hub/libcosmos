@@ -67,11 +67,20 @@ constexpr Signal BAD_SYS       = Signal{SignalNr::BAD_SYS};
  **/
 COSMOS_API void raise(const Signal s);
 
-/// Sends a signal to another process based on process ID.
+/// Sends a signal to another process based on process ID (kill).
 /**
  * \exception Throws an ApiError on error.
  **/
 COSMOS_API void send(const ProcessID proc, const Signal s);
+
+/// Sends a signal including data (sigqueue).
+/**
+ * This is similar to send(ProcessID, Signal) but also attaches a data item to
+ * the signal to be sent. If the receiver uses extended APIs like an
+ * SA_SIGINFO signal handler then it can obtain the data from the `si_value`
+ * field of `struct siginfo`. The `si_code` field will be set to SI_QUEUE.
+ **/
+COSMOS_API void send(const ProcessID proc, const Signal s, intptr_t data);
 
 /// Sends a signal to another process based on a pidfd.
 /**

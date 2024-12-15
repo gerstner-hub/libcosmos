@@ -42,6 +42,15 @@ void send(const ProcessID proc, const Signal s) {
 	}
 }
 
+void send(const ProcessID proc, const Signal s, intptr_t data) {
+	union sigval val;
+	val.sival_ptr = reinterpret_cast<void*>(data);
+
+	if (::sigqueue(to_integral(proc), to_integral(s.raw()), val)) {
+		cosmos_throw (ApiError("sigqueue()"));
+	}
+}
+
 void send(const ProcessID proc, const ThreadID thread, const Signal s) {
 	if (::tgkill(to_integral(proc), to_integral(thread), to_integral(s.raw()))) {
 		cosmos_throw (ApiError("tgkill()"));
