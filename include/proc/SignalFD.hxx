@@ -28,14 +28,16 @@ class COSMOS_API SignalFD {
 public: // types
 
 	/// Data structure returned by readEvent()
-	struct SigInfo : signalfd_siginfo {
-		/// Returns the signal number that occured
+	struct SigInfo :
+			signalfd_siginfo {
+		/// Returns the signal number that occurred
 		auto signal() const { return Signal{SignalNr{static_cast<int>(ssi_signo)}}; }
 
 		/// Returns the PID of the process that sent or caused this signal, if applicable
 		auto senderPID() const { return ProcessID{static_cast<pid_t>(ssi_pid)}; }
 
-		/// For SIGCHLD this returns the child's exit status or the signal that caused the child process to change state
+		/// For SIGCHLD this returns the child's exit status or the
+		/// signal that caused the child process to change state
 		/**
 		 * if ssi_code is CLD_EXITED then this is the exit status,
 		 * otherwise the signal number.
