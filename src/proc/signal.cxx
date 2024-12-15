@@ -23,10 +23,9 @@ namespace {
 	void set_signal_mask(int op, const sigset_t *set, sigset_t *old) {
 		auto res = ::pthread_sigmask(op, set, old);
 
-		if (res == 0)
-			return;
-
-		cosmos_throw (ApiError("pthread_sigmask()"));
+		if (const auto error = Errno{res}; error != Errno::NO_ERROR) {
+			cosmos_throw (ApiError("pthread_sigmask()", error));
+		}
 	}
 
 } // end anon ns

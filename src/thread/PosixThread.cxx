@@ -49,15 +49,15 @@ namespace {
 
 	void create_thread(pthread_t &thread, Context *ctx) {
 
-		const auto error = ::pthread_create(
+		const auto res = ::pthread_create(
 			&thread,
 			nullptr /* keep default attributes */,
 			&thread_entry,
 			reinterpret_cast<void*>(ctx)
 		);
 
-		if (error != 0) {
-			cosmos_throw (cosmos::ApiError("pthread_create()"));
+		if (const auto error = Errno{res}; error != Errno::NO_ERROR) {
+			cosmos_throw (cosmos::ApiError("pthread_create()", error));
 		}
 
 	}
@@ -128,8 +128,8 @@ pthread::ExitValue PosixThread::join() {
 	void *res = nullptr;
 	const auto join_res = ::pthread_join(*m_pthread, &res);
 
-	if (join_res != 0) {
-		cosmos_throw (ApiError("pthread_join()"));
+	if (const auto error = Errno{join_res}; error != Errno::NO_ERROR) {
+		cosmos_throw (ApiError("pthread_join()", error));
 	}
 
 	reset();
@@ -143,13 +143,13 @@ std::optional<pthread::ExitValue> PosixThread::tryJoin() {
 	void *res = nullptr;
 	const auto join_res = ::pthread_tryjoin_np(*m_pthread, &res);
 
-	if (auto err = Errno{join_res}; err != Errno::NO_ERROR) {
-		if (err == Errno::BUSY) {
+	if (const auto error = Errno{join_res}; error != Errno::NO_ERROR) {
+		if (error == Errno::BUSY) {
 			// cannot be joined yet
 			return {};
 		}
 
-		cosmos_throw (ApiError("pthread_tryjoin_np()", err));
+		cosmos_throw (ApiError("pthread_tryjoin_np()", error));
 	}
 
 	reset();
@@ -163,13 +163,13 @@ std::optional<pthread::ExitValue> PosixThread::joinTimed(const RealTime ts) {
 	void *res = nullptr;
 	const auto join_res = ::pthread_timedjoin_np(*m_pthread, &res, &ts);
 
-	if (auto err = Errno{join_res}; err != Errno::NO_ERROR) {
-		if (err == Errno::TIMEDOUT) {
+	if (const auto error = Errno{join_res}; error != Errno::NO_ERROR) {
+		if (error == Errno::TIMEDOUT) {
 			// couldn't join in time
 			return {};
 		}
 
-		cosmos_throw (ApiError("pthread_timedjoin_np()"));
+		cosmos_throw (ApiError("pthread_timedjoin_np()", error));
 	}
 
 	reset();
@@ -184,10 +184,10 @@ void PosixThread::detach() {
 		cosmos_throw (UsageError("Attempted to detach a non-joinable thread (empty or already detached)"));
 	}
 
-	const auto res = pthread_detach(*m_pthread);
+	const auto res = ::pthread_detach(*m_pthread);
 
-	if (res != 0) {
-		cosmos_throw (ApiError("pthread_detach()"));
+	if (const auto error = Errno{res}; error != Errno::NO_ERROR) {
+		cosmos_throw (ApiError("pthread_detach()", error));
 	}
 
 	reset();
