@@ -8,6 +8,7 @@
 
 // cosmos
 #include <cosmos/dso_export.h>
+#include <cosmos/proc/Signal.hxx>
 
 /**
  * @file
@@ -29,7 +30,7 @@ public: // functions
 		return !(*this == other);
 	}
 
-	auto raw() { return m_id; }
+	auto raw() const { return m_id; }
 
 protected: // data
 
@@ -49,6 +50,14 @@ enum class ThreadArg : intptr_t {};
 
 /// Returns the opaque thread ID object for the calling thread.
 ID COSMOS_API get_id();
+
+/// Send a thread-directed signal to the given POSIX thread ID.
+/**
+ * This is similar to cosmos::signal::send(ProcessID, ThreadID, Signal), but
+ * can only be used for threads in the same process and takes the POSIX thread
+ * ID instead of the Linux TID.
+ **/
+void kill(const ID thread, const Signal sig);
 
 /// Ends execution of the calling thread.
 /**

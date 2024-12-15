@@ -187,6 +187,11 @@ public: // functions
 		return id() == pthread::get_id();
 	}
 
+	/// Wrapper around cosmos::pthread::kill().
+	void kill (const Signal sig) {
+		pthread::kill(id(), sig);
+	}
+
 protected: // functions
 
 	std::string buildName(const std::string_view name, size_t nr) const;

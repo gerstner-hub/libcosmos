@@ -16,25 +16,6 @@ using namespace cosmos::pthread;
 
 namespace cosmos {
 
-namespace pthread {
-
-bool ID::operator==(const ID &other) const {
-	return ::pthread_equal(this->m_id, other.m_id) != 0;
-}
-
-ID get_id() {
-	return ID{::pthread_self()};
-}
-
-/// Ends the calling thread immediately
-void exit(const ExitValue val) {
-	::pthread_exit(reinterpret_cast<void*>(val));
-	// should never happen
-	std::abort();
-}
-
-} // end ns pthread
-
 namespace {
 
 	std::atomic<size_t> num_threads = 0;
