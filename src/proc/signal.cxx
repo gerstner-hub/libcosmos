@@ -110,6 +110,11 @@ void pause() {
 	::pause();
 }
 
+void suspend(const SigSet &mask) {
+	// same as with pause() this call always returns -1 with errno set to EINT
+	::sigsuspend(mask.raw());
+}
+
 void block(const SigSet &s, std::optional<SigSet*> old) {
 	set_signal_mask(SIG_BLOCK, s.raw(), old ? old.value()->raw() : nullptr);
 }

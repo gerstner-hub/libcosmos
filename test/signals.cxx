@@ -7,6 +7,7 @@
 #include <cosmos/proc/process.hxx>
 #include <cosmos/proc/SignalFD.hxx>
 #include <cosmos/proc/SigSet.hxx>
+#include <cosmos/thread/Condition.hxx>
 #include <cosmos/thread/PosixThread.hxx>
 #include <cosmos/thread/thread.hxx>
 
@@ -22,7 +23,7 @@ class SignalTest :
 		testSets();
 		testSigmask();
 		testIgnore();
-		testPause();
+		testPauseSuspend();
 	}
 
 	void testSets() {
@@ -43,6 +44,7 @@ class SignalTest :
 
 	void testSigmask() {
 		START_TEST("Sigmask");
+		const auto &orig_mask = cosmos::signal::get_sigmask();
 		cosmos::SigSet full{cosmos::SigSet::filled};
 		cosmos::SigSet old;
 		cosmos::signal::block(full, &old);
@@ -72,6 +74,7 @@ class SignalTest :
 
 		RUN_STEP("received-sig-correct", info.signal() == sigint);
 		std::cout << "received " << info.signal() << " from " << info.senderPID() << std::endl;
+		cosmos::signal::set_sigmask(orig_mask);
 	}
 
 	void testIgnore() {
@@ -90,8 +93,8 @@ class SignalTest :
 		(void)sig;
 	}
 
-	void testPause() {
-		START_TEST("pause and wake thread via thread-directed signal");
+	void testPauseSuspend() {
+		START_TEST("pause/suspend and wake thread via thread-directed signal");
 
 		// TODO: use libcosmos API for this in the future (not yet available)
 		struct sigaction action;
@@ -99,17 +102,50 @@ class SignalTest :
 		action.sa_handler = &SignalTest::handle_signal;
 		const auto res = ::sigaction(SIGUSR1, &action, nullptr);
 
+		bool pause_over = false;
+		cosmos::ConditionMutex pause_cond;
+
 		RUN_STEP("sigaction-succeeds", res == 0);
 
 		const auto tid_to_signal = cosmos::thread::get_tid();
 
-		cosmos::PosixThread thread{[tid_to_signal]() {
+		cosmos::PosixThread thread{[tid_to_signal, &pause_over, &pause_cond]() {
+
+			cosmos::MutexGuard g{pause_cond.mutex()};
+
+			while (!pause_over) {
+				cosmos::signal::send(cosmos::proc::get_own_pid(), tid_to_signal, cosmos::signal::USR1);
+				pause_cond.waitTimed(cosmos::MonotonicTime{std::chrono::milliseconds{50}});
+			}
+
+			// send a second signal to test suspend()
 			cosmos::signal::send(cosmos::proc::get_own_pid(), tid_to_signal, cosmos::signal::USR1);
 		}};
 
 		cosmos::signal::pause();
 
 		RUN_STEP("pause-returns-due-to-USR1", true);
+
+		// now block the signal to test suspend()
+		cosmos::SigSet ss;
+		ss.set(cosmos::signal::USR1);
+		cosmos::signal::block(ss);
+
+		{
+			cosmos::MutexGuard g{pause_cond.mutex()};
+			pause_over = true;
+		}
+
+		pause_cond.signal();
+
+		ss = cosmos::signal::get_sigmask();
+		ss.del(cosmos::signal::USR1);
+
+		// we should be able to receive the signal due to the
+		// temporarily changed signal mask in suspend()
+		cosmos::signal::suspend(ss);
+
+		RUN_STEP("suspend-returns-due-to-USR1", true);
 
 		thread.join();
 	}

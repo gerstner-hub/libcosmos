@@ -109,10 +109,18 @@ COSMOS_API void send(const ProcessID proc, const ThreadID thread, const Signal s
  **/
 COSMOS_API void pause();
 
-/// Blocks the given set of signals in the current process's signal mask.
+/// Suspend execution with altered signal mask until an asynchronous signal occurs.
+/**
+ * This is similar to pause(), with the difference that the caller's signal
+ * mask is temporarily replaced by `mask`. Upon return from the function, the
+ * original signal mask will be restored.
+ **/
+COSMOS_API void suspend(const SigSet &mask);
+
+/// Blocks the given set of signals in the caller's signal mask.
 /**
  * Blocked signals won't be delivered asynchronously to the process
- * i.e. no asynchronous signal handler will be invoked, also the
+ * i.e. no asynchronous signal handler will be invoked. Also the
  * default action will not be executed. This allows to collect the
  * information synchronously e.g. by using a SignalFD.
  *
@@ -121,10 +129,10 @@ COSMOS_API void pause();
  **/
 COSMOS_API void block(const SigSet &s, std::optional<SigSet *> old = {});
 
-/// Unblocks the given set of signals in the current process's signal mask.
+/// Unblocks the given set of signals in the caller's signal mask.
 COSMOS_API void unblock(const SigSet &s, std::optional<SigSet *> old = {});
 
-/// Assigns exactly the given signal mask to the current process.
+/// Completely replace the caller's signal mask by the given set of blocked signals.
 COSMOS_API void set_sigmask(const SigSet &s, std::optional<SigSet *> old = {});
 
 /// Restores the default signal handling behaviour for the given signal.
@@ -134,9 +142,9 @@ inline void restore(const Signal sig) {
 
 /// Ignore signal delivery for the given signal.
 /**
- * Ignoring a signal can make sense for the Signal::CHILD signal in which case
- * child processes will not become zombies even if the parent does not wait on
- * them. \see proc::wait().
+ * Ignoring a signal can make sense for the Signal::CHILD signal, in which
+ * case child processes will not become zombies, even if the parent does not
+ * wait on them. \see `proc::wait()`.
  **/
 inline void ignore(const Signal sig) {
 	::signal(to_integral(sig.raw()), SIG_IGN);
