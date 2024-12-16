@@ -117,6 +117,22 @@ COSMOS_API void pause();
  **/
 COSMOS_API void suspend(const SigSet &mask);
 
+/// Wait for a signal from `set` to occur.
+/**
+ * This call blocks execution until one of the signals found in `set` becomes
+ * pending for the calling thread. Once a signal is pending it will be removed
+ * from the pending list of signals and the call returns the number of the
+ * signal that occurred.
+ *
+ * This method of waiting for signals does not provide any contextual
+ * information that may exist for the signal, only the signal number is
+ * provided.
+ *
+ * On error an ApiError is thrown. Only Errno::INVALID is defined as a
+ * possible error reason, when an invalid signal is seen in `set`.
+ **/
+COSMOS_API Signal wait(const SigSet &set);
+
 /// Blocks the given set of signals in the caller's signal mask.
 /**
  * Blocked signals won't be delivered asynchronously to the process

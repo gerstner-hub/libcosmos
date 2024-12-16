@@ -115,6 +115,18 @@ void suspend(const SigSet &mask) {
 	::sigsuspend(mask.raw());
 }
 
+Signal wait(const SigSet &set) {
+	int num{};
+	const auto res = ::sigwait(set.raw(), &num);
+
+	if (res != 0) {
+		cosmos_throw (ApiError("sigwait()", Errno{res}));
+	}
+
+	return Signal{SignalNr{num}};
+
+}
+
 void block(const SigSet &s, std::optional<SigSet*> old) {
 	set_signal_mask(SIG_BLOCK, s.raw(), old ? old.value()->raw() : nullptr);
 }

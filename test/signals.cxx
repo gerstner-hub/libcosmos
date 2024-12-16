@@ -24,6 +24,7 @@ class SignalTest :
 		testSigmask();
 		testIgnore();
 		testPauseSuspend();
+		testSigWait();
 	}
 
 	void testSets() {
@@ -150,7 +151,24 @@ class SignalTest :
 		thread.join();
 	}
 
-	// TODO: test sigqueue data arrival
+
+	void testSigWait() {
+		START_TEST("testing send (sigqueue) and wait (sigwait)");
+
+		cosmos::SigSet set{cosmos::signal::USR1};
+
+		cosmos::signal::block(set);
+
+		cosmos::PosixThread thread{[]() {
+			cosmos::signal::send(cosmos::proc::get_own_pid(), cosmos::signal::USR1, 0);
+		}};
+
+		const auto sig = cosmos::signal::wait(set);
+
+		RUN_STEP("sigwait-returns-USR1", sig == cosmos::signal::USR1);
+
+		thread.join();
+	}
 };
 
 int main(const int argc, const char **argv) {
