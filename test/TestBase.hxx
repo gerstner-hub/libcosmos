@@ -20,7 +20,7 @@
 #include "cosmos/proc/process.hxx"
 #include "cosmos/utils.hxx"
 
-#define START_TEST(name) TestMarkGuard g{*this, name}
+#define START_TEST(name) TestMarkGuard _g{*this, name}
 #define START_STEP(text) startStep(text)
 #define EVAL_STEP(expr) do { \
 		const bool good = expr; \
