@@ -5,11 +5,11 @@
 
 // cosmos
 #include <cosmos/BitMask.hxx>
-#include <cosmos/proc/pidfd.h>
 #include <cosmos/proc/PidFD.hxx>
-#include <cosmos/proc/process.hxx>
-#include <cosmos/proc/Signal.hxx>
 #include <cosmos/proc/WaitRes.hxx>
+#include <cosmos/proc/pidfd.h>
+#include <cosmos/proc/process.hxx>
+#include <cosmos/proc/types.hxx>
 
 namespace cosmos {
 

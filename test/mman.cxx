@@ -13,7 +13,7 @@
 #include "cosmos/fs/FileStatus.hxx"
 #include "cosmos/fs/TempFile.hxx"
 #include "cosmos/proc/Mapping.hxx"
-#include "cosmos/proc/Signal.hxx"
+#include "cosmos/proc/types.hxx"
 
 class MappingTest :
 		public cosmos::TestBase {

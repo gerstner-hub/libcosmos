@@ -10,7 +10,7 @@
 // cosmos
 #include <cosmos/BitMask.hxx>
 #include <cosmos/fs/types.hxx>
-#include <cosmos/proc/Signal.hxx>
+#include <cosmos/proc/types.hxx>
 #include <cosmos/thread/thread.hxx>
 #include <cosmos/utils.hxx>
 

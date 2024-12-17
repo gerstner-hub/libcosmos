@@ -11,7 +11,7 @@
 
 // cosmos
 #include <cosmos/proc/PidFD.hxx>
-#include <cosmos/proc/Signal.hxx>
+#include <cosmos/proc/types.hxx>
 #include <cosmos/thread/thread.hxx>
 #include <cosmos/utils.hxx>
 

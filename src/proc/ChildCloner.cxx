@@ -18,10 +18,10 @@
 #include <cosmos/proc/ChildCloner.hxx>
 #include <cosmos/proc/ProcessFile.hxx>
 #include <cosmos/proc/SigSet.hxx>
-#include <cosmos/proc/Signal.hxx>
 #include <cosmos/proc/SubProc.hxx>
 #include <cosmos/proc/clone.hxx>
 #include <cosmos/proc/process.hxx>
+#include <cosmos/proc/types.hxx>
 #include <cosmos/utils.hxx>
 
 namespace cosmos {

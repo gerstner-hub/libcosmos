@@ -8,7 +8,7 @@
 
 // cosmos
 #include <cosmos/dso_export.h>
-#include <cosmos/proc/Signal.hxx>
+#include <cosmos/proc/types.hxx>
 
 /**
  * @file

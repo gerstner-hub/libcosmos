@@ -5,8 +5,8 @@
 
 // cosmos
 #include <cosmos/fs/FileDescriptor.hxx>
-#include <cosmos/proc/Signal.hxx>
 #include <cosmos/proc/SigSet.hxx>
+#include <cosmos/proc/types.hxx>
 
 namespace cosmos {
 

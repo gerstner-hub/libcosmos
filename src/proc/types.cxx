@@ -1,13 +1,11 @@
 // C++
 #include <ostream>
-#include <string>
 
 // cosmos
 #include <cosmos/formatting.hxx>
-#include <cosmos/proc/Signal.hxx>
+#include <cosmos/proc/types.hxx>
 
 // Linux
-#include <signal.h>
 #include <string.h> /* strsignal() */
 
 namespace cosmos {

@@ -4,7 +4,7 @@
 #include <signal.h>
 
 // cosmos
-#include <cosmos/proc/Signal.hxx>
+#include <cosmos/proc/types.hxx>
 #include <cosmos/utils.hxx>
 
 namespace cosmos {

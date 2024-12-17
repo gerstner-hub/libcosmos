@@ -5,14 +5,14 @@
 
 // cosmos
 #include <cosmos/fs/Directory.hxx>
-#include <cosmos/fs/FileStatus.hxx>
 #include <cosmos/fs/File.hxx>
+#include <cosmos/fs/FileStatus.hxx>
 #include <cosmos/io/EventFile.hxx>
-#include <cosmos/proc/clone.hxx>
 #include <cosmos/proc/ProcessFile.hxx>
-#include <cosmos/proc/process.hxx>
 #include <cosmos/proc/SignalFD.hxx>
-#include <cosmos/proc/Signal.hxx>
+#include <cosmos/proc/clone.hxx>
+#include <cosmos/proc/process.hxx>
+#include <cosmos/proc/types.hxx>
 
 // Test
 #include "TestBase.hxx"
