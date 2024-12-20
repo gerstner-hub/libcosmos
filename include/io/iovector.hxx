@@ -112,8 +112,8 @@ struct InputMemoryRegion :
 		setLength(s.size());
 	}
 
-	static auto asIovec(InputMemoryRegion *entry) {
-		return static_cast<struct iovec*>(entry);
+	auto asIovec() {
+		return static_cast<struct iovec*>(this);
 	}
 };
 
@@ -137,8 +137,8 @@ struct OutputMemoryRegion :
 		setLength(sv.size());
 	}
 
-	static auto asIovec(OutputMemoryRegion *entry) {
-		return reinterpret_cast<struct iovec*>(entry);
+	auto asIovec() {
+		return reinterpret_cast<struct iovec*>(this);
 	}
 };
 
@@ -167,7 +167,7 @@ public: // functions
 
 protected: // functions
 
-	auto raw() { return MEMORY_REGION::asIovec(this->data()); };
+	auto raw() { return this->data()->asIovec(); };
 
 	/// Update the vector given the number of bytes processed by a system call.
 	bool update(size_t processed_bytes);
