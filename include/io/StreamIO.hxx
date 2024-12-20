@@ -71,7 +71,7 @@ public: // functions
 	StreamIO(const StreamIO&) = delete;
 	StreamIO& operator=(const StreamIO&) = delete;
 
-	StreamIO& operator=(StreamIO &&) {
+	StreamIO& operator=(StreamIO &&) noexcept {
 		// simply do nothing, the fixed coupling to the FD remains and
 		// should reflect the new object state.
 		return *this;
