@@ -32,3 +32,27 @@
 #else
 #define COSMOS_FORMAT_PRINTF(format_index, first_Vararg_index)
 #endif
+
+namespace arch {
+
+#ifdef __x86_64__
+#	define COMSOS_X86_64
+#	define COMSOS_X86
+/// Whether we're sitting on 64-bit x64-64.
+constexpr inline bool x86_64 = true;
+#else
+constexpr inline bool x86_64 = false;
+#endif
+
+#ifdef __i386__
+#	define COSMOS_I386
+#	define COSMOS_X86
+/// Whether we're sitting on 32-bit x86.
+constexpr inline bool i386 = true;
+#else
+constexpr inline bool i386 = false;
+#endif
+
+/// Whether we're running on either 32-bit or 64-bit x86.
+constexpr inline bool x86 = x86_64 || i386;
+} // end ns
