@@ -84,7 +84,7 @@ public: // functions
 
 	/// Returns whether the process stopped due to a syscall tracing trap (enter/exit)
 	/**
-	 * \note This only works if the tracer has set the TraceFlag::TRACESYSGOOD option.
+	 * \note This only works if the tracer has set the ptrace::Opt::TRACESYSGOOD option.
 	 **/
 	bool isSyscallTrap() const {
 		return trapped() && (si_status == (SIGTRAP | 0x80));
@@ -92,10 +92,10 @@ public: // functions
 
 	/// Checks whether the given trace event occurred.
 	/**
-	 * These events only occur if the corresponding TraceFlags have been
-	 * set on the tracee
+	 * These events only occur if the corresponding ptrace::Opts have been
+	 * set on the tracee.
 	 **/
-	bool checkEvent(const TraceEvent event) {
+	bool checkEvent(const ptrace::Event event) {
 		if (!stopped())
 			return false;
 
