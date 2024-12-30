@@ -42,9 +42,13 @@ void send(const ProcessID proc, const Signal s) {
 	}
 }
 
-void send(const ProcessID proc, const Signal s, intptr_t data) {
-	union sigval val;
-	val.sival_ptr = reinterpret_cast<void*>(data);
+void send(const ProcessID proc, const Signal s, std::variant<void*, int> data) {
+	union sigval val{};
+	if (std::holds_alternative<void*>(data)) {
+		val.sival_ptr = std::get<void*>(data);
+	} else if (std::holds_alternative<int>(data)) {
+		val.sival_int = std::get<int>(data);
+	}
 
 	if (::sigqueue(to_integral(proc), to_integral(s.raw()), val)) {
 		cosmos_throw (ApiError("sigqueue()"));

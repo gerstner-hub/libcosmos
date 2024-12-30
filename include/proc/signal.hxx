@@ -8,6 +8,7 @@
 
 // C++
 #include <optional>
+#include <variant>
 
 // cosmos
 #include <cosmos/proc/PidFD.hxx>
@@ -73,14 +74,18 @@ COSMOS_API void raise(const Signal s);
  **/
 COSMOS_API void send(const ProcessID proc, const Signal s);
 
-/// Sends a signal including data (sigqueue).
+/// Sends a signal including data (`sigqueue()`).
 /**
  * This is similar to send(ProcessID, Signal) but also attaches a data item to
  * the signal to be sent. If the receiver uses extended APIs like an
  * SA_SIGINFO signal handler then it can obtain the data from the `si_value`
- * field of `struct siginfo`. The `si_code` field will be set to SI_QUEUE.
+ * or `si_int` field of `struct siginfo`. The `si_code` field will be set to
+ * SI_QUEUE.
+ *
+ * The `data` can either be an `int` or a `void *`, which can have different
+ * sizes on some architectures.
  **/
-COSMOS_API void send(const ProcessID proc, const Signal s, intptr_t data);
+COSMOS_API void send(const ProcessID proc, const Signal s, std::variant<void*, int> data);
 
 /// Sends a signal to another process based on a pidfd.
 /**
