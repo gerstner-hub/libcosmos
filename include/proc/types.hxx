@@ -82,6 +82,10 @@ enum class SignalNr : int {
 	POLL          = IO_EVENT,  ///< pollable event, synonym for IO
 	POWER         = SIGPWR,    ///< power failure
 	BAD_SYS       = SIGSYS,    ///< bad system call
+#if 0
+	LOST          = SIGLOST,   ///< file lock lost (unused)
+	EMT           = SIGEMT,    ///< emulator trap (undeclared on Linux)
+#endif
 };
 
 /// Represents a POSIX signal number and offers a minimal API around it.
