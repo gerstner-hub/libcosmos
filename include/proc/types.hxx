@@ -69,7 +69,7 @@ enum class SignalNr : int {
 	CHILD         = SIGCHLD,   ///< child stopped or terminated
 	CONT          = SIGCONT,   ///< continue if stopped
 	STOP          = SIGSTOP,   ///< stop process, cannot be ignored
-	TERM_STOP     = SIGSTOP,   ///< stop typed at terminal
+	TERM_STOP     = SIGTSTP,   ///< stop typed at terminal
 	TERM_INPUT    = SIGTTIN,   ///< terminal input for background processes
 	TERM_OUTPUT   = SIGTTOU,   ///< terminal output for background processes
 	URGENT        = SIGURG,    ///< urgent condition on socket
