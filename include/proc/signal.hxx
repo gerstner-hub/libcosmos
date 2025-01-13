@@ -20,6 +20,7 @@
 namespace cosmos {
 	class SigSet;
 	class SigInfo;
+	class SigAction;
 }
 
 namespace cosmos::signal {
@@ -60,6 +61,7 @@ constexpr Signal IO_EVENT      = Signal{SignalNr::IO_EVENT};
 constexpr Signal POLL          = Signal{SignalNr::POLL};
 constexpr Signal POWER         = Signal{SignalNr::POWER};
 constexpr Signal BAD_SYS       = Signal{SignalNr::BAD_SYS};
+constexpr Signal MAXIMUM       = Signal{SignalNr::MAXIMUM};
 
 /// Returns the first real-time signal available.
 /**
@@ -204,6 +206,69 @@ COSMOS_API WaitRes timed_wait(const SigSet &set, SigInfo &info, const IntervalTi
 inline WaitRes poll_info(const SigSet &set, SigInfo &info) {
 	return timed_wait(set, info, IntervalTime{0});
 }
+
+/// Configure asynchronous signal delivery behaviour.
+/**
+ * On error an ApiError is thrown. The following errors are documented for
+ * this call:
+ *
+ * - Errno::FAULT: `action` or `old` do not have valid addresses.
+ * - Errno::INVALID_ARG: `sig` is not a valid signal number.
+ *
+ * The asynchronous signal handling for `sig` will be configured according to
+ * the settings in `action`. Asynchronous signal handling should be avoided,
+ * if possible, for the following reasons:
+ *
+ * - the thread in whose context a signal is processed is undefined (unless
+ *   thread-directed signals are used or careful settings for signal masks are
+ *   maintained across all threads).
+ * - asynchronous signals can execute at any time, therefore the set of system
+ *   calls and C library functions that may be executed from within a signal
+ *   handler is extremely limited (see `man 7 signal-safety`). There is no
+ *   protection against using async-signal unsafe functions in a signal
+ *   handler, which can cause hard to find bugs.
+ *
+ * There are some signals that can _only_ be catched asynchronously. These are
+ * the fault family of signals like SIGSEGV, SIGFPE, SIGBUS, SIGILL. These are
+ * directed at the thread that triggers them and thus cannot be waited for
+ * synchronously.
+ *
+ * If `old` is supplied then the previously installed signal handler
+ * configuration for `sig` is returned there e.g. for being able to restore it
+ * at a later point in time.
+ *
+ * Libcosmos offers asynchronous signal handlers with type safe parameters
+ * (SigAction::SimpleHandler, SigAction::InfoHandler), but this comes at a
+ * cost. The `sigaction()` system call is very difficult to wrap. The extra
+ * level of indirection that libcosmos uses internally can cause additional
+ * types of race conditions. These race conditions can occur when an existing
+ * signal handling function is replaced by another. The race condition makes
+ * it impossible to determine if a signal that comes in while changing the
+ * signal handler is still based on the old signal handler configuration or
+ * already based on the new one.
+ *
+ * There should be very few use cases that actually require replacing one
+ * signal handler function by another. Typically a program installs signal
+ * handlers early on and never changes them again. If you do need to use
+ * different signal handlers for the same signal safely, though, then it is
+ * better to rely on synchronous signal handling (if possible) or direct
+ * `sigaction()` calls instead of using libcosmos for establishing them.
+ **/
+COSMOS_API void set_action(const Signal sig, const SigAction &action, SigAction *old = nullptr);
+
+/// Gets the currently installed SigAction configuration for `sig`.
+/**
+ * This can be used to explicitly store the current SigAction configuration
+ * for a signal for the purposes of restoring it at a later point in time via
+ * `set_action()`.
+ *
+ * On error an ApiError is thrown. The following errors are documented for
+ * this call:
+ *
+ * - Errno::FAULT: `action` does not have a valid address.
+ * - Errno::INVALID_ARG: `sig` is not a valid signal number.
+ **/
+COSMOS_API void get_action(const Signal sig, SigAction &action);
 
 /// Blocks the given set of signals in the caller's signal mask.
 /**

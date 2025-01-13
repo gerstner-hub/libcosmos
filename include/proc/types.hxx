@@ -88,6 +88,7 @@ enum class SignalNr : int {
 	LOST          = SIGLOST,   ///< file lock lost (unused)
 	EMT           = SIGEMT,    ///< emulator trap (undeclared on Linux)
 #endif
+	MAXIMUM       = _NSIG  ///< largest signal number defined
 };
 
 /// Represents a POSIX signal number and offers a minimal API around it.

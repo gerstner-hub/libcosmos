@@ -5,6 +5,10 @@
 
 namespace cosmos {
 
+/* we want to be able to reinterpret_cast siginfo_t to SigInfo in async signal
+ * handlers */
+static_assert(sizeof(SigInfo) == sizeof(siginfo_t), "SigInfo size mismatch");
+
 SigInfo::Source SigInfo::source() const {
 	const std::initializer_list<Signal> SPECIAL_SIGS{
 		signal::FPE, signal::BUS, signal::ILL, signal::SEGV,
