@@ -165,6 +165,16 @@ enum class Request {
 	GET_SYSCALL_INFO   = PTRACE_GET_SYSCALL_INFO,
 };
 
+/// System call ABI architecture.
+/**
+ * This is currently shortened just for x86 ABIs until we add support for more
+ * exotics archs.
+ **/
+enum class Arch : uint32_t {
+	X86_64 = AUDIT_ARCH_X86_64,
+	I386   = AUDIT_ARCH_I386
+};
+
 /// Wrapper around data structure used with ptrace::Request::GET_SYSCALL_INFO.
 struct SyscallInfo {
 public: // types
@@ -175,16 +185,6 @@ public: // types
 		EXIT    = PTRACE_SYSCALL_INFO_EXIT,    ///< system-call-exit-stop.
 		SECCOMP = PTRACE_SYSCALL_INFO_SECCOMP, ///< ptrace-event-stop for ptrace::Event::SECCOMP.
 		NONE    = PTRACE_SYSCALL_INFO_NONE     ///< no meaningful information placed into struct.
-	};
-
-	/// System call ABI architecture.
-	/**
-	 * This is currently shortened just for x86 ABIs until we add support for more
-	 * exotics archs.
-	 **/
-	enum class Arch : uint32_t {
-		X86_64 = AUDIT_ARCH_X86_64,
-		I386   = AUDIT_ARCH_I386
 	};
 
 	using EntryInfo = decltype(ptrace_syscall_info::entry);

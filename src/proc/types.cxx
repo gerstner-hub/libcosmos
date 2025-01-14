@@ -3,7 +3,9 @@
 
 // cosmos
 #include <cosmos/formatting.hxx>
+#include <cosmos/proc/signal.hxx>
 #include <cosmos/proc/types.hxx>
+#include <cosmos/utils.hxx>
 
 // Linux
 #include <string.h> /* strsignal() */

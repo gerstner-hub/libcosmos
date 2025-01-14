@@ -17,6 +17,14 @@
 
 namespace cosmos {
 
+/// Type used to express time in clock ticks unit in some APIs
+/**
+ * To convert this unit into seconds the value needs to be divied by number of
+ * clock ticks per seconds as returned by sysconf(_SC_CLK_TCK).
+ **/
+enum class ClockTicks : clock_t {
+};
+
 /// Available clock types for time operations.
 enum class ClockType : clockid_t {
 	/// System-wide wall clock time, settable.
