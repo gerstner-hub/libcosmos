@@ -131,16 +131,16 @@ Signal wait(const SigSet &set) {
 
 }
 
-void block(const SigSet &s, std::optional<SigSet*> old) {
-	set_signal_mask(SIG_BLOCK, s.raw(), old ? old.value()->raw() : nullptr);
+void block(const SigSet &s, SigSet *old) {
+	set_signal_mask(SIG_BLOCK, s.raw(), old ? old->raw() : nullptr);
 }
 
-void unblock(const SigSet &s, std::optional<SigSet*> old) {
-	set_signal_mask(SIG_UNBLOCK, s.raw(), old ? old.value()->raw() : nullptr);
+void unblock(const SigSet &s, SigSet *old) {
+	set_signal_mask(SIG_UNBLOCK, s.raw(), old ? old->raw() : nullptr);
 }
 
-void set_sigmask(const SigSet &s, std::optional<SigSet*> old) {
-	set_signal_mask(SIG_SETMASK, s.raw(), old ? old.value()->raw() : nullptr);
+void set_sigmask(const SigSet &s, SigSet *old) {
+	set_signal_mask(SIG_SETMASK, s.raw(), old ? old->raw() : nullptr);
 }
 
 SigSet get_sigmask() {

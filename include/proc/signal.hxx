@@ -169,13 +169,13 @@ COSMOS_API Signal wait(const SigSet &set);
  * If `old` is provided then the previous signal mask is returned
  * into this SigSet object.
  **/
-COSMOS_API void block(const SigSet &s, std::optional<SigSet *> old = {});
+COSMOS_API void block(const SigSet &s, SigSet *old = nullptr);
 
 /// Unblocks the given set of signals in the caller's signal mask.
-COSMOS_API void unblock(const SigSet &s, std::optional<SigSet *> old = {});
+COSMOS_API void unblock(const SigSet &s, SigSet *old = nullptr);
 
 /// Completely replace the caller's signal mask by the given set of blocked signals.
-COSMOS_API void set_sigmask(const SigSet &s, std::optional<SigSet *> old = {});
+COSMOS_API void set_sigmask(const SigSet &s, SigSet *old = nullptr);
 
 /// Restores the default signal handling behaviour for the given signal.
 inline void restore(const Signal sig) {
