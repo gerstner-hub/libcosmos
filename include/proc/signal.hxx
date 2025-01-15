@@ -59,6 +59,27 @@ constexpr Signal POLL          = Signal{SignalNr::POLL};
 constexpr Signal POWER         = Signal{SignalNr::POWER};
 constexpr Signal BAD_SYS       = Signal{SignalNr::BAD_SYS};
 
+/// Returns the first real-time signal available.
+/**
+ * Real-time signals are a dynamic range of signals beyond the classic
+ * predefined signals described in SignalNr. They have the special property
+ * that they are queued i.e. multiple signals can accumulate for the same
+ * signal number and each occurrence will be delivered to the process.
+ **/
+inline Signal rt_min() {
+	return Signal{SignalNr{SIGRTMIN}};
+}
+
+/// Returns the last real-time signal available.
+inline Signal rt_max() {
+	return Signal{SignalNr{SIGRTMAX}};
+}
+
+/// Returns the number of available real-time signals.
+inline size_t num_rt_sigs() {
+	return to_integral(rt_max().raw()) - to_integral(rt_min().raw());
+}
+
 /// Sends a signal to the caller itself.
 /**
  * The given signal will be delivered to the calling process or
