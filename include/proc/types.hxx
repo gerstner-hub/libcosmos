@@ -102,6 +102,11 @@ public: // functions
 	bool operator==(const Signal &o) const { return m_sig == o.m_sig; }
 	bool operator!=(const Signal &o) const { return !(*this == o); }
 
+	bool operator<(const Signal &o) const { return m_sig < o.m_sig; }
+	bool operator<=(const Signal &o) const { return m_sig <= o.m_sig; }
+	bool operator>(const Signal &o) const { return m_sig > o.m_sig; }
+	bool operator>=(const Signal &o) const { return m_sig >= o.m_sig; }
+
 	/// Returns the primitive signal number stored in this object.
 	SignalNr raw() const { return m_sig; }
 
