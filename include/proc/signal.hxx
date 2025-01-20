@@ -14,10 +14,12 @@
 #include <cosmos/proc/PidFD.hxx>
 #include <cosmos/proc/types.hxx>
 #include <cosmos/thread/thread.hxx>
+#include <cosmos/time/types.hxx>
 #include <cosmos/utils.hxx>
 
 namespace cosmos {
 	class SigSet;
+	class SigInfo;
 }
 
 namespace cosmos::signal {
@@ -158,6 +160,50 @@ COSMOS_API void suspend(const SigSet &mask);
  * possible error reason, when an invalid signal is seen in `set`.
  **/
 COSMOS_API Signal wait(const SigSet &set);
+
+/// Wait for a signal from `set` to occur and fill in `info` with signal details.
+/**
+ * This is similar to wait(const SigSet&) but provides additional details
+ * about the signal that occurred in `info`.
+ *
+ * On errors an ApiError is thrown. The only documented error condition is
+ * Errno::INTERRUPTED.
+ **/
+COSMOS_API void wait_info(const SigSet &set, SigInfo &info);
+
+/// Strong type to express timed_wait() and poll_info() results.
+enum class WaitRes {
+	SIGNALED, ///< a signal has been caught.
+	NO_RESULT ///< no signal was caught / timeout occurred.
+};
+
+/// Variant of wait_info() with a timeout.
+/**
+ * This is just like `wait_info()` only with a timeout applied. If no signal
+ * from `set` arrives within `timeout` then `info` is left untouched and
+ * WaitRes::NO_RESULT is returned. Otherwise WaitRes::SIGNALED is returned and
+ * `info` is filled accordingly.
+ *
+ * `timeout` is a relative time interval. There is no way to continue waiting
+ * for the remaining time should this call be interrupted.
+ *
+ * On errors an ApiError is thrown. Errno::INTERRUPT and Errno::INVALID (bad
+ * timeout value) are the only documented errors.
+ **/
+COSMOS_API WaitRes timed_wait(const SigSet &set, SigInfo &info, const IntervalTime timeout);
+
+/// Check for a pending signal from `set` and fill in `info` with signal details.
+/**
+ * This is a polling variant of `wait_info()` that will not block. If no
+ * signal is pending then WaitRes::NO_RESULT is returned and `info` is left
+ * unchanged.  Otherwise WaitRes::SIGNALED is returned and `info` is filled
+ * accordingly.
+ *
+ * The same error as in timed_wait() is used here.
+ **/
+inline WaitRes poll_info(const SigSet &set, SigInfo &info) {
+	return timed_wait(set, info, IntervalTime{0});
+}
 
 /// Blocks the given set of signals in the caller's signal mask.
 /**

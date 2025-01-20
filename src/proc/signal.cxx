@@ -9,6 +9,7 @@
 #include <cosmos/fs/FileDescriptor.hxx>
 #include <cosmos/private/cosmos.hxx>
 #include <cosmos/proc/pidfd.h>
+#include <cosmos/proc/SigInfo.hxx>
 #include <cosmos/proc/signal.hxx>
 #include <cosmos/proc/SigSet.hxx>
 #include <cosmos/string.hxx>
@@ -129,6 +130,25 @@ Signal wait(const SigSet &set) {
 
 	return Signal{SignalNr{num}};
 
+}
+
+void wait_info(const SigSet &set, SigInfo &info) {
+	if (::sigwaitinfo(set.raw(), info.raw()) < 0) {
+		cosmos_throw (ApiError("sigwaitinfo()"));
+	}
+}
+
+WaitRes timed_wait(const SigSet &set, SigInfo &info, const IntervalTime timeout) {
+	if (::sigtimedwait(set.raw(), info.raw(), &timeout) < 0) {
+		switch(get_errno()) {
+			case Errno::AGAIN: return WaitRes::NO_RESULT;
+			default: {
+				cosmos_throw (ApiError("sigtimedwait()"));
+			}
+		}
+	}
+
+	return WaitRes::SIGNALED;
 }
 
 void block(const SigSet &s, SigSet *old) {
