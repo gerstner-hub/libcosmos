@@ -13,6 +13,11 @@ namespace cosmos {
 /**
  * This type is needed to e.g. change a process's signal mask. It helps
  * specifying a number of signals that should be operated on.
+ *
+ * \note It is difficult to implement a proper operator== for SigSet, because
+ * the underlying data structure is supposed to be opaque on the one hand, and
+ * some kernel APIs don't seem to properly clear unused bits in returned
+ * sigsets e.g. in the oldaction return of `sigaction()`.
  **/
 class SigSet {
 public: // types
