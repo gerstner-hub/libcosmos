@@ -159,6 +159,51 @@ bool variant_holds_value(const VARIANT &var) {
 	return !is_empty_variant(var);
 }
 
+/// Helper for iterating twice over a for loop.
+/**
+ * Sometimes there is a need to execute a for loop just twice. For increasing
+ * readability this iterator helper type can be used like this:
+ *
+ * ```
+ * for (auto _: Twice{}) {
+ *     // will be executed twice
+ * }
+ * ```
+ **/
+class Twice {};
+
+class TwiceIterator {
+public: // functions
+
+	auto& operator++() {
+		m_iterations++;
+		return *this;
+	}
+
+	Twice operator*() {
+		return Twice{};
+	}
+
+	bool operator==(const TwiceIterator o) const {
+		return m_iterations == o.m_iterations;
+	}
+
+	bool operator!=(const TwiceIterator o) const {
+		return !(*this == o);
+	}
+
+public: // data
+	size_t m_iterations = 0;
+};
+
+inline TwiceIterator begin(Twice &) {
+	return TwiceIterator{};
+}
+
+inline TwiceIterator end(Twice &) {
+	return TwiceIterator{2};
+}
+
 } // end ns
 
 /// Output all the elements of a vector as a comma separated list.
