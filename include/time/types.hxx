@@ -6,6 +6,9 @@
 // C++
 #include <chrono>
 
+// cosmos
+#include <cosmos/types.hxx>
+
 /**
  * @file
  *
@@ -58,8 +61,12 @@ public:
 		set(ns);
 	}
 
+	TimeSpec() { reset(); }
+
 	/// Deliberately don't initialize the members for performance reasons.
-	TimeSpec() {}
+	explicit TimeSpec(const no_init_t) {
+
+	}
 
 	bool isZero() const { return this->tv_sec == 0 && this->tv_nsec == 0; }
 	void reset() { this->tv_sec = 0; this->tv_nsec = 0; }

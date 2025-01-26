@@ -8,6 +8,7 @@
 #include <arpa/inet.h>
 
 // cosmos
+#include <cosmos/types.hxx>
 #include <cosmos/utils.hxx>
 
 /**
@@ -162,8 +163,11 @@ public: // types
 
 public: // functions
 
-	// TODO: leave member undefined e.g. for use with placement new or performance, or zero-initialize?
-	constexpr EndianNumber() = default;
+	/// Construct a zero-initialized integer.
+	constexpr EndianNumber() : m_egg{} {}
+
+	/// Leave member undefined e.g. for use with placement new or for performance reasons.
+	constexpr EndianNumber(const no_init_t) {}
 
 	/// Construct the number from a raw integer in the correct byte order.
 	constexpr EndianNumber(const RawInt rint) :
