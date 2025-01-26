@@ -83,7 +83,7 @@ public: // functions
 	 *
 	 * \see wait()
 	 **/
-	std::optional<WaitRes> waitTimed(const std::chrono::milliseconds max,
+	std::optional<WaitRes> waitTimed(const IntervalTime max,
 			const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED});
 
 	/// Send the specified signal to the child process.

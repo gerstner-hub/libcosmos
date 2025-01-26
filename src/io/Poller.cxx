@@ -74,14 +74,10 @@ void Poller::delFD(const FileDescriptor fd) {
 	}
 }
 
-std::vector<Poller::PollEvent> Poller::wait(const std::optional<std::chrono::milliseconds> timeout) {
-	// NOTE: there exists epoll_pwait2 taking a timespec with nanosecond
-	// granularity, but glibc doesn't wrap that yet. If necessary we could
-	// invoke it using syscall() to get the finer granularity.
-
+std::vector<Poller::PollEvent> Poller::wait(const std::optional<IntervalTime> timeout) {
 	while (true) {
-		const auto num_events = epoll_wait(
-			rawPollFD(), m_events.data(), m_events.size(), timeout ? timeout->count() : -1);
+		const auto num_events = epoll_pwait2(
+			rawPollFD(), m_events.data(), m_events.size(), timeout ? &*timeout : nullptr, nullptr);
 
 		if (num_events < 0) {
 			if (auto_restart_syscalls && get_errno() == Errno::INTERRUPTED)

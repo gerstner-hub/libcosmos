@@ -51,7 +51,7 @@ WaitRes SubProc::wait(const WaitFlags flags) {
 	}
 }
 
-std::optional<WaitRes> SubProc::waitTimed(const std::chrono::milliseconds max, const WaitFlags flags) {
+std::optional<WaitRes> SubProc::waitTimed(const IntervalTime max, const WaitFlags flags) {
 	Poller poller(8);
 
 	poller.addFD(m_child_fd, {Poller::MonitorFlag::INPUT});

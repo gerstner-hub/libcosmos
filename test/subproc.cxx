@@ -62,7 +62,7 @@ public:
 		cloner.setExe("sleep");
 		cloner << "1d";
 		proc = cloner.run();
-		auto optres = proc.waitTimed(std::chrono::seconds{1});
+		auto optres = proc.waitTimed(cosmos::IntervalTime{1});
 		RUN_STEP("sleep doesn't exit quickly", !optres);
 		RUN_STEP("proc-still-running", proc.running());
 		RUN_STEP("pid-still-valid", proc.pid() != ProcessID::INVALID);
@@ -348,7 +348,7 @@ public:
 
 		while (m_proc.running()) {
 			// wait at max one second
-			auto res = m_proc.waitTimed(std::chrono::milliseconds{500});
+			auto res = m_proc.waitTimed(cosmos::IntervalTime{std::chrono::milliseconds{500}});
 
 			if (!res) {
 				num_timeouts++;
@@ -390,20 +390,20 @@ public:
 		 * collect the result from the short running process, causing
 		 * it "never to return".
 		 */
-		auto wr = m_long_proc.waitTimed(std::chrono::milliseconds(3000));
+		auto wr = m_long_proc.waitTimed(cosmos::IntervalTime{std::chrono::milliseconds{3000}});
 		const auto short_pid = m_short_proc.pid();
 		const auto long_pid = m_long_proc.pid();
 
 		RUN_STEP("no-early-return", wr == std::nullopt);
 
-		wr = m_long_proc.waitTimed(std::chrono::milliseconds(10000));
+		wr = m_long_proc.waitTimed(cosmos::IntervalTime{std::chrono::milliseconds{10000}});
 
 		RUN_STEP("long-return-in-time", wr != std::nullopt);
 
 		std::cout << "PID " << long_pid << " returned:\n" << *wr << "\n\n";
 
 		// this should long have exited
-		wr = m_short_proc.waitTimed(std::chrono::milliseconds(10000));
+		wr = m_short_proc.waitTimed(cosmos::IntervalTime{std::chrono::milliseconds{10000}});
 
 		RUN_STEP("short-return-in-time", wr != std::nullopt);
 

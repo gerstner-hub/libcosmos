@@ -71,7 +71,7 @@ class TimerFdTest :
 		cosmos::Poller poller{16};
 		poller.addFD(tfd.fd(), {cosmos::Poller::MonitorFlag::INPUT});
 
-		auto events = poller.wait(std::chrono::milliseconds{5000});
+		auto events = poller.wait(cosmos::IntervalTime{std::chrono::milliseconds{5000}});
 
 		RUN_STEP("no-interval-no-retick", events.empty());
 
@@ -92,7 +92,7 @@ class TimerFdTest :
 
 		tfd.setTime(ts);
 		tfd.disarm();
-		events = poller.wait(std::chrono::milliseconds{3000});
+		events = poller.wait(cosmos::IntervalTime{std::chrono::milliseconds{3000}});
 
 		RUN_STEP("disarm-stops-tick", events.empty());
 	}

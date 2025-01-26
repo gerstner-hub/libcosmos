@@ -11,6 +11,7 @@
 // cosmos
 #include <cosmos/BitMask.hxx>
 #include <cosmos/fs/FileDescriptor.hxx>
+#include <cosmos/time/types.hxx>
 
 namespace cosmos {
 
@@ -178,14 +179,17 @@ public: // functions
 
 	/// Wait for one of the monitored events to be ready.
 	/**
-	 * \param[in] timeout An optional timeout to apply after which the
-	 * call will return even if no events are ready. An empty vector is
-	 * returned in the timeout case.
+	 * \param[in] timeout An optional timeout interval to apply after
+	 * which the call will return even if no events are ready. An empty
+	 * vector is returned in the timeout case. A timeout of zero achieves
+	 * a polling operation that will not block at all. This is a relative
+	 * timeout specification which means that completing the timeout after
+	 * an interruption is not possible.
 	 *
 	 * \return The range of events that occurred, or an empty vector if the
 	 * timeout occurred.
 	 **/
-	std::vector<PollEvent> wait(const std::optional<std::chrono::milliseconds> timeout = {});
+	std::vector<PollEvent> wait(const std::optional<IntervalTime> timeout = {});
 
 protected: // functions
 

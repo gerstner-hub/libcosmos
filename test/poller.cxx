@@ -45,7 +45,7 @@ class PollerTest :
 
 		poller.addFD(pp.readEnd(), {cosmos::Poller::MonitorFlag::INPUT});
 
-		auto ready = poller.wait(std::chrono::milliseconds(500));
+		auto ready = poller.wait(cosmos::IntervalTime{std::chrono::milliseconds{500}});
 
 		RUN_STEP("verify-no-spurious-event", ready.empty());
 
