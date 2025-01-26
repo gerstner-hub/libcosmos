@@ -193,5 +193,7 @@ using ProcessCpuTime      = TimeSpec<ClockType::PROCESS_CPUTIME>;
 using CoarseRealTime      = TimeSpec<ClockType::REALTIME_COARSE>;
 using RealTime            = TimeSpec<ClockType::REALTIME>;
 using ThreadCpuTime       = TimeSpec<ClockType::THREAD_CPUTIME>;
+/// TimeSpec used for relative time specifications not based on absolute clock time.
+using IntervalTime        = TimeSpec<ClockType::INVALID>;
 
 } // end ns
