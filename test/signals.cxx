@@ -247,6 +247,7 @@ class SignalTest :
 		START_TEST("basic sigaction test");
 
 		using cosmos::SigAction;
+		constexpr auto TESTSIG = cosmos::signal::POWER;
 
 		SigAction act;
 		act.setFlags(SigAction::Flags{SigAction::Flag::RESET_HANDLER});
@@ -255,14 +256,24 @@ class SignalTest :
 
 		SigAction orig;
 
-		cosmos::signal::set_action(cosmos::signal::SEGV, act, &orig);
+		// NOTE: using SIGSEGV or similar fault signals is problematic
+		// when running with ASAN sanitizer. The glue code obviously
+		// installed their own signal handlers, so non-default values
+		// will be observed in these cases.
+		cosmos::signal::set_action(TESTSIG, act, &orig);
+
+		if (orig.getSimpleHandler() == SigAction::IGNORE) {
+			std::cerr << "IGNORE\n";
+		} else if (orig.getSimpleHandler() == SigAction::UNKNOWN) {
+			std::cerr << "UNKNOWN\n";
+		}
 
 		RUN_STEP("orig-action-is-default", orig.getSimpleHandler() == SigAction::DEFAULT);
 
 		SigAction act2;
 		act2.clear();
 
-		cosmos::signal::get_action(cosmos::signal::SEGV, act2);
+		cosmos::signal::get_action(TESTSIG, act2);
 
 		for (auto _: cosmos::Twice{}) {
 			// comparing signal sets is non-trivial, so just check whether SIGILL is present in both.
@@ -274,7 +285,7 @@ class SignalTest :
 
 			// restore the original signal setting, check again
 			// whether the old data is correct.
-			cosmos::signal::set_action(cosmos::signal::SEGV, orig, &act2);
+			cosmos::signal::set_action(TESTSIG, orig, &act2);
 		}
 
 		/*
@@ -288,18 +299,18 @@ class SignalTest :
 			sa.sa_handler = plain_handler;
 			sigaddset(&sa.sa_mask, SIGBUS);
 			sa.sa_flags = SA_NODEFER;
-			const auto res = ::sigaction(SIGSEGV, &sa, nullptr);
+			const auto res = ::sigaction(SIGPWR, &sa, nullptr);
 			RUN_STEP("sigaction-succeeds", res == 0);
 		}
 
-		cosmos::signal::set_action(cosmos::signal::SEGV, act, &act2);
+		cosmos::signal::set_action(TESTSIG, act, &act2);
 
 		RUN_STEP("legacy-act-mask-matches", act2.mask().isSet(cosmos::signal::BUS));
 		RUN_STEP("legacy-flags-match", act2.getFlags().reset(SigAction::Flag::RESTORER) == SigAction::Flags{SigAction::Flag::NO_DEFER});
 		RUN_STEP("legacy-handler-matches", act2.getSimpleHandler() == SigAction::UNKNOWN);
 
 		// restore default to avoid side effects for other tests
-		cosmos::signal::set_action(cosmos::signal::SEGV, orig);
+		cosmos::signal::set_action(TESTSIG, orig);
 	}
 
 	void testAsyncSignals() {
