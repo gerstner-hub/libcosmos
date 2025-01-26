@@ -1,15 +1,21 @@
 // C++
+#include <atomic>
 #include <iostream>
 
 // cosmos
 #include <cosmos/formatting.hxx>
 #include <cosmos/memory.hxx>
 #include <cosmos/proc/process.hxx>
+#include <cosmos/proc/SigAction.hxx>
+#include <cosmos/proc/SigInfo.hxx>
 #include <cosmos/proc/SignalFD.hxx>
 #include <cosmos/proc/SigSet.hxx>
 #include <cosmos/thread/Condition.hxx>
 #include <cosmos/thread/PosixThread.hxx>
 #include <cosmos/thread/thread.hxx>
+#include <cosmos/time/Clock.hxx>
+#include <cosmos/time/time.hxx>
+#include <cosmos/utils.hxx>
 
 // Test
 #include "TestBase.hxx"
@@ -25,6 +31,9 @@ class SignalTest :
 		testIgnore();
 		testPauseSuspend();
 		testSigWait();
+		testSigWaitInfo();
+		testSigAction();
+		testAsyncSignals();
 	}
 
 	void testSets() {
@@ -90,23 +99,18 @@ class SignalTest :
 		RUN_STEP("did-not-terminate", true);
 	}
 
-	static void handle_signal(int sig) {
-		(void)sig;
+	static void handle_signal(const cosmos::Signal) {
 	}
 
 	void testPauseSuspend() {
 		START_TEST("pause/suspend and wake thread via thread-directed signal");
 
-		// TODO: use libcosmos API for this in the future (not yet available)
-		struct sigaction action;
-		cosmos::zero_object(action);
-		action.sa_handler = &SignalTest::handle_signal;
-		const auto res = ::sigaction(SIGUSR1, &action, nullptr);
+		cosmos::SigAction action;
+		action.setHandler(&handle_signal);
+		cosmos::signal::set_action(cosmos::signal::USR1, action, &action);
 
 		bool pause_over = false;
 		cosmos::ConditionMutex pause_cond;
-
-		RUN_STEP("sigaction-succeeds", res == 0);
 
 		const auto tid_to_signal = cosmos::thread::get_tid();
 
@@ -128,8 +132,7 @@ class SignalTest :
 		RUN_STEP("pause-returns-due-to-USR1", true);
 
 		// now block the signal to test suspend()
-		cosmos::SigSet ss;
-		ss.set(cosmos::signal::USR1);
+		cosmos::SigSet ss{cosmos::signal::USR1};
 		cosmos::signal::block(ss);
 
 		{
@@ -149,8 +152,10 @@ class SignalTest :
 		RUN_STEP("suspend-returns-due-to-USR1", true);
 
 		thread.join();
-	}
 
+		// restore the original action
+		cosmos::signal::set_action(cosmos::signal::USR1, action);
+	}
 
 	void testSigWait() {
 		START_TEST("testing send (sigqueue) and wait (sigwait)");
@@ -169,7 +174,179 @@ class SignalTest :
 
 		thread.join();
 	}
+
+	void testSigWaitInfo() {
+		START_TEST("testing send (sigqueue) and wait_info (sigwaitinfo)");
+
+		cosmos::SigSet set{cosmos::signal::USR1};
+
+		cosmos::signal::block(set);
+
+		cosmos::PosixThread thread{[]() {
+			cosmos::signal::send(cosmos::proc::get_own_pid(), cosmos::signal::USR1, 0x1234);
+		}};
+
+		cosmos::SigInfo info{cosmos::no_init};
+
+		cosmos::signal::wait_info(set, info);
+
+		thread.join();
+
+		RUN_STEP("sigwaitinfo-sig-matches", info.sigNr() == cosmos::signal::USR1);
+		RUN_STEP("sigwaitinfo-source-matches", info.source() == SigInfo::Source::QUEUE);
+		RUN_STEP("sigwaitinfo-untrusted-source", !info.isTrustedSource());
+		RUN_STEP("sigwaitinfo-no-fault-sig", !info.isFaultSignal());
+		RUN_STEP("sigwaitinfo-no-user-sig-data", !info.userSigData());
+		RUN_STEP("sigwaitinfo-no-msg-queue-data", !info.msgQueueData());
+		RUN_STEP("sigwaitinfo-no-timer-data", !info.timerData());
+		RUN_STEP("sigwaitinfo-no-sys-data", !info.sysData());
+		RUN_STEP("sigwaitinfo-no-child-data", !info.childData());
+		RUN_STEP("sigwaitinfo-no-poll-data", !info.pollData());
+		RUN_STEP("sigwaitinfo-no-ill-data", !info.illData());
+		RUN_STEP("sigwaitinfo-no-fpe-data", !info.fpeData());
+		RUN_STEP("sigwaitinfo-no-segv-data", !info.segfaultData());
+		RUN_STEP("sigwaitinfo-no-bus-data", !info.busData());
+
+		auto data = info.queueSigData();
+
+		RUN_STEP("sigwaitinfo-has-queue-sig-data", data != std::nullopt);
+		RUN_STEP("sigwaitinfo-sender-pid-is-us", data->sender.pid == cosmos::proc::get_own_pid());
+		RUN_STEP("sigwaitinfo-sender-uid-is-us", data->sender.uid == cosmos::proc::get_real_user_id());
+		RUN_STEP("sigwaitinfo-data-matches", data->data.asInt() == 0x1234);
+
+
+		auto res = cosmos::signal::timed_wait(set, info, cosmos::IntervalTime{std::chrono::milliseconds{50}});
+
+		RUN_STEP("sigtimedwait-returns-nothing", res == cosmos::signal::WaitRes::NO_RESULT);
+
+		res = cosmos::signal::poll_info(set, info);
+
+		RUN_STEP("poll-info-returns-nothing", res == cosmos::signal::WaitRes::NO_RESULT);
+	}
+
+	static std::atomic_bool info_handler_running;
+	static std::atomic_bool simple_handler_running;
+	static std::atomic_int info_handler_int;
+	static std::atomic_int async_signal_seen;
+
+	static void info_handler(const cosmos::SigInfo &info) {
+		info_handler_int.store(info.queueSigData()->data.asInt());
+		async_signal_seen.store(cosmos::to_integral(info.sigNr().raw()));
+		info_handler_running.store(true);
+	}
+
+	static void simple_handler(const cosmos::Signal sig) {
+		async_signal_seen.store(cosmos::to_integral(sig.raw()));
+		simple_handler_running.store(true);
+	}
+
+	static void plain_handler(int) {
+	}
+
+	void testSigAction() {
+		START_TEST("basic sigaction test");
+
+		using cosmos::SigAction;
+
+		SigAction act;
+		act.setFlags(SigAction::Flags{SigAction::Flag::RESET_HANDLER});
+		act.mask().set(cosmos::signal::ILL);
+		act.setHandler(&info_handler);
+
+		SigAction orig;
+
+		cosmos::signal::set_action(cosmos::signal::SEGV, act, &orig);
+
+		RUN_STEP("orig-action-is-default", orig.getSimpleHandler() == SigAction::DEFAULT);
+
+		SigAction act2;
+		act2.clear();
+
+		cosmos::signal::get_action(cosmos::signal::SEGV, act2);
+
+		for (auto _: cosmos::Twice{}) {
+			// comparing signal sets is non-trivial, so just check whether SIGILL is present in both.
+			RUN_STEP("new-act-mask-matches", act2.mask().isSet(cosmos::signal::ILL) == act.mask().isSet(cosmos::signal::ILL));
+			// we need to mask out the SA_RESTORER flag which is implicitly set by libc
+			RUN_STEP("new-act-flags-match", act2.getFlags().reset(SigAction::Flag::RESTORER) == act.getFlags());
+
+			RUN_STEP("new-act-handler-matches", act2.getInfoHandler() == info_handler);
+
+			// restore the original signal setting, check again
+			// whether the old data is correct.
+			cosmos::signal::set_action(cosmos::signal::SEGV, orig, &act2);
+		}
+
+		/*
+		 * now test setting a regular C signal handler, overriding and
+		 * restoring that via libcosmos without losing information.
+		 */
+
+		{
+			struct sigaction sa;
+			cosmos::zero_object(sa);
+			sa.sa_handler = plain_handler;
+			sigaddset(&sa.sa_mask, SIGBUS);
+			sa.sa_flags = SA_NODEFER;
+			const auto res = ::sigaction(SIGSEGV, &sa, nullptr);
+			RUN_STEP("sigaction-succeeds", res == 0);
+		}
+
+		cosmos::signal::set_action(cosmos::signal::SEGV, act, &act2);
+
+		RUN_STEP("legacy-act-mask-matches", act2.mask().isSet(cosmos::signal::BUS));
+		RUN_STEP("legacy-flags-match", act2.getFlags().reset(SigAction::Flag::RESTORER) == SigAction::Flags{SigAction::Flag::NO_DEFER});
+		RUN_STEP("legacy-handler-matches", act2.getSimpleHandler() == SigAction::UNKNOWN);
+
+		// restore default to avoid side effects for other tests
+		cosmos::signal::set_action(cosmos::signal::SEGV, orig);
+	}
+
+	void testAsyncSignals() {
+		START_TEST("async signals test");
+
+		constexpr auto TESTSIG = cosmos::signal::USR1;
+
+		// the signal we want to use for async signal handling
+		cosmos::signal::unblock(cosmos::SigSet{TESTSIG});
+
+		cosmos::SigAction old{cosmos::no_init};
+		cosmos::SigAction action;
+		// first test the simple handler
+		action.setHandler(&simple_handler);
+
+		cosmos::signal::set_action(TESTSIG, action, &old);
+		cosmos::signal::raise(TESTSIG);
+
+		while (!simple_handler_running.load()) {
+			cosmos::time::sleep(std::chrono::milliseconds{50});
+		}
+
+		RUN_STEP("simple-handler-signal-matches", async_signal_seen.load() == SIGUSR1);
+
+		async_signal_seen.store(0);
+
+		action.setHandler(&info_handler);
+		cosmos::signal::set_action(TESTSIG, action);
+
+		cosmos::signal::send(cosmos::proc::get_own_pid(), TESTSIG, 0x4321);
+
+		while (!info_handler_running.load()) {
+			cosmos::time::sleep(std::chrono::milliseconds{50});
+		}
+
+		RUN_STEP("info-handler-signal-matches", async_signal_seen.load() == SIGUSR1);
+		RUN_STEP("info-handler-data-matches", info_handler_int.load() == 0x4321);
+
+		// restore original handler
+		cosmos::signal::set_action(TESTSIG, old);
+	}
 };
+
+std::atomic_bool SignalTest::info_handler_running;
+std::atomic_bool SignalTest::simple_handler_running;
+std::atomic_int SignalTest::info_handler_int;
+std::atomic_int SignalTest::async_signal_seen;
 
 int main(const int argc, const char **argv) {
 	SignalTest test;
