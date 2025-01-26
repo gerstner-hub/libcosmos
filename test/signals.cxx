@@ -116,7 +116,7 @@ class SignalTest :
 
 			while (!pause_over) {
 				cosmos::signal::send(cosmos::proc::get_own_pid(), tid_to_signal, cosmos::signal::USR1);
-				pause_cond.waitTimed(cosmos::MonotonicTime{std::chrono::milliseconds{50}});
+				pause_cond.waitTimed(cosmos::MonotonicClock{}.now() + cosmos::MonotonicTime{std::chrono::milliseconds{50}});
 			}
 
 			// send a second signal to test suspend()
