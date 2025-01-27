@@ -5,6 +5,7 @@
 // C++
 #include <cstdlib>
 #include <functional>
+#include <ostream>
 
 // Cosmos
 #include <cosmos/error/ApiError.hxx>
@@ -56,19 +57,22 @@ ProcessID create_new_session() {
 
 namespace {
 
-	std::optional<WaitRes> wait(const idtype_t wait_type, const id_t id, const WaitFlags flags) {
-		WaitRes ret;
-		ret.raw()->si_pid = 0;
+	std::optional<ChildData> wait(const idtype_t wait_type, const id_t id, const WaitFlags flags) {
+		SigInfo si;
+		si.raw()->si_pid = 0;
 
-		if (::waitid(wait_type, id, ret.raw(), flags.raw()) != 0) {
+		if (::waitid(wait_type, id, si.raw(), flags.raw()) != 0) {
 			cosmos_throw (ApiError("wait()"));
 		}
 
-		if (flags[WaitFlag::NO_HANG] && ret.raw()->si_pid == 0) {
+		if (flags[WaitFlag::NO_HANG] && si.raw()->si_pid == 0) {
 			return {};
 		}
 
-		return ret;
+		// signify to SigInfo that this is a waitid() result, see
+		// SigInfo::childData() implementation.
+		si.raw()->si_errno = EINVAL;
+		return si.childData();
 	}
 
 	template <typename STYPE>
@@ -109,19 +113,19 @@ namespace {
 
 } // end anons ns
 
-std::optional<WaitRes> wait(const ProcessID pid, const WaitFlags flags) {
+std::optional<ChildData> wait(const ProcessID pid, const WaitFlags flags) {
 	return wait(P_PID, to_integral(pid), flags);
 }
 
-std::optional<WaitRes> wait(const ProcessGroupID pgid, const WaitFlags flags) {
+std::optional<ChildData> wait(const ProcessGroupID pgid, const WaitFlags flags) {
 	return wait(P_PGID, to_integral(pgid), flags);
 }
 
-std::optional<WaitRes> wait(const WaitFlags flags) {
+std::optional<ChildData> wait(const WaitFlags flags) {
 	return wait(P_ALL, 0, flags);
 }
 
-std::optional<WaitRes> wait(const PidFD fd, const WaitFlags flags) {
+std::optional<ChildData> wait(const PidFD fd, const WaitFlags flags) {
 	return wait(P_PIDFD, to_integral(fd.raw()), flags);
 }
 
@@ -233,3 +237,32 @@ std::optional<ProcessID> fork() {
 PidInfo cached_pids;
 
 } // end ns
+
+std::ostream& operator<<(std::ostream &o, const cosmos::ExitStatus status) {
+	/// this could be annotated with a special character so that it is
+	/// clear right away that this is about an exit status
+	o << cosmos::to_integral(status);
+	switch (status) {
+		case cosmos::ExitStatus::INVALID: o << " (INVALID)"; break;
+		case cosmos::ExitStatus::SUCCESS: o << " (SUCCESS)"; break;
+		case cosmos::ExitStatus::FAILURE: o << " (FAILURE)"; break;
+		default: o << " (other)"; break;
+	}
+	return o;
+}
+
+std::ostream& operator<<(std::ostream &o, const cosmos::ChildData &info) {
+	using Event = cosmos::ChildData::Event;
+
+	switch (info.event) {
+		case Event::EXITED:    o << "Child exited with " << *info.status; break;
+		case Event::KILLED:    o << "Child killed by " << *info.signal; break;
+		case Event::DUMPED:    o << "Child killed by " << *info.signal << " (dumped core)"; break;
+		case Event::TRAPPED:   o << "Child trapped"; break;
+		case Event::STOPPED:   o << "Child stopped by " << *info.signal; break;
+		case Event::CONTINUED: o << "Child continued by " << *info.signal; break;
+		default: o << "Bad ChildData"; break;
+	}
+
+	return o;
+}

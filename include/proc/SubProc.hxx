@@ -6,7 +6,7 @@
 
 // cosmos
 #include <cosmos/proc/PidFD.hxx>
-#include <cosmos/proc/WaitRes.hxx>
+#include <cosmos/proc/process.hxx>
 #include <cosmos/types.hxx>
 
 namespace cosmos {
@@ -74,7 +74,7 @@ public: // functions
 	 * otherwise a UsageError is thrown. To test for child state changes
 	 * without blocking, use `waitTimed()` with a zero wait time.
 	 **/
-	WaitRes wait(const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED});
+	ChildData wait(const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED});
 
 	/// Wait for sub process exit within a timeout in milliseconds.
 	/**
@@ -83,7 +83,7 @@ public: // functions
 	 *
 	 * \see wait()
 	 **/
-	std::optional<WaitRes> waitTimed(const IntervalTime max,
+	std::optional<ChildData> waitTimed(const IntervalTime max,
 			const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED});
 
 	/// Send the specified signal to the child process.

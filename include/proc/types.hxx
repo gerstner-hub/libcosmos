@@ -38,7 +38,7 @@ enum class ProcessGroupID : pid_t {
 /// Represents an exit status code from a child process.
 /**
  * The valid range of exit statuses is 0 .. 255 (the 8 lower bits of the
- * si_status field in WaitRes).
+ * si_status field in SigInfo).
  **/
 enum class ExitStatus : int {
 	INVALID = -1,
@@ -130,3 +130,5 @@ protected: // data
 
 /// Print a friendly name of the signal to the given output stream.
 COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::Signal sig);
+/// Outputs the strongly typed ExitStatus as an integer.
+COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::ExitStatus status);

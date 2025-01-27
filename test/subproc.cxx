@@ -40,22 +40,22 @@ public:
 		cloner.setExe("true");
 		auto proc = cloner.run();
 
-		auto res = proc.wait();
+		auto info = proc.wait();
 
-		RUN_STEP("true-exited-successfully", res.exitedSuccessfully());
+		RUN_STEP("true-exited-successfully", info.exitedSuccessfully());
 		RUN_STEP("proc-not-running", !proc.running());
 
 		cloner.setExe("false");
 		proc = cloner.run();
 
 		RUN_STEP("pid-valid", proc.pid() != ProcessID::INVALID);
-		res = proc.wait(cosmos::WaitFlags{cosmos::WaitFlag::LEAVE_INFO, cosmos::WaitFlag::WAIT_FOR_EXITED});
-		RUN_STEP("false-exited-erroneously", res.exited() && res.exitStatus() == cosmos::ExitStatus::FAILURE);
+		info = proc.wait(cosmos::WaitFlags{cosmos::WaitFlag::LEAVE_INFO, cosmos::WaitFlag::WAIT_FOR_EXITED});
+		RUN_STEP("false-exited-erroneously", info.exited() && info.status == cosmos::ExitStatus::FAILURE);
 		RUN_STEP("proc-still-running (left-info)", proc.running());
 		RUN_STEP("pid-still-valid (left-info)", proc.pid() != ProcessID::INVALID);
 
-		res = proc.wait();
-		RUN_STEP("false-exited-erroneously", res.exited() && res.exitStatus() == cosmos::ExitStatus::FAILURE);
+		info = proc.wait();
+		RUN_STEP("false-exited-erroneously", info.exited() && info.status == cosmos::ExitStatus::FAILURE);
 		RUN_STEP("proc-not-running (consumed-info)", !proc.running());
 		RUN_STEP("pid-now-invalid (consumed-info)", proc.pid() == ProcessID::INVALID);
 
@@ -68,8 +68,8 @@ public:
 		RUN_STEP("pid-still-valid", proc.pid() != ProcessID::INVALID);
 
 		proc.kill(cosmos::signal::KILL);
-		res = proc.wait();
-		RUN_STEP("kill-killed-sleep", res.signaled() && res.termSignal() == cosmos::signal::KILL);
+		info = proc.wait();
+		RUN_STEP("kill-killed-sleep", info.signaled() && info.signal == cosmos::signal::KILL);
 		RUN_STEP("proc-not-running", !proc.running());
 		RUN_STEP("pid-now-invalid", proc.pid() == ProcessID::INVALID);
 	}
@@ -189,9 +189,9 @@ public:
 		cosmos::ChildCloner cloner{{m_cat_path, m_nonexisting_file}};
 		cloner.setStdErr(file.fileDesc());
 		m_proc = cloner.run();
-		auto res = m_proc.wait();
+		auto info = m_proc.wait();
 
-		RUN_STEP("child-exit-success", res.exited() && res.exitStatus() == ExitStatus(1));
+		RUN_STEP("child-exit-success", info.exited() && info.status == ExitStatus(1));
 
 		checkErrorMessage(file);
 	}
@@ -348,14 +348,14 @@ public:
 
 		while (m_proc.running()) {
 			// wait at max one second
-			auto res = m_proc.waitTimed(cosmos::IntervalTime{std::chrono::milliseconds{500}});
+			auto info = m_proc.waitTimed(cosmos::IntervalTime{std::chrono::milliseconds{500}});
 
-			if (!res) {
+			if (!info) {
 				num_timeouts++;
 				continue;
 			}
 
-			RUN_STEP("check-exit-status", res->exited() && res->exitStatus() == ExitStatus::SUCCESS);
+			RUN_STEP("check-exit-status", info->exited() && info->status == ExitStatus::SUCCESS);
 		}
 
 		RUN_STEP("check-num-timeouts", num_timeouts != 0);
@@ -471,9 +471,9 @@ public:
 				&PostForkTest::postFork, this, std::placeholders::_1 );
 		m_cloner.setPostForkCB(cb);
 		m_true_proc = m_cloner.run();
-		auto res = m_true_proc.wait();
+		auto info = m_true_proc.wait();
 
-		RUN_STEP("correct-post-fork-exit", res.exited() && res.exitStatus() == REPLACE_EXIT);
+		RUN_STEP("correct-post-fork-exit", info.exited() && info.status == REPLACE_EXIT);
 
 		std::cout << "/usr/bin/true child has been shortcut by postFork CB()" << std::endl;
 	}

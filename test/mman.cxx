@@ -13,6 +13,7 @@
 #include "cosmos/fs/FileStatus.hxx"
 #include "cosmos/fs/TempFile.hxx"
 #include "cosmos/proc/Mapping.hxx"
+#include "cosmos/proc/signal.hxx"
 #include "cosmos/proc/types.hxx"
 
 class MappingTest :
@@ -103,9 +104,9 @@ class MappingTest :
 		START_TEST("test-write-protection");
 
 		if (auto child = cosmos::proc::fork(); child != std::nullopt) {
-			auto wait_res = cosmos::proc::wait(*child);
-			RUN_STEP("child-was-signaled", wait_res && wait_res->signaled());
-			RUN_STEP("child-segfaulted", wait_res->termSignal() == cosmos::signal::SEGV);
+			auto info = cosmos::proc::wait(*child);
+			RUN_STEP("child-was-signaled",info && info->signaled());
+			RUN_STEP("child-segfaulted", *info->signal == cosmos::signal::SEGV);
 		} else {
 			// make sure we don't create a core file from this
 			// test which would clutter the CWD unnecessarily and

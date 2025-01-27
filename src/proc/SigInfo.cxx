@@ -83,13 +83,25 @@ std::optional<const SigInfo::ChildData> SigInfo::childData() const {
 	if (sigNr() == signal::CHILD) {
 		using Event = ChildData::Event;
 		const auto event = Event{m_raw.si_code};
+		/*
+		 * since this siginfo_t is so hacky, let's hack it a bit on our own:
+		 *
+		 * the structure is reused in the waitid() system call, but
+		 * not fully filled like when used with sigwaitinfo(). In this
+		 * case there is no si_utime and no si_stime. To avoid
+		 * duplicating this code just to leave out these two optionals
+		 * the cosmos::proc::wait() sets si_errno to EINVAL (si_errno
+		 * is also unused with waitid()).
+		 */
+		const auto is_waitid_res = error() == Errno::INVALID_ARG;
+
 		return ChildData{
 			event,
 			this->procCtx(),
 			event == Event::EXITED ? std::make_optional(ExitStatus{m_raw.si_status}) : std::nullopt,
 			event == Event::EXITED ? std::nullopt : std::make_optional(Signal{SignalNr{m_raw.si_status}}),
-			ClockTicks{m_raw.si_utime},
-			ClockTicks{m_raw.si_stime}
+			is_waitid_res ? std::nullopt : std::make_optional(ClockTicks{m_raw.si_utime}),
+			is_waitid_res ? std::nullopt : std::make_optional(ClockTicks{m_raw.si_stime})
 		};
 	}
 

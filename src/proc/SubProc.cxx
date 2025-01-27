@@ -4,6 +4,7 @@
 #include <cosmos/io/Poller.hxx>
 #include <cosmos/private/cosmos.hxx>
 #include <cosmos/proc/process.hxx>
+#include <cosmos/proc/signal.hxx>
 #include <cosmos/proc/SubProc.hxx>
 
 namespace cosmos {
@@ -23,18 +24,18 @@ void SubProc::reset() {
 	m_child_fd.close();
 }
 
-WaitRes SubProc::wait(const WaitFlags flags) {
+ChildData SubProc::wait(const WaitFlags flags) {
 
 	if (flags[WaitFlag::NO_HANG]) {
 		cosmos_throw (UsageError("cannot use NO_HANG with SubProc, use waitTimed() instead"));
 	}
 
 	try {
-		auto wr = proc::wait(m_child_fd, flags);
-		if (!flags[WaitFlag::LEAVE_INFO] && (wr->exited() || wr->signaled())) {
+		auto child = proc::wait(m_child_fd, flags);
+		if (!flags[WaitFlag::LEAVE_INFO] && (child->exited() || child->signaled())) {
 			reset();
 		}
-		return *wr;
+		return *child;
 	} catch (const ApiError &err) {
 		// for some reason the child was already collected, invalidate
 		// our state to prevent infinite loops / uncleanable SubProc
@@ -51,7 +52,7 @@ WaitRes SubProc::wait(const WaitFlags flags) {
 	}
 }
 
-std::optional<WaitRes> SubProc::waitTimed(const IntervalTime max, const WaitFlags flags) {
+std::optional<ChildData> SubProc::waitTimed(const IntervalTime max, const WaitFlags flags) {
 	Poller poller(8);
 
 	poller.addFD(m_child_fd, {Poller::MonitorFlag::INPUT});

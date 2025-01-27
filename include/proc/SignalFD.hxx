@@ -19,10 +19,10 @@ namespace cosmos {
  * SignalFD::SigInfo data structure describing the event.
  *
  * As usual with signal handling you need to block the signals that you want
- * to handle synchronously via a SignalFD by calling Process::blockSignals().
+ * to handle synchronously via a SignalFD by calling cosmos::signal::block().
  * Use the readEvent() member function to comfortably receive the signal
  * information. The underlying file descriptor can be used with common file
- * descriptor monitoring interfaces like select() or poll().
+ * descriptor monitoring interfaces like Poller.
  **/
 class COSMOS_API SignalFD {
 public: // types
@@ -58,7 +58,7 @@ public: // functions
 	}
 
 	/// Creates a signal FD listening on the given list of signals.
-	explicit SignalFD(const std::initializer_list<Signal> &siglist) {
+	explicit SignalFD(const std::initializer_list<Signal> siglist) {
 		create(SigSet{siglist});
 	}
 
@@ -101,7 +101,7 @@ public: // functions
 	void readEvent(SigInfo &info);
 
 	/// Returns the FileDescriptor object associated with the SignalFD.
-	auto raw() { return m_fd; }
+	auto fd() { return m_fd; }
 
 protected: // data
 

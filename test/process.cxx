@@ -99,8 +99,8 @@ class ProcessTest :
 		START_TEST("fork/wait tests");
 
 		if (auto child = cosmos::proc::fork(); child) {
-			auto res = cosmos::proc::wait(*child);
-			RUN_STEP("simple-child-exit", res->exitStatus() == cosmos::ExitStatus{10});
+			auto info = cosmos::proc::wait(*child);
+			RUN_STEP("simple-child-exit", info->status == cosmos::ExitStatus{10});
 		} else {
 			cosmos::proc::exit(cosmos::ExitStatus{10});
 		}
@@ -109,39 +109,39 @@ class ProcessTest :
 		cosmos::signal::block(cosmos::SigSet{cosmos::signal::TERMINATE});
 
 		if (auto child = cosmos::proc::fork(); child) {
-			auto res = cosmos::proc::wait(*child,
-					cosmos::WaitFlags{
-						cosmos::WaitFlag::WAIT_FOR_EXITED,
-						cosmos::WaitFlag::NO_HANG});
-			RUN_STEP("wait-no-hang-works", !res);
+			auto info = cosmos::proc::wait(*child,
+						cosmos::WaitFlags{
+							cosmos::WaitFlag::WAIT_FOR_EXITED,
+							cosmos::WaitFlag::NO_HANG});
+			RUN_STEP("wait-no-hang-works", !info);
 
 			cosmos::signal::send(*child, cosmos::signal::TERMINATE);
-			res = cosmos::proc::wait(*child);
-			RUN_STEP("term-wait-works", res->exited() && res->exitStatus() == cosmos::ExitStatus{0});
+			info = cosmos::proc::wait(*child);
+			RUN_STEP("term-wait-works", info->exited() && info->status == cosmos::ExitStatus{0});
 		} else {
 			waitForTermSig();
 		}
 
 		if (auto child = cosmos::proc::fork(); child) {
 			cosmos::signal::send(*child, cosmos::signal::STOP);
-			auto res = cosmos::proc::wait(*child,
-					cosmos::WaitFlags{
-						cosmos::WaitFlag::WAIT_FOR_EXITED,
-						cosmos::WaitFlag::WAIT_FOR_STOPPED});
+			auto info = cosmos::proc::wait(*child,
+						cosmos::WaitFlags{
+							cosmos::WaitFlag::WAIT_FOR_EXITED,
+							cosmos::WaitFlag::WAIT_FOR_STOPPED});
 
-			RUN_STEP("wait-for-stop-works", res->stopped());
+			RUN_STEP("wait-for-stop-works", info->stopped());
 
 			cosmos::signal::send(*child, cosmos::signal::CONT);
-			res = cosmos::proc::wait(*child,
-					cosmos::WaitFlags{
-						cosmos::WaitFlag::WAIT_FOR_EXITED,
-						cosmos::WaitFlag::WAIT_FOR_CONTINUED});
+			info = cosmos::proc::wait(*child,
+						cosmos::WaitFlags{
+							cosmos::WaitFlag::WAIT_FOR_EXITED,
+							cosmos::WaitFlag::WAIT_FOR_CONTINUED});
 
-			RUN_STEP("wait-for-continue-works", res->continued());
+			RUN_STEP("wait-for-continue-works", info->continued());
 
 			cosmos::signal::send(*child, cosmos::signal::TERMINATE);
-			res = cosmos::proc::wait(*child);
-			RUN_STEP("term-after-stop/cont-works", res->exited() && res->exitStatus() == cosmos::ExitStatus{0});
+			info = cosmos::proc::wait(*child);
+			RUN_STEP("term-after-stop/cont-works", info->exited() && info->status == cosmos::ExitStatus{0});
 
 		} else {
 			waitForTermSig();
@@ -158,9 +158,9 @@ class ProcessTest :
 		}
 
 		for (size_t i = 0; i < 2; i++) {
-			auto res = cosmos::proc::wait();
+			auto info = cosmos::proc::wait();
 
-			RUN_STEP("wait-for-any-child-works", res->exited() && childs.find(res->pid()) != childs.end());
+			RUN_STEP("wait-for-any-child-works", info->exited() && childs.find(info->child.pid) != childs.end());
 		}
 	}
 
@@ -168,18 +168,18 @@ class ProcessTest :
 		START_TEST("exec() tests");
 
 		if (auto child = cosmos::proc::fork(); child) {
-			auto res = cosmos::proc::wait(*child);
+			auto info = cosmos::proc::wait(*child);
 
-			RUN_STEP("exec-false-works", res->exited() && res->exitStatus() == cosmos::ExitStatus{1});
+			RUN_STEP("exec-false-works", info->exited() && info->status == cosmos::ExitStatus{1});
 		} else {
 			cosmos::proc::exec("/bin/false");
 			cosmos::proc::exit(cosmos::ExitStatus{10});
 		}
 
 		if (auto child = cosmos::proc::fork(); child) {
-			auto res = cosmos::proc::wait(*child);
+			auto info = cosmos::proc::wait(*child);
 
-			RUN_STEP("exec_at-true-works", res->exited() && res->exitStatus() == cosmos::ExitStatus{0});
+			RUN_STEP("exec_at-true-works", info->exited() && info->status == cosmos::ExitStatus{0});
 		} else {
 			cosmos::Directory bin{"/bin"};
 			cosmos::proc::exec_at(bin.fd(), "true");
@@ -187,9 +187,9 @@ class ProcessTest :
 		}
 
 		if (auto child = cosmos::proc::fork(); child) {
-			auto res = cosmos::proc::wait(*child);
+			auto info = cosmos::proc::wait(*child);
 
-			RUN_STEP("fexec-true-works", res->exited() && res->exitStatus() == cosmos::ExitStatus{0});
+			RUN_STEP("fexec-true-works", info->exited() && info->status == cosmos::ExitStatus{0});
 		} else {
 			cosmos::File true_file{"/bin/true", cosmos::OpenMode::READ_ONLY};
 			cosmos::proc::fexec(true_file.fd());
@@ -213,9 +213,9 @@ class ProcessTest :
 		constexpr auto STATUS = cosmos::ExitStatus{20};
 
 		if (auto child = cosmos::proc::clone(args); child) {
-			auto wr = cosmos::proc::wait(pid_fd);
-			RUN_STEP("waitid-on-pidfd-works", wr != std::nullopt && wr->exited());
-			RUN_STEP("wait-res-exit-status-matches", wr->exitStatus() == STATUS);
+			auto info = cosmos::proc::wait(pid_fd);
+			RUN_STEP("waitid-on-pidfd-works", info && info->exited());
+			RUN_STEP("wait-res-exit-status-matches", info->status == STATUS);
 			pid_fd.close();
 		} else {
 			cosmos::proc::exit(STATUS);
@@ -245,9 +245,9 @@ class ProcessTest :
 
 			pf.sendSignal(cosmos::signal::USR1);
 
-			auto res = pf.wait();
+			auto info = pf.wait();
 
-			RUN_STEP("child-exited-due-to-signal", res->signaled() && res->termSignal() == cosmos::signal::USR1);
+			RUN_STEP("child-exited-due-to-signal", info->signaled() && info->signal == cosmos::signal::USR1);
 		} else {
 			cosmos::File fstab{"/etc/fstab", cosmos::OpenMode::READ_ONLY};;
 			// communicate the file descriptor number as event

@@ -16,6 +16,7 @@
 #include <cosmos/io/types.hxx>
 #include <cosmos/memory.hxx>
 #include <cosmos/proc/ptrace.hxx>
+#include <cosmos/proc/signal.hxx>
 #include <cosmos/proc/types.hxx>
 #include <cosmos/time/types.hxx>
 #include <cosmos/utils.hxx>
@@ -322,15 +323,61 @@ public: // types
 
 		/// Types of SIGCHLD events that can occur.
 		enum class Event : int {
+			INVALID   = -1,
 			EXITED    = CLD_EXITED,   ///< Child has exited.
 			KILLED    = CLD_KILLED,   ///< Child was killed.
-			DUMPED    = CLD_DUMPED,   ///< Child terminated abnormally.
+			DUMPED    = CLD_DUMPED,   ///< Child terminated abnormally due to a signal, dumping core.
 			TRAPPED   = CLD_TRAPPED,  ///< Traced child has trapped.
-			STOPPED   = CLD_STOPPED,  ///< Child has stopped.
+			STOPPED   = CLD_STOPPED,  ///< Child has stopped due to a signal.
 			CONTINUED = CLD_CONTINUED ///< Stopped child has continued.
 		};
 
 	public: // functions
+
+		/// Returns whether the child exited.
+		bool exited() const { return event == Event::EXITED; }
+
+		/// Returns whether the child was killed by a signal.
+		bool killed() const { return event == Event::KILLED; }
+
+		/// Returns whether the child dumped core due to a signal.
+		bool dumped() const { return event == Event::DUMPED; }
+
+		/// Returns true if the child entered a tracing trap.
+		bool trapped() const { return event == Event::TRAPPED; }
+
+		/// Returns whether the child continued due to a signal.
+		bool continued() const { return event == Event::CONTINUED; }
+
+		/// Returns whether the child stopped.
+		bool stopped() const { return event == Event::STOPPED; }
+
+		/// Returns whether the child exited and had an exit status of 0.
+		bool exitedSuccessfully() const {
+			return exited() && *status == ExitStatus::SUCCESS;
+		}
+
+		/// Returns whether the child received a signal.
+		bool signaled() const {
+			return event == Event::KILLED ||
+				event == Event::DUMPED ||
+				event == Event::STOPPED ||
+				event == Event::CONTINUED;
+		}
+
+		/// Returns whether the structure contains valid information.
+		bool valid() const {
+			return event != Event::INVALID;
+		}
+
+		void reset() {
+			event = Event::INVALID;
+			child.pid = ProcessID::INVALID;
+			status = std::nullopt;
+			signal = std::nullopt;
+		}
+
+	public: // data
 
 		/// The kind of child process event that occurred.
 		Event event;
@@ -355,14 +402,20 @@ public: // types
 		/**
 		 * This does not include the time of waited-for children of
 		 * the child.
+		 *
+		 * This data is not available from the cosmos::proc::wait()
+		 * family of functions.
 		 **/
-		ClockTicks user_time;
+		std::optional<ClockTicks> user_time;
 
 		/// The CPU time the child spent in kernel space.
 		/**
 		 * This does not include the time of waited-for children of the child.
+		 *
+		 * This data is not available from the cosmos::proc::wait()
+		 * family of functions.
 		 **/
-		ClockTicks system_time;
+		std::optional<ClockTicks> system_time;
 	};
 
 	/// Additional data found in SigInfo delivered with SIGSYS.

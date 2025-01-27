@@ -188,7 +188,7 @@ public: // functions
 	}
 
 	/// Wrapper around cosmos::pthread::kill().
-	void kill (const Signal sig) {
+	void kill(const Signal sig) {
 		pthread::kill(id(), sig);
 	}
 

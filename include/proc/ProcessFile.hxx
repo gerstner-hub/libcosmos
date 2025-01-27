@@ -5,10 +5,10 @@
 
 // cosmos
 #include <cosmos/BitMask.hxx>
-#include <cosmos/proc/PidFD.hxx>
-#include <cosmos/proc/WaitRes.hxx>
 #include <cosmos/proc/pidfd.h>
+#include <cosmos/proc/PidFD.hxx>
 #include <cosmos/proc/process.hxx>
+#include <cosmos/proc/signal.hxx>
 #include <cosmos/proc/types.hxx>
 
 namespace cosmos {
@@ -116,7 +116,7 @@ public: // functions
 	/**
 	 * \see proc::wait(const PidFD, const WaitFlags).
 	 **/
-	std::optional<WaitRes> wait(const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED}) {
+	std::optional<ChildData> wait(const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED}) {
 		return proc::wait(m_fd, flags);
 	}
 
