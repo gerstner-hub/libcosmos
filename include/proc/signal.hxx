@@ -11,6 +11,8 @@
 #include <variant>
 
 // cosmos
+#include <cosmos/BitMask.hxx>
+#include <cosmos/memory.hxx>
 #include <cosmos/proc/PidFD.hxx>
 #include <cosmos/proc/types.hxx>
 #include <cosmos/thread/thread.hxx>
@@ -305,5 +307,101 @@ inline void ignore(const Signal sig) {
 
 /// Returns the currently active signal mask for the calling thread.
 COSMOS_API SigSet get_sigmask();
+
+/// Data structure used for defining an alternate signal stack.
+class COSMOS_API Stack {
+public: // types
+
+	/// Various bitmask settings for alternative stack setup.
+	enum class Flag : int {
+		ON_STACK    = SS_ONSTACK,    ///< the thread is currently executing on the alternate signal stack (output flag only).
+		DISABLE     = SS_DISABLE,    ///< the alternate signal stack is currently disabled (output flag only).
+		/* SS_AUTODISARM not yet in userspace headers? */
+		AUTO_DISARM = 1 << 31,       ///< clear the alternate signal stack settings on entry to the signal handler.
+	};
+
+	using Flags = BitMask<Flag>;
+
+	/// Minimum size an alternate signal stack needs to have.
+	static size_t MIN_SIZE;
+
+public: // functions
+
+	Stack() {
+		clear();
+	}
+
+	/// Leaves underlying data uninitialized.
+	Stack (const no_init_t) {}
+
+	void setFlags(const Flags flags) {
+		m_raw.ss_flags = flags.raw();
+	}
+
+	Flags getFlags() const {
+		return Flags{m_raw.ss_flags};
+	}
+
+	/// Sets the base pointer for the alternate signal stack.
+	void setBase(void *base) {
+		m_raw.ss_sp = base;
+	}
+
+	void* getBase() const {
+		return m_raw.ss_sp;
+	}
+
+	/// Sets the size of the alternate signal stack found at getBase().
+	void setSize(const size_t size) {
+		m_raw.ss_size = size;
+	}
+
+	size_t getSize() const {
+		return m_raw.ss_size;
+	}
+
+	void clear() {
+		zero_object(m_raw);
+	}
+
+	auto raw() {
+		return &m_raw;
+	}
+
+	auto raw() const {
+		return &m_raw;
+	}
+
+protected: // data
+
+	stack_t m_raw;
+};
+
+/// Configure an alternate signal stack.
+/**
+ * This call informs the kernel of a memory area to be used for establishing
+ * the stack of asynchronous signal handlers. After configuring the alternate
+ * stack it can be used by establishing an asynchronous signal handler via
+ * cosmos::signal::set_action() with SigAction::Flag::ON_STACK set.
+ *
+ * The previous alternate stack settings can optionally be returned in `old`.
+ * Only Flag::AUTO_DISARM will be recognized in `stack`. The other flags are
+ * only used in output data that can be returned in `old`.
+ *
+ * On error an ApiError is thrown. The following error reasons are documented:
+ *
+ * - Errno::FAULT: `stack` or `old` are outside the process's address space.
+ * - Errno::INVALID_ARG: `stack.getFlags()` contains invalid flags.
+ * - Errno::NO_MEMORY: `stack.getSize()` is smaller than MIN_SIZE.
+ * - Errno::PERMISSION: Attempted to change the stack while it was active.
+ **/
+COSMOS_API void set_altstack(const Stack &stack, Stack *old = nullptr);
+
+/// Retrieve the current alternate signal stack configuration.
+/**
+ * On error an ApiError is thrown. Errno::INVALID_ARG is documented for the
+ * case when `old` is outside of the process's address space.
+ **/
+COSMOS_API void get_altstack(Stack &old);
 
 } // end ns

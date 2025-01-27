@@ -169,4 +169,18 @@ SigSet get_sigmask() {
 	return ret;
 }
 
+size_t Stack::MIN_SIZE = MINSIGSTKSZ;
+
+void set_altstack(const Stack &stack, Stack *old) {
+	if (::sigaltstack(stack.raw(), old ? old->raw() : nullptr) != 0) {
+		cosmos_throw (ApiError("sigaltstack()"));
+	}
+}
+
+void get_altstack(Stack &old) {
+	if (::sigaltstack(nullptr, old.raw()) != 0) {
+		cosmos_throw (ApiError("sigalstack()"));
+	}
+}
+
 } // end ns
