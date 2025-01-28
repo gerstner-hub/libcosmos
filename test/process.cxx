@@ -90,7 +90,7 @@ class ProcessTest :
 
 	void waitForTermSig() {
 		cosmos::SignalFD fd{cosmos::signal::TERMINATE};
-		cosmos::SignalFD::SigInfo info;
+		cosmos::SignalFD::Info info;
 		fd.readEvent(info);
 		cosmos::proc::exit(cosmos::ExitStatus{0});
 	}
@@ -255,7 +255,7 @@ class ProcessTest :
 			ef.signal(static_cast<cosmos::EventFile::Counter>(fstab.fd().raw()));
 
 			cosmos::SignalFD fd{cosmos::signal::USR1};
-			cosmos::SignalFD::SigInfo info;
+			cosmos::SignalFD::Info info;
 			fd.readEvent(info);
 			fstab.close();
 

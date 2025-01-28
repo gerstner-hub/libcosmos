@@ -5,6 +5,7 @@
 
 // cosmos
 #include <cosmos/fs/FileDescriptor.hxx>
+#include <cosmos/proc/SigInfo.hxx>
 #include <cosmos/proc/SigSet.hxx>
 #include <cosmos/proc/types.hxx>
 
@@ -23,27 +24,16 @@ namespace cosmos {
  * Use the readEvent() member function to comfortably receive the signal
  * information. The underlying file descriptor can be used with common file
  * descriptor monitoring interfaces like Poller.
+ *
+ * The SignalFD mirrors the behaviour from other ways to handle signals:
+ * When calling readEvent() then signals directed to the calling thread and
+ * those directed to the process can be received. Signals directed at other
+ * threads cannot be seen.
  **/
 class COSMOS_API SignalFD {
 public: // types
 
-	/// Data structure returned by readEvent()
-	struct SigInfo :
-			signalfd_siginfo {
-		/// Returns the signal number that occurred
-		auto signal() const { return Signal{SignalNr{static_cast<int>(ssi_signo)}}; }
-
-		/// Returns the PID of the process that sent or caused this signal, if applicable
-		auto senderPID() const { return ProcessID{static_cast<pid_t>(ssi_pid)}; }
-
-		/// For SIGCHLD this returns the child's exit status or the
-		/// signal that caused the child process to change state
-		/**
-		 * if ssi_code is CLD_EXITED then this is the exit status,
-		 * otherwise the signal number.
-		 **/
-		auto childStatus() const { return ssi_status; }
-	};
+	class Info;
 
 public: // functions
 
@@ -98,7 +88,7 @@ public: // functions
 	 * If an error occurs trying to read a signal description then an
 	 * exception is thrown.
 	 **/
-	void readEvent(SigInfo &info);
+	void readEvent(Info &info);
 
 	/// Returns the FileDescriptor object associated with the SignalFD.
 	auto fd() { return m_fd; }
@@ -106,6 +96,138 @@ public: // functions
 protected: // data
 
 	FileDescriptor m_fd;
+};
+
+/// SigInfo style data structure returned by SignalFD::readEvent().
+/**
+ * This is mostly the same as SigInfo, but tailored towards SignalFD. The
+ * underlying data structures differ too much to merge them into one on
+ * libcosmos level.
+ *
+ * One difference between this structure and SigInfo is that SignalFDs cannot
+ * be used to catch fault signals (these can only be catched by SigAction
+ * signal handlers). Thus the fault signal part is missing from this
+ * structure.
+ **/
+class COSMOS_API SignalFD::Info {
+public: // types
+
+	/* reuse the sub-structures as is */
+
+	using Source       = SigInfo::Source;
+	using ProcessCtx   = SigInfo::ProcessCtx;
+	using UserSigData  = SigInfo::UserSigData;
+	using QueueSigData = SigInfo::QueueSigData;
+	using MsgQueueData = SigInfo::MsgQueueData;
+	using TimerData    = SigInfo::TimerData;
+	using ChildData    = SigInfo::ChildData;
+	using SysData      = SigInfo::SysData;
+	using PollData     = SigInfo::PollData;
+
+public: // functions
+
+	/// Creates a zero-initialized Info wrapper.
+	Info() {
+		clear();
+	}
+
+	/// Leaves the underlying data structure uninitalized.
+	/**
+	 * When Info is used as an output parameter only (the typical case)
+	 * then you can invoke this constructor to avoid unnecessary
+	 * zero-initialization.
+	 **/
+	Info(const no_init_t) {}
+
+	const signalfd_siginfo* raw() const {
+		return &m_raw;
+	}
+
+	signalfd_siginfo* raw() {
+		return &m_raw;
+	}
+
+	/// Returns the signal number that occurred.
+	Signal sigNr() const {
+		// ssi_signo is unsigned, while in sigaction it's signed.
+		return Signal{SignalNr{static_cast<int>(m_raw.ssi_signo)}};
+	}
+
+	/// Returns the source of the signal.
+	/**
+	 * \see SigInfo::source().
+	 **/
+	Source source() const;
+
+	/// Returns whether the signal was sent from a trusted source (i.e. the kernel).
+	/**
+	 * \see SigInfo::isTrustedSource().
+	 **/
+	bool isTrustedSource() const {
+		return m_raw.ssi_code >= 0;
+	}
+
+	/// Returns the Source::USER specific data.
+	std::optional<const UserSigData> userSigData() const;
+
+	/// Returns the Source::QUEUE specific data.
+	std::optional<const QueueSigData> queueSigData() const;
+
+	/// Returns the Source::MSGQ specific data.
+	std::optional<const MsgQueueData> msgQueueData() const;
+
+	/// Returns the Source::TIMER specific data.
+	std::optional<const TimerData> timerData() const;
+
+	/// Returns signal::BAD_SYS specific data.
+	/**
+	 * This data is only available for `sigNr() == signal::BAD_SYS`.
+	 **/
+	std::optional<const SysData> sysData() const;
+
+	/// Returns signal::CHILD specific data.
+	/**
+	 * This data is only available for `sigNr() == signal::CHILD`.
+	 **/
+	std::optional<const ChildData> childData() const;
+
+	/// Returns signal::POLL specific data.
+	/**
+	 * This data is only available for `sigNr() == signal::POLL`.
+	 **/
+	std::optional<const PollData> pollData() const;
+
+	/// Zeroes out the low level siginfo_t data structure.
+	void clear() {
+		zero_object(m_raw);
+	}
+
+protected: // functions
+
+	/// Returns an error code that is generally unused on Linux (always 0).
+	/**
+	 * An exception is the case of SIGSYS generated by seccomp(2) filters.
+	 **/
+	Errno error() const {
+		return Errno{m_raw.ssi_errno};
+	}
+
+	ProcessCtx procCtx() const {
+		return ProcessCtx{pid(), uid()};
+	}
+
+	ProcessID pid() const {
+		// ssi_pid is unsigned while pid_t is signed
+		return ProcessID{static_cast<pid_t>(m_raw.ssi_pid)};
+	}
+
+	UserID uid() const {
+		return UserID{m_raw.ssi_uid};
+	}
+
+protected: // data
+
+	signalfd_siginfo m_raw;
 };
 
 } // end ns

@@ -245,11 +245,11 @@ public:
 			cosmos::File f{path, cosmos::OpenMode::READ_ONLY};
 		}};
 
-		cosmos::SignalFD::SigInfo info;
+		cosmos::SignalFD::Info info;
 
 		sfd.readEvent(info);
 
-		RUN_STEP("received-sigusr1", info.signal() == cosmos::signal::USR1);
+		RUN_STEP("received-sigusr1", info.sigNr() == cosmos::signal::USR1);
 
 		lease = fd.getLease();
 

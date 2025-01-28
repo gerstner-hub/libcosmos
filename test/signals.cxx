@@ -77,13 +77,15 @@ class SignalTest :
 
 		RUN_STEP("signalfd-validity", sfd.valid());
 
-		cosmos::SignalFD::SigInfo info;
+		cosmos::SignalFD::Info info;
 
-		cosmos::signal::raise(sigint);
+		cosmos::signal::send(cosmos::proc::get_own_pid(), sigint, 0x12345678);
 		sfd.readEvent(info);
 
-		RUN_STEP("received-sig-correct", info.signal() == sigint);
-		std::cout << "received " << info.signal() << " from " << info.senderPID() << std::endl;
+		RUN_STEP("received-sig-correct", info.sigNr() == sigint);
+		const auto sigdata = *info.queueSigData();
+		std::cout << "received " << info.sigNr() << " from " << sigdata.sender.pid << std::endl;
+		RUN_STEP("received-data-correct", sigdata.data.asInt() == 0x12345678);
 		cosmos::signal::set_sigmask(orig_mask);
 	}
 
