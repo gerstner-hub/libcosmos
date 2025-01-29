@@ -54,7 +54,8 @@ class SignalTest :
 
 	void testSigmask() {
 		START_TEST("Sigmask");
-		const auto &orig_mask = cosmos::signal::get_sigmask();
+		cosmos::SigSet orig_mask;
+		cosmos::signal::get_sigmask(orig_mask);
 		cosmos::SigSet full{cosmos::SigSet::filled};
 		cosmos::SigSet old;
 		cosmos::signal::block(full, &old);
@@ -70,7 +71,7 @@ class SignalTest :
 		cosmos::signal::set_sigmask(set, &old);
 
 		RUN_STEP("old-mask-correct", !old.isSet(sigint));
-		set = cosmos::signal::get_sigmask();
+		cosmos::signal::get_sigmask(set);
 		RUN_STEP("get-mask-correct", set.isSet(sigint));
 
 		cosmos::SignalFD sfd{sigint};
@@ -144,7 +145,7 @@ class SignalTest :
 
 		pause_cond.signal();
 
-		ss = cosmos::signal::get_sigmask();
+		cosmos::signal::get_sigmask(ss);
 		ss.del(cosmos::signal::USR1);
 
 		// we should be able to receive the signal due to the

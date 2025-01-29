@@ -163,10 +163,9 @@ void set_sigmask(const SigSet &s, SigSet *old) {
 	set_signal_mask(SIG_SETMASK, s.raw(), old ? old->raw() : nullptr);
 }
 
-SigSet get_sigmask() {
-	SigSet ret;
-	set_signal_mask(SIG_SETMASK, nullptr, ret.raw());
-	return ret;
+void get_sigmask(SigSet &old) {
+	// `how` is ignored when no `set` is provided. Just return the current mask in `old`.
+	set_signal_mask(0, nullptr, old.raw());
 }
 
 size_t Stack::MIN_SIZE = MINSIGSTKSZ;

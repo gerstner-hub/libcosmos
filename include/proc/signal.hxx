@@ -290,6 +290,9 @@ COSMOS_API void unblock(const SigSet &s, SigSet *old = nullptr);
 /// Completely replace the caller's signal mask by the given set of blocked signals.
 COSMOS_API void set_sigmask(const SigSet &s, SigSet *old = nullptr);
 
+/// Returns the currently active signal mask for the calling thread.
+COSMOS_API void get_sigmask(SigSet &old);
+
 /// Restores the default signal handling behaviour for the given signal.
 inline void restore(const Signal sig) {
 	::signal(to_integral(sig.raw()), SIG_DFL);
@@ -304,9 +307,6 @@ inline void restore(const Signal sig) {
 inline void ignore(const Signal sig) {
 	::signal(to_integral(sig.raw()), SIG_IGN);
 }
-
-/// Returns the currently active signal mask for the calling thread.
-COSMOS_API SigSet get_sigmask();
 
 /// Data structure used for defining an alternate signal stack.
 class COSMOS_API Stack {
