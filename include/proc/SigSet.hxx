@@ -9,10 +9,13 @@
 
 namespace cosmos {
 
-/// A bitset of signal numbers for use in system calls.
+/// A bit set of signal numbers for use in system calls.
 /**
  * This type is needed to e.g. change a process's signal mask. It helps
  * specifying a number of signals that should be operated on.
+ *
+ * This data structure is surprisingly large (128 bytes), so copying it is
+ * best avoided.
  *
  * \note It is difficult to implement a proper operator== for SigSet, because
  * the underlying data structure is supposed to be opaque on the one hand, and

@@ -15,20 +15,21 @@ namespace cosmos {
  * specific operations or lifetime management. Use cosmos::ProcessFile for
  * this.
  *
- * A PidFD can be obtained via cosmos::Proc or from proc::clone(). The
+ * A PidFD can be obtained via cosmos::ProcessFile or from proc::clone(). The
  * uses of a PidFD are the following:
  *
  * - send a signal to the represented process
- * - monitor process termination using (e)poll or select, i.e.
- *   cosmos::ChildCloner. There is a limitation: the file descriptor will
- *   appear as readable in the poll API but it won't actually return any data.
+ * - monitor process termination using (e)poll or select, used e.g. in
+ *   cosmos::SubProc. There is a limitation: the file descriptor will
+ *   appear as readable when the process can be waited on in the poll API, but
+ *   it won't actually return any data when reading from it.
  * - it can be waited on using proc::wait(), but only if the process is a
  *   child of the calling process.
  * - it can be used to obtain a file descriptor from the represented process,
  *   see proc::getFD().
  * - it can be used to enter any namespaces of the target process using
- *   setns().
- * - it can be used with process_madvise() to inform the kernel about memory
+ *   `setns()`.
+ * - it can be used with `process_madvise()` to inform the kernel about memory
  *   usage patterns of the target process.
  **/
 class COSMOS_API PidFD :
@@ -40,8 +41,6 @@ public: // functions
 	explicit PidFD(FileNum fd = FileNum::INVALID) :
 			FileDescriptor{fd}
 	{}
-
-protected: // data
 };
 
 } // end ns

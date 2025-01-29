@@ -14,14 +14,14 @@ namespace cosmos {
 /// Represents a child process created via ChildCloner.
 /**
  * This is a lightweight sub process description returned from
- * ChildCloner::run. It is used to interact with a running sub process:
+ * ChildCloner::run(). It is used to interact with a running sub process:
  *
  * - sending signals to it
  * - waiting for it to exit, optionally with timeout
  * - getting a pidfd for waiting for it in event driven I/O, or otherwise
  *   operate on the child (e.g. Linux namespace operations).
  *
- * This is a non-copyable move-only type. If you want to store it as a member
+ * This is a non-copyable move-only type. If you want to store it in a member
  * variable then use std::move().
  *
  * Each running() SubProc instance needs to be wait()ed on to free the

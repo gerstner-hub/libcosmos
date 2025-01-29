@@ -7,7 +7,6 @@
  **/
 
 // C++
-#include <optional>
 #include <variant>
 
 // cosmos
@@ -116,9 +115,9 @@ COSMOS_API void send(const ProcessID proc, const Signal s, std::variant<void*, i
 
 /// Sends a signal to another process based on a pidfd.
 /**
- * \param[in] pidfd needs to refer to a valid pidfd type file
- * descriptor. The process represented by it will bet sent the
- * specified signal \p s.
+ * \param[in] pidfd needs to refer to a valid PidFD type file
+ * descriptor. The process represented by it will be sent the
+ * specified signal `s`.
  *
  * \exception Throws an ApiError on error.
  **/
@@ -137,7 +136,7 @@ COSMOS_API void send(const ProcessID proc, const ThreadID thread, const Signal s
 /**
  * The calling thread will be blocked until a signal is delivered that either
  * terminates the process or causes the execution of an asynchronous signal
- * catching function.
+ * catching function (e.g. registered via cosmos::signal::set_action())..
  **/
 COSMOS_API void pause();
 
@@ -203,7 +202,7 @@ COSMOS_API WaitRes timed_wait(const SigSet &set, SigInfo &info, const IntervalTi
  * unchanged.  Otherwise WaitRes::SIGNALED is returned and `info` is filled
  * accordingly.
  *
- * The same error as in timed_wait() is used here.
+ * The same errors as in timed_wait() can occur here.
  **/
 inline WaitRes poll_info(const SigSet &set, SigInfo &info) {
 	return timed_wait(set, info, IntervalTime{0});
@@ -211,12 +210,6 @@ inline WaitRes poll_info(const SigSet &set, SigInfo &info) {
 
 /// Configure asynchronous signal delivery behaviour.
 /**
- * On error an ApiError is thrown. The following errors are documented for
- * this call:
- *
- * - Errno::FAULT: `action` or `old` do not have valid addresses.
- * - Errno::INVALID_ARG: `sig` is not a valid signal number.
- *
  * The asynchronous signal handling for `sig` will be configured according to
  * the settings in `action`. Asynchronous signal handling should be avoided,
  * if possible, for the following reasons:
@@ -227,13 +220,13 @@ inline WaitRes poll_info(const SigSet &set, SigInfo &info) {
  * - asynchronous signals can execute at any time, therefore the set of system
  *   calls and C library functions that may be executed from within a signal
  *   handler is extremely limited (see `man 7 signal-safety`). There is no
- *   protection against using async-signal unsafe functions in a signal
- *   handler, which can cause hard to find bugs.
+ *   protection against using unsafe functions in a signal handler, which can
+ *   cause hard to find bugs.
  *
- * There are some signals that can _only_ be catched asynchronously. These are
- * the fault family of signals like SIGSEGV, SIGFPE, SIGBUS, SIGILL. These are
- * directed at the thread that triggers them and thus cannot be waited for
- * synchronously.
+ * There are some signals that can _only_ be caught asynchronously. These are
+ * the fault family of signals like SIGSEGV, SIGFPE, SIGBUS and SIGILL. These
+ * are directed at the thread that triggers them and thus cannot be waited for
+ * in another thread.
  *
  * If `old` is supplied then the previously installed signal handler
  * configuration for `sig` is returned there e.g. for being able to restore it
@@ -244,17 +237,24 @@ inline WaitRes poll_info(const SigSet &set, SigInfo &info) {
  * cost. The `sigaction()` system call is very difficult to wrap. The extra
  * level of indirection that libcosmos uses internally can cause additional
  * types of race conditions. These race conditions can occur when an existing
- * signal handling function is replaced by another. The race condition makes
+ * signal handling function is replaced by another. These race conditions make
  * it impossible to determine if a signal that comes in while changing the
  * signal handler is still based on the old signal handler configuration or
- * already based on the new one.
+ * already on the new one.
  *
  * There should be very few use cases that actually require replacing one
  * signal handler function by another. Typically a program installs signal
  * handlers early on and never changes them again. If you do need to use
  * different signal handlers for the same signal safely, though, then it is
- * better to rely on synchronous signal handling (if possible) or direct
- * `sigaction()` calls instead of using libcosmos for establishing them.
+ * better to rely on synchronous signal handling (if possible) or employ
+ * direct `sigaction()` calls instead of using libcosmos for establishing
+ * them.
+ *
+ * On error an ApiError is thrown. The following errors are documented for
+ * this call:
+ *
+ * - Errno::FAULT: `action` or `old` do not have valid addresses.
+ * - Errno::INVALID_ARG: `sig` is not a valid signal number.
  **/
 COSMOS_API void set_action(const Signal sig, const SigAction &action, SigAction *old = nullptr);
 
@@ -275,8 +275,9 @@ COSMOS_API void get_action(const Signal sig, SigAction &action);
 /// Blocks the given set of signals in the caller's signal mask.
 /**
  * Blocked signals won't be delivered asynchronously to the process
- * i.e. no asynchronous signal handler will be invoked. Also the
- * default action will not be executed. This allows to collect the
+ * i.e. no asynchronous signal handler will be invoked, the default action
+ * will not be perfomed (except for signal where it cannot be suppressed).
+ * Also the default action will not be executed. This allows to collect the
  * information synchronously e.g. by using a SignalFD.
  *
  * If `old` is provided then the previous signal mask is returned
@@ -312,12 +313,12 @@ inline void ignore(const Signal sig) {
 class COSMOS_API Stack {
 public: // types
 
-	/// Various bitmask settings for alternative stack setup.
+	/// Settings for alternate stack setup.
 	enum class Flag : int {
-		ON_STACK    = SS_ONSTACK,    ///< the thread is currently executing on the alternate signal stack (output flag only).
-		DISABLE     = SS_DISABLE,    ///< the alternate signal stack is currently disabled (output flag only).
+		ON_STACK    = SS_ONSTACK, ///< the thread is currently executing on the alternate signal stack (output flag only).
+		DISABLE     = SS_DISABLE, ///< the alternate signal stack is currently disabled (output flag only).
 		/* SS_AUTODISARM not yet in userspace headers? */
-		AUTO_DISARM = 1 << 31,       ///< clear the alternate signal stack settings on entry to the signal handler.
+		AUTO_DISARM = 1 << 31,    ///< clear the alternate signal stack settings on entry to the signal handler.
 	};
 
 	using Flags = BitMask<Flag>;

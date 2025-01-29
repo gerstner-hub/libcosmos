@@ -21,7 +21,7 @@ namespace cosmos {
  * heavy weight type that can be reused to create multiple child processes.
  * The SubProc type returned from wait() is rather lightweight in contrast.
  *
- * By default created child processes will inherit the current process's
+ * By default, created child processes will inherit the current process's
  * stdout, stderr and stdin file descriptors. You can redirect the child's
  * stdout, stderr and stdin file descriptors via the setStdErr(), setStdOut()
  * and setStdIn() member functions. It is expected that all file descriptors
@@ -34,7 +34,7 @@ namespace cosmos {
  * Furthermore the child's environment variables, current working directory,
  * scheduling policy and command line arguments can be configured.
  *
- * For advance usage a post fork callback can be installed that performs
+ * For advanced usage a post fork callback can be installed that performs
  * actions before the child process is replaced by the new target executable.
  **/
 class COSMOS_API ChildCloner {
@@ -240,6 +240,9 @@ public: // functions
 	 * The returned object is a move-only type that can be used to control
 	 * the new sub process, communicate with it and evaluate its exit
 	 * state.
+	 *
+	 * It is mandatory to join the child process via SubProc::wait()
+	 * before the SubProc object is destroyed.
 	 **/
 	SubProc run();
 

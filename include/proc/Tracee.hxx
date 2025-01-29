@@ -382,7 +382,7 @@ public: // functions
 	 * This request is only valid during syscall-entry-stop,
 	 * syscall-exit-stop or ptrace-event-stop for ptrace::Event::SECCOMP.
 	 *
-	 * Depending on the type of stop that occured `info` will contain
+	 * Depending on the type of stop that occurred `info` will contain
 	 * different data, thus only certain parts of the struct are
 	 * accessible via std::optional return values.
 	 **/

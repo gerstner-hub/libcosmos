@@ -13,7 +13,7 @@ namespace cosmos {
 
 /// A file descriptor for receiving process signals.
 /**
- * A SignalFD is used for handling process signals on a file descriptor level.
+ * A SignalFD is used for handling process signals on file descriptor level.
  * During creation of the file descriptor the signals that the caller is
  * interested in are declared. Once one of these signals is sent to the
  * process, the file descriptor will become readable and returns the
@@ -25,10 +25,14 @@ namespace cosmos {
  * information. The underlying file descriptor can be used with common file
  * descriptor monitoring interfaces like Poller.
  *
- * The SignalFD mirrors the behaviour from other ways to handle signals:
+ * The SignalFD mirrors the behaviour of other ways to handle signals:
  * When calling readEvent() then signals directed to the calling thread and
  * those directed to the process can be received. Signals directed at other
  * threads cannot be seen.
+ *
+ * The readEvent() function fills in SignalFD::Info, a data structure that is
+ * very similar to the SigInfo structure, but not quite, which made it
+ * necessary to model a distinct type for use with SignalFD.
  **/
 class COSMOS_API SignalFD {
 public: // types
@@ -105,7 +109,7 @@ protected: // data
  * libcosmos level.
  *
  * One difference between this structure and SigInfo is that SignalFDs cannot
- * be used to catch fault signals (these can only be catched by SigAction
+ * be used to catch fault signals (these can only be caught by SigAction
  * signal handlers). Thus the fault signal part is missing from this
  * structure.
  **/
@@ -131,7 +135,7 @@ public: // functions
 		clear();
 	}
 
-	/// Leaves the underlying data structure uninitalized.
+	/// Leaves the underlying data structure uninitialized.
 	/**
 	 * When Info is used as an output parameter only (the typical case)
 	 * then you can invoke this constructor to avoid unnecessary

@@ -53,6 +53,8 @@ public: // functions
 			m_fd{fd}
 	{}
 
+	/* non-copyable and move semantics */
+
 	ProcessFile(const ProcessFile&) = delete;
 	ProcessFile& operator=(const ProcessFile&) = delete;
 
@@ -68,6 +70,7 @@ public: // functions
 
 	~ProcessFile();
 
+	/// Returns whether a pidfd is currently open.
 	bool open() const {
 		return m_fd.valid();
 	}
@@ -108,7 +111,7 @@ public: // functions
 	 *
 	 * The caller is responsible for closing the returned file descriptor
 	 * at the appropriate time. It is best to wrap the file descriptor in
-	 * a more specialized, managing type.
+	 * a more specialized, managed type.
 	 **/
 	FileDescriptor dupFD(const FileNum targetfd) const;
 
