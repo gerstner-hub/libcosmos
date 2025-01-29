@@ -383,13 +383,13 @@ using LockAllFlags = BitMask<LockAllFlag>;
  * - Errno::INVALID_ARG: bad `flags` encountered, or LockAllFlag::ONFAULT was
  *   specified without any of the other flags.
  **/
-COSMOS_API void lockall(const LockAllFlags flags);
+COSMOS_API void lock_all(const LockAllFlags flags);
 
 /// Unlock all current process memory pages..
 /**
  * This is the inverse operation of lockall(), remove memory locking from all
  * currently loaded pages.
  **/
-COSMOS_API void unlockall();
+COSMOS_API void unlock_all();
 
 } // end ns

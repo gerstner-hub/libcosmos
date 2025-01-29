@@ -62,13 +62,13 @@ void unlock(void *addr, const size_t length) {
 	}
 }
 
-void lockall(const LockAllFlags flags) {
+void lock_all(const LockAllFlags flags) {
 	if (::mlockall(flags.raw()) != 0) {
 		cosmos_throw (ApiError("mlockall()"));
 	}
 }
 
-void unlockall() {
+void unlock_all() {
 	if (::munlockall() != 0) {
 		cosmos_throw (ApiError("munlockall()"));
 	}
