@@ -23,6 +23,7 @@
 // cosmos
 #include <cosmos/BitMask.hxx>
 #include <cosmos/dso_export.h>
+#include <cosmos/memory.hxx>
 #include <cosmos/proc/types.hxx>
 
 namespace cosmos::ptrace {
@@ -232,6 +233,55 @@ public: // functions
 
 protected: // data
 	struct ptrace_syscall_info m_info;
+};
+
+/// Wrapper around data structure used with ptrace::Request::PEEKSIGINFO.
+class PeekSigInfo {
+public: // types
+
+	enum class Flag : uint32_t {
+		PEEK_SHARED = PTRACE_PEEKSIGINFO_SHARED, ///< dump signals from the process-wide queue, otherwise from the per-thread queue.
+	};
+
+	using Flags = BitMask<Flag>;
+
+public: // functions
+
+	/// Creates an object with default settings.
+	/**
+	 * The Flag::PEEK_SHARED setting is applied, since this is the typical
+	 * request that will be needed. All other members are set to zero.
+	 **/
+	PeekSigInfo() {
+		clear();
+		setFlags(Flags{Flag::PEEK_SHARED});
+	}
+
+	void clear() {
+		zero_object(m_args);
+	}
+
+	void setFlags(Flags flags) {
+		m_args.flags = flags.raw();
+	}
+
+	/// Sets the offset into the queue from which SigInfo structures should be obtained.
+	void setOffset(uint64_t off) {
+		m_args.off = off;
+	}
+
+	/// Sets the maximum amount of SigInfo structures to copy.
+	void setAmount(int32_t nr) {
+		m_args.nr = nr;
+	}
+
+	auto raw() const {
+		return &m_args;
+	}
+
+protected: // data
+
+	struct ptrace_peeksiginfo_args m_args;
 };
 
 /// Perform a tracer request.

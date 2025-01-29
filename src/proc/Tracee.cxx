@@ -1,5 +1,6 @@
 // cosmos
 #include "cosmos/error/RuntimeError.hxx"
+#include "cosmos/proc/SigInfo.hxx"
 #include "cosmos/proc/Tracee.hxx"
 
 // Linux
@@ -60,6 +61,27 @@ void Tracee::getSyscallInfo(ptrace::SyscallInfo &info) const {
 	if (*obtained < 0 || static_cast<unsigned long>(*obtained) > sizeof(*info.raw())) {
 		cosmos_throw (RuntimeError("excess SYSCALL_INFO data, truncation occurred!"));
 	}
+}
+
+void Tracee::getSigInfo(SigInfo &info) const {
+	this->request(ptrace::Request::GETSIGINFO, nullptr, info.raw());
+}
+
+void Tracee::setSigInfo(const SigInfo &info) {
+	this->request(ptrace::Request::SETSIGINFO, nullptr, info.raw());
+}
+
+std::vector<SigInfo> Tracee::peekSigInfo(const ptrace::PeekSigInfo &settings) {
+	const auto raw_settings = settings.raw();
+	std::vector<SigInfo> ret;
+	ret.resize(raw_settings->nr);
+
+	const auto num_entries = this->request(
+			ptrace::Request::PEEKSIGINFO, raw_settings, ret.data());
+
+	ret.resize(*num_entries);
+
+	return ret;
 }
 
 } // end ns

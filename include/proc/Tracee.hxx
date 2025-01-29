@@ -27,6 +27,7 @@ struct user_desc;
 namespace cosmos {
 
 struct InputMemoryRegion;
+class SigInfo;
 
 /// Thin wrapper class around the `ptrace()` system call.
 /**
@@ -270,8 +271,8 @@ public: // functions
 		this->request(ptrace::Request::SETREGSET, type, iovec.asIovec());
 	}
 
-	// TODO: wait for SigInfo modeling
-	//void getSigInfo(SigInfo &info) const;
+	/// Obtain information about the signal that caused the stop.
+	void getSigInfo(SigInfo &info) const;
 
 	/// Set signal information for the tracee.
 	/**
@@ -282,10 +283,20 @@ public: // functions
 	 * When changing the signal information this way then the signal
 	 * passed to restart() needs to match, to prevent undefined behaviour.
 	 **/
-	//void setSigInfo(const SigInfo &info);
+	void setSigInfo(const SigInfo &info);
 
-	// needs a wrapper around ptrace_peekinfo_args, a std::vector likely etc.
-	//std::vector<SigInfo> peekSigInfo(const PeekInfo info);
+	/// Obtains SigInfo structures pending for the tracee.
+	/**
+	 * Based on `settings` obtain a numer of SigInfo structures pending
+	 * for the tracee. `settings` define how many SigInfo will be
+	 * retrieved at max and from what position in the signal queue.
+	 *
+	 * There is no way to know how many entries exist currently (this
+	 * information can also rapidly change). If no more SigInfo structures
+	 * exist at the given position then a short or zero item count is
+	 * returned.
+	 **/
+	std::vector<SigInfo> peekSigInfo(const ptrace::PeekSigInfo &settings);
 
 	/// Obtain the tracee's mask of blocked signals.
 	void getSigMask(SigSet &set) const {
