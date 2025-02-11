@@ -34,6 +34,7 @@ constexpr Signal INTERRUPT     = Signal{SignalNr::INTERRUPT};
 constexpr Signal QUIT          = Signal{SignalNr::QUIT};
 constexpr Signal ILL           = Signal{SignalNr::ILL};
 constexpr Signal TRAP          = Signal{SignalNr::TRAP};
+constexpr Signal SYS_TRAP      = Signal{SignalNr::SYS_TRAP};
 constexpr Signal ABORT         = Signal{SignalNr::ABORT};
 constexpr Signal IOT           = Signal{SignalNr::IOT};
 constexpr Signal BUS           = Signal{SignalNr::BUS};

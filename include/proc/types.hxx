@@ -56,6 +56,7 @@ enum class SignalNr : int {
 	QUIT          = SIGQUIT,   ///< quit from keyboard
 	ILL           = SIGILL,    ///< illegal instruction
 	TRAP          = SIGTRAP,   ///< trace/breakpoint trap
+	SYS_TRAP      = SIGTRAP | 0x80, ///< system call trap report (only seen with ptrace(2), PTRACE_O_TRACESYSGOOD)
 	ABORT         = SIGABRT,   ///< abort signal from abort()
 	IOT           = ABORT,     ///< IOT trap, synonym for ABORT
 	BUS           = SIGBUS,    ///< bus error (bad memory access)
