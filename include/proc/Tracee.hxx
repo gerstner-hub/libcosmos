@@ -348,10 +348,10 @@ public: // functions
 
 	/// Retrieve a classic seccomp BPF program installed in the tracee.
 	/**
-	 * If `prog_index` is zero then the most recently installed BPF
-	 * program is returned. Otherwise it is the index of the program to
-	 * return. If the index is greater than the number of installed
-	 * programs then an ApiError with Errno::NO_ENTRY is thrown.
+	 * `prog_index` is the index of the program to return, where index 0
+	 * is the most recently installed program. If the index is greater
+	 * than the number of installed programs then an ApiError with
+	 * Errno::NO_ENTRY is thrown.
 	 *
 	 * If `instructions` is empty then the call will first ask the kernel
 	 * how big the given program is, to dimension `instructions`
@@ -361,8 +361,7 @@ public: // functions
 	 * If `instructions` is non-empty then the provided size will be used.
 	 * Note that there seems to be error handling missing in the kernel to
 	 * detect when the provided vector is too small. This means a too
-	 * small vector could lead to a segmentation fault or memory
-	 * corruption in the process.
+	 * small vector could lead to memory corruption in the process.
 	 **/
 	void getSeccompFilter(std::vector<struct sock_filter> &instructions, const unsigned long prog_index) const;
 

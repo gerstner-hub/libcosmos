@@ -26,16 +26,11 @@ void Tracee::getSeccompFilter(std::vector<struct sock_filter> &instructions, con
 
 	/*
 	 * This ptrace request actually seems to be missing a size check in
-	 * the kernel. We do communicate the number of arrays we have in
+	 * the kernel. We do communicate the number of filters we have in
 	 * fprog.len, but the kernel simply copies into the sock_fprog
-	 * whatever amount of data is has. This could lead to a SIGSEGV or an
-	 * EFAULT return.
-	 *
-	 * TODO: Needs runtime testing to find out what exactly will happen.
-	 *
-	 * For now let's just complain if a larger number of programs is
-	 * reported than we'd have space for. Although I believe this code
-	 * never be reached, due to SIGSEGV or EFAULT return.
+	 * whatever amount of data it has. This could lead to memory
+	 * corruption or a SIGSEGV.
+	 * TODO: test what exactly happens.
 	 */
 
 	if (*num_progs < 0 || static_cast<unsigned long>(*num_progs) >= instructions.size()) {
