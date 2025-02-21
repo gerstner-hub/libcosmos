@@ -105,8 +105,8 @@ using OpenFlags = BitMask<OpenFlag>;
  **/
 enum class ModeT : mode_t {
 	NONE      = 0,
-	TYPE_MASK = S_IFMT, ///< masks all type bits
-	MODE_MASK = ~static_cast<mode_t>(S_IFMT) ///< masks all mode bits
+	MODE_T_TYPE_MASK = S_IFMT, ///< masks all type bits
+	MODE_T_MODE_MASK = ~static_cast<mode_t>(S_IFMT) ///< masks all mode bits
 };
 
 /// Support bit masking operations on ModeT for extracting type and mode parts.
@@ -180,7 +180,7 @@ public:
 	explicit FileType(const FileT raw) : m_raw{raw} {}
 
 	explicit FileType(const ModeT raw) :
-		m_raw{static_cast<FileT>(raw & ModeT::TYPE_MASK)}
+		m_raw{static_cast<FileT>(raw & ModeT::MODE_T_TYPE_MASK)}
 	{}
 
 	bool isRegular()   const { return m_raw == REGULAR;  }
@@ -234,7 +234,7 @@ public:
 	 * of octal literals.
 	 **/
 	FileMode(const ModeT raw = ModeT::NONE) :
-		m_mode{static_cast<FileModeBit>(raw & ModeT::MODE_MASK)}
+		m_mode{static_cast<FileModeBit>(raw & ModeT::MODE_T_MODE_MASK)}
 	{}
 
 	bool isSetUID() const { return m_mode[FileModeBit::SETUID]; }
