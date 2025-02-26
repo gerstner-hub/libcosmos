@@ -44,7 +44,6 @@ with tempfile.TemporaryDirectory() as worktree:
         subprocess.check_call(['git', 'branch', '-D', GH_PAGES_BRANCH], cwd=worktree)
         subprocess.check_call(['git', 'branch', '-m', GH_PAGES_BRANCH_NEW, GH_PAGES_BRANCH], cwd=worktree)
 
-        print(f"Run 'git push --force {GH_PAGES_BRANCH}' to publish")
-    except Exception:
+        print(f"Run 'git push --force github {GH_PAGES_BRANCH}' to publish")
+    finally:
         subprocess.check_call(['git', 'worktree', 'remove', worktree])
-        raise
