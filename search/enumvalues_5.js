@@ -1,0 +1,23 @@
+var searchData=
+[
+  ['fail_0',['FAIL',['../classcosmos_1_1ResolveError.html#a851732a967515704a58a6dcef8114cd9ac2759effffc94bb9acc71d69fe3e8a1f',1,'cosmos::ResolveError']]],
+  ['family_1',['FAMILY',['../classcosmos_1_1ResolveError.html#a851732a967515704a58a6dcef8114cd9a499a1fe16898531e2422c704a0288797',1,'cosmos::ResolveError']]],
+  ['fastopen_2',['FASTOPEN',['../net_2types_8hxx.html#a4adf7b22262f68bd5cada4024fd82a6cab6ad724b40206b2976c44c06a1c64e7c',1,'cosmos']]],
+  ['fault_3',['FAULT',['../errno_8hxx.html#a5c1aef3a972b5a9a3bb6b3df1aa01939a893b3aaf1661e3717b18e8335ff93a72',1,'cosmos']]],
+  ['file_5ftoo_5fbig_4',['FILE_TOO_BIG',['../errno_8hxx.html#a5c1aef3a972b5a9a3bb6b3df1aa01939acc0def6016dbea8424a2178954f22082',1,'cosmos']]],
+  ['fixed_5',['FIXED',['../mman_8hxx.html#ae3b95f6ae2fe5969048ee0ed7c327a59ac6e6dc18b53b4c2681394b9d8aefcec7',1,'FIXEDcosmos::mem'],['../mman_8hxx.html#a8741a1dc6e3c44ad82d23b9d3975ece2ac6e6dc18b53b4c2681394b9d8aefcec7',1,'FIXEDcosmos::mem']]],
+  ['fixed_5fnoreplace_6',['FIXED_NOREPLACE',['../mman_8hxx.html#ae3b95f6ae2fe5969048ee0ed7c327a59a08334200c31ecd2659d881970e4841f4',1,'cosmos::mem']]],
+  ['float_5fcondtrap_7',['FLOAT_CONDTRAP',['../structcosmos_1_1SigInfo_1_1FPEData.html#a077d33036fa15c736cef89ef9744e26ba25b67a30d3e5a10022414a8b2ad0d9bb',1,'cosmos::SigInfo::FPEData']]],
+  ['float_5fdiv_5fzero_8',['FLOAT_DIV_ZERO',['../structcosmos_1_1SigInfo_1_1FPEData.html#a077d33036fa15c736cef89ef9744e26bac370fec68d174f76467075cd79a2bd2b',1,'cosmos::SigInfo::FPEData']]],
+  ['float_5finexact_9',['FLOAT_INEXACT',['../structcosmos_1_1SigInfo_1_1FPEData.html#a077d33036fa15c736cef89ef9744e26ba748de86981655270155a7c54daeb6e70',1,'cosmos::SigInfo::FPEData']]],
+  ['float_5finvalid_10',['FLOAT_INVALID',['../structcosmos_1_1SigInfo_1_1FPEData.html#a077d33036fa15c736cef89ef9744e26bad11d3df10f6f8a3139bb82442ab554f0',1,'cosmos::SigInfo::FPEData']]],
+  ['float_5foverflow_11',['FLOAT_OVERFLOW',['../structcosmos_1_1SigInfo_1_1FPEData.html#a077d33036fa15c736cef89ef9744e26ba28b9a325f54579444b71f7a9b1c6a918',1,'cosmos::SigInfo::FPEData']]],
+  ['float_5fsub_5frange_12',['FLOAT_SUB_RANGE',['../structcosmos_1_1SigInfo_1_1FPEData.html#a077d33036fa15c736cef89ef9744e26babf9e605eedac84ea35916785782cbb66',1,'cosmos::SigInfo::FPEData']]],
+  ['float_5funderflow_13',['FLOAT_UNDERFLOW',['../structcosmos_1_1SigInfo_1_1FPEData.html#a077d33036fa15c736cef89ef9744e26ba3c7ccc665d38180c2e011e4ee12b77b6',1,'cosmos::SigInfo::FPEData']]],
+  ['float_5funknown_14',['FLOAT_UNKNOWN',['../structcosmos_1_1SigInfo_1_1FPEData.html#a077d33036fa15c736cef89ef9744e26baee9b07392545308938fbd00f8e2b2f75',1,'cosmos::SigInfo::FPEData']]],
+  ['fork_15',['FORK',['../ptrace_8hxx.html#a9a489662d1a635d981aed845ab5d146faa59a5773c21e7a30b474d0b16ac5e8d2',1,'cosmos::ptrace']]],
+  ['fpe_16',['FPE',['../proc_2types_8hxx.html#aed04aa4104b74886098b88363dfd7374afdb3e4bcc61a742185e3fed028b8e5de',1,'cosmos']]],
+  ['fs_5fexceeded_17',['FS_EXCEEDED',['../proc_2types_8hxx.html#aed04aa4104b74886098b88363dfd7374aeaee45a671a99841045e375551a7fbd3',1,'cosmos']]],
+  ['future_18',['FUTURE',['../mman_8hxx.html#a96bc02608edf205de3ad910df9cc4528afa4cec41dc4b368db740c5cb2300b7a3',1,'cosmos::mem']]],
+  ['future_5fwrite_19',['FUTURE_WRITE',['../classcosmos_1_1FileDescriptor.html#abf99c2d0b4de270d4b9998814fa0335ea4aa530886ebaefd382fb7c6a0cf542a7',1,'cosmos::FileDescriptor']]]
+];

@@ -1,0 +1,37 @@
+var classcosmos_1_1Tracee =
+[
+    [ "RestartMode", "classcosmos_1_1Tracee.html#a13c909fd8690131c70200894ed2630de", [
+      [ "CONT", "classcosmos_1_1Tracee.html#a13c909fd8690131c70200894ed2630dea53f6b3ace3aa40916de167636293ac80", null ],
+      [ "DETACH", "classcosmos_1_1Tracee.html#a13c909fd8690131c70200894ed2630dea36b709e0b9f2710e86bade3966143a15", null ],
+      [ "SYSCALL", "classcosmos_1_1Tracee.html#a13c909fd8690131c70200894ed2630dea45f1e61f22cb04eb7a6a39016b56db9b", null ],
+      [ "SINGLESTEP", "classcosmos_1_1Tracee.html#a13c909fd8690131c70200894ed2630deaeeccd61f1d9dbe457038a5f3d2a53f62", null ],
+      [ "LISTEN", "classcosmos_1_1Tracee.html#a13c909fd8690131c70200894ed2630deac1f9314a03f63f33410be3489b12b29b", null ]
+    ] ],
+    [ "attach", "classcosmos_1_1Tracee.html#ac1de9f10eef0e0ee6f2a61b5759db291", null ],
+    [ "detach", "classcosmos_1_1Tracee.html#ac8785ac430ddac58225e81d74a7b4d6d", null ],
+    [ "getEventMsg", "classcosmos_1_1Tracee.html#afb7e548fe0ae620ca51a784a55763324", null ],
+    [ "getExitEventMsg", "classcosmos_1_1Tracee.html#a30e73b270a2c5a348a4e32c57ffe1bfc", null ],
+    [ "getFloatRegisters", "classcosmos_1_1Tracee.html#af21220e05519e5226dd680359e0ee9f4", null ],
+    [ "getPIDEventMsg", "classcosmos_1_1Tracee.html#a59698473cee595aedaa01ee96c214569", null ],
+    [ "getRegisters", "classcosmos_1_1Tracee.html#afc72ae9be72090cad317fa84257d34de", null ],
+    [ "getRegisterSet", "classcosmos_1_1Tracee.html#a496109c8f9d527121e2f0f2ae0dc15c5", null ],
+    [ "getSeccompFilter", "classcosmos_1_1Tracee.html#adc46d804de43e3abe2da909f78f74111", null ],
+    [ "getSeccompRetDataEventMsg", "classcosmos_1_1Tracee.html#a137298b99ea1ec58e7bf1463b9e38d13", null ],
+    [ "getSigInfo", "classcosmos_1_1Tracee.html#ac0ea2fdf1b7bd9aaa4915f52c772013b", null ],
+    [ "getSigMask", "classcosmos_1_1Tracee.html#af0dcf6d0867ecd5b20a77c2e1a803f6a", null ],
+    [ "getSyscallInfo", "classcosmos_1_1Tracee.html#ad868f8e5d6b18b4ef2c569fdb4f98c35", null ],
+    [ "interrupt", "classcosmos_1_1Tracee.html#a63c81ded0c902d5ec3ccbc9966749d13", null ],
+    [ "peekData", "classcosmos_1_1Tracee.html#a9f5eeb63d1485e982060ea22d1298573", null ],
+    [ "peekSigInfo", "classcosmos_1_1Tracee.html#a2a0869e4a7832b750f363f93a3e0d361", null ],
+    [ "peekUser", "classcosmos_1_1Tracee.html#ab885b1d2e0bbc99d63db5a32de435b6c", null ],
+    [ "pokeData", "classcosmos_1_1Tracee.html#a871a3986682db6c4745933eeb0e2f67b", null ],
+    [ "pokeUser", "classcosmos_1_1Tracee.html#af0a46160569f645dbfbf01818f038da5", null ],
+    [ "restart", "classcosmos_1_1Tracee.html#af50c00c9d07f00812e55e288c97d0c40", null ],
+    [ "seize", "classcosmos_1_1Tracee.html#a968432f97b30f27034234657f4feaa6b", null ],
+    [ "setFloatRegisters", "classcosmos_1_1Tracee.html#a11f4b897829d82773cd4420a554243fa", null ],
+    [ "setOptions", "classcosmos_1_1Tracee.html#aa3b5f159473a8be7a0e74c1b593f58e2", null ],
+    [ "setRegisters", "classcosmos_1_1Tracee.html#a2cda1e5d38ad2243b4cee1bac1911404", null ],
+    [ "setRegisterSet", "classcosmos_1_1Tracee.html#a6524b926fdaaece495a139a7c2021742", null ],
+    [ "setSigInfo", "classcosmos_1_1Tracee.html#a734c8731ffacba884ddaebfa46d76892", null ],
+    [ "setSigMask", "classcosmos_1_1Tracee.html#a173bcd08cf9740bc26cb5a2168c12c70", null ]
+];

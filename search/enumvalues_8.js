@@ -1,0 +1,28 @@
+var searchData=
+[
+  ['icmp_0',['ICMP',['../classcosmos_1_1SocketErrorT.html#a6730519091ea7c77c5d1c74b56580fc4a7d6fe0dd606232f7155fdeae2ea620a9',1,'cosmos::SocketErrorT']]],
+  ['icmp6_1',['ICMP6',['../classcosmos_1_1SocketErrorT.html#a6730519091ea7c77c5d1c74b56580fc4a879e4ca434c0793ed0f499f0992eb148',1,'cosmos::SocketErrorT']]],
+  ['id_5fremoved_2',['ID_REMOVED',['../errno_8hxx.html#a5c1aef3a972b5a9a3bb6b3df1aa01939a18c6f30e8497df6ff6338c2ded9bf406',1,'cosmos']]],
+  ['idn_3',['IDN',['../classcosmos_1_1AddressHints.html#a64a2d4dc43c4197f9393fcc6a4b362f7a91b986165f8990bf44fd00cd6eaec922',1,'cosmos::AddressHints::IDN'],['../classcosmos_1_1IPAddressBase.html#a10f666880dbf28ccf23f56bf29b1d883a91b986165f8990bf44fd00cd6eaec922',1,'cosmos::IPAddressBase::IDN']]],
+  ['ill_4',['ILL',['../proc_2types_8hxx.html#aed04aa4104b74886098b88363dfd7374a17f34743de4f5fe092824e327550da5b',1,'cosmos']]],
+  ['illegal_5fseq_5',['ILLEGAL_SEQ',['../errno_8hxx.html#a5c1aef3a972b5a9a3bb6b3df1aa01939a7f5ddc9aa7aee1a57f9b6c3f1faa66f7',1,'cosmos']]],
+  ['in_5fprogress_6',['IN_PROGRESS',['../errno_8hxx.html#a5c1aef3a972b5a9a3bb6b3df1aa01939aca69f96c768067fbff6c911ca87bccc9',1,'cosmos']]],
+  ['inet_7',['INET',['../net_2types_8hxx.html#a4ab1157cfda3b3ca14065d87286cde7eacbeeb469aeabf16bcff81f4cde1e0b48',1,'cosmos']]],
+  ['inet6_8',['INET6',['../net_2types_8hxx.html#a4ab1157cfda3b3ca14065d87286cde7ea3a1be585a9d1d7af08b562f200a982bb',1,'cosmos']]],
+  ['input_9',['INPUT',['../classcosmos_1_1Poller.html#a9efa9b7b5b54fa37ea1aeed5a4d504f3aa84cc046d48610b05c21fd3670d0c829',1,'cosmos::Poller::INPUT'],['../structcosmos_1_1SigInfo_1_1PollData.html#a10dfee15bd18d439fb5b0cf2c5f374cbaa84cc046d48610b05c21fd3670d0c829',1,'cosmos::SigInfo::PollData::INPUT'],['../io_2types_8hxx.html#a2f9cc880f6befaa0c7ac4aeb4f6f92b7aa84cc046d48610b05c21fd3670d0c829',1,'INPUTcosmos']]],
+  ['input_5fready_10',['INPUT_READY',['../classcosmos_1_1Poller.html#a2f7dba073c0a7b430a320a05ee4176b9ad47ac449658fcc0ea2b8621ced7a0620',1,'cosmos::Poller']]],
+  ['int_5fdiv_5fzero_11',['INT_DIV_ZERO',['../structcosmos_1_1SigInfo_1_1FPEData.html#a077d33036fa15c736cef89ef9744e26ba5cd7caf2cc2f7f1e5d6c2e5c500b48d6',1,'cosmos::SigInfo::FPEData']]],
+  ['int_5foverflow_12',['INT_OVERFLOW',['../structcosmos_1_1SigInfo_1_1FPEData.html#a077d33036fa15c736cef89ef9744e26bae549141c1699e200739b80705a402a77',1,'cosmos::SigInfo::FPEData']]],
+  ['interrupt_13',['INTERRUPT',['../ptrace_8hxx.html#a5c84789f5ce6e305df719009e982a157a81b7fe15c43052525db74111aa314cc9',1,'INTERRUPTcosmos::ptrace'],['../proc_2types_8hxx.html#aed04aa4104b74886098b88363dfd7374a81b7fe15c43052525db74111aa314cc9',1,'INTERRUPTcosmos']]],
+  ['interrupted_14',['INTERRUPTED',['../errno_8hxx.html#a5c1aef3a972b5a9a3bb6b3df1aa01939a658f2cadfdf09b6046246e9314f7cd43',1,'cosmos']]],
+  ['into_5fcgroup_15',['INTO_CGROUP',['../clone_8hxx.html#a81345d68d0dcf73e0794f2b826025d23a9004c456f02a94e3a18b11897fbb565a',1,'cosmos']]],
+  ['invalid_16',['INVALID',['../io_2types_8hxx.html#a2f9cc880f6befaa0c7ac4aeb4f6f92b7accc0377a8afbf50e7094f5c23a8af223',1,'cosmos']]],
+  ['invalid_5farg_17',['INVALID_ARG',['../errno_8hxx.html#a5c1aef3a972b5a9a3bb6b3df1aa01939a894ac82c59da1ab27f0f2ec607e67de4',1,'cosmos']]],
+  ['invalidate_18',['INVALIDATE',['../mman_8hxx.html#a95494c109bf8f696d54d3b37915b8ac8ac7ba4bde5fe21a5ad38e8ddb71e2ae2a',1,'cosmos::mem']]],
+  ['inverse_5fon_19',['INVERSE_ON',['../colors_8hxx.html#a56401679f9b10e15adc2bc7d5bafff15a05694bdc25373afd775bdc462130547a',1,'cosmos::term']]],
+  ['io_5fevent_20',['IO_EVENT',['../proc_2types_8hxx.html#aed04aa4104b74886098b88363dfd7374a84b97b22d38a59e21879b6bfec355eac',1,'cosmos']]],
+  ['iot_21',['IOT',['../proc_2types_8hxx.html#aed04aa4104b74886098b88363dfd7374ab244ff421031fde652f9bb66d1486576',1,'cosmos']]],
+  ['is_5fconnected_22',['IS_CONNECTED',['../errno_8hxx.html#a5c1aef3a972b5a9a3bb6b3df1aa01939ad2067c87931b1be2526ccb816575d19b',1,'cosmos']]],
+  ['is_5fdirectory_23',['IS_DIRECTORY',['../errno_8hxx.html#a5c1aef3a972b5a9a3bb6b3df1aa01939aa839dfc63b2fd9269576a81a467680b2',1,'cosmos']]],
+  ['is_5fpipe_24',['IS_PIPE',['../errno_8hxx.html#a5c1aef3a972b5a9a3bb6b3df1aa01939a14cfea4cb0819f33c5644bcd9d9e4ebc',1,'cosmos']]]
+];

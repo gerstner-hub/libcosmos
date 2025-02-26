@@ -1,0 +1,19 @@
+var searchData=
+[
+  ['range_0',['RANGE',['../errno_8hxx.html#a5c1aef3a972b5a9a3bb6b3df1aa01939a01036ddcc971d02f6c32c3da31a119f2',1,'cosmos']]],
+  ['raw_1',['RAW',['../net_2types_8hxx.html#a6aead79c1e67f1119ffd4851e6ad8072a633d6abff0a3fc22404347728d195059',1,'cosmos']]],
+  ['rdm_2',['RDM',['../net_2types_8hxx.html#a6aead79c1e67f1119ffd4851e6ad8072a006795aeeab570e4ca336932c33932f2',1,'cosmos']]],
+  ['read_3',['READ',['../mman_8hxx.html#afb9443daacfad2ab033d0ab08a594fd4a3466fab4975481651940ed328aa990e4',1,'cosmos::mem']]],
+  ['read_5fhangup_4',['READ_HANGUP',['../io_2types_8hxx.html#a2f9cc880f6befaa0c7ac4aeb4f6f92b7a6d2df861d44c5073a2d7922838dae372',1,'cosmos']]],
+  ['read_5fok_5',['READ_OK',['../filesystem_8hxx.html#a361c5c05ce4d64cd3e955bd241dae937ac0dce885d45da898502898bc994d2623',1,'cosmos::fs']]],
+  ['realtime_6',['REALTIME',['../time_2types_8hxx.html#a64b3fa7658be66c2e15e48a336ed88dfa4abfc22ad3c3ef567d80c65263fd7754',1,'cosmos']]],
+  ['realtime_5fcoarse_7',['REALTIME_COARSE',['../time_2types_8hxx.html#a64b3fa7658be66c2e15e48a336ed88dfa419bdcc9aee46395477080f102e1e8d8',1,'cosmos']]],
+  ['recverr_8',['RECVERR',['../net_2types_8hxx.html#af5c6aee859e1c019054c9686183f1d63aa2626f7bd497edb10bad6fe4c13bd94b',1,'cosmos']]],
+  ['regular_9',['REGULAR',['../classcosmos_1_1FileType.html#abc7864f9a8108e08ce67ccb9c5fbbba2aa36a6eee528e48b71966cd57f00f60e1',1,'cosmos::FileType']]],
+  ['reliability_10',['RELIABILITY',['../classcosmos_1_1IP4Options.html#a3233c6ac3ab38d59a6ce2983c175fe87abc19a8994086babbb8f14c370ef36052',1,'cosmos::IP4Options']]],
+  ['reset_11',['RESET',['../colors_8hxx.html#a56401679f9b10e15adc2bc7d5bafff15ab5859d8721cfdc0312b2838b9c985bc1',1,'cosmos::term']]],
+  ['reset_5fhandler_12',['RESET_HANDLER',['../classcosmos_1_1SigAction.html#aa0b5d5c62f43aa0b67c9a6e09037a64ca94c3e5862766795bc5aad5f326fff856',1,'cosmos::SigAction']]],
+  ['restart_13',['RESTART',['../classcosmos_1_1SigAction.html#aa0b5d5c62f43aa0b67c9a6e09037a64ca1104c54a9ec6549e4ef9562b687596fb',1,'cosmos::SigAction']]],
+  ['restorer_14',['RESTORER',['../classcosmos_1_1SigAction.html#aa0b5d5c62f43aa0b67c9a6e09037a64ca99af344fab3ed1a41d4e165d04fa0ab3',1,'cosmos::SigAction']]],
+  ['rights_15',['RIGHTS',['../net_2types_8hxx.html#af4840ff9a71d3468db26fe550c0e3b7aaedc618e5803064535d20c5b007f6a9f7',1,'cosmos']]]
+];
