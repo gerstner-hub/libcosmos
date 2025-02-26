@@ -237,6 +237,12 @@ descriptor passing over UNIX domain sockets is implemented.
 
 Furthermore memory mapping support has been added since library version 2.1.
 
+In version 0.4.0 major additions and changes occurred. In particular the
+complex area of signal handling is now completed covered. This made it
+necessary to adjust some existing APIs to use the newly introduced type
+wrappers. Also the ptrace() API, file locking and file leases have been added
+in this version.
+
 Future Directions
 =================
 
