@@ -700,6 +700,34 @@ public:
 	}
 };
 
+class WaitTest :
+		public cosmos::TestBase {
+public:
+
+	void runTests() override {
+		START_TEST("test special wait() conditions");
+
+		cosmos::ChildCloner cloner;
+		cloner.setPostForkCB([](const cosmos::ChildCloner &) {
+			cosmos::signal::raise(cosmos::signal::STOP);
+			cosmos::proc::exit(cosmos::ExitStatus::SUCCESS);
+		});
+		cloner.setNoExe();
+
+		auto proc = cloner.run();
+		auto data = proc.wait(cosmos::WaitFlags{cosmos::WaitFlag::WAIT_FOR_STOPPED});
+		RUN_STEP("child was signaled", data.signaled());
+		RUN_STEP("child stopped", data.stopped());
+		RUN_STEP("sub-proc still valid", proc.running());
+
+		cosmos::signal::send(proc.pidFD(), cosmos::signal::CONT);
+
+		data = proc.wait();
+		RUN_STEP("sub-proc exited", data.exited());
+		RUN_STEP("exit-status success", data.status == cosmos::ExitStatus::SUCCESS);
+	}
+};
+
 template <typename T>
 void runTest(const int argc, const char **argv) {
 	T test;
@@ -720,6 +748,7 @@ int main(const int argc, const char **argv) {
 		runTest<ArgOperatorTest>(argc, argv);
 		runTest<SchedulerTest>(argc, argv);
 		runTest<RedirectNonStdTest>(argc, argv);
+		runTest<WaitTest>(argc, argv);
 		return 0;
 	} catch (const cosmos::CosmosError &ex) {
 		std::cerr << ex.what() << std::endl;

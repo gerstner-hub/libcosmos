@@ -32,7 +32,7 @@ ChildData SubProc::wait(const WaitFlags flags) {
 
 	try {
 		auto child = proc::wait(m_child_fd, flags);
-		if (!flags[WaitFlag::LEAVE_INFO] && (child->exited() || child->signaled())) {
+		if (!flags[WaitFlag::LEAVE_INFO] && (child->exited() || child->killed())) {
 			reset();
 		}
 		return *child;
