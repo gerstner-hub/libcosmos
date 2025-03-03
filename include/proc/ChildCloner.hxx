@@ -71,8 +71,23 @@ public: // functions
 	 * same. You can change argv0, if necessary via getArgs().
 	 **/
 	void setExe(const std::string_view exe) {
+		m_allow_no_exe = false;
 		m_executable = exe;
 		setArgv0();
+	}
+
+	/// Indicate that no new program is to be executed.
+	/**
+	 * If you don't want to run a new program but just create a new
+	 * process execution context then you can call this function. You must
+	 * register a callback via setPostForkCB() in this case. This callback
+	 * will be the entry function for the new process.
+	 *
+	 * The callback should exit the process via proc::exit(). If it
+	 * returns then ExitStatus::SUCCESS will be returned.
+	 **/
+	void setNoExe() {
+		m_allow_no_exe = true;
 	}
 
 	/// Returns the currently configured argument vector.
@@ -219,12 +234,17 @@ public: // functions
 	 * perform custom child process setup, but care should be taken not to
 	 * interfere with the SubProc's internal child process setup.
 	 *
-	 * This callback is invoked *before* any redirections or other
-	 * settings are performed by the implementation.
+	 * This callback is invoked with any redirections and other
+	 * child process specific settings already performed.
 	 *
 	 * Be aware that any exceptions thrown from this callback will prevent
 	 * the child process from executing, but you will not be notified
 	 * about this apart from premature exit of the child process.
+	 *
+	 * If setNoExe() is active then this callback is the only child
+	 * process execution context and it should exit via
+	 * cosmos::proc::exit(). If this does not happen then
+	 * cosmos::ExitStatus::SUCCESS is implicitly returned.
 	 **/
 	void setPostForkCB(Callback cb) { m_post_fork_cb = cb; }
 
@@ -287,6 +307,8 @@ protected: // data
 	std::optional<StringVector> m_env;
 	/// Scheduler policy settings, if any
 	std::optional<SchedulerSettingsVariant> m_sched_settings;
+	/// Whether just to clone, not to exec a new program.
+	bool m_allow_no_exe = false;
 
 	/// File descriptor to use as child's stdin
 	FileDescriptor m_stdout;

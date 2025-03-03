@@ -75,7 +75,13 @@ public:
 } // end anon ns
 
 SubProc ChildCloner::run() {
-	if (m_executable.empty() || m_argv.empty()) {
+	if (m_allow_no_exe) {
+		if (!m_post_fork_cb) {
+			cosmos_throw (UsageError(
+				"attempted to run a cloned process without callback function (no post fork CB)"
+			));
+		}
+	} else if (m_executable.empty() || m_argv.empty()) {
 		cosmos_throw (UsageError(
 			"attempted to run a sub process w/o specifying an executable path and/or argv0"
 		));
@@ -164,6 +170,10 @@ SubProc ChildCloner::run() {
 	try {
 		postFork();
 
+		if (m_allow_no_exe) {
+			proc::exit(ExitStatus(0));
+		}
+
 		auto argv = setup_argv(m_argv);
 
 		if (!m_env) {
@@ -193,10 +203,6 @@ void ChildCloner::resetSignals() {
 }
 
 void ChildCloner::postFork() {
-	if (m_post_fork_cb) {
-		m_post_fork_cb(*this);
-	}
-
 	if (m_sched_settings) {
 		try {
 			std::visit([](auto &&sched_settings) {
@@ -221,6 +227,10 @@ void ChildCloner::postFork() {
 
 	for (auto fd: m_inherit_fds) {
 		fd.setCloseOnExec(false);
+	}
+
+	if (m_post_fork_cb) {
+		m_post_fork_cb(*this);
 	}
 }
 
