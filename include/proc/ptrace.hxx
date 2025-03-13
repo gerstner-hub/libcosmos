@@ -188,14 +188,104 @@ public: // types
 		NONE    = PTRACE_SYSCALL_INFO_NONE     ///< no meaningful information placed into struct.
 	};
 
-	using EntryInfo = decltype(ptrace_syscall_info::entry);
-	using ExitInfo = decltype(ptrace_syscall_info::exit);
-	using SeccompInfo = decltype(ptrace_syscall_info::seccomp);
+	using RawEntryInfo = decltype(ptrace_syscall_info::entry);
+	using RawExitInfo = decltype(ptrace_syscall_info::exit);
+	using RawSeccompInfo = decltype(ptrace_syscall_info::seccomp);
+
+	class EntryInfo :
+			protected RawEntryInfo {
+	public: // functions
+
+		uint64_t syscallNr() const {
+			return this->nr;
+		}
+
+		/// A pointer to the (up to) 6 system call arguments
+		const uint64_t* args() const {
+			// the typedef for __u64 is different to uint64_t, but
+			// we have a static_assert in the implementation to
+			// verify the sizes match.
+			return reinterpret_cast<const uint64_t*>(raw().args);
+		}
+
+		static constexpr size_t maxArgs() {
+			return sizeof(RawEntryInfo::args) / sizeof(uint64_t);
+		}
+
+		const RawEntryInfo& raw() const {
+			return *this;
+		}
+	};
+
+	class ExitInfo :
+			protected RawExitInfo {
+	public: // functions
+
+		/// Indicates wheter a system call return value is present or an error number return.
+		bool isError() const {
+			return this->is_error != 0;
+		}
+
+		bool isValue() const {
+			return !isError();
+		}
+
+		std::optional<int64_t> retVal() const {
+			return isError() ? std::nullopt : std::make_optional(this->rval);
+		}
+
+		std::optional<Errno> errVal() const {
+			return isError() ? std::make_optional(static_cast<Errno>(this->rval)) : std::nullopt;
+		}
+
+		const RawExitInfo& raw() const {
+			return *this;
+		}
+	};
+
+	class SeccompInfo :
+			protected RawSeccompInfo {
+	public: // functions
+
+		uint64_t syscallNr() const {
+			return this->nr;
+		}
+
+		/// Pointer to the (up to) 6 system call arguments.
+		const uint64_t* args() const {
+			return reinterpret_cast<const uint64_t*>(raw().args);
+		}
+
+		static constexpr size_t maxArgs() {
+			return sizeof(RawSeccompInfo::args) / sizeof(uint64_t);
+		}
+
+		/// Returns the SECCOMP_RET_DATA portion of the SECCOMP_RET_TRACE return value.
+		uint32_t retData() const {
+			return this->ret_data;
+		}
+
+		const RawSeccompInfo& raw() const {
+			return *this;
+		}
+	};
 
 public: // functions
 
 	Type type() const {
 		return Type{m_info.op};
+	}
+
+	bool isEntry() const {
+		return type() == Type::ENTRY;
+	}
+
+	bool isExit() const {
+		return type() == Type::EXIT;
+	}
+
+	bool isSeccomp() const {
+		return type() == Type::SECCOMP;
 	}
 
 	/// Returns the system call ABI in effect for the current system call.
@@ -214,18 +304,30 @@ public: // functions
 	}
 
 	/// If available return the syscall-entry-stop information from the struct.
-	std::optional<EntryInfo> entryInfo() const {
-		return type() == Type::ENTRY ? std::make_optional(m_info.entry) : std::nullopt;
+	const EntryInfo* entryInfo() const {
+		if (!isEntry())
+			return nullptr;
+
+		auto raw = &m_info.entry;
+		return reinterpret_cast<const EntryInfo*>(raw);
 	}
 
 	/// If available return the syscall-exit-stop information from the struct.
-	std::optional<ExitInfo> exitInfo() const {
-		return type() == Type::EXIT ? std::make_optional(m_info.exit) : std::nullopt;
+	const ExitInfo* exitInfo() const {
+		if (!isExit())
+			return nullptr;
+
+		auto raw = &m_info.exit;
+		return reinterpret_cast<const ExitInfo*>(raw);
 	}
 
 	/// If available return the ptrace-event seccomp info from the struct.
-	std::optional<SeccompInfo> seccompInfo() const {
-		return type() == Type::SECCOMP ? std::make_optional(m_info.seccomp) : std::nullopt;
+	const SeccompInfo* seccompInfo() const {
+		if (!isSeccomp())
+			return nullptr;
+
+		auto raw = &m_info.seccomp;
+		return reinterpret_cast<const SeccompInfo*>(raw);
 	}
 
 	auto raw() { return &m_info; }

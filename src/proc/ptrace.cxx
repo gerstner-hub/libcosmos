@@ -5,6 +5,16 @@
 
 namespace cosmos::ptrace {
 
+static_assert(sizeof(SyscallInfo::EntryInfo) == sizeof(SyscallInfo::RawEntryInfo),
+		"SyscallInfo::EntryInfo size mismatch");
+static_assert(sizeof(SyscallInfo::ExitInfo) == sizeof(SyscallInfo::RawExitInfo),
+		"SyscallInfo::ExitInfo size mismatch");
+static_assert(sizeof(SyscallInfo::SeccompInfo) == sizeof(SyscallInfo::SeccompInfo),
+		"SyscallInfo::SeccompInfo size mismatch");
+static_assert(sizeof(uint64_t) == sizeof(__u64),
+		"mismatch between uint64_t and __64");
+
+
 std::optional<long> trace(const Request req, const ProcessID pid, void *addr, void *data) {
 	const auto is_peek =
 		req == Request::PEEKDATA ||
