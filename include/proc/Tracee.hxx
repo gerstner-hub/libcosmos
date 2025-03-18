@@ -208,6 +208,7 @@ public: // functions
 		this->request(ptrace::Request::POKEUSER, offset, value);
 	}
 
+#ifdef PTRACE_GETREGS
 	/// Copy the tracee's general purpose registers into the provided structure.
 	/**
 	 * You need to include sys/user.h and check out the data structure
@@ -222,7 +223,9 @@ public: // functions
 		// it, we'd need an #ifdef of some sort.
 		this->request(ptrace::Request::GETREGS, nullptr, &out);
 	}
+#endif
 
+#ifdef PTRACE_SETREGS
 	/// Modify the tracee's general purpose registers.
 	/**
 	 * Some register modifications may be disallowed by the kernel to
@@ -232,7 +235,9 @@ public: // functions
 		// NOTE: see getRegisters() about Sparc architecture
 		this->request(ptrace::Request::SETREGS, nullptr, &out);
 	}
+#endif
 
+#ifdef PTRACE_GETFPREGS
 	/// Copy the tracee's floating point registers into the provided structure.
 	/**
 	 * This is similar to getRegisters() but provides the floating point
@@ -244,7 +249,9 @@ public: // functions
 		// NOTE: see getRegisters() about Sparc architecture
 		this->request(ptrace::Request::GETFPREGS, nullptr, &out);
 	}
+#endif
 
+#ifdef PTRACE_SETFPREGS
 	/// Modify the tracee's floating point registers.
 	/**
 	 * \see setRegisters().
@@ -252,6 +259,7 @@ public: // functions
 	void setFloatRegisters(const struct user_fpregs_struct &out) {
 		this->request(ptrace::Request::SETFPREGS, nullptr, &out);
 	}
+#endif
 
 	/// Retrieve a set of registers from the tracee.
 	/**

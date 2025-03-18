@@ -82,9 +82,14 @@ enum class RegisterType {
 
 /// Basic requests that can be passed to the ptrace() system call.
 /**
+ * \note Some of these requests are only available on some architectures.
+ * Some have also been deprecated by now. This can only be modeled via #ifdefs
+ * currently, which means that client code has to deal with the possibility of
+ * the affected requests not being available.
+ *
  * \note On system call level this has an actual `enum __ptrace_request` type,
- *       thus there is no defined underlying type and we keep the compiler's
- *       default.
+ * thus there is no defined underlying type and we keep the compiler's
+ * default.
  **/
 enum class Request {
 	/// The tracee asks to be traced by its parent.
@@ -99,16 +104,24 @@ enum class Request {
 	POKEDATA           = PTRACE_POKEDATA,
 	/// Write a word at the given offset into the tracee's USER data.
 	POKEUSER           = PTRACE_POKEUSER,
+#ifdef PTRACE_GETREGS
 	/// Copy the tracee's general-purpose registers to the given address in the tracer.
 	GETREGS            = PTRACE_GETREGS,
+#endif
+#ifdef PTRACE_GETFPREGS
 	/// Copy the tracee's floating-point registers to the given address in the tracer.
 	GETFPREGS          = PTRACE_GETFPREGS,
+#endif
 	/// Reg the tracee's registers in an architecture dependent way.
 	GETREGSET          = PTRACE_GETREGSET,
+#ifdef PTRACE_SETREGS
 	/// Modify the tracee's general-purpose registers (not available on all architectures).
 	SETREGS            = PTRACE_SETREGS,
+#endif
+#ifdef PTRACE_SETFPREGS
 	/// Modify the tracee's floating-point registers.
 	SETFPREGS          = PTRACE_SETFPREGS,
+#endif
 	/// Modify the tracee's registers, analogous to GETREGSET.
 	SETREGSET          = PTRACE_SETREGSET,
 	/// Retrieve information about the signal that cause the tracee to stop. Copies a siginfo_t structure.
@@ -156,9 +169,11 @@ enum class Request {
 	SECCOMP_GET_FILTER = PTRACE_SECCOMP_GET_FILTER,
 	/// Restart the stopped tracee, but first detach from it.
 	DETACH             = PTRACE_DETACH,
+#ifdef PTRACE_GET_THREAD_AREA
 	/// Performs an operation similar to `get_thread_area()`.
 	GET_THREAD_AREA    = PTRACE_GET_THREAD_AREA,
-#if PTRACE_SET_THREAD_AREA
+#endif
+#ifdef PTRACE_SET_THREAD_AREA
 	/// Performs an operation similar to `set_thread_area()`.
 	SET_THREAD_AREA    = PTRACE_SET_THREAD_AREA,
 #endif
