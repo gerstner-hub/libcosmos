@@ -250,7 +250,7 @@ public: // types
 		}
 
 		std::optional<Errno> errVal() const {
-			return isError() ? std::make_optional(static_cast<Errno>(this->rval)) : std::nullopt;
+			return isError() ? std::make_optional(static_cast<Errno>(-this->rval)) : std::nullopt;
 		}
 
 		const RawExitInfo& raw() const {
