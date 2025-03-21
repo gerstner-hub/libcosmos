@@ -1,4 +1,4 @@
-from SCons.Script import Dir, File, SConscript, ARGUMENTS, Environment, Export
+from SCons.Script import Dir, File, SConscript, ARGUMENTS, Environment, Export, Entry
 import os
 import subprocess
 import sys
@@ -224,11 +224,11 @@ def addVersionFileTarget(self, basename, version):
 
 def getCurrentGitTag(self, basename):
     """This returns the most recent Git tag found in the Git repository where
-    the current SConstruct file is located. If there is not Git repository
+    the current SConstruct file is located. If there is no Git repository
     around (e.g. building from a release source tarball) then a version tag
     stored in the SCons root directory is looked for. I nothing is found, an
     exception is raised."""
-    if os.path.exists(str(Dir('#/.git'))):  # we have git
+    if os.path.exists(str(Entry('#/.git'))):  # we have git
         srcdir = Dir('.').srcnode().abspath
         # run Git in the actual source tree directory so that we get the correct tag (e.g. for sub-modules)
         current_tag = subprocess.check_output('git describe --abbrev=0 --tags'.split(), cwd=srcdir).decode().strip()
