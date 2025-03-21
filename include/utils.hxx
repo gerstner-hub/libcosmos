@@ -112,15 +112,21 @@ bool in_range(const T1 &v, const IdentityT<T1> &_min, const IdentityT<T1> &_max)
 	return _min <= v && v <= _max;
 }
 
-/// Checks whether the value `v` is found in the given list of values `l`.
-template <typename T>
-bool in_list(const T &v, const std::initializer_list<T> &l) {
-	for (const auto &cmp: l) {
+/// Checks sequentially whether the value `v` is found in the given container `c`.
+template <typename T, typename C>
+bool in_container(const T &v, const C &c) {
+	for (const auto &cmp: c) {
 		if (v == cmp)
 			return true;
 	}
 
 	return false;
+}
+
+/// Checks whether the value `v` is found in the given list of values `l`.
+template <typename T>
+bool in_list(const T &v, const std::initializer_list<T> &l) {
+	return in_container(v, l);
 }
 
 /// Returns the number of elements in a C style array.

@@ -15,6 +15,7 @@ class MiscTest :
 		testRanges();
 		testNumElements();
 		testInList();
+		testInContainer();
 		testResGuard();
 	}
 
@@ -44,6 +45,15 @@ class MiscTest :
 
 		RUN_STEP("in-list", cosmos::in_list(i, {1, 5, 20}));
 		RUN_STEP("not-in-list", !cosmos::in_list(i, {1, 20}));
+	}
+
+	void testInContainer() {
+		START_TEST("in_container");
+
+		const std::array<int, 5> ARR = {1, 2, 3, 4, 5};
+
+		RUN_STEP("in-container", cosmos::in_container(5, ARR));
+		RUN_STEP("not-in-container", !cosmos::in_container(0, ARR));
 	}
 
 	struct CharPtrGuard :
