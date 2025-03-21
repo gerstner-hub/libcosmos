@@ -33,26 +33,35 @@
 #define COSMOS_FORMAT_PRINTF(format_index, first_Vararg_index)
 #endif
 
-namespace arch {
+namespace cosmos::arch {
 
 #ifdef __x86_64__
-#	define COMSOS_X86_64
-#	define COMSOS_X86
+#	define COSMOS_X86_64
+#	define COSMOS_X86
 /// Whether we're sitting on 64-bit x64-64.
-constexpr inline bool x86_64 = true;
+constexpr inline bool X86_64 = true;
 #else
-constexpr inline bool x86_64 = false;
+constexpr inline bool X86_64 = false;
 #endif
 
 #ifdef __i386__
 #	define COSMOS_I386
 #	define COSMOS_X86
 /// Whether we're sitting on 32-bit x86.
-constexpr inline bool i386 = true;
+constexpr inline bool I386 = true;
 #else
-constexpr inline bool i386 = false;
+constexpr inline bool I386 = false;
 #endif
 
 /// Whether we're running on either 32-bit or 64-bit x86.
-constexpr inline bool x86 = x86_64 || i386;
+constexpr inline bool X86 = X86_64 || I386;
+
+#ifdef __arm__
+/// Whether we're sitting on arm EABI
+#	define COSMOS_ARM
+constexpr inline bool ARM = true;
+#else
+constexpr inline bool ARM = false;
+#endif
+
 } // end ns
