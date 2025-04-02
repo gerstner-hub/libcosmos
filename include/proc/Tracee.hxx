@@ -7,6 +7,7 @@
 // cosmos
 #include <cosmos/compiler.hxx>
 #include <cosmos/io/iovector.hxx>
+#include <cosmos/proc/process.hxx>
 #include <cosmos/proc/ptrace.hxx>
 #include <cosmos/proc/signal.hxx>
 #include <cosmos/proc/SigSet.hxx>
@@ -318,7 +319,7 @@ public: // functions
 
 	/// Returns the PID of a newly created child of the tracee in the context of a ptrace-event-stop.
 	/**
-	 * This request is only valid during a ptrace-event-stop and when
+	 * This call is only valid during a ptrace-event-stop and when
 	 * ptrace::Event::FORK, ptrace::EVENT::VFORK,
 	 * ptrace::Event::VFORK_DONE or ptrace::Event::CLONE is reported.
 	 *
@@ -329,16 +330,17 @@ public: // functions
 		return static_cast<ProcessID>(pid);
 	}
 
-	/// Returns the exit code of the tracee in the context of a ptrace-event-stop.
+	/// Returns the tracee's WaitStatus in of a ptrace-event-stop.
 	/**
-	 * This request is only valid during a ptrace-event-stop when
+	 * This call is only valid during a ptrace-event-stop when
 	 * ptrace::Event::EXIT is reported.
 	 *
-	 * The return value is the exit status of the exited tracee process.
+	 * The return value either contains the ExitStatus in case of a
+	 * regular exit or the Signal by which the process was killed.
 	 **/
-	ExitStatus getExitEventMsg() const {
+	WaitStatus getExitEventMsg() const {
 		const auto status = getEventMsg();
-		return static_cast<ExitStatus>(status);
+		return WaitStatus{static_cast<int>(status)};
 	}
 
 	/// Returns the SECCOMP_RET_DATA in the context of a ptrace-event-stop.

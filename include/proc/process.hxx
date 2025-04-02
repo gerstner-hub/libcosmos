@@ -56,6 +56,73 @@ using WaitFlags = BitMask<WaitFlag>;
  */
 using ChildData = SigInfo::ChildData;
 
+/// A lightweight wrapper around process wait() status codes.
+/**
+ * This is a wrapper around the status `int` returned by the`wait()` family of
+ * system calls.
+ *
+ * libcosmos doesn't rely on this type for child process handling, but some
+ * APIs like ptrace() return such a status `int` and offer no alternative.
+ * This class can be used to access the details of the status in a typesafe
+ * manner.
+ **/
+class WaitStatus {
+public: // functions
+
+	explicit WaitStatus(const int status=0) :
+			m_status{status} {}
+
+	/// Returns whether the process exited regularly and status() is available.
+	bool exited() const {
+		return WIFEXITED(m_status);
+	}
+
+	/// Returns whether the process was killed by a signal and termSig() is available.
+	bool signaled() const {
+		return WIFSIGNALED(m_status);
+	}
+
+	/// Returns whether the process, if killed by a signal, also dumped core.
+	bool dumped() const {
+		return signaled() && WCOREDUMP(m_status);
+	}
+
+	/// Returns whether the process was stopped by a signal.
+	/**
+	 * This information is only available for traced processes or if using
+	 * a `wait()` call with the WUNTRACED flag.
+	 **/
+	bool stopped() const {
+		return WIFSTOPPED(m_status);
+	}
+
+	/// Returns whether the process was resumed by a signal.
+	bool continued() const {
+		return WIFCONTINUED(m_status);
+	}
+
+	/// Returns the process's ExitStatus code, if available.
+	std::optional<ExitStatus> status() const {
+		if (!exited())
+			return {};
+
+		return ExitStatus{WEXITSTATUS(m_status)};
+	}
+
+	/// Returns the signal that terminated the process, if available.
+	std::optional<Signal> termSig() const {
+		if (!signaled())
+			return {};
+
+		return Signal{SignalNr{WTERMSIG(m_status)}};
+	}
+
+protected: // data
+
+	/// the raw child status as returned e.g. from wait() and waitpid().
+	int m_status = 0;
+};
+
 } // end ns
 
 namespace cosmos::proc {
