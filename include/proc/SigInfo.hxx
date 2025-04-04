@@ -24,6 +24,9 @@
 #ifndef SYS_SECCOMP
 #	define SYS_SECCOMP 1
 #endif
+#ifndef SYS_USER_DISPATCH
+#	define SYS_USER_DISPATCH 2
+#endif
 
 /**
  * @file
@@ -424,8 +427,8 @@ public: // types
 
 		/// Different reasons for delivering SIGYS.
 		enum class Reason : int {
-			// TODO: check what happens for non-seccomp SIGSYS
-			SECCOMP = SYS_SECCOMP, ///< triggered by a seccomp(2) filter rule, SECCOMP_RET_TRAP.
+			SECCOMP       = SYS_SECCOMP, ///< triggered by a seccomp(2) filter rule, SECCOMP_RET_TRAP.
+			USER_DISPATCH = SYS_USER_DISPATCH, ///< triggered by syscall user dispatch.
 		};
 
 	public: // data
@@ -537,7 +540,10 @@ public: // functions
 
 	/// Returns signal::BAD_SYS specific data.
 	/**
-	 * This data is only available for `sigNr() == signal::BAD_SYS`.
+	 * This data is only available for `sigNr() == signal::BAD_SYS`. This
+	 * signal is used for seccomp mainly and in some situations when the
+	 * kernel deems it necessary (not simply if a bad system call nr. is
+	 * passed).
 	 **/
 	std::optional<const SysData> sysData() const;
 
