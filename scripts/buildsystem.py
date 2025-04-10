@@ -185,6 +185,9 @@ def installHeaders(self, subdir):
         target = os.path.sep.join(parts)
 
         for fil in files:
+            if fil.rsplit('.')[-1] not in ('h', 'hxx', 'hpp', 'h++'):
+                # this is to prevent e.g. installing *.swp files created by VIM
+                continue
             src = os.path.join(root, fil)
             node = self.Install(target, src)
             self.Alias('install', node)
