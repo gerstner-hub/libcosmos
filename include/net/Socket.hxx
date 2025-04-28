@@ -140,7 +140,7 @@ protected: // functions
 	 * descriptor is not lost but encapsulated in an object that can
 	 * manage its lifetime.
 	 **/
-	FileDescriptor accept(SocketAddress *addr);
+	FileDescriptor accept(SocketAddress *addr, const SocketFlags flags);
 
 	/// Send the given data over the socket, using specific send flags.
 	/**

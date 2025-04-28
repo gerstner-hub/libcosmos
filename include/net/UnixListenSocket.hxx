@@ -43,8 +43,9 @@ public: // functions
 		return Socket::bind(addr);
 	}
 
-	UnixConnection accept(UnixAddress *addr = nullptr) {
-		auto fd = Socket::accept(addr);
+	UnixConnection accept(UnixAddress *addr = nullptr,
+			const SocketFlags flags = SocketFlags{SocketFlag::CLOEXEC}) {
+		auto fd = Socket::accept(addr, flags);
 		return UnixConnection{fd};
 	}
 };

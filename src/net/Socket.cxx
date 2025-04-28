@@ -48,9 +48,9 @@ void Socket::listen(const size_t backlog) {
 	}
 }
 
-FileDescriptor Socket::accept(SocketAddress *addr) {
+FileDescriptor Socket::accept(SocketAddress *addr, const SocketFlags flags) {
 	socklen_t addrlen = addr ? addr->maxSize() : 0;
-	auto res = ::accept(to_integral(m_fd.raw()), addr ? addr->basePtr() : nullptr, addr ? &addrlen : nullptr);
+	auto res = ::accept4(to_integral(m_fd.raw()), addr ? addr->basePtr() : nullptr, addr ? &addrlen : nullptr, flags.raw());
 
 	if (res == -1) {
 		cosmos_throw (ApiError("accept()"));

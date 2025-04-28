@@ -61,8 +61,9 @@ public: // functions
 		return Socket::bind(addr);
 	}
 
-	TCPConnectionT<FAMILY> accept(IPAddress *addr = nullptr) {
-		auto fd = Socket::accept(addr);
+	TCPConnectionT<FAMILY> accept(IPAddress *addr = nullptr,
+			const SocketFlags flags = SocketFlags{SocketFlag::CLOEXEC}) {
+		auto fd = Socket::accept(addr, flags);
 		return TCPConnectionT<FAMILY>{fd};
 	}
 };
