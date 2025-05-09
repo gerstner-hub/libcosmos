@@ -35,6 +35,16 @@ namespace cosmos {
  */
 
 /// Different child process wait options used in the proc::wait() family of calls.
+/**
+ * The flags ALL, CLONE and NOTHREAD are Linux specific. Originally they could
+ * only be used with child processes created via `clone()`. Since Linux 4.7
+ * they can always be used with `waitid()`, which is used in all
+ * cosmos::proc::wait() wrappers.
+ *
+ * In the context of these flags a "clone children" are child processes
+ * created with the `clone()` system call, which deliver no signal or a signal
+ * other than SIGCHLD upon termination.
+ **/
 enum class WaitFlag : int {
 	/// Wait for child processes that have terminated.
 	WAIT_FOR_EXITED    = WEXITED,
@@ -45,7 +55,13 @@ enum class WaitFlag : int {
 	/// If no matching child processes are available don't block but return nothing.
 	NO_HANG            = WNOHANG,
 	/// Don't remove the info from the kernel, a later wait call can be used to retrieve the same information.
-	LEAVE_INFO         = WNOWAIT
+	LEAVE_INFO         = WNOWAIT,
+	/// Wait for all kinds of children regardless of type. This is the default for `ptrace()`'d children.
+	ALL                = __WALL,
+	/// Wait for "clone" children only.
+	CLONE              = static_cast<int>(__WCLONE),
+	/// Do not wait for children of other threads in the same thread group.
+	NOTHREAD           = __WNOTHREAD
 };
 
 using WaitFlags = BitMask<WaitFlag>;
