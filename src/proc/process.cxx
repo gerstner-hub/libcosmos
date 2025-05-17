@@ -45,6 +45,30 @@ ProcessGroupID get_own_process_group() {
 	return ProcessGroupID{getpgrp()};
 }
 
+ProcessGroupID get_process_group_of(const ProcessID pid) {
+	auto pgid = ::getpgid(to_integral(pid));
+	if (pgid == -1) {
+		cosmos_throw (ApiError("getpgid()"));
+	}
+
+	return ProcessGroupID(pgid);
+}
+
+void set_process_group_of(const ProcessID pid, const ProcessGroupID pgid) {
+	if (::setpgid(to_integral(pid), to_integral(pgid)) != 0) {
+		cosmos_throw (ApiError("setpgid()"));
+	}
+}
+
+bool is_process_group_leader(const ProcessID pid) {
+	if (pid == ProcessID::INVALID)
+		return false;
+
+	auto pgid = get_process_group_of(pid);
+
+	return to_integral(pid) == to_integral(pgid);
+}
+
 ProcessID create_new_session() {
 	auto res = ProcessID{::setsid()};
 

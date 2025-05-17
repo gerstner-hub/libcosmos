@@ -172,6 +172,37 @@ COSMOS_API GroupID get_effective_group_id();
 /// Returns the process group ID of the caller.
 COSMOS_API ProcessGroupID get_own_process_group();
 
+/// Returns the process group ID of the given process.
+/**
+ * An ApiError with Errno::SEARCH is thrown if `pid` does not exist.
+ **/
+COSMOS_API ProcessGroupID get_process_group_of(const ProcessID pid);
+
+/// Move `pid` into the process group identified by `pgid`
+/**
+ * An ApiError with one of the following Errnos is thrown on error:
+ *
+ * - Errno::ACCESS if `pid` refers to a child of the calling process and the
+ *   child already performed an `execve()`.
+ * - Errno::INVALID_ARG if `pgid` is < 0.
+ * - Errno::PERMISSION if `pid` would be moved into a different session or if
+ *   `pid` is a session leader. Also if `pgid` does not exist.
+ * - Errno::SEARCH if `pid` is neither the calling process nor a child of the
+ *   calling process.
+ **/
+COSMOS_API void set_process_group_of(const ProcessID pid, const ProcessGroupID pgid);
+
+inline void set_own_process_group(const ProcessGroupID pgid) {
+	set_process_group_of(ProcessID::SELF, pgid);
+}
+
+/// Returns whether given `pid` is a process group leader.
+COSMOS_API bool is_process_group_leader(const ProcessID pid);
+
+inline bool is_caller_process_group_leader() {
+	return is_process_group_leader(ProcessID::SELF);
+}
+
 /// Creates a new session with the current process as leader.
 /**
  * The session will also receive a new process group of which the

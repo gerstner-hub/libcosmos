@@ -34,6 +34,9 @@ namespace thread {
 ThreadID COSMOS_API get_tid();
 
 /// Returns whether the calling thread is this process's main thread.
+/**
+ * In Linux terms this is also called the thread group leader.
+ **/
 bool COSMOS_API is_main_thread();
 
 } // end ns
