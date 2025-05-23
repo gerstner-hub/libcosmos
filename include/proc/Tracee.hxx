@@ -321,9 +321,15 @@ public: // functions
 	/**
 	 * This call is only valid during a ptrace-event-stop and when
 	 * ptrace::Event::FORK, ptrace::EVENT::VFORK,
-	 * ptrace::Event::VFORK_DONE or ptrace::Event::CLONE is reported.
+	 * ptrace::Event::VFORK_DONE, ptrace::Event::CLONE or
+	 * ptrace::Event::EXEC is reported.
 	 *
-	 * The return value is the PID of the newly created child process.
+	 * For ptrace::Event::EXEC this returns the PID of the thread that
+	 * performed the execve(), which can differ from the PID that received
+	 * the event in case of `execve()` in a multi-threaded scenario.
+	 *
+	 * In all other cases the return value is the PID of the newly created
+	 * child process.
 	 **/
 	ProcessID getPIDEventMsg() const {
 		const auto pid = getEventMsg();
