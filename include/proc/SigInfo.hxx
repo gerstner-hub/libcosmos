@@ -378,6 +378,8 @@ public: // types
 			child.pid = ProcessID::INVALID;
 			status = std::nullopt;
 			signal = std::nullopt;
+			user_time = std::nullopt;
+			system_time = std::nullopt;
 		}
 
 	public: // data
