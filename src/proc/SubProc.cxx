@@ -24,7 +24,7 @@ void SubProc::reset() {
 	m_child_fd.close();
 }
 
-ChildData SubProc::wait(const WaitFlags flags) {
+ChildState SubProc::wait(const WaitFlags flags) {
 
 	if (flags[WaitFlag::NO_HANG]) {
 		cosmos_throw (UsageError("cannot use NO_HANG with SubProc, use waitTimed() instead"));
@@ -52,7 +52,7 @@ ChildData SubProc::wait(const WaitFlags flags) {
 	}
 }
 
-std::optional<ChildData> SubProc::waitTimed(const IntervalTime max, const WaitFlags flags) {
+std::optional<ChildState> SubProc::waitTimed(const IntervalTime max, const WaitFlags flags) {
 	Poller poller(8);
 
 	poller.addFD(m_child_fd, {Poller::MonitorFlag::INPUT});

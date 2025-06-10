@@ -81,7 +81,7 @@ ProcessID create_new_session() {
 
 namespace {
 
-	std::optional<ChildData> wait(const idtype_t wait_type, const id_t id, const WaitFlags flags) {
+	std::optional<ChildState> wait(const idtype_t wait_type, const id_t id, const WaitFlags flags) {
 		SigInfo si;
 		si.raw()->si_pid = 0;
 
@@ -137,19 +137,19 @@ namespace {
 
 } // end anons ns
 
-std::optional<ChildData> wait(const ProcessID pid, const WaitFlags flags) {
+std::optional<ChildState> wait(const ProcessID pid, const WaitFlags flags) {
 	return wait(P_PID, to_integral(pid), flags);
 }
 
-std::optional<ChildData> wait(const ProcessGroupID pgid, const WaitFlags flags) {
+std::optional<ChildState> wait(const ProcessGroupID pgid, const WaitFlags flags) {
 	return wait(P_PGID, to_integral(pgid), flags);
 }
 
-std::optional<ChildData> wait(const WaitFlags flags) {
+std::optional<ChildState> wait(const WaitFlags flags) {
 	return wait(P_ALL, 0, flags);
 }
 
-std::optional<ChildData> wait(const PidFD fd, const WaitFlags flags) {
+std::optional<ChildState> wait(const PidFD fd, const WaitFlags flags) {
 	return wait(P_PIDFD, to_integral(fd.raw()), flags);
 }
 
@@ -275,8 +275,8 @@ std::ostream& operator<<(std::ostream &o, const cosmos::ExitStatus status) {
 	return o;
 }
 
-std::ostream& operator<<(std::ostream &o, const cosmos::ChildData &info) {
-	using Event = cosmos::ChildData::Event;
+std::ostream& operator<<(std::ostream &o, const cosmos::ChildState &info) {
+	using Event = cosmos::ChildState::Event;
 
 	switch (info.event) {
 		case Event::EXITED:    o << "Child exited with " << *info.status; break;
@@ -285,7 +285,7 @@ std::ostream& operator<<(std::ostream &o, const cosmos::ChildData &info) {
 		case Event::TRAPPED:   o << "Child trapped"; break;
 		case Event::STOPPED:   o << "Child stopped by " << *info.signal; break;
 		case Event::CONTINUED: o << "Child continued by " << *info.signal; break;
-		default: o << "Bad ChildData"; break;
+		default: o << "Bad ChildState"; break;
 	}
 
 	return o;

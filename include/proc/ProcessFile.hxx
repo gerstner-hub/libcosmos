@@ -119,7 +119,7 @@ public: // functions
 	/**
 	 * \see proc::wait(const PidFD, const WaitFlags).
 	 **/
-	std::optional<ChildData> wait(const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED}) {
+	std::optional<ChildState> wait(const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED}) {
 		return proc::wait(m_fd, flags);
 	}
 

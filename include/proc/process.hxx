@@ -30,8 +30,8 @@ namespace cosmos {
  * and sys/wait.h, which would cause conflicts when done so in types.hxx
  * directly.
  *
- * WaitFlags and ChildData is needed across different classes, thus don't
- * place them in the proc sub-namespace.
+ * WaitFlags is needed across different classes, thus don't place it in the
+ * proc sub-namespace.
  */
 
 /// Different child process wait options used in the proc::wait() family of calls.
@@ -66,15 +66,9 @@ enum class WaitFlag : int {
 
 using WaitFlags = BitMask<WaitFlag>;
 
-/*
- * This is the same basic structure as found in SigInfo, only that waitid() &
- * friends don't fill in the user and sys times
- */
-using ChildData = SigInfo::ChildData;
-
 /// A lightweight wrapper around process wait() status codes.
 /**
- * This is a wrapper around the status `int` returned by the`wait()` family of
+ * This is a wrapper around the status `int` returned by the `wait()` family of
  * system calls.
  *
  * libcosmos doesn't rely on this type for child process handling, but some
@@ -240,7 +234,7 @@ COSMOS_API std::optional<ProcessID> fork();
  * will be waited for. By default a blocking wait for child process exit is
  * performed.
  **/
-COSMOS_API std::optional<ChildData> wait(const ProcessID pid, const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED});
+COSMOS_API std::optional<ChildState> wait(const ProcessID pid, const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED});
 
 /// Wait for any process from the given process group.
 /**
@@ -249,14 +243,14 @@ COSMOS_API std::optional<ChildData> wait(const ProcessID pid, const WaitFlags fl
  * pgid == ProcessGroupID::SELF then this waits for any process for the
  * caller's process group.
  **/
-COSMOS_API std::optional<ChildData> wait(const ProcessGroupID pgid, const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED});
+COSMOS_API std::optional<ChildState> wait(const ProcessGroupID pgid, const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED});
 
 /// Wait for any child process of the calling process.
 /**
  * This is just like wait(const ProcessID, const WaitFlags) only that it waits
  * for any kind of child process, not any specific child process.
  **/
-COSMOS_API std::optional<ChildData> wait(const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED});
+COSMOS_API std::optional<ChildState> wait(const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED});
 
 /// Wait for the process referred to by the given pidfd.
 /**
@@ -266,7 +260,7 @@ COSMOS_API std::optional<ChildData> wait(const WaitFlags flags = WaitFlags{WaitF
  * The process represented by `fd` needs to be a child process of the calling
  * process, otherwise an ApiError with Errno::CHILD is thrown.
  **/
-COSMOS_API std::optional<ChildData> wait(const PidFD fd, const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED});
+COSMOS_API std::optional<ChildState> wait(const PidFD fd, const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED});
 
 /// Replace the current process by executing the program found in `path`.
 /**
@@ -411,5 +405,5 @@ extern COSMOS_API PidInfo cached_pids;
 
 }; // end ns
 
-/// Outputs a human readable summary of ChildData.
-COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::ChildData &data);
+/// Outputs a human readable summary of `data`
+COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::ChildState &data);

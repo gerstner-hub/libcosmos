@@ -119,7 +119,6 @@ public: // types
 	/* reuse the sub-structures as is */
 
 	using Source       = SigInfo::Source;
-	using ProcessCtx   = SigInfo::ProcessCtx;
 	using UserSigData  = SigInfo::UserSigData;
 	using QueueSigData = SigInfo::QueueSigData;
 	using MsgQueueData = SigInfo::MsgQueueData;

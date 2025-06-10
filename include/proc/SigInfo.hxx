@@ -94,22 +94,6 @@ public: // types
 		TKILL   = SI_TKILL,   ///< sent by tkill() or tgkill().
 	};
 
-	/// Information about the process a signal is from or about.
-	/**
-	 * Note that the pid and uid information is not necessarily to be
-	 * trusted, `rt_sigqueueinfo()` allows user space to fill in arbitrary
-	 * values here. Only privileged processes or processes running under
-	 * the same UID as the target process may send signals. In some
-	 * scenarios this may still be an issue.
-	 *
-	 * For Source::KERNEL the values should be safe, though. See also
-	 * isTrustedSource().
-	 **/
-	struct ProcessCtx{
-		ProcessID pid; ///< PID of the process
-		UserID uid;    ///< real user ID of the process
-	};
-
 	/// Additional custom SigInfo data.
 	/**
 	 * Some SigInfo contexts allow to add custom data either as an `int`
@@ -321,87 +305,22 @@ public: // types
 	};
 
 	/// Additional data found in SigInfo with SIGCHILD.
-	struct ChildData {
-	public: // types
-
-		/// Types of SIGCHLD events that can occur.
-		enum class Event : int {
-			INVALID   = -1,
-			EXITED    = CLD_EXITED,   ///< Child has exited.
-			KILLED    = CLD_KILLED,   ///< Child was killed.
-			DUMPED    = CLD_DUMPED,   ///< Child terminated abnormally due to a signal, dumping core.
-			TRAPPED   = CLD_TRAPPED,  ///< Traced child has trapped.
-			STOPPED   = CLD_STOPPED,  ///< Child has stopped due to a signal.
-			CONTINUED = CLD_CONTINUED ///< Stopped child has continued.
-		};
-
+	/**
+	 * This is the same basic structure as ChildState used in the `wait()`
+	 * family of system calls. In the SigInfo context some additional
+	 * fields about CPU time are filled in, though.
+	 **/
+	struct ChildData :
+			public ChildState {
 	public: // functions
 
-		/// Returns whether the child exited.
-		bool exited() const { return event == Event::EXITED; }
-
-		/// Returns whether the child was killed by a signal.
-		bool killed() const { return event == Event::KILLED; }
-
-		/// Returns whether the child dumped core due to a signal.
-		bool dumped() const { return event == Event::DUMPED; }
-
-		/// Returns true if the child entered a tracing trap.
-		bool trapped() const { return event == Event::TRAPPED; }
-
-		/// Returns whether the child continued due to a signal.
-		bool continued() const { return event == Event::CONTINUED; }
-
-		/// Returns whether the child stopped.
-		bool stopped() const { return event == Event::STOPPED; }
-
-		/// Returns whether the child exited and had an exit status of 0.
-		bool exitedSuccessfully() const {
-			return exited() && *status == ExitStatus::SUCCESS;
-		}
-
-		/// Returns whether the child received a signal.
-		bool signaled() const {
-			return event == Event::KILLED ||
-				event == Event::DUMPED ||
-				event == Event::STOPPED ||
-				event == Event::CONTINUED;
-		}
-
-		/// Returns whether the structure contains valid information.
-		bool valid() const {
-			return event != Event::INVALID;
-		}
-
 		void reset() {
-			event = Event::INVALID;
-			child.pid = ProcessID::INVALID;
-			status = std::nullopt;
-			signal = std::nullopt;
+			ChildState::reset();
 			user_time = std::nullopt;
 			system_time = std::nullopt;
 		}
 
 	public: // data
-
-		/// The kind of child process event that occurred.
-		Event event;
-		/// the PID and its real user ID the signal is about.
-		ProcessCtx child;
-
-		/// Contains the process's exit status, if applicable.
-		/**
-		 * An exit status is only available for Event::EXITED. In the other
-		 * cases a `signal` is available instead.
-		 **/
-		std::optional<ExitStatus> status;
-
-		/// Contains the signal number that caused the child process to change state.
-		/**
-		 * This signal number is only available for events other than
-		 * Event::EXITED. Otherwise `status` is available instead.
-		 **/
-		std::optional<Signal> signal;
 
 		/// The CPU time the child spent in user space.
 		/**
