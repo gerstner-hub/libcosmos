@@ -1,5 +1,6 @@
 // cosmos
 #include <cosmos/error/ApiError.hxx>
+#include <cosmos/error/UsageError.hxx>
 #include <cosmos/proc/ptrace.hxx>
 #include <cosmos/utils.hxx>
 
@@ -53,6 +54,19 @@ void traceme() {
 	// all arguments except the request are ignored.
 	// this is not clearly documented but I checked the kernel code to verify.
 	trace(Request::TRACEME, ProcessID{0}, nullptr, nullptr);
+}
+
+std::tuple<SignalNr, Event> decode_event(const cosmos::Signal sig) {
+
+	if (!sig.isPtraceEventStop()) {
+		cosmos_throw (UsageError("this is not a ptrace-event-stop signal"));
+	}
+
+	const auto raw = to_integral(sig.raw());
+	const auto event = cosmos::ptrace::Event{raw >> 8};
+	const cosmos::SignalNr signr{raw & 0xff};
+
+	return std::make_tuple(signr, event);
 }
 
 } // end ns

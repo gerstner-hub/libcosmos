@@ -142,6 +142,18 @@ public: // functions
 		return m_sig != SignalNr::NONE;
 	}
 
+	/// Returns whether the signal contains data about a ptrace() event stop.
+	/**
+	 * In the ptrace() API, during wait(), a special event stop can be
+	 * encoded in the signal field of the siginfo structure. This call
+	 * here checks whether this might be the case. This only makes sense
+	 * if you are actually tracing other processes and are expecting
+	 * ptrace() events.
+	 **/
+	bool isPtraceEventStop() const {
+		return m_sig > SignalNr::MAXIMUM;
+	}
+
 protected: // data
 
 	/// The raw signal number
