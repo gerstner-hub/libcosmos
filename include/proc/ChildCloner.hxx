@@ -295,6 +295,12 @@ protected: // functions
 			m_executable = m_argv[0];
 	}
 
+	std::optional<SubProc> runClone2();
+
+	std::optional<SubProc> runClone3();
+
+	void runChild();
+
 protected: // data
 
 	/// Path to the child process executable to run
