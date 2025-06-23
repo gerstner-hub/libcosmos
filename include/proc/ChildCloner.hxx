@@ -263,6 +263,28 @@ public: // functions
 	 *
 	 * It is mandatory to join the child process via SubProc::wait()
 	 * before the SubProc object is destroyed.
+	 *
+	 * The design of the fork()/clone() & execve() system calls used to
+	 * create child processes involves a problem when something goes wrong
+	 * in the child process before or during `execve()`. These errors
+	 * already happen in child process context but before the new program
+	 * is actually executed. There exists no simple error channel to
+	 * forward detailed error information to the parent.
+	 *
+	 * By default the implementation will exit with one of the following
+	 * ExitStatus values if something goes wrong in child context:
+	 *
+	 * - ExitStatus::PROG_NOT_FOUND if the program to be executed could
+	 *   not be found.
+	 * - ExitStatus::PROG_NOT_EXECUTABLE if the program to be executed was
+	 *   found but is not executable.
+	 * - ExitStatus::PRE_EXEC_ERROR on any other error conditions
+	 *   including out of memory, out of file descriptors, errors while
+	 *   trying to setup file redirection etc.
+	 *
+	 * These exit codes are just conventions used by libcosmos and can be
+	 * ambiguous if the actual program invoked by the child process uses
+	 * them as well, but for other purposes.
 	 **/
 	SubProc run();
 

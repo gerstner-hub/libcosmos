@@ -104,7 +104,8 @@ enum class Errno : int { // errnos are distinct positive `int` values says `man 
 	TIMEDOUT              = ETIMEDOUT,       ///< connection timed out
 	WOULD_BLOCK           = EWOULDBLOCK,     ///< operation would block
 	TEXT_FILE_BUSY        = ETXTBSY,
-	CROSS_DEVICE          = EXDEV            ///< cross-device link
+	CROSS_DEVICE          = EXDEV,           ///< cross-device link
+	BAD_LIBRARY           = ELIBBAD,         ///< attempt to access a corrupted shared library.
 };
 
 /// Wrapper that returns the Errno strongly typed representation of the current `errno`

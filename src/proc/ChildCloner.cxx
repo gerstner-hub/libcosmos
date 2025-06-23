@@ -8,6 +8,7 @@
 #include <iostream>
 
 // cosmos
+#include <cosmos/error/ApiError.hxx>
 #include <cosmos/error/InternalError.hxx>
 #include <cosmos/error/UsageError.hxx>
 #include <cosmos/formatting.hxx>
@@ -149,7 +150,7 @@ std::optional<SubProc> ChildCloner::runClone2() {
 			ev.wait();
 		} catch (const std::exception &ex) {
 			print_child_error("post fork/ev wait", ex.what());
-			proc::exit(ExitStatus{3});
+			proc::exit(ExitStatus::PRE_EXEC_ERROR);
 		}
 	}
 
@@ -196,17 +197,39 @@ void ChildCloner::runChild() {
 
 		auto argv = setup_argv(m_argv);
 
-		if (!m_env) {
-			proc::exec(argv[0], &argv);
-		} else {
-			auto envp = setup_env(m_env.value());
-			proc::exec(argv[0], &argv, &envp);
+		try {
+			std::optional<CStringVector> envp;
+			if (m_env) {
+				envp = setup_env(m_env.value());
+			}
+
+			proc::exec(argv[0], &argv, envp ? &*envp : nullptr);
+		} catch (const ApiError &e) {
+			switch (e.errnum()) {
+				case Errno::LINK_LOOP:
+				case Errno::NAME_TOO_LONG:
+				case Errno::NO_ENTRY:
+				case Errno::NOT_A_DIR:
+					proc::exit(ExitStatus::PROG_NOT_FOUND);
+					return;
+				case Errno::NOT_EXECUTABLE:
+				// note that ACCESS can also mean the program
+				// exists but we lack permission. we cannot
+				// determine the exact cause without opening
+				// the executable ourselves.
+				case Errno::ACCESS:
+					proc::exit(ExitStatus::PROG_NOT_EXECUTABLE);
+					return;
+				default:
+					throw;
+			}
 		}
-	} catch (const CosmosError &ce) {
+	} catch (const std::exception &ce) {
 		print_child_error("post fork/exec", ce.what());
-		// use something else than "1" which might help debugging this
-		// situation a bit.
-		proc::exit(ExitStatus{3});
+		proc::exit(ExitStatus::PRE_EXEC_ERROR);
+	} catch (...) {
+		print_child_error("post fork/exec", "unhandled exception");
+		proc::exit(ExitStatus::PRE_EXEC_ERROR);
 	}
 }
 

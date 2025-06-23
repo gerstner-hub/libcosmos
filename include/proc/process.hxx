@@ -285,6 +285,45 @@ COSMOS_API std::optional<ChildState> wait(const PidFD fd, const WaitFlags flags 
  * the new program. Only file descriptors not marked close-on-exec will be
  * inherited to the new program. The ProcessID of the caller will remain the
  * same.
+ *
+ * On error an ApiError is thrown containing one of the following Errnos:
+ * - Errno::TOOBIG: the amount of memory consumed by `args` + `env` is too
+ *   big, or `path` is too long.
+ * - Errno::ACCESS:
+ *   - search permission is denied in a component leading to `path`.
+ *   - `path` is not a regular file, or the interpreter stated in `path` is
+ *   not a regular file.
+ *   - execute permission is denied for `path` or the file system containing
+ *   `path` is mounted "noexec".
+ * - Errno::AGAIN: `path` is a setuid program and the maximum number of
+ *   processes for the target UID is exceeded.
+ * - Errno::FAULT: one or more of the parameters point outside of accessible
+ *   address space.
+ * - Errno::INVALID_ARG: `path` refers to an ELF executable with more than one
+ *   PT_INTERP segments (thus naming more than one interpreter).
+ * - Errno::IO_ERROR: an I/O error occurred.
+ * - Errno::IS_DIRECTORY: An ELF interpreter was a directory.
+ * - Errno::BAD_LIBRARY: An ELF interpreter was not recognized in format.
+ * - Errno::LINK_LOOP: too many symbolic links in `path` or the maximum link
+ *   recursion limit was reached.
+ * - Errno::TOO_MANY_FILES
+ * - Errno::NAME_TOO_LONG: `path` is too long.
+ * - Errno::TOO_MANY_FILES_IN_SYS
+ * - Errno::NO_ENTRY: `path` or interpreter does not exist.
+ * - Errno::NOT_EXECUTABLE: an executable does not have a recognized or
+ *   supported format.
+ * - Errno::NO_MEMORY: out of kernel memory.
+ * - Errno::NOT_A_DIR: A component leading to `path` or to an interpreter is
+ *   not a directory.
+ * - Errno::PERMISSION:
+ *   - the file system containing `path` is mounted nosuid, but `path` is a
+ *   setuid or setgid program.
+ *   - the program is being traced but `path` is a setuid or setgid program,
+ *   while the caller is not the superuser.
+ *   - `path` refers to a capability-dump application, capabilities are set
+ *   on the file, but they could not all be granted.
+ * - Errno::TEXT_FILE_BUSY: `path` is opened for writing by one or more
+ *   processes.
  **/
 COSMOS_API void exec(const SysString path,
 		const CStringVector *args = nullptr, const CStringVector *env = nullptr);

@@ -728,6 +728,61 @@ public:
 	}
 };
 
+class PreExecErrorTest :
+		public cosmos::TestBase {
+public:
+	void runTests() override {
+		testProgNotFound();
+		testProgNotExecutable();
+		testOtherPreExecError();
+	}
+
+	void testProgNotFound() {
+		START_TEST("test pre-execve error conditions (prog not found)");
+
+		cosmos::ChildCloner cloner;
+		// this should cause ExitStatus::PROG_NOT_FOUND
+		cloner.setExe("/_not_existing");
+		auto proc = cloner.run();
+		auto data = proc.wait();
+		RUN_STEP("prog-not-found child exited", data.exited());
+		RUN_STEP("exit-status prog-not-found", data.status == cosmos::ExitStatus::PROG_NOT_FOUND);
+	}
+
+	void testProgNotExecutable() {
+		START_TEST("test pre-execve error conditions (prog not executable)");
+
+		cosmos::ChildCloner cloner;
+		// this should cause ExitStatus::PROG_NOT_EXECUTABLE
+		cloner.setExe("/etc/fstab");
+		auto proc = cloner.run();
+		auto data = proc.wait();
+		RUN_STEP("prog-not-executable child exited", data.exited());
+		RUN_STEP("exit-status prog-not-executable", data.status == cosmos::ExitStatus::PROG_NOT_EXECUTABLE);
+	}
+
+	void badPostFork(const cosmos::ChildCloner &) {
+		throw std::exception();
+	}
+
+	void testOtherPreExecError() {
+		START_TEST("test pre-execve error conditions (other pre-exec error)");
+
+		cosmos::ChildCloner cloner;
+		cloner.setExe("/bin/bash");
+		// we will throw an exception from our custom post fork
+		// handler which should trigger the PRE_EXEC_ERROR exit status
+		cosmos::ChildCloner::Callback cb = std::bind(
+				&PreExecErrorTest::badPostFork, this, std::placeholders::_1 );
+		cloner.setPostForkCB(cb);
+
+		auto proc = cloner.run();
+		auto data = proc.wait();
+		RUN_STEP("other-pre-execve-error child exited", data.exited());
+		RUN_STEP("exit-status pre-exec-error", data.status == cosmos::ExitStatus::PRE_EXEC_ERROR);
+	}
+};
+
 template <typename T>
 void runTest(const int argc, const char **argv) {
 	T test;
@@ -749,6 +804,7 @@ int main(const int argc, const char **argv) {
 		runTest<SchedulerTest>(argc, argv);
 		runTest<RedirectNonStdTest>(argc, argv);
 		runTest<WaitTest>(argc, argv);
+		runTest<PreExecErrorTest>(argc, argv);
 		return 0;
 	} catch (const cosmos::CosmosError &ex) {
 		std::cerr << ex.what() << std::endl;

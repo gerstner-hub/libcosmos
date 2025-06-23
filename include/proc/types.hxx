@@ -62,9 +62,14 @@ struct ProcessCtx {
  * si_status field in SigInfo).
  **/
 enum class ExitStatus : int {
-	INVALID = -1,
-	SUCCESS = EXIT_SUCCESS,
-	FAILURE = EXIT_FAILURE,
+	INVALID             = -1,
+	SUCCESS             = EXIT_SUCCESS,
+	FAILURE             = EXIT_FAILURE,
+	PRE_EXEC_ERROR      = 125, ///< other pre-execve() error in ChlidCloner
+	PROG_NOT_EXECUTABLE = 126, ///< used by shells and ChildCloner to indicate that a program to be started is not executable.
+	PROG_NOT_FOUND      = 127, ///< used by shells and ChildCloner to indicate that a program to be started was not found
+	BAD_EXIT_VAL        = 128, ///< by convention used to indicate that a bad value was passed to `exit()`
+	MAXIMUM             = 255, ///< largest value that can be returned, is often used to indicate abnormal exit or out-of-range exit codes.
 };
 
 /// A primitive signal number specification.
