@@ -1,6 +1,7 @@
 #pragma once
 
 // Linux
+#include <limits.h>
 #include <unistd.h>
 
 // cosmos
@@ -87,7 +88,7 @@ public: // functions
 	 * in the same length on the read end. This is only possible up to a
 	 * maximum size, however. This function returns this size.
 	 **/
-	static size_t maxAtomicWriteSize() {
+	static constexpr size_t maxAtomicWriteSize() {
 		return MAX_ATOMIC_WRITE;
 	}
 
@@ -100,7 +101,7 @@ protected: // data
 
 	FileDescriptor m_read_end;
 	FileDescriptor m_write_end;
-	static const size_t MAX_ATOMIC_WRITE;
+	static constexpr size_t MAX_ATOMIC_WRITE = PIPE_BUF;
 };
 
 } // end ns
