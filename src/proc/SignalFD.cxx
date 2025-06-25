@@ -144,11 +144,11 @@ std::optional<const Info::ChildData> Info::childData() const {
 		using Event = ChildData::Event;
 		const auto event = Event{m_raw.ssi_code};
 
-		return ChildData{
+		return ChildData{{
 			event,
 			this->procCtx(),
 			event == Event::EXITED ? std::make_optional(ExitStatus{m_raw.ssi_status}) : std::nullopt,
-			event == Event::EXITED ? std::nullopt : std::make_optional(Signal{SignalNr{m_raw.ssi_status}}),
+			event == Event::EXITED ? std::nullopt : std::make_optional(Signal{SignalNr{m_raw.ssi_status}})},
 			// is an uint64_t here, so cast it to clock_t for reuse
 			std::make_optional(ClockTicks{static_cast<clock_t>(m_raw.ssi_utime)}),
 			std::make_optional(ClockTicks{static_cast<clock_t>(m_raw.ssi_stime)})

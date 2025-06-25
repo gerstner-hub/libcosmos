@@ -95,11 +95,11 @@ std::optional<const SigInfo::ChildData> SigInfo::childData() const {
 		 */
 		const auto is_waitid_res = error() == Errno::INVALID_ARG;
 
-		return ChildData{
+		return ChildData{{
 			event,
 			this->procCtx(),
 			event == Event::EXITED ? std::make_optional(ExitStatus{m_raw.si_status}) : std::nullopt,
-			event == Event::EXITED ? std::nullopt : std::make_optional(Signal{SignalNr{m_raw.si_status}}),
+			event == Event::EXITED ? std::nullopt : std::make_optional(Signal{SignalNr{m_raw.si_status}})},
 			is_waitid_res ? std::nullopt : std::make_optional(ClockTicks{m_raw.si_utime}),
 			is_waitid_res ? std::nullopt : std::make_optional(ClockTicks{m_raw.si_stime})
 		};
