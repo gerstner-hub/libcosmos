@@ -147,11 +147,11 @@ class ProcessTest :
 			waitForTermSig();
 		}
 
-		std::set<cosmos::ProcessID> childs;
+		std::set<cosmos::ProcessID> children;
 
 		for (size_t i = 0; i < 2; i++) {
 			if (auto child = cosmos::proc::fork(); child) {
-				childs.insert(*child);
+				children.insert(*child);
 			} else {
 				cosmos::proc::exit(cosmos::ExitStatus{0});
 			}
@@ -160,7 +160,7 @@ class ProcessTest :
 		for (size_t i = 0; i < 2; i++) {
 			auto info = cosmos::proc::wait();
 
-			RUN_STEP("wait-for-any-child-works", info->exited() && childs.find(info->child.pid) != childs.end());
+			RUN_STEP("wait-for-any-child-works", info->exited() && children.find(info->child.pid) != children.end());
 		}
 	}
 
