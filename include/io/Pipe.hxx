@@ -23,6 +23,9 @@ namespace cosmos {
  * The pipe file descriptors created by this class have the close-on-exec flag
  * set by default, so you need to explicitly re-enable that flag to inherit
  * the necessary end to a child process.
+ *
+ * This type maintains ownership of the contained file descriptors and thus is
+ * a move-only type.
  **/
 class COSMOS_API Pipe {
 	// disallow copy/assignment
@@ -35,6 +38,18 @@ public: // functions
 	explicit Pipe();
 
 	~Pipe() { closeReadEnd(); closeWriteEnd(); }
+
+	Pipe(Pipe &&other) {
+		*this = std::move(other);
+	}
+
+	Pipe& operator=(Pipe &&other) {
+		m_read_end = other.m_read_end;
+		m_write_end = other.m_write_end;
+		other.invalidateReadEnd();
+		other.invalidateWriteEnd();
+		return *this;
+	}
 
 	void closeReadEnd() { if (haveReadEnd()) m_read_end.close(); }
 	void closeWriteEnd() { if (haveWriteEnd()) m_write_end.close(); }
