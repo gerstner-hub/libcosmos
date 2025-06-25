@@ -9,11 +9,15 @@
 
 // cosmos
 #include <cosmos/error/ApiError.hxx>
+#include <cosmos/error/FileError.hxx>
 #include <cosmos/error/InternalError.hxx>
+#include <cosmos/error/RuntimeError.hxx>
 #include <cosmos/error/UsageError.hxx>
 #include <cosmos/formatting.hxx>
+#include <cosmos/fs/File.hxx>
 #include <cosmos/fs/filesystem.hxx>
 #include <cosmos/io/EventFile.hxx>
+#include <cosmos/io/Pipe.hxx>
 #include <cosmos/private/cosmos.hxx>
 #include <cosmos/private/Scheduler.hxx>
 #include <cosmos/proc/ChildCloner.hxx>
@@ -72,7 +76,7 @@ void print_child_error(const std::string_view context, const std::string_view er
 
 } // end anon ns
 
-SubProc ChildCloner::run() {
+void ChildCloner::verifyArgs() {
 	if (m_allow_no_exe) {
 		if (!m_post_fork_cb) {
 			cosmos_throw (UsageError(
@@ -84,21 +88,44 @@ SubProc ChildCloner::run() {
 			"attempted to run a sub process w/o specifying an executable path and/or argv0"
 		));
 	}
+}
 
-	if (!cosmos::running_on_valgrind) {
-		if (auto subproc = runClone3(); subproc) {
-			return std::move(*subproc);
-		}
-	} else {
-		if (auto subproc = runClone2(); subproc) {
-			return std::move(*subproc);
-		}
+SubProc ChildCloner::run() {
+	verifyArgs();
+
+	std::optional<Pipe> error_pipe;
+
+	if (m_forward_child_errors) {
+		error_pipe = std::make_optional(Pipe{});
 	}
 
-	// the child process -- let's do something!
-	runChild();
-	// should never be reached
-	return SubProc{};
+	auto run_clone = cosmos::running_on_valgrind ?
+		&ChildCloner::runClone2 : &ChildCloner::runClone3;
+
+	if (auto subproc = (this->*run_clone)(); subproc) {
+		// parent context
+		if (error_pipe) {
+			// this will throw if something goes wrong
+			try {
+				handlePreExecError(*error_pipe);
+			} catch (...) {
+				try {
+					subproc->kill(signal::KILL);
+				} catch (const std::exception &ex) {
+					std::cerr << "WARNING: failed to kill half-ready child process\n";
+				}
+				(void)subproc->wait();
+				throw;
+			}
+		}
+
+		return std::move(*subproc);
+	} else {
+		// the child process -- let's do something!
+		runChild(error_pipe);
+		// should never be reached
+		return SubProc{};
+	}
 }
 
 std::optional<SubProc> ChildCloner::runClone2() {
@@ -187,8 +214,22 @@ std::optional<SubProc> ChildCloner::runClone3() {
 	}
 }
 
-void ChildCloner::runChild() {
+void ChildCloner::runChild(std::optional<Pipe> &error_pipe) {
 	try {
+		if (error_pipe) {
+			/*
+			 * the pipe FDs are marked O_CLOEXEC, thus, when we
+			 * successfully execve() then the write end will also
+			 * be closed without data being sent out, which
+			 * indicates success.
+			 *
+			 * it would be better to explicitly report a success
+			 * error code, but this is not possible, since we only
+			 * now whether it worked when execve() doesn't return.
+			 */
+			error_pipe->closeReadEnd();
+		}
+
 		postFork();
 
 		if (m_allow_no_exe) {
@@ -205,6 +246,11 @@ void ChildCloner::runChild() {
 
 			proc::exec(argv[0], &argv, envp ? &*envp : nullptr);
 		} catch (const ApiError &e) {
+			if (error_pipe) {
+				reportPreExecErrorAndExit(*error_pipe,
+						e.errnum(), e.what());
+			}
+
 			switch (e.errnum()) {
 				case Errno::LINK_LOOP:
 				case Errno::NAME_TOO_LONG:
@@ -224,12 +270,78 @@ void ChildCloner::runChild() {
 					throw;
 			}
 		}
-	} catch (const std::exception &ce) {
-		print_child_error("post fork/exec", ce.what());
+	} catch (const std::exception &e) {
+		if (error_pipe) {
+			reportPreExecErrorAndExit(*error_pipe,
+					Errno::NO_ERROR, e.what());
+		}
+		print_child_error("post fork/exec", e.what());
 		proc::exit(ExitStatus::PRE_EXEC_ERROR);
 	} catch (...) {
+		if (error_pipe) {
+			reportPreExecErrorAndExit(*error_pipe,
+					Errno::NO_ERROR, "unhandled exception");
+		}
 		print_child_error("post fork/exec", "unhandled exception");
 		proc::exit(ExitStatus::PRE_EXEC_ERROR);
+	}
+}
+
+void ChildCloner::reportPreExecErrorAndExit(Pipe &pipe,
+		Errno error, const std::string &description) {
+	File error_file{pipe.takeWriteEndOwnership(), AutoCloseFD{true}};
+	error_file.write(&error, sizeof(error));
+	error_file.write(description.c_str(), description.size());
+	proc::exit(ExitStatus::PRE_EXEC_ERROR);
+}
+
+void ChildCloner::handlePreExecError(Pipe &pipe) {
+	char buf[Pipe::maxAtomicWriteSize()];
+
+	pipe.closeWriteEnd();
+	File error_file{pipe.takeReadEndOwnership(), AutoCloseFD{true}};
+	/*
+	 * we are expecting two separate messages:
+	 * - the Errno code (which will be zero if something else than an API
+	 *   call failed).
+	 * - the string describing the error.
+	 */
+	auto bytes = error_file.read(&buf, sizeof(buf));
+
+	if (bytes == 0) {
+		// no pre-execve error occurred
+		return;
+	}
+
+	Errno errnum;
+
+	if (bytes != sizeof(errnum)) {
+		cosmos_throw(RuntimeError("bad error code read from error pipe"));
+	}
+
+	std::memcpy(&errnum, buf, sizeof(errnum));
+
+	bytes = error_file.read(&buf, sizeof(buf));
+
+	if (bytes == 0) {
+		cosmos_throw(RuntimeError("missing error message from error pipe"));
+	}
+
+	std::string message;
+	message.resize(bytes);
+	std::memcpy(message.data(), buf, bytes);
+
+	if (errnum == Errno::NO_ERROR) {
+		// an error other than ApiError occurred, we translate it
+		// into a RuntimeError.
+		cosmos_throw(RuntimeError{message});
+	} else {
+		// Ignore the automatic message generation of ApiError, since
+		// it was already generated in the child. Simply override the
+		// message.
+		ApiError child_error{"", errnum};
+		child_error.setMessage(message);
+		cosmos_throw(child_error);
 	}
 }
 

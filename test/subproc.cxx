@@ -735,6 +735,9 @@ public:
 		testProgNotFound();
 		testProgNotExecutable();
 		testOtherPreExecError();
+		testForwardErrorGood();
+		testForwardErrorBadExecve();
+		testForwardErrorOtherError();
 	}
 
 	void testProgNotFound() {
@@ -780,6 +783,61 @@ public:
 		auto data = proc.wait();
 		RUN_STEP("other-pre-execve-error child exited", data.exited());
 		RUN_STEP("exit-status pre-exec-error", data.status == cosmos::ExitStatus::PRE_EXEC_ERROR);
+	}
+
+	void testForwardErrorGood() {
+		START_TEST("test error forwarding (without error occurring)");
+
+		cosmos::ChildCloner cloner;
+		cloner.setForwardChildErrors(true);
+		// this should cause ExitStatus::PROG_NOT_EXECUTABLE
+		cloner.setExe("true");
+		auto proc = cloner.run();
+		auto data = proc.wait();
+		RUN_STEP("child exited normally", data.exited());
+		RUN_STEP("exit-status success", data.status == cosmos::ExitStatus::SUCCESS);
+	}
+
+	void testForwardErrorBadExecve() {
+		START_TEST("test error forwarding (with pre-exec error occurring)");
+
+		cosmos::ChildCloner cloner;
+		cloner.setForwardChildErrors(true);
+		// this should cause ExitStatus::PROG_NOT_EXECUTABLE
+		cloner.setExe("/not/existing");
+		try {
+			auto proc = cloner.run();
+			RUN_STEP("run() succeeded in spite of pre-exec error",
+					false);
+			(void)proc.wait();
+		} catch (const cosmos::ApiError &ex) {
+			std::cerr << ex.what() << std::endl;
+			RUN_STEP("pre-exec-error has been forwarded", true);
+			RUN_STEP("pre-exec-error errno matches", ex.errnum() == cosmos::Errno::NO_ENTRY);
+		}
+	}
+
+	void testForwardErrorOtherError() {
+		START_TEST("test error forwarding (with non-api pre-exec error occurring)");
+
+		cosmos::ChildCloner cloner;
+		cloner.setForwardChildErrors(true);
+		// this should cause ExitStatus::PROG_NOT_EXECUTABLE
+		cloner.setExe("/not/existing");
+		// we will throw an exception from our custom post fork
+		// handler which should trigger the PRE_EXEC_ERROR exit status
+		cosmos::ChildCloner::Callback cb = std::bind(
+				&PreExecErrorTest::badPostFork, this, std::placeholders::_1 );
+		cloner.setPostForkCB(cb);
+		try {
+			auto proc = cloner.run();
+			RUN_STEP("run() succeeded in spite of pre-exec error",
+					false);
+			(void)proc.wait();
+		} catch (const cosmos::RuntimeError &ex) {
+			std::cerr << ex.what() << std::endl;
+			RUN_STEP("custom-pre-exec-error has been forwarded", true);
+		}
 	}
 };
 

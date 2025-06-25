@@ -15,6 +15,8 @@
 
 namespace cosmos {
 
+class Pipe;
+
 /// Sub process creation facility.
 /**
  * This type allows to configure and create child processes. This is a rather
@@ -215,6 +217,24 @@ public: // functions
 		m_stdout.reset();
 	}
 
+	/// Enable or disable forwarding of errors occurring pre-execve().
+	/**
+	 * By passing `true` to this function the implementation will utilize
+	 * Pipe file descriptors to indicate pre-execve error conditions to
+	 * the parent process. If an error is encountered in the child before
+	 * `execve()` then an ApiError will be thrown synchronously when
+	 * invoking `run()`. This increases the cost of creating child
+	 * processes and is thus not enabled by default.
+	 *
+	 * Note that this type of error handling is incompatible with logic in
+	 * the callback set via `setPostForkCB()` that blocks the child
+	 * process, because this will block the call to `run()` in turn, which
+	 * waits for the `execve()` in the child to occur.
+	 **/
+	void setForwardChildErrors(const bool forward) {
+		m_forward_child_errors = forward;
+	}
+
 	/// Sets scheduler type and settings.
 	/**
 	 * By default the parent's scheduling settings will be inherited. If
@@ -245,6 +265,11 @@ public: // functions
 	 * process execution context and it should exit via
 	 * cosmos::proc::exit(). If this does not happen then
 	 * cosmos::ExitStatus::SUCCESS is implicitly returned.
+	 *
+	 * Note that if this callback blocks the child process and
+	 * `setForwardChildErrors()` is enabled, the `run()` invocation will
+	 * equally block, because it is waiting for the `execve()` to occur in
+	 * the child.
 	 **/
 	void setPostForkCB(Callback cb) { m_post_fork_cb = cb; }
 
@@ -285,6 +310,9 @@ public: // functions
 	 * These exit codes are just conventions used by libcosmos and can be
 	 * ambiguous if the actual program invoked by the child process uses
 	 * them as well, but for other purposes.
+	 *
+	 * If you want more exact information about pre-exec error conditions,
+	 * you can call `setForwardChildErrors(true)`.
 	 **/
 	SubProc run();
 
@@ -321,7 +349,15 @@ protected: // functions
 
 	std::optional<SubProc> runClone3();
 
-	void runChild();
+	void runChild(std::optional<Pipe> &error_pipe);
+
+	void reportPreExecErrorAndExit(Pipe &pipe,
+			Errno error,
+			const std::string &description);
+
+	void handlePreExecError(Pipe &pipe);
+
+	void verifyArgs();
 
 protected: // data
 
@@ -348,6 +384,9 @@ protected: // data
 	std::vector<FileDescriptor> m_inherit_fds;
 
 	Callback m_post_fork_cb = nullptr;
+
+	/// Whether to forward errors occurring in child context to the parent
+	bool m_forward_child_errors = false;
 
 	friend std::ostream& operator<<(std::ostream&, const ChildCloner&);
 };
