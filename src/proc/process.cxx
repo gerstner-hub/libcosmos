@@ -9,6 +9,7 @@
 
 // Cosmos
 #include <cosmos/error/ApiError.hxx>
+#include <cosmos/error/FileError.hxx>
 #include <cosmos/error/UsageError.hxx>
 #include <cosmos/proc/SigSet.hxx>
 #include <cosmos/proc/pidfd.h>
@@ -157,7 +158,7 @@ void exec(const SysString path, const CStringVector *args, const CStringVector *
 
 	exec_wrapper(::execvpe, path, args, env);
 
-	cosmos_throw (ApiError("execvpe()"));
+	cosmos_throw (FileError(path, "execvpe()"));
 }
 
 void exec(const SysString path,
