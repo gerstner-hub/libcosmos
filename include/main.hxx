@@ -58,11 +58,11 @@ protected: // functions
  * These classes use the cosmos::ExitStatus strong type instead of the plain
  * `int` exit code. This offers improved readability and less room for
  * mistakes. To allow quick exit paths in the application you can throw a
- * plain cosmos::ExitStatus, which will be catched in the wrapper and results
+ * plain cosmos::ExitStatus, which will be caught in the wrapper and results
  * in a regular return of the integer value from the actual `main()` entry
  * point.
  *
- * Any other exceptions derived from std::exception will also be catched and
+ * Any other exceptions derived from std::exception will also be caught and
  * lead to an output on stderr and an exit status of ExitStatus::FAILURE. This
  * should be a last resort only, though, and you should handle non-fatal
  * exceptions in the implementation of your program to provide context aware

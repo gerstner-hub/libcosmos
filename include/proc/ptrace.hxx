@@ -126,7 +126,7 @@ enum class Request {
 	SETREGSET          = PTRACE_SETREGSET,
 	/// Retrieve information about the signal that cause the tracee to stop. Copies a siginfo_t structure.
 	GETSIGINFO         = PTRACE_GETSIGINFO,
-	/// Modify the tracee's signal information (used when the tracer catched a signal that would normally be delivered to the tracee).
+	/// Modify the tracee's signal information (used when the tracer caught a signal that would normally be delivered to the tracee).
 	SETSIGINFO         = PTRACE_SETSIGINFO,
 	/// Retrieve siginfo_t structures without removing them from the tracee's queue.
 	PEEKSIGINFO        = PTRACE_PEEKSIGINFO,
