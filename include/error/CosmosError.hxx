@@ -108,6 +108,12 @@ public: // functions
 	/// Throw the most specialized type of this object in the inheritance hierarchy.
 	[[ noreturn ]] virtual void raise() = 0;
 
+	/// Override the stored message to contain the given `msg`
+	void setMessage(const std::string_view msg) {
+		m_msg = msg;
+		m_msg_generated = true;
+	}
+
 protected: // functions
 
 	/// Append type specific error information to m_msg.
