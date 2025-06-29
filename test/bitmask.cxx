@@ -20,7 +20,12 @@ protected: // types
 		MASK45 = 0x18
 	};
 
-	typedef cosmos::BitMask<MyEnum> MyBitMask;
+	enum class OtherEnum : int {
+		SOMEVAL = 0x5
+	};
+
+	using MyBitMask = cosmos::BitMask<MyEnum>;
+	using OtherBitMask = cosmos::BitMask<OtherEnum>;
 public:
 	void runTests() override {
 		testCtors();
@@ -31,11 +36,17 @@ public:
 		testLimit();
 	}
 
+	bool processBitMask(const MyBitMask mask) {
+		if (mask == MyBitMask{MyEnum::VAL1, MyEnum::VAL2})
+			return true;
+		return false;
+	}
+
 	void testCtors() {
 		START_TEST("Constructor test");
 		MyBitMask empty;
 
-		START_STEP("Empty Bitmask Ctor");
+		START_STEP("Empty BitMask Ctor");
 		FINISH_STEP(empty.raw() == 0);
 
 		MyBitMask valmask{MyEnum::VAL3};
@@ -58,6 +69,11 @@ public:
 			FINISH_STEP(initlist[bit] == expected && initlist.test(bit) == expected);
 		}
 
+		const auto matches = processBitMask({MyEnum::VAL1, MyEnum::VAL2});
+		RUN_STEP("implicit-bitmask-matches", matches);
+		// this must fail to compile, because the enum value is from
+		// another type of bitmask
+		//processBitMask({OtherEnum::SOMEVAL});
 	}
 
 	void testStringRep() {
