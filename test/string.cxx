@@ -51,6 +51,10 @@ class StringTest :
 		cosmos::strip(spacy_copy);
 
 		RUN_STEP("strip-by-value", spacy_copy == stripped);
+
+		const std::string bracky{"{[this is it]}"};
+		const auto no_bracky = cosmos::stripped(bracky, "{[]}");
+		RUN_STEP("strip-set-chars", no_bracky == "this is it");
 	}
 
 	void testPrefix() {

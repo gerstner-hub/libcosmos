@@ -60,19 +60,33 @@ std::wstring to_upper(const std::wstring_view s) {
 	return ret;
 }
 
-void strip(std::string &s) {
-	while (!s.empty() && std::isspace(s[0]))
+void strip(std::string &s, const std::string_view strip_set) {
+	auto stripit = [&strip_set](const char ch) -> bool {
+		if (strip_set.empty())
+		       return std::isspace(ch);
+		else
+			return strip_set.find(ch) != strip_set.npos;
+	};
+
+	while (!s.empty() && stripit(s[0]))
 		s.erase(s.begin());
 
-	while (!s.empty() && std::isspace(s.back()))
+	while (!s.empty() && stripit(s.back()))
 		s.pop_back();
 }
 
-void strip(std::wstring &s) {
-	while (!s.empty() && std::iswspace(s[0]))
+void strip(std::wstring &s, const std::wstring_view strip_set) {
+	auto stripit = [&strip_set](const char ch) -> bool {
+		if (strip_set.empty())
+		       return std::iswspace(ch);
+		else
+			return strip_set.find(ch) != strip_set.npos;
+	};
+
+	while (!s.empty() && stripit(s[0]))
 		s.erase(s.begin());
 
-	while (!s.empty() && std::iswspace(s.back()))
+	while (!s.empty() && stripit(s.back()))
 		s.pop_back();
 }
 

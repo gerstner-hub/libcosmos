@@ -47,23 +47,30 @@ std::wstring COSMOS_API to_lower(const std::wstring_view s);
 /// Returns an all upper case version of `s`.
 std::wstring COSMOS_API to_upper(const std::wstring_view s);
 
-/// Strips leading and trailing whitespace from the given string in-place.
-void COSMOS_API strip(std::string &s);
+/// Strips leading and trailing characters from the given string in-place.
+/**
+ * If `strip_set` is empty then this function strips leading and trailing
+ * whistespace (according to std::isspace()) from `s`. Otherwise any
+ * characters in `strip_set` will be stripped from `s`.
+ **/
+void COSMOS_API strip(std::string &s, const std::string_view strip_set = {});
 
-/// Returns a version of the given string with stripped off leading and trailing whitespace.
-inline std::string stripped(const std::string_view s) {
+/// Returns a version of the given string with stripped off characters like according to `strip()`
+inline std::string stripped(const std::string_view s,
+		const std::string_view strip_set = {}) {
 	std::string ret{s};
-	strip(ret);
+	strip(ret, strip_set);
 	return ret;
 }
 
 /// Wide string variant of strip(std::string &s)
-void COSMOS_API strip(std::wstring &s);
+void COSMOS_API strip(std::wstring &s, const std::wstring_view strip_set = {});
 
 /// Wide string variant of stripped(const std::string_view)
-inline std::wstring stripped(const std::wstring_view s) {
+inline std::wstring stripped(const std::wstring_view s,
+		const std::wstring_view strip_set = {}) {
 	std::wstring ret{s};
-	strip(ret);
+	strip(ret, strip_set);
 	return ret;
 }
 
