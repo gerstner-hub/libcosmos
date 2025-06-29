@@ -120,19 +120,25 @@ using SplitFlags = BitMask<SplitFlag>;
  * subsequent occurrences of `sep` are ignored. If SplitFlag::KEEP_EMPTY is
  * set in `flags` then empty elements will be returned for these occurrences
  * instead.
+ *
+ * `max_splits` sets the maximum number of split operations i.e. if it is set
+ * to 1 then at max a vector with two elements will be returned. If it is set
+ * to zero then no limit is in effect.
  **/
 template <typename CHAR>
 COSMOS_API std::vector<std::basic_string<CHAR>> split(
 		const std::basic_string_view<CHAR> str,
 		const std::basic_string_view<CHAR> sep,
-		const SplitFlags flags = SplitFlags{});
+		const SplitFlags flags = SplitFlags{},
+		const size_t max_splits = 0);
 
 // overload of split avoid type deduction problems
 inline std::vector<std::string> split(
 		const std::string_view str,
 		const std::string_view sep,
-		const SplitFlags flags = SplitFlags{}) {
-	return split<char>(str, sep, flags);
+		const SplitFlags flags = SplitFlags{},
+		const size_t max_splits = 0) {
+	return split<char>(str, sep, flags, max_splits);
 }
 
 } // end ns

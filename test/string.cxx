@@ -96,6 +96,10 @@ class StringTest :
 		parts = cosmos::split(bigsep, "--", {cosmos::SplitFlag::STRIP_PARTS});
 		const auto expected_bigsep_stripped = {"A bit", "more", "of", "splitting"};
 		RUN_STEP("bigsep-split-strip-matches", compareParts(parts, expected_bigsep_stripped));
+
+		parts = cosmos::split("this:is:a:string", ":", cosmos::SplitFlags{}, 2);
+		const auto expected_maxsplit_result = {"this", "is", "a:string"};
+		RUN_STEP("split-with-maxsplit-matches", compareParts(parts, expected_maxsplit_result));
 	}
 
 	void testSysString() {

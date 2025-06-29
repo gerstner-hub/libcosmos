@@ -80,7 +80,8 @@ template <typename CHAR>
 std::vector<std::basic_string<CHAR>> split(
 		const std::basic_string_view<CHAR> str,
 		const std::basic_string_view<CHAR> sep,
-		const SplitFlags flags) {
+		const SplitFlags flags,
+		const size_t max_splits) {
 
 	using String = std::basic_string<CHAR>;
 	std::vector<String> parts;
@@ -100,7 +101,10 @@ std::vector<std::basic_string<CHAR>> split(
 				pos1 += sep.size();
 		}
 
-		pos2 = str.find(sep, pos1);
+		const auto max_reached = max_splits &&
+			parts.size() == max_splits;
+
+		pos2 = max_reached ? str.npos : str.find(sep, pos1);
 
 		auto token_len = pos2 - pos1;
 
@@ -130,6 +134,7 @@ std::vector<std::basic_string<CHAR>> split(
 template COSMOS_API std::vector<std::basic_string<char>> split(
 		const std::basic_string_view<char> str,
 		const std::basic_string_view<char> sep,
-		const SplitFlags flags);
+		const SplitFlags flags,
+		const size_t);
 
 } // end ns
