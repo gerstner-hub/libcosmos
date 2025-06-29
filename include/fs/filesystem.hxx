@@ -280,7 +280,7 @@ COSMOS_API std::string get_working_dir();
  * variable for an executable named `exec_base`. If one is found then the
  * full path to this executable is returned.
  *
- * If `exec_base` is an absolute path then it is only checked whether the
+ * If `exec_base` contains path separators then it is only checked whether the
  * path (symlinks are followed) is accessible and executable and returns it
  * unmodified if this is the case.
  *

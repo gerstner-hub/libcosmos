@@ -254,7 +254,7 @@ std::optional<std::string> which(const std::string_view exec_base) noexcept {
 	if (exec_base.empty())
 		return {};
 
-	if (exec_base.front() == '/') {
+	if (exec_base.find('/') != exec_base.npos) {
 		// check absolute path and be done with it
 		if (checkExecutable(std::string{exec_base})) {
 		       return {std::string{exec_base}};
