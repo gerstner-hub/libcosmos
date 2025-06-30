@@ -4,6 +4,7 @@
 #include <cosmos/compiler.hxx>
 #include <cosmos/error/UsageError.hxx>
 #include <cosmos/fs/FileDescriptor.hxx>
+#include <cosmos/fs/FDFile.hxx>
 #include <cosmos/io/Pipe.hxx>
 #include <cosmos/utils.hxx>
 
@@ -36,6 +37,10 @@ using StdioFileBuf = __gnu_cxx::stdio_filebuf<char>;
  *
  * This is a base class for implementing a wrapper of an existing file
  * descriptor offering an std::istream or std::ostream interface on top of it.
+ *
+ * Note that the stream adaptor takes ownership of the file descriptor that is
+ * passed to it. There exist specialized constructors for types like Pipe and
+ * FileBase to automatically move the file descriptor correctly.
  **/
 template <typename STREAM_TYPE>
 class StreamAdaptor :
@@ -77,6 +82,10 @@ public: // functions
 	explicit InputStreamAdaptor(Pipe &p) :
 			InputStreamAdaptor{p.takeReadEndOwnership()}
 	{}
+
+	explicit InputStreamAdaptor(FDFile &file) :
+			InputStreamAdaptor{file.takeOwnership()}
+	{}
 };
 
 /// Wraps a file descriptor in a std::ostream interface.
@@ -93,6 +102,10 @@ public: // functions
 			OutputStreamAdaptor{p.takeWriteEndOwnership()}
 	{}
 
+	explicit OutputStreamAdaptor(FDFile &file) :
+			OutputStreamAdaptor{file.takeOwnership()}
+	{}
+
 	void close() override {
 		*this << std::flush;
 		StreamAdaptor::close();
@@ -106,6 +119,10 @@ public: // functions
 
 	explicit InputOutputStreamAdaptor(FileDescriptor fd) :
 		StreamAdaptor<std::iostream>{fd, std::ios_base::in | std::ios_base::out}
+	{}
+
+	explicit InputOutputStreamAdaptor(FDFile &file) :
+			InputOutputStreamAdaptor{file.takeOwnership()}
 	{}
 
 	void close() override {
