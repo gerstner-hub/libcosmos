@@ -84,7 +84,7 @@ protected: // types
 
 protected: // functions
 
-	void startTest(std::string name) {
+	void startTest(const std::string& name) {
 		using namespace cosmos::term;
 		if (!m_active_test.empty()) {
 			cosmos_throw (UsageError("Previous test has not been finished!"));
