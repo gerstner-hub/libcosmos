@@ -18,7 +18,7 @@ void testFileError() {
 
 struct DerivedError : public cosmos::CosmosError {
 	COSMOS_ERROR_IMPL;
-	DerivedError() : CosmosError("looks bad") {}
+	DerivedError() : CosmosError("bad-looker", "looks bad") {}
 };
 
 void test_func() {
