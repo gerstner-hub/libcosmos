@@ -91,7 +91,7 @@ void send(const PidFD pidfd, const Signal s) {
 		constexpr std::string_view PID_FIELD{"Pid:"};
 
 		while (std::getline(fdinfo, line).good()) {
-			if (!is_prefix(line, PID_FIELD))
+			if (!line.starts_with(PID_FIELD))
 				continue;
 
 			auto pid_str = stripped(line.substr(PID_FIELD.size()));

@@ -64,7 +64,7 @@ struct EndianTraits<Endian::BIG> {
 // a template recursion algorithm can be used to perform the byte order
 // swapping for compile time.
 //
-// NOTE: older gcc/gblic doesn't work with `constexpr` here, so drop it for
+// NOTE: older gcc/glibc doesn't work with `constexpr` here, so drop it for
 // the time being.
 
 /// Return the reversed byte order for the given 16 bit value.

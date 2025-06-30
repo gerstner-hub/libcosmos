@@ -53,6 +53,9 @@ namespace cosmos {
  * Overall to implement this feature maybe implementing parts of it on foot
  * using existing code snippets from libbacktrace & friends could be
  * investigated. Currently the problems seem not worth the gain.
+ *
+ * In C++23 a <stacktrace> header will be introduced that seems to provide
+ * builtin support for backtraces.
  */
 
 /// Base class for libcosmos exceptions.

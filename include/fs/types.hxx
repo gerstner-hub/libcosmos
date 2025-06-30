@@ -158,14 +158,8 @@ public: // types
 	 *
 	 * These are the upper 4 bits of the st_mode field in struct stat. You can
 	 * extract it using FileType.
-	 *
-	 * TODO: This is now no class enum and thus no strong type. Using a
-	 * strong type would be awkward, because we'd have something like
-	 * OtherType::SOCKET, or FileType::Type::SOCKET. Once we reach C++20
-	 * we can use `using enum OtherType` within the FileType class which
-	 * will solve the problem.
 	 **/
-	enum FileT : mode_t {
+	enum class FileT : mode_t {
 		NONE      = 0,
 		SOCKET    = S_IFSOCK,
 		LINK      = S_IFLNK, /// symbolic link
@@ -175,6 +169,8 @@ public: // types
 		CHARDEV   = S_IFCHR,
 		FIFO      = S_IFIFO /// (named) pipe
 	};
+
+	using enum FileT;
 
 public:
 	explicit FileType(const FileT raw) : m_raw{raw} {}

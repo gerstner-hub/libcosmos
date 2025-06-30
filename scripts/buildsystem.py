@@ -411,7 +411,7 @@ def initSCons(project, rtti=True, deflibtype='shared'):
     env['use_system_pkgs'] = evalBool(ARGUMENTS.get('use-system-pkgs', '0'))
     env['build_docs'] = evalBool(ARGUMENTS.get('docs', '1'))
 
-    env.Append(CXXFLAGS=['-std=c++17'])
+    env.Append(CXXFLAGS=['-std=c++20'])
     env.Append(CCFLAGS=['-g', '-flto=auto', '-D_FILE_OFFSET_BITS=64', '-fdiagnostics-color=auto'])
     env.Append(LINKFLAGS=['-Wl,--as-needed', '-flto=auto'])
 

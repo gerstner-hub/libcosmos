@@ -75,17 +75,21 @@ inline std::wstring stripped(const std::wstring_view s,
 }
 
 /// Returns whether `prefix` is a prefix of `s`.
+/**
+ * Starting with C++20 this function should no longer be necessary in favour
+ * of std::string::starts_with().
+ **/
 inline bool is_prefix(const std::string_view s, const std::string_view prefix) {
-	// TODO: in C++20 string_view has a starts_with() member
-	return s.substr(0, prefix.length()) == prefix;
+	return s.starts_with(prefix);
 }
 
 /// Returns whether `suffix` is a suffix of `s`.
+/**
+ * Starting with C++20 this function should no longer be necessary in favour
+ * of std::string::ends_with().
+ **/
 inline bool is_suffix(const std::string_view s, const std::string_view suffix) {
-	if (s.size() < suffix.size())
-		return false;
-	// TODO: in C++20 string_view has an ends_with() member
-	return s.substr(s.size() - suffix.size()) == suffix;
+	return s.ends_with(suffix);
 }
 
 /// Simple wrapper that creates a string_view from `s` and supports also nullptr.
