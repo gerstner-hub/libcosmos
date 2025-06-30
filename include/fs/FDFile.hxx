@@ -7,10 +7,10 @@ namespace cosmos {
 
 /// File objects that are opened from existing FileDescriptor objects.
 /**
- * This is a thin file type that simply wraps an existing FileDescriptor
- * object. Taking ownership of the provided file descriptor is optional and
- * needs to be decided explicitly. If ownership is not taken then the file
- * descriptor will never be closed by the implementation.
+ * This is a thin file type that manages ownership of an existing
+ * FileDescriptor object. Taking ownership of the provided file descriptor is
+ * optional and needs to be decided explicitly. If ownership is not taken then
+ * the file descriptor will never be closed by the implementation.
  **/
 class COSMOS_API FDFile :
 		public FileBase {
@@ -70,7 +70,31 @@ public: // functions
 		FileBase::close();
 	}
 
+	/// Return the current file descriptor and invalidate the object.
+	/**
+	 * This function can be used to transfer the ownership of the stored
+	 * file descriptor to the caller. The stored file descriptor will be
+	 * invalidated.
+	 **/
+	FileDescriptor takeOwnership() {
+		auto ret = m_fd;
+		m_fd.reset();
+		return ret;
+	}
+
+	/// Stop owning the stored file descriptor.
+	/**
+	 * The stored file descriptor will no longer be automatically closed,
+	 * but the object will remain valid for operating on the file. The
+	 * caller is responsible for closing the file descriptor at the
+	 * appropriate time.
+	 **/
+	void releaseOwnership() {
+		m_auto_close = AutoCloseFD{false};
+	}
+
 protected: // data
+
 	AutoCloseFD m_auto_close;
 };
 

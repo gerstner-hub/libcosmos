@@ -44,7 +44,6 @@ protected: // functions
 		return *this;
 	}
 
-
 public: // functions
 
 	virtual ~FileBase();
