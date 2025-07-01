@@ -89,7 +89,12 @@ protected: // functions
 		if (!m_active_test.empty()) {
 			throw UsageError{"Previous test has not been finished!"};
 		}
-		std::cout << BrightBlue(std::string("[Running test \"") + name + "\"]") << "\n\n" << std::flush;
+		/* NOTE: GCC (14.2.1) in C++20 mode emits a strange memcpy
+		 * warning here when using std::string::operator+. The
+		 * warnings seems buggy to me. Thus I switched to using
+		 * sprintf() here, which avoids the warning */
+		auto text = cosmos::sprintf("[Running test \"%s\"]", name.c_str());
+		std::cout << BrightBlue(text) << "\n\n" << std::flush;
 		m_active_test = name;
 	}
 
