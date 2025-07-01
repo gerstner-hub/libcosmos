@@ -33,7 +33,7 @@ GroupInfo::GroupInfo(const GroupID gid) {
 
 SysStringVector GroupInfo::members() const {
 	if (!valid()) {
-		cosmos_throw (UsageError{"cannot get members of invalid GroupInfo"});
+		throw UsageError{"cannot get members of invalid GroupInfo"};
 	}
 
 	SysStringVector ret;

@@ -10,7 +10,7 @@ EventFile::EventFile(const Counter initval, const Flags flags) {
 	auto fd = ::eventfd(to_integral(initval), flags.raw());
 
 	if (fd == -1) {
-		cosmos_throw (ApiError("eventfd()"));
+		throw ApiError{"eventfd()"};
 	}
 
 	this->open(FileDescriptor{FileNum{fd}}, AutoCloseFD{true});
@@ -23,7 +23,7 @@ EventFile::Counter EventFile::wait() {
 	const auto bytes = this->read(&ret, sizeof(Counter));
 
 	if (bytes != sizeof(ret)) {
-		cosmos_throw (RuntimeError("short eventfd read?!"));
+		throw RuntimeError{"short eventfd read?!"};
 	}
 
 	return ret;
@@ -33,7 +33,7 @@ void EventFile::signal(const Counter increment) {
 	const auto bytes = this->write(&increment, sizeof(increment));
 
 	if (bytes != sizeof(increment)) {
-		cosmos_throw (RuntimeError("short eventfd write?!"));
+		throw RuntimeError{"short eventfd write?!"};
 	}
 }
 

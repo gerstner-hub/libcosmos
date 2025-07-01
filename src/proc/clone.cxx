@@ -32,7 +32,7 @@ std::optional<ProcessID> clone(const CloneArgs &args) {
 	const auto child = clone3(args);
 
 	if (child == -1) {
-		cosmos_throw (ApiError("clone3()"));
+		throw ApiError{"clone3()"};
 	} else if (child == 0) {
 		return std::nullopt;
 	}

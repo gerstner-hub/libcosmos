@@ -49,7 +49,7 @@ ProcessGroupID get_own_process_group() {
 ProcessGroupID get_process_group_of(const ProcessID pid) {
 	auto pgid = ::getpgid(to_integral(pid));
 	if (pgid == -1) {
-		cosmos_throw (ApiError("getpgid()"));
+		throw ApiError{"getpgid()"};
 	}
 
 	return ProcessGroupID(pgid);
@@ -57,7 +57,7 @@ ProcessGroupID get_process_group_of(const ProcessID pid) {
 
 void set_process_group_of(const ProcessID pid, const ProcessGroupID pgid) {
 	if (::setpgid(to_integral(pid), to_integral(pgid)) != 0) {
-		cosmos_throw (ApiError("setpgid()"));
+		throw ApiError{"setpgid()"};
 	}
 }
 
@@ -74,7 +74,7 @@ ProcessID create_new_session() {
 	auto res = ProcessID{::setsid()};
 
 	if (res == ProcessID::INVALID) {
-		cosmos_throw (ApiError("setsid()"));
+		throw ApiError{"setsid()"};
 	}
 
 	return res;
@@ -87,7 +87,7 @@ namespace {
 		si.raw()->si_pid = 0;
 
 		if (::waitid(wait_type, id, si.raw(), flags.raw()) != 0) {
-			cosmos_throw (ApiError("wait()"));
+			throw ApiError{"wait()"};
 		}
 
 		if (flags[WaitFlag::NO_HANG] && si.raw()->si_pid == 0) {
@@ -118,9 +118,9 @@ namespace {
 	void exec_wrapper(ExecFunc exec_func, const SysString path,
 			const CStringVector *args, const CStringVector *env) {
 		if (args && args->back() != nullptr) {
-			cosmos_throw (UsageError("argument vector without nullptr terminator encountered"));
+			throw UsageError{"argument vector without nullptr terminator encountered"};
 		} else if(env && env->back() != nullptr) {
-			cosmos_throw (UsageError("environment vector without nullptr terminator encountered"));
+			throw UsageError{"environment vector without nullptr terminator encountered"};
 		}
 
 		const std::array<const char*, 2> defargs = {path.raw(), nullptr};
@@ -158,7 +158,7 @@ void exec(const SysString path, const CStringVector *args, const CStringVector *
 
 	exec_wrapper(::execvpe, path, args, env);
 
-	cosmos_throw (FileError(path, "execvpe()"));
+	throw FileError{path, "execvpe()"};
 }
 
 void exec(const SysString path,
@@ -200,7 +200,7 @@ void exec_at(const DirFD dir_fd, const SysString path,
 
 	exec_wrapper(exec_at_wrapper, path, args, env);
 
-	cosmos_throw (ApiError("execveat()"));
+	throw ApiError{"execveat()"};
 }
 
 void fexec(const FileDescriptor fd, const CStringVector *args, const CStringVector *env) {
@@ -213,7 +213,7 @@ void fexec(const FileDescriptor fd, const CStringVector *args, const CStringVect
 
 	exec_wrapper(exec_at_wrapper, "", args, env);
 
-	cosmos_throw (ApiError("fexecve()"));
+	throw ApiError{"fexecve()"};
 }
 
 void exit(ExitStatus status) {
@@ -235,7 +235,7 @@ void set_env_var(const SysString name, const SysString val, const OverwriteEnv o
 	const auto res = ::setenv(name.raw(), val.raw(), overwrite ? 1 : 0);
 
 	if (res != 0) {
-		cosmos_throw (ApiError("setenv()"));
+		throw ApiError{"setenv()"};
 	}
 }
 
@@ -243,7 +243,7 @@ void clear_env_var(const SysString name) {
 	const auto res = ::unsetenv(name.raw());
 
 	if (res != 0) {
-		cosmos_throw (ApiError("unsetenv()"));
+		throw ApiError{"unsetenv()"};
 	}
 }
 
@@ -251,7 +251,7 @@ std::optional<ProcessID> fork() {
 	ProcessID res{::fork()};
 
 	if (res == ProcessID::INVALID) {
-		cosmos_throw (ApiError("fork()"));
+		throw ApiError{"fork()"};
 	} else if (res == ProcessID::CHILD) {
 		return {};
 	}

@@ -43,9 +43,9 @@ namespace {
 				 * special error containing the suggested
 				 * length.
 				 */
-				cosmos_throw (RangeError("getsockopt", len));
+				throw RangeError{"getsockopt", len};
 			} else {
-				cosmos_throw (ApiError("getsockopt()"));
+				throw ApiError{"getsockopt()"};
 			}
 		}
 
@@ -63,7 +63,7 @@ namespace {
 		// size, so we cannot judge generically whether a short option
 		// len is okay or not.
 		if (len != sizeof(T)) {
-			cosmos_throw (RuntimeError("short getsockopt read"));
+			throw RuntimeError{"short getsockopt read"};
 		}
 
 		return out;
@@ -83,7 +83,7 @@ namespace {
 				&ptr_len);
 
 		if (res != 0) {
-			cosmos_throw (ApiError("getsockopt()"));
+			throw ApiError{"getsockopt()"};
 		}
 
 		return ptr_len;
@@ -104,7 +104,7 @@ namespace {
 				socklen_t{sizeof(T)});
 
 		if (res != 0) {
-			cosmos_throw (ApiError("setsockopt()"));
+			throw ApiError{"setsockopt()"};
 		}
 	}
 
@@ -121,7 +121,7 @@ namespace {
 				len);
 
 		if (res != 0) {
-			cosmos_throw (ApiError("setsockopt()"));
+			throw ApiError{"setsockopt()"};
 		}
 	}
 

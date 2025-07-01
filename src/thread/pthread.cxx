@@ -25,7 +25,7 @@ void kill(const ID thread, const Signal sig) {
 	const auto res = pthread_kill(thread.raw(), to_integral(sig.raw()));
 
 	if (const auto error = Errno{res}; error != Errno::NO_ERROR) {
-		cosmos_throw (ApiError("pthread_kill()", error));
+		throw ApiError{"pthread_kill()", error};
 	}
 }
 

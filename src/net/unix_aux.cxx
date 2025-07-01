@@ -41,7 +41,7 @@ void UnixRightsMessage::deserialize(const ReceiveMessageHeader::ControlMessage &
 
 SendMessageHeader::ControlMessage UnixRightsMessage::serialize() const {
 	if (m_fds.empty()) {
-		cosmos_throw (UsageError("Attempt to serialize empty vector of FileNum"));
+		throw UsageError{"Attempt to serialize empty vector of FileNum"};
 	}
 
 	auto ret = this->createMsg(UnixMessage::RIGHTS, sizeof(FileNum) * m_fds.size());
@@ -75,7 +75,7 @@ void UnixCredentialsMessage::deserialize(const ReceiveMessageHeader::ControlMess
 	const auto bytes = msg.dataLength();
 
 	if (bytes != sizeof(m_creds)) {
-		cosmos_throw (RuntimeError("SCM_CREDS message with mismatching length encountered"));
+		throw RuntimeError{"SCM_CREDS message with mismatching length encountered"};
 	}
 
 	std::memcpy(&m_creds, data, bytes);

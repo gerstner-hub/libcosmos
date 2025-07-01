@@ -10,7 +10,7 @@ namespace cosmos {
 Pipe::Pipe() {
 	int ends[2];
 	if (::pipe2(ends, O_CLOEXEC | O_DIRECT) != 0) {
-		cosmos_throw (ApiError("pipe2()"));
+		throw ApiError{"pipe2()"};
 	}
 
 	m_read_end.setFD(FileNum{ends[0]});

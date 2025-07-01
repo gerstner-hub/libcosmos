@@ -36,7 +36,7 @@ FileDescriptor open(
 		const OpenFlags flags, const std::optional<FileMode> fmode) {
 
 	if (flags.anyOf({OpenFlag::CREATE, OpenFlag::TMPFILE}) && !fmode) {
-		cosmos_throw (UsageError("the given open flags require an fmode argument"));
+		throw UsageError{"the given open flags require an fmode argument"};
 	}
 
 	int raw_flags = flags.raw() | to_integral(mode);
@@ -45,7 +45,7 @@ FileDescriptor open(
 	auto fd = ::open(path.raw(), raw_flags, fmode ? to_integral(fmode.value().raw()) : 0);
 
 	if (fd == -1) {
-		cosmos_throw (FileError(path, "open"));
+		throw FileError{path, "open"};
 	}
 
 	return FileDescriptor{FileNum{fd}};
@@ -58,14 +58,14 @@ FileDescriptor open_at(
 	int raw_flags = flags.raw() | to_integral(mode);
 
 	if (flags.anyOf({OpenFlag::CREATE, OpenFlag::TMPFILE}) && !fmode) {
-		cosmos_throw (UsageError("the given open flags require an fmode argument"));
+		throw UsageError{"the given open flags require an fmode argument"};
 	}
 
 	auto fd = ::openat(to_integral(dir_fd.raw()), path.raw(),
 				raw_flags, fmode ? to_integral(fmode.value().raw()) : 0);
 
 	if (fd == -1) {
-		cosmos_throw (FileError(path, "openat"));
+		throw FileError{path, "openat"};
 	}
 
 	return FileDescriptor{FileNum{fd}};
@@ -76,7 +76,7 @@ void close_range(const FileNum first, const FileNum last, const CloseRangeFlags 
 	// inconsistent with all other system calls. Using FileNum::MAX_FD
 	// (int) as the maximum file descriptor should still work I guess.
 	if (::close_range(to_integral(first), to_integral(last), flags.raw()) != 0) {
-		cosmos_throw (ApiError("close_range()"));
+		throw ApiError{"close_range()"};
 	}
 }
 
@@ -96,7 +96,7 @@ namespace {
 		}
 
 		if (base.empty()) {
-			cosmos_throw (UsageError("empty basename not allowed"));
+			throw UsageError{"empty basename not allowed"};
 		}
 
 		constexpr auto XS = "XXXXXX";
@@ -125,7 +125,7 @@ std::pair<FileDescriptor, std::string> make_tempfile(
 	const auto fd = ::mkostemps(path.data(), suffixlen, flags.raw());
 
 	if (fd == -1) {
-		cosmos_throw (ApiError("mkostemps()"));
+		throw ApiError{"mkostemps()"};
 	}
 
 	return {FileDescriptor{FileNum{fd}}, path};
@@ -138,7 +138,7 @@ std::string make_tempdir(const SysString _template) {
 	expanded += "XXXXXX";
 
 	if (::mkdtemp(expanded.data()) == nullptr) {
-		cosmos_throw (ApiError("mkdtemp()"));
+		throw ApiError{"mkdtemp()"};
 	}
 
 	return expanded;
@@ -148,7 +148,7 @@ void make_fifo(const SysString path, const FileMode mode) {
 	auto res = ::mkfifo(path.raw(), to_integral(mode.raw()));
 
 	if (res != 0) {
-		cosmos_throw (FileError(path, "mkfifo()"));
+		throw FileError{path, "mkfifo()"};
 	}
 }
 
@@ -157,7 +157,7 @@ void make_fifo_at(const DirFD dir_fd, const SysString path,
 	auto res = ::mkfifoat(to_integral(dir_fd.raw()), path.raw(), to_integral(mode.raw()));
 
 	if (res != 0) {
-		cosmos_throw (FileError(path, "mkfifoat()"));
+		throw FileError{path, "mkfifoat()"};
 	}
 }
 
@@ -165,7 +165,7 @@ FileMode set_umask(const FileMode mode) {
 	auto raw_mode = to_integral(mode.raw());
 
 	if ((raw_mode & ~0777) != 0) {
-		cosmos_throw (UsageError("invalid bits set in umask"));
+		throw UsageError{"invalid bits set in umask"};
 	}
 
 	auto old_mode = ::umask(raw_mode);
@@ -178,26 +178,26 @@ bool exists_file(const SysString path) {
 	if (::lstat(path.raw(), &s) == 0)
 		return true;
 	else if (get_errno() != Errno::NO_ENTRY)
-		cosmos_throw (FileError(path, "lstat()"));
+		throw FileError{path, "lstat()"};
 
 	return false;
 }
 
 void unlink_file(const SysString path) {
 	if (::unlink(path.raw()) != 0) {
-		cosmos_throw (FileError(path, "unlink()"));
+		throw FileError{path, "unlink()"};
 	}
 }
 
 void unlink_file_at(const DirFD dir_fd, const SysString path) {
 	if (::unlinkat(to_integral(dir_fd.raw()), path.raw(), 0) != 0) {
-		cosmos_throw (FileError(path, "unlinkat()"));
+		throw FileError{path, "unlinkat()"};
 	}
 }
 
 void change_dir(const SysString path) {
 	if (::chdir(path.raw()) != 0) {
-		cosmos_throw (FileError(path, "chdir()"));
+		throw FileError{path, "chdir()"};
 	}
 }
 
@@ -213,7 +213,7 @@ std::string get_working_dir() {
 					ret.resize(ret.size() * 2);
 					continue;
 				}
-				default: cosmos_throw (ApiError("getcwd()"));
+				default: throw ApiError{"getcwd()"};
 			}
 		}
 
@@ -281,25 +281,25 @@ std::optional<std::string> which(const std::string_view exec_base) noexcept {
 
 void make_dir(const SysString path, const FileMode mode) {
 	if (::mkdir(path.raw(), to_integral(mode.raw())) != 0) {
-		cosmos_throw (FileError(path, "mkdir()"));
+		throw FileError{path, "mkdir()"};
 	}
 }
 
 void make_dir_at(const DirFD dir_fd, const SysString path, const FileMode mode) {
 	if (::mkdirat(to_integral(dir_fd.raw()), path.raw(), to_integral(mode.raw())) != 0) {
-		cosmos_throw (FileError(path, "mkdirat()"));
+		throw FileError{path, "mkdirat()"};
 	}
 }
 
 void remove_dir(const SysString path) {
 	if (::rmdir(path.raw()) != 0) {
-		cosmos_throw (FileError(path, "rmdir()"));
+		throw FileError{path, "rmdir()"};
 	}
 }
 
 void remove_dir_at(const DirFD dir_fd, const SysString path) {
 	if (::unlinkat(to_integral(dir_fd.raw()), path.raw(), AT_REMOVEDIR) != 0) {
-		cosmos_throw (FileError(path, "unlinkat(AT_REMOVEDIR)"));
+		throw FileError{path, "unlinkat(AT_REMOVEDIR)"};
 	}
 }
 
@@ -310,7 +310,7 @@ Errno make_all_dirs(const SysString path, const FileMode mode) {
 	Errno ret{Errno::EXISTS};
 
 	if (path.empty()) {
-		cosmos_throw (UsageError("empty string passed in"));
+		throw UsageError{"empty string passed in"};
 	}
 
 	while (sep_pos != normpath.npos) {
@@ -330,7 +330,7 @@ Errno make_all_dirs(const SysString path, const FileMode mode) {
 				continue;
 			}
 
-			cosmos_throw (FileError(prefix, "mkdir()"));
+			throw FileError{prefix, "mkdir()"};
 		}
 
 		// at least one directory was created
@@ -390,25 +390,25 @@ void remove_tree(const SysString path) {
 
 void change_mode(const SysString path, const FileMode mode) {
 	if (::chmod(path.raw(), to_integral(mode.raw())) != 0) {
-		cosmos_throw (FileError(path, "chmod()"));
+		throw FileError{path, "chmod()"};
 	}
 }
 
 void change_mode(const FileDescriptor fd, const FileMode mode) {
 	if (::fchmod(to_integral(fd.raw()), to_integral(mode.raw())) != 0) {
-		cosmos_throw (FileError("(fd)", "fchmod()"));
+		throw FileError{"(fd)", "fchmod()"};
 	}
 }
 
 void change_owner(const SysString path, const UserID uid, const GroupID gid) {
 	if (::chown(path.raw(), to_integral(uid), to_integral(gid)) != 0) {
-		cosmos_throw (FileError(path, "chown()"));
+		throw FileError{path, "chown()"};
 	}
 }
 
 void change_owner(const FileDescriptor fd, const UserID uid, const GroupID gid) {
 	if (::fchown(to_integral(fd.raw()), to_integral(uid), to_integral(gid)) != 0) {
-		cosmos_throw (FileError("(fd)", "fchown()"));
+		throw FileError{"(fd)", "fchown()"};
 	}
 }
 
@@ -421,7 +421,7 @@ UserID resolve_user(const SysString user) {
 
 	PasswdInfo info{user};
 	if (!info.valid()) {
-		cosmos_throw (RuntimeError{user.str() + " does not exist"});
+		throw RuntimeError{user.str() + " does not exist"};
 	}
 
 	return info.uid();
@@ -434,7 +434,7 @@ GroupID resolve_group(const SysString group) {
 
 	GroupInfo info{group};
 	if (!info.valid()) {
-		cosmos_throw (RuntimeError{group.str() + "does not exist"});
+		throw RuntimeError{group.str() + "does not exist"};
 	}
 
 	return info.gid();
@@ -457,7 +457,7 @@ void change_owner(const FileDescriptor fd, const SysString user, const SysString
 
 void change_owner_nofollow(const SysString path, const UserID uid, const GroupID gid) {
 	if (::lchown(path.raw(), to_integral(uid), to_integral(gid)) != 0) {
-		cosmos_throw (FileError(path, "lchown()"));
+		throw FileError{path, "lchown()"};
 	}
 }
 
@@ -469,14 +469,14 @@ void change_owner_nofollow(const SysString path, const SysString user, const Sys
 
 void make_symlink(const SysString target, const SysString path) {
 	if (::symlink(target.raw(), path.raw()) != 0) {
-		cosmos_throw (FileError(path, "symlink()"));
+		throw FileError{path, "symlink()"};
 	}
 }
 
 void make_symlink_at(const SysString target, const DirFD dir_fd,
 		const SysString path) {
 	if (::symlinkat(target.raw(), to_integral(dir_fd.raw()), path.raw()) != 0) {
-		cosmos_throw (FileError(path, "symlinkat()"));
+		throw FileError{path, "symlinkat()"};
 	}
 }
 
@@ -491,7 +491,7 @@ namespace {
 			auto res = readlink_func(path.raw(), &ret.front(), ret.size());
 
 			if (res < 0) {
-				cosmos_throw (FileError(path, call));
+				throw FileError{path, call};
 			}
 
 			// NOTE: this returns the size excluding a null terminator,
@@ -527,7 +527,7 @@ std::string read_symlink_at(const DirFD dir_fd, const SysString path) {
 
 void link(const SysString old_path, const SysString new_path) {
 	if (::link(old_path.raw(), new_path.raw()) != 0) {
-		cosmos_throw (FileError(new_path, std::string{"link() for "} + std::string{old_path}));
+		throw FileError{new_path, std::string{"link() for "} + std::string{old_path}};
 	}
 }
 
@@ -538,7 +538,7 @@ void linkat(const DirFD old_dir, const SysString old_path,
 				to_integral(old_dir.raw()), old_path.raw(),
 				to_integral(new_dir.raw()), new_path.raw(),
 				follow_old ? AT_SYMLINK_FOLLOW : 0) != 0) {
-		cosmos_throw (FileError(new_path, std::string{"linkat() for "} + std::string{old_path}));
+		throw FileError{new_path, std::string{"linkat() for "} + std::string{old_path}};
 	}
 }
 
@@ -548,7 +548,7 @@ void linkat_fd(const FileDescriptor fd, const DirFD new_dir, const SysString new
 				to_integral(new_dir.raw()), new_path.raw(),
 				AT_EMPTY_PATH) != 0) {
 
-		cosmos_throw (FileError(new_path, std::string{"linkat(AT_EMPTY_PATH)"}));
+		throw FileError{new_path, std::string{"linkat(AT_EMPTY_PATH)"}};
 	}
 }
 
@@ -571,13 +571,13 @@ void linkat_proc_fd(const FileDescriptor fd, const DirFD new_dir, const SysStrin
 
 void truncate(const FileDescriptor fd, off_t length) {
 	if (::ftruncate(to_integral(fd.raw()), length) != 0) {
-		cosmos_throw (ApiError("ftruncate()"));
+		throw ApiError{"ftruncate()"};
 	}
 }
 
 void truncate(const SysString path, off_t length) {
 	if (::truncate(path.raw(), length) != 0) {
-		cosmos_throw (ApiError("truncate()"));
+		throw ApiError{"truncate()"};
 	}
 }
 
@@ -595,7 +595,7 @@ namespace {
 				len, 0);
 
 		if (res < 0) {
-			cosmos_throw (ApiError("copy_file_range()"));
+			throw ApiError{"copy_file_range()"};
 		}
 
 		return static_cast<size_t>(res);
@@ -629,7 +629,7 @@ void check_access(const SysString path, const AccessChecks checks) {
 		return;
 	}
 
-	cosmos_throw (ApiError("access()"));
+	throw ApiError{"access()"};
 }
 
 void check_access_at(const DirFD dir_fd, const SysString path,
@@ -638,7 +638,7 @@ void check_access_at(const DirFD dir_fd, const SysString path,
 		return;
 	}
 
-	cosmos_throw (ApiError("faccessat()"));
+	throw ApiError{"faccessat()"};
 }
 
 COSMOS_API void check_access_fd(const FileDescriptor fd, const AccessChecks checks,
@@ -648,12 +648,12 @@ COSMOS_API void check_access_fd(const FileDescriptor fd, const AccessChecks chec
 		return;
 	}
 
-	cosmos_throw (ApiError("faccessat()"));
+	throw ApiError{"faccessat()"};
 }
 
 COSMOS_API void flock(const FileDescriptor fd, const LockOperation operation, const LockFlags flags) {
 	if (::flock(to_integral(fd.raw()), cosmos::to_integral(operation) | flags.raw()) != 0) {
-		cosmos_throw (ApiError("flock()"));
+		throw ApiError{"flock()"};
 	}
 }
 

@@ -117,7 +117,7 @@ public: // functions
 		auto ret = ::telldir(m_stream);
 
 		if (ret == -1) {
-			cosmos_throw (ApiError("telldir()"));
+			throw ApiError{"telldir()"};
 		}
 
 		return DirEntry::DirPos{ret};
@@ -157,7 +157,7 @@ protected: // functions
 
 	void requireOpenStream(const std::string_view context) const {
 		if (!isOpen()) {
-			cosmos_throw (UsageError(std::string(context) + " on unassociated DirStream instance"));
+			throw UsageError{std::string(context) + " on unassociated DirStream instance"};
 		}
 	}
 

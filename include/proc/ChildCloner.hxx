@@ -200,7 +200,7 @@ public: // functions
 	 **/
 	void addInheritFD(FileDescriptor fd) {
 		if (fd.raw() <= FileNum::STDERR) {
-			cosmos_throw(UsageError{"added stdio or invalid FD as extra inherit FD"});
+			throw UsageError{"added stdio or invalid FD as extra inherit FD"};
 		};
 		m_inherit_fds.push_back(fd);
 	}

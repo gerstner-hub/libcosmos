@@ -79,14 +79,14 @@ void print_child_error(const std::string_view context, const std::string_view er
 void ChildCloner::verifyArgs() {
 	if (m_allow_no_exe) {
 		if (!m_post_fork_cb) {
-			cosmos_throw (UsageError(
+			throw UsageError{
 				"attempted to run a cloned process without callback function (no post fork CB)"
-			));
+			};
 		}
 	} else if (m_executable.empty() || m_argv.empty()) {
-		cosmos_throw (UsageError(
+		throw UsageError{
 			"attempted to run a sub process w/o specifying an executable path and/or argv0"
-		));
+		};
 	}
 }
 
@@ -316,7 +316,7 @@ void ChildCloner::handlePreExecError(Pipe &pipe) {
 	Errno errnum;
 
 	if (bytes != sizeof(errnum)) {
-		cosmos_throw(RuntimeError("bad error code read from error pipe"));
+		throw RuntimeError{"bad error code read from error pipe"};
 	}
 
 	std::memcpy(&errnum, buf, sizeof(errnum));
@@ -324,7 +324,7 @@ void ChildCloner::handlePreExecError(Pipe &pipe) {
 	bytes = error_file.read(&buf, sizeof(buf));
 
 	if (bytes == 0) {
-		cosmos_throw(RuntimeError("missing error message from error pipe"));
+		throw RuntimeError{"missing error message from error pipe"};
 	}
 
 	std::string message;
@@ -334,14 +334,14 @@ void ChildCloner::handlePreExecError(Pipe &pipe) {
 	if (errnum == Errno::NO_ERROR) {
 		// an error other than ApiError occurred, we translate it
 		// into a RuntimeError.
-		cosmos_throw(RuntimeError{message});
+		throw RuntimeError{message};
 	} else {
 		// Ignore the automatic message generation of ApiError, since
 		// it was already generated in the child. Simply override the
 		// message.
 		ApiError child_error{"", errnum};
 		child_error.setMessage(message);
-		cosmos_throw(child_error);
+		throw child_error;
 	}
 }
 

@@ -14,12 +14,12 @@ class COSMOS_API InternalError :
 		public CosmosError {
 public: // functions
 
-	explicit InternalError(const std::string_view msg) :
-			CosmosError{"InternalError"} {
+	explicit InternalError(const std::string_view msg,
+				const SourceLocation &src_loc =
+					SourceLocation::current()) :
+			CosmosError{"InternalError", {}, src_loc} {
 		m_msg = msg;
 	}
-
-	COSMOS_ERROR_IMPL;
 };
 
 } // end ns

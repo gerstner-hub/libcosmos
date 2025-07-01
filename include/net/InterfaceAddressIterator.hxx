@@ -25,14 +25,14 @@ public: // functions
 		if (m_pos) {
 			m_pos = m_pos->ifa_next;
 		} else {
-			cosmos_throw (RuntimeError("Attempt to increment InterfaceAddressIterator past the end"));
+			throw RuntimeError{"Attempt to increment InterfaceAddressIterator past the end"};
 		}
 		return *this;
 	}
 
 	const InterfaceAddress& operator*() {
 		if (!m_pos) {
-			cosmos_throw (RuntimeError("Attempt to dereference invalid InterfaceAddressIterator"));
+			throw RuntimeError{"Attempt to dereference invalid InterfaceAddressIterator"};
 		}
 
 		return *(reinterpret_cast<InterfaceAddress*>(m_pos));

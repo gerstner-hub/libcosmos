@@ -30,7 +30,7 @@ public: // functions
 		if (m_pos && m_pos->if_name != nullptr) {
 			m_pos++;
 		} else {
-			cosmos_throw (RuntimeError("Attempt to increment InterfaceIterator past the end"));
+			throw RuntimeError{"Attempt to increment InterfaceIterator past the end"};
 		}
 
 		return *this;
@@ -38,7 +38,7 @@ public: // functions
 
 	const InterfaceInfo& operator*() {
 		if (!m_pos || m_pos->if_name == nullptr) {
-			cosmos_throw (RuntimeError("Attempt to dereference invalid InterfaceIterator"));
+			throw RuntimeError{"Attempt to dereference invalid InterfaceIterator"};
 		}
 
 		return *m_pos;

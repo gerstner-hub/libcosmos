@@ -49,6 +49,8 @@ class EventFileTest :
 		try {
 			retcount = ef.wait();
 		} catch (const cosmos::ApiError &ex) {
+			std::cout << ex.what() << std::endl;
+			std::cerr << "errno is " << cosmos::to_integral(ex.errnum()) << "\n";
 			RUN_STEP("nonblocking-wait causes EAGAIN", ex.errnum() == cosmos::Errno::AGAIN);
 		}
 	}

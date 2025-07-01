@@ -26,7 +26,7 @@ public: // functions
 
 	auto& operator++() {
 		if (!m_pos) {
-			cosmos_throw (RuntimeError("Attempt to increment past the end() AddressInfoIterator"));
+			throw RuntimeError{"Attempt to increment past the end() AddressInfoIterator"};
 		}
 
 		m_pos = m_pos->next();
@@ -36,7 +36,7 @@ public: // functions
 
 	const AddressInfo& operator*() {
 		if (!m_pos) {
-			cosmos_throw (RuntimeError("Attempt to dereference an invalid AddressInfoIterator"));
+			throw RuntimeError{"Attempt to dereference an invalid AddressInfoIterator"};
 		}
 
 		return *m_pos;

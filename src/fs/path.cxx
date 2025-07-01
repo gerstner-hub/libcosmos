@@ -67,7 +67,7 @@ std::string canonicalize_path(const SysString path) {
 	std::string ret;
 	ret.resize(max::PATH);
 	if (::realpath(path.raw(), ret.data()) == nullptr) {
-		cosmos_throw (FileError(path, "realpath()"));
+		throw FileError{path, "realpath()"};
 	}
 
 	ret.resize(std::strlen(ret.data()));

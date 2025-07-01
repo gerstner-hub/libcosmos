@@ -26,7 +26,7 @@ void SignalFD::create(const SigSet &mask) {
 	close();
 	auto fd = ::signalfd(-1, mask.raw(), SFD_CLOEXEC);
 	if (fd == -1) {
-		cosmos_throw (ApiError("signalfd()"));
+		throw ApiError{"signalfd()"};
 	}
 
 	m_fd.setFD(FileNum{fd});
@@ -34,7 +34,7 @@ void SignalFD::create(const SigSet &mask) {
 
 void SignalFD::adjustMask(const SigSet &mask) {
 	if (!valid()) {
-		cosmos_throw (UsageError("no signal fd currently open"));
+		throw UsageError{"no signal fd currently open"};
 	}
 
 	// NOTE: it's unclear from the man page whether flags are used when
@@ -42,7 +42,7 @@ void SignalFD::adjustMask(const SigSet &mask) {
 	// flags will be taken away again through this.
 	auto fd = ::signalfd(to_integral(m_fd.raw()), mask.raw(), 0);
 	if (fd == -1) {
-		cosmos_throw (ApiError("signalfd()"));
+		throw ApiError{"signalfd()"};
 	}
 }
 
@@ -53,10 +53,10 @@ void SignalFD::readEvent(Info &info) {
 	auto res = ::read(to_integral(m_fd.raw()), raw, RAW_SIZE);
 
 	if (res < 0) {
-		cosmos_throw (ApiError("read(sigfd)"));
+		throw ApiError{"read(sigfd)"};
 	}
 	else if (static_cast<size_t>(res) < RAW_SIZE) {
-		cosmos_throw (RuntimeError("short read from signal fd"));
+		throw RuntimeError{"short read from signal fd"};
 	}
 }
 

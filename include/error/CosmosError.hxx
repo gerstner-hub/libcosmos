@@ -2,6 +2,7 @@
 
 // C++
 #include <exception>
+#include <source_location>
 #include <string>
 #include <string_view>
 
@@ -11,10 +12,13 @@
 
 namespace cosmos {
 
+//! Shorthand for the rather clunky type
+using SourceLocation = std::source_location;
+
 /*
  * NOTE:
  *
- * It would be nice adding the possibility for a function call backtrace to
+ * It would be nice to add the possibility of a function call backtrace to
  * the exception class. There are a bunch of obstacles to this, though:
  *
  * There exists a kind of base mechanism present in Glibc and GCC/Clang:
@@ -63,38 +67,18 @@ namespace cosmos {
  * This base class carries the file, line and function contextual information
  * from where it was thrown. Furthermore it stores a dynamically allocated
  * string with optional additional runtime information.
- *
- * The cosmos_throw macro allows to transparently throw any type derived from
- * this base class, all contextual information filled in.
- *
- * Each derived type must override the raise() virtual function to allow to
- * throw the correct specialized type even when only the base class type is
- * known. The generateMsg() function can be overwritten to update the error
- * message content at the time what() is called. This allows to defer
- * expensive calculations until the time the actual exception message content
- * is accessed.
  **/
 class COSMOS_API CosmosError :
 		public std::exception {
 public: // functions
 
-	explicit CosmosError(const std::string_view error_class, const std::string_view fixed_text = {}) :
-			m_error_class{error_class} {
-		m_msg = fixed_text;
-	}
-
-	/// Set exception context information.
-	/**
-	 * This function is used by the `cosmos_throw` macro to store
-	 * information about the program location where the exception was
-	 * thrown.
-	 **/
-	CosmosError& setInfo(const char *file, const size_t line, const char *func) {
-		m_line = line;
-		m_file = file;
-		m_func = func;
-
-		return *this;
+	explicit CosmosError(const std::string_view error_class,
+				const std::string_view fixed_text = {},
+				const SourceLocation &src_loc =
+					SourceLocation::current()) :
+			m_error_class{error_class},
+			m_msg{fixed_text},
+			m_src_loc{src_loc} {
 	}
 
 	/// Implementation of the std::exception interface.
@@ -107,9 +91,6 @@ public: // functions
 
 	/// Returns a shorter description of the error without verbose context.
 	std::string shortWhat() const;
-
-	/// Throw the most specialized type of this object in the inheritance hierarchy.
-	[[ noreturn ]] virtual void raise() = 0;
 
 	/// Override the stored message to contain the given `msg`
 	void setMessage(const std::string_view msg) {
@@ -146,9 +127,11 @@ protected: // data
 	mutable std::string m_msg;
 	/// Whether m_msg has been assembled yet
 	mutable bool m_msg_generated = false;
-	const char *m_file = nullptr;
-	const char *m_func = nullptr;
-	size_t m_line = 0;
+	/// The source location where the exception has been generated
+	std::source_location m_src_loc;
 };
+
+// shorthand name
+using Error = CosmosError;
 
 } // end ns

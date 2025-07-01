@@ -3,8 +3,9 @@
 
 namespace cosmos {
 
-FileError::FileError(const SysString path, const std::string_view operation) :
-		ApiError({}),
+FileError::FileError(const SysString path, const std::string_view operation,
+			const SourceLocation &src_loc) :
+		ApiError{{}, src_loc},
 		m_path{path}, m_operation{operation} {
 	setErrorClass("FileError");
 }

@@ -34,7 +34,7 @@ void Tracee::getSeccompFilter(std::vector<struct sock_filter> &instructions, con
 	 */
 
 	if (*num_progs < 0 || static_cast<unsigned long>(*num_progs) >= instructions.size()) {
-		cosmos_throw (RuntimeError("seccomp filter array size inconsistency"));
+		throw RuntimeError{"seccomp filter array size inconsistency"};
 	}
 }
 
@@ -54,7 +54,7 @@ void Tracee::getSyscallInfo(ptrace::SyscallInfo &info) const {
 	const auto obtained = this->request(ptrace::Request::GET_SYSCALL_INFO, sizeof(*info.raw()), info.raw());
 
 	if (*obtained < 0 || static_cast<unsigned long>(*obtained) > sizeof(*info.raw())) {
-		cosmos_throw (RuntimeError("excess SYSCALL_INFO data, truncation occurred!"));
+		throw RuntimeError{"excess SYSCALL_INFO data, truncation occurred!"};
 	}
 }
 

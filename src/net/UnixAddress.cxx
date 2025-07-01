@@ -7,7 +7,7 @@ namespace cosmos {
 void UnixAddress::setPath(const std::string_view path, const Abstract abstract) {
 
 	if (path.size() > maxPathLen()) {
-		cosmos_throw( RuntimeError("UNIX address path too long") );
+		throw RuntimeError{"UNIX address path too long"} ;
 	}
 
 	char *ptr = m_addr.sun_path;
@@ -30,7 +30,7 @@ void UnixAddress::update(size_t new_length) {
 	if (new_length < BASE_SIZE) {
 		m_addr.sun_family = to_integral(family());
 		m_path_len = 0;
-		cosmos_throw( RuntimeError("short address on update") );
+		throw RuntimeError{"short address on update"} ;
 	}
 
 	new_length -= BASE_SIZE;

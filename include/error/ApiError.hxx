@@ -19,10 +19,12 @@ class COSMOS_API ApiError :
 public: // functions
 
 	/// Stores the current errno code in the exception
-	explicit ApiError(const std::string_view prefix);
+	explicit ApiError(const std::string_view prefix,
+			const SourceLocation &src_loc = SourceLocation::current());
 
 	/// Stores the given errno code in the exception
-	ApiError(const std::string_view prefix, const Errno err);
+	ApiError(const std::string_view prefix, const Errno err,
+			const SourceLocation &src_loc = SourceLocation::current());
 
 	/// Returns the plain operating system error message
 	std::string msg() const { return msg(m_errno); }
@@ -32,8 +34,6 @@ public: // functions
 
 	/// Returns the plain errno stored in the exception
 	auto errnum() const { return m_errno; }
-
-	COSMOS_ERROR_IMPL;
 
 protected: // functions
 

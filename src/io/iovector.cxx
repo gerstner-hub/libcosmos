@@ -33,7 +33,7 @@ bool IOVector<MEMORY_REGION>::update(size_t processed_bytes) {
 	}
 
 	if (processed_bytes != 0) {
-		cosmos_throw (RuntimeError("inconsistency while updating IOVector"));
+		throw RuntimeError{"inconsistency while updating IOVector"};
 	}
 
 	return vec_finished;

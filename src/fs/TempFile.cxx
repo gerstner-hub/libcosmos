@@ -17,7 +17,7 @@ const std::string& TempFile::path() const {
 	if (!m_tmp_path.empty())
 		return m_tmp_path;
 
-	cosmos_throw (UsageError("accessed path for closed TempFile"));
+	throw UsageError{"accessed path for closed TempFile"};
 	return m_tmp_path; // to silence compiler warning
 }
 

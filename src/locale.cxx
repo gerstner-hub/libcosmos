@@ -20,7 +20,7 @@ std::string get(Category category) {
 
 void set(Category category, const SysString val) {
 	if (::setlocale(get_cat(category), val.raw()) == nullptr) {
-		cosmos_throw (ApiError("setlocale()"));
+		throw ApiError{"setlocale()"};
 	}
 }
 

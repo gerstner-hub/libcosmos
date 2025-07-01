@@ -18,7 +18,7 @@ void TimerFD<CLOCK>::create(const TimerFD::CreateFlags flags) {
 		return;
 	}
 
-	cosmos_throw (ApiError("timerfd_create()"));
+	throw ApiError{"timerfd_create()"};
 }
 
 template <ClockType CLOCK>
@@ -26,7 +26,7 @@ typename TimerFD<CLOCK>::TimerSpec TimerFD<CLOCK>::getTime() const {
 	TimerSpec ret;
 
 	if (auto res = timerfd_gettime(to_integral(m_fd.raw()), &ret); res != 0) {
-		cosmos_throw (ApiError("timerfd_gettime()"));
+		throw ApiError{"timerfd_gettime()"};
 	}
 
 	return ret;
@@ -42,7 +42,7 @@ void TimerFD<CLOCK>::setTime(const TimerSpec spec, const StartFlags flags) {
 		return;
 	}
 
-	cosmos_throw (ApiError("timerfd_settime()"));
+	throw ApiError{"timerfd_settime()"};
 }
 
 template <ClockType CLOCK>
@@ -54,7 +54,7 @@ uint64_t TimerFD<CLOCK>::wait() {
 	// from the man page I deduce that short reads should not be possible
 	// (reads with less than 8 bytes return EINVAL)
 	if (bytes != sizeof(ret)) {
-		cosmos_throw (RuntimeError("Short read on timer fd"));
+		throw RuntimeError{"Short read on timer fd"};
 	}
 
 	return ret;

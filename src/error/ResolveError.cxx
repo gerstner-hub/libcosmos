@@ -32,8 +32,8 @@ namespace cosmos {
 
 	}
 
-ResolveError::ResolveError(const Code code) :
-		CosmosError{"ResolveError"},
+ResolveError::ResolveError(const Code code, const SourceLocation &src_loc) :
+		CosmosError{"ResolveError", {}, src_loc},
 		m_eai_code{code},
 		m_system_errno{code == Code::SYSTEM ? get_errno() : Errno::NO_ERROR} {
 }

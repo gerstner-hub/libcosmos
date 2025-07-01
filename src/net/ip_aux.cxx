@@ -24,7 +24,7 @@ void SocketErrorMessage<FAMILY>::deserialize(const ReceiveMessageHeader::Control
 	// reason we use a vector as memory backend for the error.
 
 	if (msg.dataLength() < sizeof(SocketError)) {
-		cosmos_throw (RuntimeError("IP_RECVERR ancillary message too small"));
+		throw RuntimeError{"IP_RECVERR ancillary message too small"};
 	}
 
 	m_data.resize(msg.dataLength());

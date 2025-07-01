@@ -33,7 +33,7 @@ void Poller::create(size_t max_events) {
 	auto pfd = epoll_create1(EPOLL_CLOEXEC);
 
 	if (pfd < 0) {
-		cosmos_throw (ApiError("epoll_create1()"));
+		throw ApiError{"epoll_create1()"};
 	}
 
 	m_poll_fd.setFD(FileNum{pfd});
@@ -55,7 +55,7 @@ namespace {
 		ev.data.fd = fd;
 		ev.events = events;
 		if (epoll_ctl(epfd, op, fd, &ev) < 0) {
-			cosmos_throw (ApiError("epoll_ctl()"));
+			throw ApiError{"epoll_ctl()"};
 		}
 	}
 }
@@ -70,7 +70,7 @@ void Poller::modFD(const FileDescriptor fd, const MonitorFlags flags) {
 
 void Poller::delFD(const FileDescriptor fd) {
 	if (epoll_ctl(rawPollFD(), EPOLL_CTL_DEL, to_integral(fd.raw()), nullptr) < 0) {
-		cosmos_throw (ApiError("epoll_ctl(EPOLL_CTL_DEL)"));
+		throw ApiError{"epoll_ctl(EPOLL_CTL_DEL)"};
 	}
 }
 
@@ -83,7 +83,7 @@ std::vector<Poller::PollEvent> Poller::wait(const std::optional<IntervalTime> ti
 			if (auto_restart_syscalls && get_errno() == Errno::INTERRUPTED)
 				// transparent restart
 				continue;
-			cosmos_throw (ApiError("epoll_wait()"));
+			throw ApiError{"epoll_wait()"};
 		}
 
 		return std::vector<PollEvent>(m_events.begin(), m_events.begin() + num_events);

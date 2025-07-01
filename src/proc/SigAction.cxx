@@ -68,7 +68,7 @@ void set_action(const Signal sig, const SigAction &action, SigAction *old) {
 	const auto raw_sig = to_integral(sig.raw());
 
 	if (::sigaction(raw_sig, action.raw(), old ? old->raw() : nullptr) != 0) {
-		cosmos_throw (ApiError("sigaction()"));
+		throw ApiError{"sigaction()"};
 	}
 
 	/*
@@ -115,7 +115,7 @@ void get_action(const Signal sig, SigAction &action) {
 	const auto raw_sig = to_integral(sig.raw());
 
 	if (::sigaction(raw_sig, nullptr, action.raw())) {
-		cosmos_throw (ApiError("sigaction()"));
+		throw ApiError{"sigaction()"};
 	}
 
 	action.updateFromOld(
@@ -137,7 +137,7 @@ const SigAction::SimpleHandler SigAction::UNKNOWN = reinterpret_cast<SigAction::
 
 void SigAction::setHandler(SimpleHandler handler) {
 	if (handler == UNKNOWN) {
-		cosmos_throw (UsageError("Cannot set UNKNOWN type handler"));
+		throw UsageError{"Cannot set UNKNOWN type handler"};
 	}
 
 	// NOTE: don't use setFlags() here, since it doesn't allow changing

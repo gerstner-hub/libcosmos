@@ -16,19 +16,21 @@ void testFileError() {
 	f.open(to_open, cosmos::OpenMode::READ_ONLY);
 }
 
+using SrcLoc = cosmos::SourceLocation;
+
 struct DerivedError : public cosmos::CosmosError {
-	COSMOS_ERROR_IMPL;
-	DerivedError() : CosmosError("bad-looker", "looks bad") {}
+	DerivedError(const SrcLoc &src_loc = SrcLoc::current()) :
+		CosmosError{"bad-looker", "looks bad", src_loc} {}
 };
 
 void test_func() {
-	cosmos_throw(DerivedError());
+	throw(DerivedError());
 }
 
 struct TestClass {
 	void throwSomething(int num) {
 		(void)num;
-		cosmos_throw(DerivedError());
+		throw(DerivedError());
 	}
 };
 
@@ -36,14 +38,14 @@ int main() {
 	cosmos::Init init;
 	errno = ENOENT;
 	try {
-		cosmos_throw (cosmos::ApiError("Testing ApiError (ENOENT)"));
+		throw (cosmos::ApiError("Testing ApiError (ENOENT)"));
 	}
 	catch (const cosmos::CosmosError &ce) {
 		std::cerr << ce.what() << std::endl;
 	}
 
 	try {
-		cosmos_throw (cosmos::UsageError("testing is good"));
+		throw (cosmos::UsageError("testing is good"));
 	}
 	catch (const cosmos::CosmosError &ce) {
 		std::cerr << "Testing UsageError: " << ce.what() << std::endl;

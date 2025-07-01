@@ -26,7 +26,7 @@ SocketOptions::Linger SocketOptions::getLinger() const {
 	auto len = getsockopt(m_sock, M_LEVEL, OptName{SO_LINGER}, &ret, sizeof(ret));
 
 	if (len != sizeof(ret)) {
-		cosmos_throw (RuntimeError("getsockopt: short read on SO_LINGER"));
+		throw RuntimeError{"getsockopt: short read on SO_LINGER"};
 	}
 
 	return ret;

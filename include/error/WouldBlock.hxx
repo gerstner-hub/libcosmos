@@ -16,11 +16,11 @@ namespace cosmos {
 class COSMOS_API WouldBlock :
 		public ApiError {
 public:
-	WouldBlock(const std::string_view prefix = {}) :
-		ApiError{prefix}
+	WouldBlock(const std::string_view prefix = {},
+			const SourceLocation &src_loc =
+				SourceLocation::current()) :
+		ApiError{prefix, src_loc}
 	{}
-
-	COSMOS_ERROR_IMPL;
 };
 
 } // end ns

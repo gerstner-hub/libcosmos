@@ -62,7 +62,8 @@ public: // functions
 	 * If code is Code::SYSTEM then the current Errno will also be stored
 	 * in the exception.
 	 **/
-	explicit ResolveError(const Code code);
+	explicit ResolveError(const Code code, const SourceLocation &src_loc =
+			SourceLocation::current());
 
 	/// Returns the plain resolve error code stored in the exception.
 	Code code() const {
@@ -81,8 +82,6 @@ public: // functions
 	std::string_view msg() const { return msg(m_eai_code); }
 
 	static std::string_view msg(const Code code);
-
-	COSMOS_ERROR_IMPL;
 
 protected: // functions
 

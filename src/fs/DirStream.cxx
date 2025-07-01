@@ -30,7 +30,7 @@ void DirStream::close() {
 	m_stream = nullptr;
 
 	if (ret == -1) {
-		cosmos_throw (ApiError("closedir()"));
+		throw ApiError{"closedir()"};
 	}
 }
 
@@ -50,7 +50,7 @@ void DirStream::open(const SysString path, const FollowSymlinks follow_links) {
 	DirFD fd{FileNum{res}};
 
 	if (fd.invalid()) {
-		cosmos_throw (ApiError("open(O_DIRECTORY)"));
+		throw ApiError{"open(O_DIRECTORY)"};
 	}
 
 	try {
@@ -75,7 +75,7 @@ void DirStream::open(const FileNum fd) {
 	m_stream = ::fdopendir(to_integral(fd));
 
 	if (!m_stream) {
-		cosmos_throw (ApiError("fdopendir()"));
+		throw ApiError{"fdopendir()"};
 	}
 }
 
@@ -88,7 +88,7 @@ void DirStream::open(const DirFD dir_fd, const SysString subpath) {
 	m_stream = ::fdopendir(to_integral(fd.raw()));
 
 	if (!m_stream) {
-		cosmos_throw (ApiError("fdopendir()"));
+		throw ApiError{"fdopendir()"};
 	}
 }
 
@@ -98,7 +98,7 @@ DirFD DirStream::fd() const {
 	DirFD ret{FileNum{fd}};
 
 	if (ret.invalid()) {
-		cosmos_throw (ApiError("dirfd()"));
+		throw ApiError{"dirfd()"};
 	}
 
 	return ret;
@@ -124,7 +124,7 @@ std::optional<DirEntry> DirStream::nextEntry() {
 	}
 
 	if (is_errno_set()) {
-		cosmos_throw(ApiError("readdir()"));
+		throw ApiError{"readdir()"};
 	}
 
 	return {};

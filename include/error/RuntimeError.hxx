@@ -14,12 +14,12 @@ class COSMOS_API RuntimeError :
 		public CosmosError {
 public: // functions
 
-	explicit RuntimeError(const std::string_view msg) :
-			CosmosError{"RuntimeError"} {
+	explicit RuntimeError(const std::string_view msg,
+				const SourceLocation &src_loc =
+					SourceLocation::current()) :
+			CosmosError{"RuntimeError", {}, src_loc} {
 		m_msg = msg;
 	}
-
-	COSMOS_ERROR_IMPL;
 };
 
 } // end ns

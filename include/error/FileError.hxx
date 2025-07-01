@@ -22,9 +22,8 @@ class COSMOS_API FileError :
 		public ApiError {
 public: // functions
 
-	FileError(const SysString path, const std::string_view operation);
-
-	COSMOS_ERROR_IMPL;
+	FileError(const SysString path, const std::string_view operation,
+			const SourceLocation &src_loc = SourceLocation::current());
 
 protected: // functions
 

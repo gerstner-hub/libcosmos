@@ -14,8 +14,11 @@ class COSMOS_API RangeError :
 		public ApiError {
 public: // functions
 
-	explicit RangeError(const std::string_view operation, const size_t required_length = 0) :
-			ApiError{operation},
+	explicit RangeError(const std::string_view operation,
+				const size_t required_length = 0,
+				const SourceLocation &src_loc =
+					SourceLocation::current()) :
+			ApiError{operation, {}, src_loc},
 			m_required_length{required_length} {
 
 	}

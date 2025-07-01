@@ -15,9 +15,9 @@ void handleIOError(const std::string_view operation) {
 	if (const auto error = get_errno(); auto_restart_syscalls && error == Errno::INTERRUPTED)
 		return;
 	else if (in_list(error, {Errno::AGAIN, Errno::WOULD_BLOCK}))
-		cosmos_throw (WouldBlock(operation));
+		throw WouldBlock{operation};
 
-	cosmos_throw (ApiError(operation));
+	throw ApiError{operation};
 
 }
 
@@ -44,7 +44,7 @@ void StreamIO::readAll(void *buf, size_t length) {
 		length -= res;
 
 		if (res == 0) {
-			cosmos_throw (RuntimeError("unexpected EOF"));
+			throw RuntimeError{"unexpected EOF"};
 		}
 	}
 }
@@ -103,7 +103,7 @@ off_t StreamIO::seek(const SeekType type, off_t off) {
 	const auto res = ::lseek(to_integral(m_stream_fd.raw()), off, to_integral(type));
 
 	if (res == static_cast<off_t>(-1)) {
-		cosmos_throw (ApiError("lseek()"));
+		throw ApiError{"lseek()"};
 	}
 
 	return res;

@@ -38,7 +38,7 @@ std::optional<long> trace(const Request req, const ProcessID pid, void *addr, vo
 			return ret;
 		}
 
-		cosmos_throw (ApiError("ptrace()"));
+		throw ApiError{"ptrace()"};
 	}
 
 	// only these ptrace requests return meaningful data, otherwise just
@@ -59,7 +59,7 @@ void traceme() {
 std::tuple<SignalNr, Event> decode_event(const cosmos::Signal sig) {
 
 	if (!sig.isPtraceEventStop()) {
-		cosmos_throw (UsageError("this is not a ptrace-event-stop signal"));
+		throw UsageError{"this is not a ptrace-event-stop signal"};
 	}
 
 	const auto raw = to_integral(sig.raw());

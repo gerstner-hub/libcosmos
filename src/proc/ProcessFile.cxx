@@ -32,7 +32,7 @@ ProcessFile::ProcessFile(const ProcessID pid, const OpenFlags flags) {
 	auto fd = pidfd_open(to_integral(pid), flags.raw());
 
 	if (fd == -1) {
-		cosmos_throw (ApiError("pidfd_open()"));
+		throw ApiError{"pidfd_open()"};
 	}
 
 	m_fd.setFD(FileNum{fd});
@@ -52,7 +52,7 @@ FileDescriptor ProcessFile::dupFD(const FileNum targetfd) const {
 	auto fd = pidfd_getfd(to_integral(m_fd.raw()), to_integral(targetfd), 0);
 
 	if (fd == -1) {
-		cosmos_throw (ApiError("pidfd_getfd()"));
+		throw ApiError{"pidfd_getfd()"};
 	}
 
 	return FileDescriptor{FileNum{fd}};

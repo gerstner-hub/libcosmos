@@ -31,7 +31,7 @@ std::string IPAddressBase::ipAsString() const {
 			ret.data(),
 			ret.size())) {
 		if (ret.size() > 512) {
-			cosmos_throw (ApiError("inet_ntop()"));
+			throw ApiError{"inet_ntop()"};
 		}
 		ret.resize(ret.size() * 2);
 	}
@@ -47,9 +47,9 @@ void IPAddressBase::setIpFromString(const SysString str) {
 			ipAddrPtr());
 
 	if (res < 0) {
-		cosmos_throw (ApiError("inet_pton()"));
+		throw ApiError{"inet_pton()"};
 	} else if (res == 0) {
-		cosmos_throw (RuntimeError("inet_pton: bad IP address string"));
+		throw RuntimeError{"inet_pton: bad IP address string"};
 	}
 }
 
@@ -90,7 +90,7 @@ void IPAddressBase::getNameInfo(std::string *host, std::string *service, const N
 			flags.raw());
 
 	if (res != 0) {
-		cosmos_throw (ResolveError(ResolveError::Code{res}));
+		throw ResolveError{ResolveError::Code{res}};
 	}
 
 	if (host) {

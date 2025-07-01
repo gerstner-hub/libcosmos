@@ -50,7 +50,7 @@ void ReceiveMessageHeader::setControlBufferSize(const size_t bytes) {
 		m_control_buffer.clear();
 		return;
 	} else if (bytes < sizeof(cmsghdr)) {
-		cosmos_throw (RuntimeError("control buffer size smaller than control message header"));
+		throw RuntimeError{"control buffer size smaller than control message header"};
 	}
 
 	m_control_buffer.resize(bytes);

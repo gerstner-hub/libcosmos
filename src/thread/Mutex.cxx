@@ -21,7 +21,7 @@ public: // functions
 
 	pthread_mutexattr_t* getAttr() {
 		if (!libInitialized()) {
-			cosmos_throw (UsageError("libcosmos was not initialized"));
+			UsageError("libcosmos was not initialized");
 		}
 		return DEBUG_MUTEX ? &m_attr : nullptr;
 	}
@@ -34,7 +34,7 @@ protected: // functions
 
 		auto res = ::pthread_mutexattr_init(&m_attr);
 		if (auto err = Errno{res}; err != Errno::NO_ERROR) {
-			cosmos_throw (ApiError("pthread_mutexattr_init()", err));
+			ApiError("pthread_mutexattr_init()", err);
 		}
 
 		res = ::pthread_mutexattr_settype(
@@ -42,7 +42,7 @@ protected: // functions
 		);
 
 		if (auto err = Errno{res}; err != Errno::NO_ERROR) {
-			cosmos_throw (ApiError("pthread_mutexattr_settype()", err));
+			throw ApiError{"pthread_mutexattr_settype()", err};
 		}
 	}
 
@@ -64,7 +64,7 @@ MutexAttr g_attr;
 Mutex::Mutex() {
 	auto res = ::pthread_mutex_init(&m_pmutex, g_attr.getAttr());
 	if (auto err = Errno{res}; err != Errno::NO_ERROR) {
-		cosmos_throw (ApiError("pthread_mutex_init()", err));
+		throw ApiError{"pthread_mutex_init()", err};
 	}
 }
 

@@ -24,12 +24,12 @@ bool InfoBase<DB_STRUCT>::getInfo(std::function<int(DB_STRUCT**)> get_func, cons
 			case Errno::NO_ERROR:
 				return res != nullptr;
 			case Errno::RANGE: m_buf.resize(m_buf.size() << 1); break;
-			default: cosmos_throw(ApiError(errlabel, Errno{err})); break;
+			default: ApiError(errlabel, Errno{err}); break;
 		}
 
 		if (m_buf.size() > BUF_MAX_SIZE) {
 			// don't get too crazy here
-			cosmos_throw(RuntimeError("buffer size limit reached"));
+			throw RuntimeError{"buffer size limit reached"};
 		}
 	}
 

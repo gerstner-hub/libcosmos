@@ -87,7 +87,7 @@ protected: // functions
 	void startTest(const std::string& name) {
 		using namespace cosmos::term;
 		if (!m_active_test.empty()) {
-			cosmos_throw (UsageError("Previous test has not been finished!"));
+			throw UsageError{"Previous test has not been finished!"};
 		}
 		std::cout << BrightBlue(std::string("[Running test \"") + name + "\"]") << "\n\n" << std::flush;
 		m_active_test = name;
@@ -136,7 +136,7 @@ protected: // functions
 
 	void assertHaveTest() {
 		if (m_active_test.empty()) {
-			cosmos_throw (UsageError("No test has been started!"));
+			throw UsageError{"No test has been started!"};
 		}
 	}
 
@@ -169,7 +169,7 @@ protected: // functions
 		auto proc = cloner.run();
 		auto res = proc.wait();
 		if (!res.exitedSuccessfully()) {
-			cosmos_throw (cosmos::RuntimeError("running tool failed"));
+			throw cosmos::RuntimeError{"running tool failed"};
 		}
 	}
 
@@ -202,7 +202,7 @@ protected: // functions
 			auto fd_num = std::stoi(fd_str, &pos);
 
 			if (pos < fd_str.size()) {
-				cosmos_throw (cosmos::RuntimeError("failed to convert /proc/self/fd number"));
+				throw cosmos::RuntimeError{"failed to convert /proc/self/fd number"};
 			}
 
 			if (fd_num >= 0 && fd_num <= 2)
@@ -283,7 +283,7 @@ public: // functions
 
 	void runOrThrow(int argc, const char **argv) {
 		if (run(argc, argv) != 0) {
-			cosmos_throw (cosmos::RuntimeError("test failed"));
+			throw cosmos::RuntimeError{"test failed"};
 		}
 	}
 

@@ -13,7 +13,7 @@ Condition::Condition(Mutex &lock) :
 	res = pthread_condattr_init(&attr);
 
 	if (auto err = Errno{res}; err != Errno::NO_ERROR) {
-		cosmos_throw (ApiError("pthread_condattr_init()", err));
+		ApiError("pthread_condattr_init()", err);
 	}
 
 	try {
@@ -25,13 +25,13 @@ Condition::Condition(Mutex &lock) :
 		res = pthread_condattr_setclock(&attr, to_integral(ClockType::MONOTONIC));
 
 		if (auto err = Errno{res}; err != Errno::NO_ERROR) {
-			cosmos_throw (ApiError("pthread_condattr_setclock()", err));
+			ApiError("pthread_condattr_setclock()", err);
 		}
 
 		res = ::pthread_cond_init(&m_pcond, &attr);
 
 		if (auto err = Errno{res}; err != Errno::NO_ERROR) {
-			cosmos_throw (ApiError("pthread_cond_init()", err));
+			ApiError("pthread_cond_init()", err);
 		}
 	} catch(...) {
 		(void)pthread_condattr_destroy(&attr);

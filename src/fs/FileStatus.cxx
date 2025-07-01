@@ -11,12 +11,12 @@
 namespace cosmos {
 
 void FileStatus::throwBadType(const std::string_view context) const {
-	cosmos_throw (UsageError(context));
+	throw UsageError{context};
 }
 
 void FileStatus::updateFrom(const FileDescriptor fd) {
 	if (fstat(to_integral(fd.raw()), &m_st) != 0) {
-		cosmos_throw (ApiError("fstat()"));
+		throw ApiError{"fstat()"};
 	}
 }
 
@@ -24,7 +24,7 @@ void FileStatus::updateFrom(const SysString path, const FollowSymlinks follow) {
 	auto statfunc = follow ? ::stat : ::lstat;
 
 	if (statfunc(path.raw(), &m_st) != 0) {
-		cosmos_throw (FileError(path, follow ? "stat" : "lstat"));
+		throw FileError{path, follow ? "stat" : "lstat"};
 	}
 }
 
@@ -33,7 +33,7 @@ void FileStatus::updateFrom(const DirFD fd, const SysString path, const FollowSy
 	auto res = ::fstatat(to_integral(fd.raw()), path.raw(), &m_st, follow ? 0 : AT_SYMLINK_NOFOLLOW);
 
 	if (res != 0) {
-		cosmos_throw (FileError(path, "fstatat()"));
+		throw FileError{path, "fstatat()"};
 	}
 }
 

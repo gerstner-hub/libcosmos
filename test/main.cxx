@@ -79,7 +79,7 @@ class MainTest :
 				public cosmos::MainNoArgs {
 		protected:
 			cosmos::ExitStatus main() override {
-				cosmos_throw(cosmos::ApiError("main()", cosmos::Errno::PERMISSION));
+				throw cosmos::ApiError{"main()", cosmos::Errno::PERMISSION};
 				return cosmos::ExitStatus::SUCCESS;
 			}
 		};
@@ -95,7 +95,7 @@ class MainTest :
 				public cosmos::MainNoArgs {
 		public:
 			CtorThrowingMain() {
-				cosmos_throw(cosmos::ApiError("main()", cosmos::Errno::RANGE));
+				throw cosmos::ApiError{"main()", cosmos::Errno::RANGE};
 			}
 		protected:
 			cosmos::ExitStatus main() override {

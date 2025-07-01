@@ -25,7 +25,7 @@ namespace {
 		auto res = ::pthread_sigmask(op, set, old);
 
 		if (const auto error = Errno{res}; error != Errno::NO_ERROR) {
-			cosmos_throw (ApiError("pthread_sigmask()", error));
+			throw ApiError{"pthread_sigmask()", error};
 		}
 	}
 
@@ -33,13 +33,13 @@ namespace {
 
 void raise(const Signal s) {
 	if (::raise(to_integral(s.raw()))) {
-		cosmos_throw (ApiError("raise()"));
+		throw ApiError{"raise()"};
 	}
 }
 
 void send(const ProcessID proc, const Signal s) {
 	if (::kill(to_integral(proc), to_integral(s.raw()))) {
-		cosmos_throw (ApiError("kill()"));
+		throw ApiError{"kill()"};
 	}
 }
 
@@ -52,13 +52,13 @@ void send(const ProcessID proc, const Signal s, std::variant<void*, int> data) {
 	}
 
 	if (::sigqueue(to_integral(proc), to_integral(s.raw()), val)) {
-		cosmos_throw (ApiError("sigqueue()"));
+		throw ApiError{"sigqueue()"};
 	}
 }
 
 void send(const ProcessID proc, const ThreadID thread, const Signal s) {
 	if (::tgkill(to_integral(proc), to_integral(thread), to_integral(s.raw()))) {
-		cosmos_throw (ApiError("tgkill()"));
+		throw ApiError{"tgkill()"};
 	}
 }
 
@@ -70,7 +70,7 @@ void send(const PidFD pidfd, const Signal s) {
 		// signal auxiliary data, but the defaults are just like kill(), so
 		// let's use them for now.
 		if (::pidfd_send_signal(to_integral(pidfd.raw()), to_integral(s.raw()), nullptr, 0) != 0) {
-			cosmos_throw (ApiError("pidfd_send_signal()"));
+			throw ApiError{"pidfd_send_signal()"};
 		}
 	} else {
 		// when running on Valgrind then this system isn't covered yet
@@ -84,7 +84,7 @@ void send(const PidFD pidfd, const Signal s) {
 		fdinfo.open(path);
 
 		if (!fdinfo) {
-			cosmos_throw (ApiError("open(\"/proc/self/fdinfo/<pidfd>\")"));
+			throw ApiError{"open(\"/proc/self/fdinfo/<pidfd>\")"};
 		}
 
 		std::string line;
@@ -99,14 +99,14 @@ void send(const PidFD pidfd, const Signal s) {
 			auto pid = std::stoi(pid_str, &processed);
 
 			if (processed < 1) {
-				cosmos_throw (RuntimeError("failed to determine PID for PIDFD (valgrind fallback logic)"));
+				throw RuntimeError{"failed to determine PID for PIDFD (valgrind fallback logic)"};
 			}
 
 			signal::send(ProcessID{pid}, s);
 			return;
 		}
 
-		cosmos_throw (RuntimeError("couldn't parse PID for PIDFD (valgrind fallback logic)"));
+		throw RuntimeError{"couldn't parse PID for PIDFD (valgrind fallback logic)"};
 	}
 }
 
@@ -125,7 +125,7 @@ Signal wait(const SigSet &set) {
 	const auto res = ::sigwait(set.raw(), &num);
 
 	if (res != 0) {
-		cosmos_throw (ApiError("sigwait()", Errno{res}));
+		throw ApiError{"sigwait()", Errno{res}};
 	}
 
 	return Signal{SignalNr{num}};
@@ -134,7 +134,7 @@ Signal wait(const SigSet &set) {
 
 void wait_info(const SigSet &set, SigInfo &info) {
 	if (::sigwaitinfo(set.raw(), info.raw()) < 0) {
-		cosmos_throw (ApiError("sigwaitinfo()"));
+		throw ApiError{"sigwaitinfo()"};
 	}
 }
 
@@ -143,7 +143,7 @@ WaitRes timed_wait(const SigSet &set, SigInfo &info, const IntervalTime timeout)
 		switch(get_errno()) {
 			case Errno::AGAIN: return WaitRes::NO_RESULT;
 			default: {
-				cosmos_throw (ApiError("sigtimedwait()"));
+				throw ApiError{"sigtimedwait()"};
 			}
 		}
 	}
@@ -172,13 +172,13 @@ size_t Stack::MIN_SIZE = MINSIGSTKSZ;
 
 void set_altstack(const Stack &stack, Stack *old) {
 	if (::sigaltstack(stack.raw(), old ? old->raw() : nullptr) != 0) {
-		cosmos_throw (ApiError("sigaltstack()"));
+		throw ApiError{"sigaltstack()"};
 	}
 }
 
 void get_altstack(Stack &old) {
 	if (::sigaltstack(nullptr, old.raw()) != 0) {
-		cosmos_throw (ApiError("sigalstack()"));
+		throw ApiError{"sigalstack()"};
 	}
 }
 

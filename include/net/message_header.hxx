@@ -350,7 +350,7 @@ public: // types
 				const cmsghdr *chdr = m_pos;
 				m_pos = CMSG_NXTHDR(const_cast<msghdr*>(hdr), const_cast<cmsghdr*>(chdr));
 			} else {
-				cosmos_throw (RuntimeError("Attempt to increment ControlMessageIterator past the end"));
+				throw RuntimeError{"Attempt to increment ControlMessageIterator past the end"};
 			}
 
 			return *this;
@@ -367,7 +367,7 @@ public: // types
 		/// Access the current ControlMessage the iterator points to.
 		const ControlMessage& operator*() {
 			if (!m_pos) {
-				cosmos_throw (RuntimeError("Attempt to dereference an invalid ControlMessageIterator"));
+				throw RuntimeError{"Attempt to dereference an invalid ControlMessageIterator"};
 			}
 
 			return *reinterpret_cast<const ControlMessage*>(m_pos);
@@ -465,7 +465,7 @@ protected: // functions
 
 	void checkMsg(const ReceiveMessageHeader::ControlMessage &msg, MSG_TYPE type) const {
 		if (msg.level() != level || type != MSG_TYPE(msg.type())) {
-			cosmos_throw(RuntimeError("ancillary message type mismatch"));
+			throw RuntimeError{"ancillary message type mismatch"};
 		}
 	}
 

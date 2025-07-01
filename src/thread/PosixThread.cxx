@@ -57,7 +57,7 @@ namespace {
 		);
 
 		if (const auto error = Errno{res}; error != Errno::NO_ERROR) {
-			cosmos_throw (cosmos::ApiError("pthread_create()", error));
+			throw cosmos::ApiError("pthread_create()", error);
 		}
 
 	}
@@ -108,9 +108,9 @@ PosixThread& PosixThread::operator=(PosixThread &&other) noexcept {
 
 void PosixThread::assertJoinConditions() {
 	if (!joinable()) {
-		cosmos_throw (UsageError("Attempted to join non-joinable thread (empty or detached)"));
+		throw UsageError{"Attempted to join non-joinable thread (empty or detached)"};
 	} else if (isCallerThread()) {
-		cosmos_throw (UsageError("Attempted to join self"));
+		throw UsageError{"Attempted to join self"};
 	}
 }
 
@@ -129,7 +129,7 @@ pthread::ExitValue PosixThread::join() {
 	const auto join_res = ::pthread_join(*m_pthread, &res);
 
 	if (const auto error = Errno{join_res}; error != Errno::NO_ERROR) {
-		cosmos_throw (ApiError("pthread_join()", error));
+		throw ApiError{"pthread_join()", error};
 	}
 
 	reset();
@@ -149,7 +149,7 @@ std::optional<pthread::ExitValue> PosixThread::tryJoin() {
 			return {};
 		}
 
-		cosmos_throw (ApiError("pthread_tryjoin_np()", error));
+		throw ApiError{"pthread_tryjoin_np()", error};
 	}
 
 	reset();
@@ -169,7 +169,7 @@ std::optional<pthread::ExitValue> PosixThread::joinTimed(const RealTime ts) {
 			return {};
 		}
 
-		cosmos_throw (ApiError("pthread_timedjoin_np()", error));
+		throw ApiError{"pthread_timedjoin_np()", error};
 	}
 
 	reset();
@@ -181,13 +181,13 @@ void PosixThread::detach() {
 	// NOTE: in theory it is valid that a thread detaches itself, so let's
 	// not use assertJoinConditions() here ATM.
 	if (!joinable()) {
-		cosmos_throw (UsageError("Attempted to detach a non-joinable thread (empty or already detached)"));
+		throw UsageError{"Attempted to detach a non-joinable thread (empty or already detached)"};
 	}
 
 	const auto res = ::pthread_detach(*m_pthread);
 
 	if (const auto error = Errno{res}; error != Errno::NO_ERROR) {
-		cosmos_throw (ApiError("pthread_detach()", error));
+		throw ApiError{"pthread_detach()", error};
 	}
 
 	reset();

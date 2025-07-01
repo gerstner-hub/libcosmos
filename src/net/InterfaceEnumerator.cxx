@@ -20,7 +20,7 @@ void InterfaceEnumerator::fetch() {
 	m_list = reinterpret_cast<InterfaceInfo*>(::if_nameindex());
 
 	if (!m_list) {
-		cosmos_throw(ApiError("ifnameindex()"));
+		throw ApiError{"ifnameindex()"};
 	}
 }
 

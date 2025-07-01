@@ -59,7 +59,7 @@ protected: // functions
 	StreamAdaptor(FileDescriptor fd, std::ios_base::openmode mode) :
 			m_buffer{to_integral(fd.raw()), mode} {
 		if (fd.invalid()) {
-			cosmos_throw (UsageError("Attempt to construct StreamAdaptor for invalid FD"));
+			throw UsageError{"Attempt to construct StreamAdaptor for invalid FD"};
 		}
 
 		this->rdbuf(&m_buffer);

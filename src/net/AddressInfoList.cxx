@@ -14,7 +14,7 @@ void AddressInfoList::resolve(const SysString node, const SysString service) {
 	);
 
 	if (res != 0) {
-		cosmos_throw(ResolveError(ResolveError::Code{res}));
+		throw ResolveError{ResolveError::Code{res}};
 	}
 }
 

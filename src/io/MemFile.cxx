@@ -16,7 +16,7 @@ void MemFile::create(const SysString name, const OpenFlags flags, const HugePage
 	auto fd = ::memfd_create(name.raw(), flags.raw() | page_size);
 
 	if (fd == -1) {
-		cosmos_throw (ApiError("memfd_create()"));
+		throw ApiError{"memfd_create()"};
 	}
 
 	m_fd.setFD(FileNum{fd});

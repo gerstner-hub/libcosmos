@@ -24,7 +24,7 @@ bool Terminal::isTTY() const {
 
 	switch (get_errno()) {
 		case Errno::NOT_A_TTY: break;
-		default: cosmos_throw (ApiError("isatty:"));
+		default: throw ApiError{"isatty:"};
 	}
 
 	return false;
@@ -34,7 +34,7 @@ TermDimension Terminal::getSize() const {
 	TermDimension ws;
 	int rc = ::ioctl(rawFD(), TIOCGWINSZ, &ws);
 	if (rc != 0) {
-		cosmos_throw (ApiError("ioctl(GWINSZ)"));
+		throw ApiError{"ioctl(GWINSZ)"};
 	}
 
 	return ws;
@@ -43,20 +43,20 @@ TermDimension Terminal::getSize() const {
 void Terminal::setSize(const TermDimension dim) {
 	int rc = ::ioctl(rawFD(), TIOCSWINSZ, &dim);
 	if (rc != 0) {
-		cosmos_throw (ApiError("ioctl(SWINSZ)"));
+		throw ApiError{"ioctl(SWINSZ)"};
 	}
 }
 
 void Terminal::sendBreak(const std::chrono::milliseconds ms) {
 	if (::tcsendbreak(rawFD(), static_cast<int>(ms.count())) != 0) {
-		cosmos_throw (ApiError("tcsendbreak"));
+		throw ApiError{"tcsendbreak"};
 	}
 }
 
 void Terminal::makeControllingTerminal(bool force) {
 	int rc = ::ioctl(rawFD(), TIOCSCTTY, force ? 1 : 0);
 	if (rc != 0) {
-		cosmos_throw (ApiError("ioctl(TIOCSCTTY)"));
+		throw ApiError{"ioctl(TIOCSCTTY)"};
 	}
 }
 
@@ -71,7 +71,7 @@ std::pair<FileDescriptor, FileDescriptor> openPTY(const std::optional<TermDimens
 	const struct winsize *size = initial_size ? &(*initial_size) : nullptr;
 
 	if (::openpty(&master, &slave, nullptr, nullptr, size) < 0) {
-		cosmos_throw (ApiError("openpty()"));
+		throw ApiError{"openpty()"};
 	}
 
 	return {

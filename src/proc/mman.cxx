@@ -16,7 +16,7 @@ void* map(const size_t length, const MapSettings &settings) {
 			flags, to_integral(settings.fd.raw()), settings.offset);
 
 	if (addr == MAP_FAILED) {
-		cosmos_throw (ApiError("mmap()"));
+		throw ApiError{"mmap()"};
 	}
 
 	return addr;
@@ -24,27 +24,27 @@ void* map(const size_t length, const MapSettings &settings) {
 
 void unmap(void *addr, const size_t length) {
 	if (::munmap(addr, length) != 0) {
-		cosmos_throw (ApiError("munmap()"));
+		throw ApiError{"munmap()"};
 	}
 }
 
 void sync(void *addr, const size_t length, const SyncFlags flags) {
 	if (::msync(addr, length, flags.raw()) != 0) {
-		cosmos_throw (ApiError("msync()"));
+		throw ApiError{"msync()"};
 	}
 }
 
 void* remap(void *old_addr, const size_t old_size, const size_t new_size, const RemapFlags flags, std::optional<void*> new_addr) {
 	if (flags[RemapFlag::FIXED] && !new_addr) {
-		cosmos_throw (UsageError("missing new_addr argument along with FIXED"));
+		throw UsageError{"missing new_addr argument along with FIXED"};
 	} else if (!flags[RemapFlag::FIXED] && new_addr) {
-		cosmos_throw (UsageError("unexpected new_addr argument without FIXED"));
+		throw UsageError{"unexpected new_addr argument without FIXED"};
 	}
 
 	auto ret = ::mremap(old_addr, old_size, new_size, flags.raw(), new_addr ? *new_addr : MAP_FAILED);
 
 	if (ret == MAP_FAILED) {
-		cosmos_throw (ApiError("mremap()"));
+		throw ApiError{"mremap()"};
 	}
 
 	return ret;
@@ -52,25 +52,25 @@ void* remap(void *old_addr, const size_t old_size, const size_t new_size, const 
 
 void lock(void *addr, const size_t length, const LockFlags flags) {
 	if (::mlock2(addr, length, flags.raw()) != 0) {
-		cosmos_throw (ApiError("mlock2()"));
+		throw ApiError{"mlock2()"};
 	}
 }
 
 void unlock(void *addr, const size_t length) {
 	if (::munlock(addr, length) != 0) {
-		cosmos_throw (ApiError("munlock()"));
+		throw ApiError{"munlock()"};
 	}
 }
 
 void lock_all(const LockAllFlags flags) {
 	if (::mlockall(flags.raw()) != 0) {
-		cosmos_throw (ApiError("mlockall()"));
+		throw ApiError{"mlockall()"};
 	}
 }
 
 void unlock_all() {
 	if (::munlockall() != 0) {
-		cosmos_throw (ApiError("munlockall()"));
+		throw ApiError{"munlockall()"};
 	}
 }
 
@@ -79,14 +79,14 @@ void protect(void *addr, const size_t length, const AccessFlags flags, const Pro
 	const auto raw_flags = flags.raw() | extra.raw();
 
 	if (::mprotect(addr, length, raw_flags) != 0) {
-		cosmos_throw (ApiError("mprotect()"));
+		throw ApiError{"mprotect()"};
 	}
 }
 
 void MapFlags::setTLBPageSize(size_t page_size) {
 	if (!page_size || (page_size & (page_size-1)) != 0) {
 		// it's not a power of 2
-		cosmos_throw (UsageError("non-log2 TLB page size encountered"));
+		throw UsageError{"non-log2 TLB page size encountered"};
 	}
 
 	EnumBaseType log2 = 1;
@@ -101,7 +101,7 @@ void MapFlags::setTLBPageSize(size_t page_size) {
 	if (log2 > MAX_TLB_LOG2) {
 		// a maximum of 6 bits can be used for specifying the log2 for
 		// the page size
-		cosmos_throw (UsageError("requested TLB page size is too large"));
+		throw UsageError{"requested TLB page size is too large"};
 	}
 
 	// set all TLB page bits to zero first

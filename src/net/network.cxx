@@ -17,7 +17,7 @@ namespace {
 		int fds[2];
 		const auto res = ::socketpair(to_integral(family), to_integral(type) | flags.raw(), to_integral(protocol), fds);
 		if (res != 0) {
-			cosmos_throw(ApiError("socketpair()"));
+			throw ApiError{"socketpair()"};
 		}
 
 		return {FileDescriptor{FileNum{fds[0]}}, FileDescriptor{FileNum{fds[1]}}};
@@ -42,7 +42,7 @@ std::pair<UnixDatagramSocket, UnixDatagramSocket> create_dgram_socket_pair(const
 InterfaceIndex name_to_index(const SysString name) {
 	const auto index = if_nametoindex(name.raw());
 	if (index == 0) {
-		cosmos_throw(ApiError("if_nametoindex()"));
+		throw ApiError{"if_nametoindex()"};
 	}
 	return InterfaceIndex{static_cast<int>(index)};
 }
@@ -51,7 +51,7 @@ std::string index_to_name(const InterfaceIndex index) {
 	std::string ret;
 	ret.resize(IF_NAMESIZE);
 	if (!if_indextoname(to_integral(index), ret.data())) {
-		cosmos_throw(ApiError("if_indextoname()"));
+		throw ApiError{"if_indextoname()"};
 	}
 
 	ret.resize(std::strlen(ret.data()));
@@ -70,11 +70,11 @@ std::string get_hostname() {
 		// doesn't even use the gethostname() system call but inspects
 		// the system's uname. It does report truncation via an error,
 		// while POSIX does not guarantee this.
-		cosmos_throw(ApiError("gethostname()"));
+		throw ApiError{"gethostname()"};
 	}
 
 	if (ret.back() != 0) {
-		cosmos_throw(RuntimeError("gethostname() truncation occurred"));
+		throw RuntimeError{"gethostname() truncation occurred"};
 	}
 
 	ret.resize(std::strlen(ret.c_str()));

@@ -23,7 +23,7 @@ const std::string& TempDir::path() const {
 	if (!m_tmp_path.empty())
 		return m_tmp_path;
 
-	cosmos_throw (UsageError("accessed path for closed TempDir"));
+	throw UsageError{"accessed path for closed TempDir"};
 	return m_tmp_path; // to silence compiler warning
 }
 

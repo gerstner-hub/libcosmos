@@ -20,31 +20,31 @@ Socket::Socket(
 	m_fd.setFD(FileNum{fd});
 
 	if (!m_fd.valid()) {
-		cosmos_throw(ApiError("socket()"));
+		throw ApiError{"socket()"};
 	}
 }
 
 void Socket::bind(const SocketAddress &addr) {
 	if (::bind(to_integral(m_fd.raw()), addr.basePtr(), addr.size()) != 0) {
-		cosmos_throw(ApiError("bind()"));
+		throw ApiError{"bind()"};
 	}
 }
 
 void Socket::connect(const SocketAddress &addr) {
 	if (::connect(to_integral(m_fd.raw()), addr.basePtr(), addr.size()) != 0) {
-		cosmos_throw(ApiError("connect()"));
+		throw ApiError{"connect()"};
 	}
 }
 
 void Socket::shutdown(const Direction dir) {
 	if (::shutdown(to_integral(m_fd.raw()), to_integral(dir)) != 0) {
-		cosmos_throw (ApiError("shutdown()"));
+		throw ApiError{"shutdown()"};
 	}
 }
 
 void Socket::listen(const size_t backlog) {
 	if (::listen(to_integral(m_fd.raw()), backlog) != 0) {
-		cosmos_throw (ApiError("listen()"));
+		throw ApiError{"listen()"};
 	}
 }
 
@@ -53,7 +53,7 @@ FileDescriptor Socket::accept(SocketAddress *addr, const SocketFlags flags) {
 	auto res = ::accept4(to_integral(m_fd.raw()), addr ? addr->basePtr() : nullptr, addr ? &addrlen : nullptr, flags.raw());
 
 	if (res == -1) {
-		cosmos_throw (ApiError("accept()"));
+		throw ApiError{"accept()"};
 	}
 
 	if (addr) {
@@ -66,7 +66,7 @@ FileDescriptor Socket::accept(SocketAddress *addr, const SocketFlags flags) {
 size_t Socket::send(const void *buf, size_t length, const MessageFlags flags) {
 	const auto res = ::send(to_integral(m_fd.raw()), buf, length, flags.raw());
 	if (res < 0) {
-		cosmos_throw(ApiError("send()"));
+		throw ApiError{"send()"};
 	}
 
 	return static_cast<size_t>(res);
@@ -75,7 +75,7 @@ size_t Socket::send(const void *buf, size_t length, const MessageFlags flags) {
 size_t Socket::sendTo(const void *buf, size_t length, const SocketAddress &addr, const MessageFlags flags) {
 	const auto res = ::sendto(to_integral(m_fd.raw()), buf, length, flags.raw(), addr.basePtr(), addr.size());
 	if (res < 0) {
-		cosmos_throw(ApiError("sendto()"));
+		throw ApiError{"sendto()"};
 	}
 
 	return static_cast<size_t>(res);
@@ -84,7 +84,7 @@ size_t Socket::sendTo(const void *buf, size_t length, const SocketAddress &addr,
 size_t Socket::receive(void *buf, size_t length, const MessageFlags flags) {
 	const auto res = ::recv(to_integral(m_fd.raw()), buf, length, flags.raw());
 	if (res < 0) {
-		cosmos_throw(ApiError("recv()"));
+		throw ApiError{"recv()"};
 	}
 
 	return static_cast<size_t>(res);
@@ -95,7 +95,7 @@ Socket::receiveFrom(void *buf, size_t length, SocketAddress &addr, const Message
 	socklen_t addrlen = addr.maxSize();
 	const auto res = ::recvfrom(to_integral(m_fd.raw()), buf, length, flags.raw(), addr.basePtr(), &addrlen);
 	if (res < 0) {
-		cosmos_throw(ApiError("recvfrom()"));
+		throw ApiError{"recvfrom()"};
 	}
 
 	const AddressFilledIn filled_in{addrlen != 0};
@@ -112,12 +112,12 @@ void Socket::getSockName(SocketAddress &addr) {
 	socklen_t size = addr.maxSize();
 	auto base = addr.basePtr();
 	if (::getsockname(to_integral(m_fd.raw()), base, &size) != 0) {
-		cosmos_throw(ApiError("getsockname()"));
+		throw ApiError{"getsockname()"};
 	}
 
 	if (SocketFamily{base->sa_family} != addr.family()) {
 		addr.clear();
-		cosmos_throw(RuntimeError("getsockname: wrong type of SocketAddress was passed"));
+		throw RuntimeError{"getsockname: wrong type of SocketAddress was passed"};
 	}
 
 	addr.update(size);
@@ -132,7 +132,7 @@ void Socket::sendMessage(SendMessageHeader &header, const SocketAddress* addr) {
 			header.ioFlags().raw());
 
 	if (res < 0) {
-		cosmos_throw(ApiError("sendmsg()"));
+		throw ApiError{"sendmsg()"};
 	}
 
 	// NOTE: if a control message is configured in the header, then even
@@ -151,7 +151,7 @@ Socket::AddressFilledIn Socket::receiveMessage(ReceiveMessageHeader &header, Soc
 			header.ioFlags().raw());
 
 	if (res < 0) {
-		cosmos_throw(ApiError("recvmsg()"));
+		throw ApiError{"recvmsg()"};
 	}
 
 	auto ret = Socket::AddressFilledIn{false};

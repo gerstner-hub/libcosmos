@@ -8,12 +8,14 @@
 
 namespace cosmos {
 
-ApiError::ApiError(const std::string_view prefix) :
-		ApiError{prefix, Errno{errno}} {
+ApiError::ApiError(const std::string_view prefix,
+		const SourceLocation &src_loc) :
+		ApiError{prefix, Errno{errno}, src_loc} {
 }
 
-ApiError::ApiError(const std::string_view prefix, const Errno err) :
-		CosmosError{"ApiError"},
+ApiError::ApiError(const std::string_view prefix, const Errno err,
+			const SourceLocation &src_loc) :
+		CosmosError{"ApiError", {}, src_loc},
 		m_errno{err} {
 	if (!prefix.empty()) {
 		m_msg = prefix;

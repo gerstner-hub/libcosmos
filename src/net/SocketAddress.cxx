@@ -7,7 +7,7 @@ namespace cosmos {
 
 void SocketAddress::update(size_t new_length) {
 	if (new_length != this->size()) {
-		cosmos_throw(RuntimeError("inconsistent socket address size on return"));
+		throw RuntimeError{"inconsistent socket address size on return"};
 	}
 }
 

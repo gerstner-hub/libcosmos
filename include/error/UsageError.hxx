@@ -14,12 +14,11 @@ class COSMOS_API UsageError :
 		public CosmosError {
 public: // functions
 
-	explicit UsageError(const std::string_view msg) :
-			CosmosError{"UsageError"} {
+	explicit UsageError(const std::string_view msg, const SourceLocation &src_loc =
+				SourceLocation::current()) :
+			CosmosError{"UsageError", {}, src_loc} {
 		m_msg = msg;
 	}
-
-	COSMOS_ERROR_IMPL;
 };
 
 } // end ns

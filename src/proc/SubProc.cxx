@@ -27,7 +27,7 @@ void SubProc::reset() {
 ChildState SubProc::wait(const WaitFlags flags) {
 
 	if (flags[WaitFlag::NO_HANG]) {
-		cosmos_throw (UsageError("cannot use NO_HANG with SubProc, use waitTimed() instead"));
+		throw UsageError{"cannot use NO_HANG with SubProc, use waitTimed() instead"};
 	}
 
 	try {
