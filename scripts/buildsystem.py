@@ -416,7 +416,7 @@ def initSCons(project, rtti=True, deflibtype='shared'):
     env.Append(LINKFLAGS=['-Wl,--as-needed', '-flto=auto'])
 
     if ARGUMENTS.get('sanitizer', 0):
-        sanitizers = ['address', 'return', 'undefined', 'leak']
+        sanitizers = ['address', 'return', 'undefined', 'leak', 'alignment']
         sanitizers = ['-fsanitize={}'.format(f) for f in sanitizers]
         env.Append(CXXFLAGS=sanitizers)
         env.Append(LINKFLAGS=sanitizers)
