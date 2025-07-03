@@ -17,6 +17,7 @@ class MiscTest :
 		testInList();
 		testInContainer();
 		testResGuard();
+		testTwice();
 	}
 
 	void testRanges() {
@@ -79,6 +80,16 @@ class MiscTest :
 			delete[] stuff;
 			RUN_STEP("manual-delete", true);
 		}
+	}
+
+	void testTwice() {
+		START_TEST("twice");
+		size_t val = 0;
+		for (auto _: cosmos::Twice{}) {
+			val++;
+		}
+
+		RUN_STEP("twice-runs-twice", val == 2);
 	}
 };
 
