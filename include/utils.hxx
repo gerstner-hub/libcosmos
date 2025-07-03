@@ -98,6 +98,46 @@ protected: // data
 	std::function<CleanFunc> m_cleaner;
 };
 
+/// Helper class for cosmos::defer().
+template <typename F>
+class DeferGuard {
+public:
+	explicit constexpr DeferGuard(const F &&f) :
+		m_f{std::move(f)} {}
+
+	~DeferGuard() {
+		if (m_armed) {
+			m_f();
+		}
+	}
+
+	void disarm() {
+		m_armed = false;
+	}
+
+protected: // data
+
+	bool m_armed = true;
+	const F m_f;
+};
+
+/// Execute a lambda function when the current scope ends.
+/**
+ * This is a helper for deferred execution of code for simplification of
+ * functions with multiple return paths. This ensures certain operations are
+ * always performed regardless of the return path taken.
+ *
+ * A typical usage example would be:
+ *
+ *     auto guard = cosmos::defer([this]() {
+ *         // perform deferred operations
+ *     });
+ **/
+template <typename F>
+DeferGuard<F> defer(const F &&func) {
+	return DeferGuard{std::move(func)};
+}
+
 template<typename T>
 struct Identity { using type = T; };
 

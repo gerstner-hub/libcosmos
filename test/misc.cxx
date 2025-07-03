@@ -18,6 +18,7 @@ class MiscTest :
 		testInContainer();
 		testResGuard();
 		testTwice();
+		testDeferGuard();
 	}
 
 	void testRanges() {
@@ -90,6 +91,30 @@ class MiscTest :
 		}
 
 		RUN_STEP("twice-runs-twice", val == 2);
+	}
+
+	void testDeferGuard() {
+		START_TEST("defer guard");
+
+		size_t var = 0;
+		{
+			auto guard = cosmos::defer([&var]() {
+				var = 10;
+			});
+		}
+
+		RUN_STEP("defer-guard-ran", var == 10);
+
+		{
+			auto guard = cosmos::defer([&var]() {
+				var = 20;
+			});
+
+			guard.disarm();
+
+		}
+
+		RUN_STEP("disarmed-guard-skipped", var == 10);
 	}
 };
 
