@@ -153,3 +153,19 @@ inline std::vector<std::string> split(
 }
 
 } // end ns
+
+/// Support comparison of vectors with std::string and vectors with std::string_view
+inline bool operator==(const cosmos::StringVector &left, const cosmos::StringViewVector &right) {
+	if (left.size() != right.size())
+		return false;
+	for (size_t i = 0; i < left.size(); i++) {
+		if (left[i] != right[i])
+			return false;
+	}
+
+	return true;
+}
+
+inline bool operator!=(const cosmos::StringVector &left, const cosmos::StringViewVector &right) {
+	return !(left == right);
+}
