@@ -100,18 +100,6 @@ namespace {
 		return si.childData();
 	}
 
-	template <typename STYPE>
-	CStringVector to_cstring_vector(const std::vector<STYPE> &in_vector) {
-		CStringVector ret;
-
-		for (const auto &str: in_vector) {
-			ret.push_back(str.data());
-		}
-
-		ret.push_back(nullptr);
-		return ret;
-	}
-
 	using ExecFunc = std::function<int(const char*, char *const[], char *const[])>;
 
 	// wrapper to reuse execve style invocation logic
@@ -159,32 +147,6 @@ void exec(const SysString path, const CStringVector *args, const CStringVector *
 	exec_wrapper(::execvpe, path, args, env);
 
 	throw FileError{path, "execvpe()"};
-}
-
-void exec(const SysString path,
-		const StringViewVector &args, const StringViewVector *env) {
-
-	const auto args_vector = to_cstring_vector(args);
-
-	if (!env) {
-		exec(path, &args_vector);
-	} else {
-		const auto env_vector = to_cstring_vector(*env);
-		exec(path, &args_vector, &env_vector);
-	}
-}
-
-void exec(const SysString path,
-		const StringVector &args, const StringVector *env) {
-
-	const auto args_vector = to_cstring_vector(args);
-
-	if (!env) {
-		exec(path, &args_vector);
-	} else {
-		const auto env_vector = to_cstring_vector(*env);
-		exec(path, &args_vector, &env_vector);
-	}
 }
 
 void exec_at(const DirFD dir_fd, const SysString path,

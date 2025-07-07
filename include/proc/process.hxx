@@ -279,7 +279,7 @@ COSMOS_API std::optional<ChildState> wait(const PidFD fd, const WaitFlags flags 
  * will be passed on.
  *
  * Both `args` and `env` need to have a nullptr terminator element at the
- * end. If is missing then a UsageError is thrown.
+ * end. If it is missing, then a UsageError is thrown.
  *
  * As a result of this call the calling process will be completely replaced by
  * the new program. Only file descriptors not marked close-on-exec will be
@@ -328,22 +328,55 @@ COSMOS_API std::optional<ChildState> wait(const PidFD fd, const WaitFlags flags 
 COSMOS_API void exec(const SysString path,
 		const CStringVector *args = nullptr, const CStringVector *env = nullptr);
 
-/// Variant of exec(const SysString, const CStringVector*, const CStringVector*) that takes StringViewVector.
+inline void exec(const SysString path, const CStringVector &args) {
+	exec(path, &args);
+}
+
+inline void exec(const SysString path, const CStringVector &args, const CStringVector &env) {
+	exec(path, &args, &env);
+}
+
+/// Variant of exec() that takes StringViewVector for `args` and inherits environment variables.
 /**
  * This performs a conversion of the given StringViewVector(s) to
  * CStringVectors. Therefore the call requires some dynamic memory allocation
- * and copying of pointer values. `args` and `env` do not need to contain a
+ * and copying of pointer values. `args` does not need to contain a
  * terminating nullptr at the end.
  **/
-COSMOS_API void exec(const SysString path,
-		const StringViewVector &args, const StringViewVector *env = nullptr);
+inline void exec(const SysString path, const StringViewVector &args) {
+	const auto args_vector = to_cstring_vector(args);
 
-/// Variant of exec() that takes StringVector.
+	exec(path, &args_vector);
+}
+
+/// Variant of exec() that takes StringViewVector for`args` and `env`.
+/**
+ * `args` and `env` do not need to contain a terminating nullptr at the end.
+ **/
+inline void exec(const SysString path, const StringViewVector &args, const StringViewVector &env) {
+	const auto args_vector = to_cstring_vector(args);
+	const auto env_vector = to_cstring_vector(env);
+	exec(path, &args_vector, &env_vector);
+}
+
+/// Variant of exec() that takes StringVector for `args` and inherits environment variables.
 /**
  * \see exec(const SysString, const StringViewVector&, const StringViewVector*).
  **/
-COSMOS_API void exec(const SysString path,
-		const StringVector &args, const StringVector *env = nullptr);
+inline void exec(const SysString path, const StringVector &args) {
+	const auto args_vector = to_cstring_vector(args);
+	exec(path, &args_vector);
+}
+
+/// Variant of exec() that takes StringVector for `args` and `env`.
+/**
+ * \see exec(const SysString, const StringViewVector&, const StringViewVector*).
+ **/
+inline void exec(const SysString path, const StringVector &args, const StringVector &env) {
+	const auto args_vector = to_cstring_vector(args);
+	const auto env_vector = to_cstring_vector(env);
+	exec(path, &args_vector, &env_vector);
+}
 
 /// Variant of exec() that looks up a program relative to `dir_fd`.
 /**
@@ -359,6 +392,20 @@ COSMOS_API void exec(const SysString path,
 COSMOS_API void exec_at(const DirFD dir_fd, const SysString path,
 		const CStringVector *args = nullptr, const CStringVector *env = nullptr,
 		const FollowSymlinks follow_symlinks = FollowSymlinks{false});
+
+/// Variant of exec_at() that takes a CStringVector& for `args` and inherits environment variables.
+inline void exec_at(const DirFD dir_fd, const SysString path,
+		const CStringVector &args,
+		const FollowSymlinks follow_symlinks = FollowSymlinks{false}) {
+	exec_at(dir_fd, path, &args, nullptr, follow_symlinks);
+}
+
+/// Variant of exec_at() that takes a CStringVector& for `args` and `env`
+inline void exec_at(const DirFD dir_fd, const SysString path,
+		const CStringVector &args, const CStringVector &env,
+		const FollowSymlinks follow_symlinks = FollowSymlinks{false}) {
+	exec_at(dir_fd, path, &args, &env, follow_symlinks);
+}
 
 /// Variant of exec() that executes the program referred to by the given file descriptor.
 /**
@@ -376,6 +423,16 @@ COSMOS_API void exec_at(const DirFD dir_fd, const SysString path,
  **/
 COSMOS_API void fexec(const FileDescriptor fd,
 		const CStringVector *args = nullptr, const CStringVector *env = nullptr);
+
+/// Variant of fexec() that takes a CStringVector& for `args` and inherits environment variables.
+inline void fexec(const FileDescriptor fd, const CStringVector &args) {
+	fexec(fd, &args);
+}
+
+/// Variant of fexec() that takes a CStringVector& for `args` and `env`
+inline void fexec(const FileDescriptor fd, const CStringVector &args, const CStringVector &env) {
+	fexec(fd, &args, &env);
+}
 
 /// Immediately terminate the calling process.
 /**

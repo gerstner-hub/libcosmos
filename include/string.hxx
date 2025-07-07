@@ -30,6 +30,19 @@ using SysStringVector  = std::vector<SysString>;
  * std::string objects and general string processing topics.
  **/
 
+/// Convert StringVector or StringViewVector to CStringVector.
+template <typename STYPE>
+inline CStringVector to_cstring_vector(const std::vector<STYPE> &in_vector) {
+	CStringVector ret;
+
+	for (const auto &str: in_vector) {
+		ret.push_back(str.data());
+	}
+
+	ret.push_back(nullptr);
+	return ret;
+}
+
 /// Comparison type for std::map and similar containers with plain char* as keys.
 struct CompareCString {
 	bool operator()(const char *a, const char *b) const {
