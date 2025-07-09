@@ -1,6 +1,7 @@
 // cosmos
 #include <cosmos/error/ApiError.hxx>
 #include <cosmos/error/UsageError.hxx>
+#include <cosmos/formatting.hxx>
 #include <cosmos/proc/ptrace.hxx>
 #include <cosmos/utils.hxx>
 
@@ -15,6 +16,65 @@ static_assert(sizeof(SyscallInfo::SeccompInfo) == sizeof(SyscallInfo::SeccompInf
 static_assert(sizeof(uint64_t) == sizeof(__u64),
 		"mismatch between uint64_t and __64");
 
+namespace {
+
+	const char* to_label(const Request req) {
+		switch(req) {
+			case Request::TRACEME: return "TRACEME";
+			case Request::PEEKDATA: return "PEEKDATA";
+			case Request::PEEKTEXT: return "PEEKTEXT";
+			case Request::PEEKUSER: return "PEEKUSER";
+			case Request::POKEDATA: return "POKEDATA";
+			case Request::POKEUSER: return "POKEUSER";
+#ifdef PTRACE_GETREGS
+			case Request::GETREGS: return "GETREGS";
+#endif
+#ifdef PTRACE_GETFPREGS
+			case Request::GETFPREGS: return "GETFPREGS";
+#endif
+			case Request::GETREGSET: return "GETREGSET";
+#ifdef PTRACE_SETREGS
+			case Request::SETREGS: return "SETREGS";
+#endif
+#ifdef PTRACE_SETFPREGS
+			case Request::SETFPREGS: return "SETFPREGS";
+#endif
+			case Request::SETREGSET: return "SETREGSET";
+			case Request::GETSIGINFO: return "GETSIGINFO";
+			case Request::SETSIGINFO: return "SETSIGINFO";
+			case Request::PEEKSIGINFO: return "PEEKSIGINFO";
+			case Request::GETSIGMASK: return "GETSIGMASK";
+			case Request::SETSIGMASK: return "SETSIGMASK";
+			case Request::SETOPTIONS: return "SETOPTIONS";
+			case Request::GETEVENTMSG: return "GETEVENTMSG";
+			case Request::CONT: return "CONT";
+			case Request::SYSCALL: return "SYSCALL";
+			case Request::SINGLESTEP: return "SINGLESTEP";
+#ifdef PTRACE_SET_SYSCALL
+			case Request::SET_SYSCALL: return "SET_SYSCALL";
+#endif
+#ifdef PTRACE_SYSEMU
+			case Request::SYSEMU: return "SYSEMU";
+			case Request::SYSEMU_SINGLESTEP: return "SYSEMU_SINGLESTEP";
+#endif
+			case Request::LISTEN: return "LISTEN";
+			case Request::KILL: return "KILL";
+			case Request::INTERRUPT: return "INTERRUPT";
+			case Request::ATTACH: return "ATTACH";
+			case Request::SEIZE: return "SEIZE";
+			case Request::SECCOMP_GET_FILTER: return "SECCOMP_GET_FILTER";
+			case Request::DETACH: return "DETACH";
+#ifdef PTRACE_GET_THREAD_AREA
+			case Request::GET_THREAD_AREA: return "GET_THREAD_AREA";
+#endif
+#ifdef PTRACE_SET_THREAD_AREA
+			case Request::SET_THREAD_AREA: return "SET_THREAD_AREA";
+#endif
+			case Request::GET_SYSCALL_INFO: return "GET_SYSCALL_INFO";
+			default: return "?unknown?";
+		}
+	}
+}
 
 std::optional<long> trace(const Request req, const ProcessID pid, void *addr, void *data) {
 	const auto is_peek =
@@ -38,7 +98,7 @@ std::optional<long> trace(const Request req, const ProcessID pid, void *addr, vo
 			return ret;
 		}
 
-		throw ApiError{"ptrace()"};
+		throw ApiError{sprintf("ptrace(%d, %s, ...)", to_integral(pid), to_label(req))};
 	}
 
 	// only these ptrace requests return meaningful data, otherwise just
