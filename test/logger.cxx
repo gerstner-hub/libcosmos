@@ -18,5 +18,13 @@ int main() {
 	logger.info() << "this is an info message" << std::endl;
 	logger.debug() << "this is a debug message" << std::endl;
 
+	logger.setChannels(true, false, true, false);
+	logger.configFromString("!error,warn,!info,debug");
+
+	if (logger.errorEnabled() || !logger.warnEnabled() || logger.infoEnabled() || !logger.debugEnabled()) {
+		std::cerr << "configFromString() unexpected results\n";
+		return 1;
+	}
+
 	return 0;
 }

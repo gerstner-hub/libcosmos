@@ -43,6 +43,12 @@ public: // functions
 	/// Log a debug message
 	std::ostream& debug() { return getStream(m_debug); }
 
+	bool errorEnabled() const { return m_err.enabled; }
+	bool warnEnabled() const { return m_warn.enabled; }
+	bool infoEnabled() const { return m_info.enabled; }
+	bool debugEnabled() const { return m_debug.enabled; }
+
+
 	/// Enable/disable different log channels
 	void setChannels(const bool error, const bool warning, const bool info, const bool debug) {
 		m_err.enabled = error;
@@ -54,6 +60,28 @@ public: // functions
 	void setPrefix(const std::string_view prefix) {
 		m_common_prefix = prefix;
 	}
+
+	/// Configure channels from the contents of an environment variable.
+	/**
+	 * This looks for an environment variable named `var` and passes its
+	 * contents to configFromString(). If a syntax error is found, then a
+	 * RuntimeError is thrown.
+	 *
+	 * The return value indicates whether `var` was found and passed to
+	 * configFromString(), `false` otherwise.
+	 **/
+	bool configFromEnvVar(const char *var);
+
+	/// Configure channels from the contents of the given string.
+	/**
+	 * The given string is a comma separated list of channel names like
+	 * "info,!debug,error", which would enable the info and error
+	 * channels, while the debug channel would be explicitly disabled.
+	 *
+	 * If there is a syntax error then a RuntimeError is thrown and no
+	 * configuration is changed.
+	 **/
+	void configFromString(const std::string_view var);
 
 protected: // types
 
