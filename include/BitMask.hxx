@@ -190,6 +190,16 @@ public: // functions
 		return sizeof(EnumBaseType) * 8;
 	}
 
+	/// like `test()`, but automatically reset the bit position if it's set.
+	bool steal(const ENUM val) {
+		if (!test(val)) {
+			return false;
+		} else {
+			reset(val);
+			return true;
+		}
+	}
+
 	/// Returns whether the given bit position is set.
 	/**
 	 * \note If `val` consists of multiple bits then this only returns

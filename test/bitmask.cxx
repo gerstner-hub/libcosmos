@@ -34,6 +34,7 @@ public:
 		testFlip();
 		testAllAndEmpty();
 		testLimit();
+		testSteal();
 	}
 
 	bool processBitMask(const MyBitMask mask) {
@@ -177,6 +178,14 @@ public:
 
 
 		FINISH_STEP(full.only(MyEnum::VAL1) == true);
+	}
+
+	void testSteal() {
+		START_TEST("Test stealing bits");
+		MyBitMask mask;
+		RUN_STEP("Verify steal() of unset value does nothing", mask.steal(MyEnum::VAL1) == false && !mask[MyEnum::VAL1]);
+		mask.set(MyEnum::VAL1);
+		RUN_STEP("Verify steal() of set value works", mask.steal(MyEnum::VAL1) == true && !mask[MyEnum::VAL1]);
 	}
 };
 
