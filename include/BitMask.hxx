@@ -36,13 +36,13 @@ public: // functions
 	}
 
 	/// Sets only the flags found in the given initializer list.
-	BitMask(const std::initializer_list<ENUM> &init_list) {
-		for (auto val: init_list) {
+	BitMask(const std::initializer_list<ENUM> &flags) {
+		for (auto val: flags) {
 			m_flags |= static_cast<EnumBaseType>(val);
 		}
 	}
 
-	/// Sets exactly the given value to one.
+	/// Sets exactly the given bit position.
 	constexpr BitMask(const ENUM val) :
 		m_flags{static_cast<EnumBaseType>(val)}
 	{}
@@ -58,7 +58,7 @@ public: // functions
 	/// Return a string representation of the bit mask.
 	explicit operator std::string() const { return toString(); }
 
-	/// Returns a boolean value for the given value, \see test().
+	/// Returns a boolean value for the given value, \see `test()`.
 	bool operator[] (const ENUM flag) const { return test(flag); }
 
 	std::string toString() const {
@@ -73,19 +73,20 @@ public: // functions
 		return ret;
 	}
 
-	/// Sets all bits it the set.
+	/// Sets all bits it the mask.
 	BitMask& set(const All) {
 		m_flags = ~EnumBaseType(0);
 		return *this;
 	}
 
-	/// Set or unset the given value.
+	/// Set or reset the given bit position.
 	BitMask& set(const ENUM val, bool on_off = true) {
 		const auto bitval = static_cast<EnumBaseType>(val);
 		m_flags = (on_off ? (m_flags|bitval) : (m_flags & ~bitval));
 		return *this;
 	}
 
+	/// Set all of the given bit positions.
 	BitMask& set(const std::initializer_list<ENUM> &flags) {
 		for (auto flag: flags) {
 			set(flag);
@@ -93,7 +94,7 @@ public: // functions
 		return *this;
 	}
 
-	/// Sets all the bits that are also set in `other`.
+	/// Set all the bits that are also set in `other`.
 	BitMask& set(const BitMask other) {
 		m_flags |= other.m_flags;
 		return *this;
@@ -105,13 +106,13 @@ public: // functions
 		return *this;
 	}
 
-	/// Zeroes the given value.
+	/// Zeroes the given bit position.
 	BitMask& reset(const ENUM val) {
 		reset({val});
 		return *this;
 	}
 
-	/// Zeroes all of the given values.
+	/// Zeroes all of the given flags.
 	BitMask& reset(const std::initializer_list<ENUM> &flags) {
 		for (auto val: flags) {
 			m_flags &= ~static_cast<EnumBaseType>(val);
@@ -119,17 +120,19 @@ public: // functions
 		return *this;
 	}
 
+	/// Zeroes all bit positions that are set in `other`.
 	BitMask& reset(const BitMask other) {
 		m_flags &= ~(other.raw());
 		return *this;
 	}
 
+	/// Returns a copy of the bit mask with all positions zeroed that are set in `other`.
 	BitMask reset(const BitMask other) const {
 		auto ret = *this;
 		return ret.reset(other);
 	}
 
-	/// Sets all bits to zero except the given flags.
+	/// Sets all bits to zero except those already set and also found in `flags`.
 	BitMask& limit(const std::initializer_list<ENUM> &flags) {
 		EnumBaseType mask = 0;
 		for (auto val: flags) {
@@ -145,12 +148,13 @@ public: // functions
 		return limit({flag});
 	}
 
-	/// Sets all bits to zero except the bits in the given mask.
+	/// Sets all bits to zero except the bits in the given mask `other`.
 	BitMask& limit(const BitMask other) {
 		m_flags &= other.raw();
 		return *this;
 	}
 
+	/// Returns a copy of the bit mask with all bits set to zero except those also set in `other`.
 	BitMask limit(const BitMask other) const {
 		auto ret = *this;
 		return ret.limit(other);
@@ -162,13 +166,13 @@ public: // functions
 		return *this;
 	}
 
-	/// Flips the given value.
+	/// Flips the given bit position.
 	BitMask& flip(const ENUM val) {
 		m_flags ^= static_cast<EnumBaseType>(val);
 		return *this;
 	}
 
-	/// Returns the number of set bits.
+	/// Returns the number of set bits in the mask.
 	size_t count() const {
 		size_t ret = 0;
 
@@ -186,7 +190,7 @@ public: // functions
 		return sizeof(EnumBaseType) * 8;
 	}
 
-	/// Returns whether the given value is set.
+	/// Returns whether the given bit position is set.
 	/**
 	 * \note If `val` consists of multiple bits then this only returns
 	 * `true` if all of the bits it represents are set.
@@ -196,7 +200,7 @@ public: // functions
 		return (m_flags & raw_val) == raw_val;
 	}
 
-	/// Returns whether any of the bits of `val` are set.
+	/// Returns whether any of the bits of `val` are set in the mask.
 	/**
 	 * This is only different to test() if the given value
 	 * consists of multiple bit positions. In this case testAny() will
@@ -209,17 +213,17 @@ public: // functions
 	}
 
 
-	/// Returns whether this is the only value set.
+	/// Returns whether this is the only bit position set in the mask.
 	bool only(const ENUM val) const {
 		return m_flags == static_cast<EnumBaseType>(val);
 	}
 
-	/// Returns whether any bit in the bitset is set.
+	/// Returns whether any bit in the mask is set.
 	bool any() const {
 		return m_flags != 0;
 	}
 
-	/// Tests whether all of the given values are set.
+	/// Tests whether all of the given bit positions are set in the mask.
 	bool allOf(const std::initializer_list<ENUM> &flags) const {
 		for (auto val: flags) {
 			if (!test(val))
@@ -229,11 +233,12 @@ public: // functions
 		return true;
 	}
 
+	/// Tests whether all of the bits set in `other` are also set in this mask.
 	bool allOf(const BitMask other) const {
 		return (m_flags & other.m_flags) == other.m_flags;
 	}
 
-	/// Returns whether any of the given values is set.
+	/// Returns whether any of the given bit positions is set in the mask.
 	bool anyOf(const std::initializer_list<ENUM> &flags) const {
 		for (auto val: flags) {
 			if (test(val))
@@ -243,6 +248,7 @@ public: // functions
 		return false;
 	}
 
+	/// Returns whether any of the flags set in `other` is also set in this mask.
 	bool anyOf(const BitMask other) const {
 		return (m_flags & other.m_flags) != 0;
 	}
@@ -260,7 +266,7 @@ public: // functions
 		return !(*this == other);
 	}
 
-	/// Checks whether any bit of the given value is set, \see testAny().
+	/// Checks whether any bit of the given `val` is set, \see testAny().
 	bool operator&(const ENUM val) const {
 		return testAny(val);
 	}
@@ -270,6 +276,7 @@ public: // functions
 		return ENUM{other.raw() & this->raw()};
 	}
 
+	/// Returns the flip()'ed mask.
 	BitMask operator~() const {
 		return BitMask{~m_flags};
 	}
@@ -298,6 +305,7 @@ public: // functions
 		return ret.set(val);
 	}
 
+	/// Returns the union of `first` and `second`.
 	friend BitMask operator|(const BitMask &first, const BitMask &second) {
 		BitMask ret{first.m_flags | second.m_flags};
 	}
