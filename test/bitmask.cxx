@@ -12,6 +12,7 @@ class BitMaskTest :
 		public cosmos::TestBase {
 protected: // types
 	enum class MyEnum : int {
+		ZERO = 0,
 		VAL1 = 0x1,
 		VAL2 = 0x2,
 		VAL3 = 0x4,
@@ -34,6 +35,7 @@ public:
 		testFlip();
 		testAllAndEmpty();
 		testLimit();
+		testTest();
 		testSteal();
 	}
 
@@ -178,6 +180,12 @@ public:
 
 
 		FINISH_STEP(full.only(MyEnum::VAL1) == true);
+	}
+
+	void testTest() {
+		START_TEST("Test testing of bits");
+		MyBitMask mask;
+		EXPECT_EXCEPTION("test of 0 throws", mask.test(MyEnum::ZERO));
 	}
 
 	void testSteal() {

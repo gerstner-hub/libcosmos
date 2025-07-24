@@ -5,6 +5,9 @@
 #include <string>
 #include <type_traits>
 
+// cosmos
+#include <cosmos/error/UsageError.hxx>
+
 namespace cosmos {
 
 /// A typesafe bit mask representation using class enums.
@@ -207,6 +210,10 @@ public: // functions
 	 **/
 	bool test(const ENUM val) const {
 		const auto raw_val = static_cast<EnumBaseType>(val);
+		if (raw_val == 0) {
+			// testing for no bit makes no sense
+			throw UsageError("test for zero");
+		}
 		return (m_flags & raw_val) == raw_val;
 	}
 
