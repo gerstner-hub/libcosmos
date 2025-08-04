@@ -225,6 +225,29 @@ def addVersionFileTarget(self, basename, version):
     self.Alias('create-version-files', version_file_target)
 
 
+def cloneNoSanitizer(self):
+    """Returns an environment without sanitizer compilation or linker
+    flags."""
+    non_sanitizer_env = self.Clone()
+
+    if not self['sanitizer']:
+        # already as it should be
+        return non_sanitizer_env
+
+    for var in ('CXXFLAGS', 'LINKFLAGS'):
+        new_flags = []
+        for flag in str(non_sanitizer_env[var]).split():
+            if flag.startswith('-fsanitize'):
+                continue
+            new_flags.append(flag)
+        non_sanitizer_env[var] = new_flags
+
+    non_sanitizer_env['LIBS'].remove('asan')
+    non_sanitizer_env['LIBS'].remove('ubsan')
+
+    return non_sanitizer_env
+
+
 def getCurrentGitTag(self, basename):
     """This returns the most recent Git tag found in the Git repository where
     the current SConstruct file is located. If there is no Git repository
@@ -287,6 +310,7 @@ def enhanceEnv(env):
     env.AddMethod(getSharedLibVersionInfo, 'GetSharedLibVersionInfo')
     env.AddMethod(getCurrentGitTag, 'GetCurrentGitTag')
     env.AddMethod(addVersionFileTarget, 'AddVersionFileTarget')
+    env.AddMethod(cloneNoSanitizer, 'CloneNoSanitizer')
 
 
 def initSCons(project, rtti=True, deflibtype='shared'):
@@ -421,6 +445,9 @@ def initSCons(project, rtti=True, deflibtype='shared'):
         env.Append(CXXFLAGS=sanitizers)
         env.Append(LINKFLAGS=sanitizers)
         env.Append(LIBS=['asan', 'ubsan'])
+        env['sanitizer'] = True
+    else:
+        env['sanitizer'] = False
 
     if evalBool(ARGUMENTS.get('debug', '0')):
         env.Append(CXXFLAGS=['-O0'])
