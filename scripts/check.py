@@ -16,6 +16,7 @@ parser = argparse.ArgumentParser(description='build and test various compiler co
 parser.add_argument('--skip-static', action='store_true', help='don\'t build static linking configurations')
 parser.add_argument('--skip-32bit', action='store_true', help='don\'t build x86 32-bit configurations on x86_64')
 parser.add_argument('--skip-clang', action='store_true', help='don\'t build clang configurations')
+parser.add_argument('--skip-sanitizer', action='store_true', help='don\'t build saniizer=1 configuration')
 parser.add_argument('--skip-flake', nargs='*', action='append', help='skip flake8 check on Python source files')
 parser.add_argument('--extra-compiler', nargs='*', action='append', help='build configurations with additional custom compilers')
 
@@ -94,8 +95,8 @@ addConfig('libtype=shared')
 
 if not args.skip_static:
     addConfig('libtype=static')
-
-configurations.append('sanitizer=1')
+if not args.skip_sanitizer:
+    configurations.append('sanitizer=1')
 
 for config in configurations:
     buildConfig(config)
