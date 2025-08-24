@@ -4,6 +4,7 @@
 
 // cosmos
 #include <cosmos/error/ApiError.hxx>
+#include <cosmos/private/strerror.hxx>
 #include <cosmos/utils.hxx>
 
 namespace cosmos {
@@ -33,9 +34,15 @@ void ApiError::generateMsg() const {
 std::string ApiError::msg(const Errno err) {
 	char error[512];
 
-	const char *text = ::strerror_r(to_integral(err), &error[0], sizeof(error));
+	auto ret = xsi_strerror_r(to_integral(err), &error[0], sizeof(error));
 
-	return text;
+	if (ret != 0) {
+		std::stringstream ss;
+		ss << "failed to format errno (error code:" << (ret < 0 ? errno : ret) << ")";
+		return ss.str();
+	}
+
+	return std::string{error};
 }
 
 } // end ns
