@@ -32,6 +32,16 @@ public: // functions
 
 	auto raw() const { return m_id; }
 
+	/// This operator allows to place IDs into STL containers.
+	/**
+	 * While pthread_t should be treated as opaque they're still supposed
+	 * to be unique per thread and they can be on Linux/glibc at least, so
+	 * this operator allows to place IDs into STL containers.
+	 **/
+	bool operator<(const ID &other) const {
+		return m_id < other.m_id;
+	}
+
 protected: // data
 
 	pthread_t m_id;
