@@ -15,6 +15,7 @@
 #include <stdint.h>
 
 // Linux
+#include <asm/unistd.h>
 #include <elf.h>
 #include <linux/audit.h>
 #include <sys/ptrace.h>
@@ -319,6 +320,18 @@ public: // functions
 	/// Returns the system call ABI in effect for the current system call.
 	Arch arch() const {
 		return Arch{m_info.arch};
+	}
+
+	/// Returns whether this is an entry for an X32 system call on Arch::X86_64.
+	/**
+	 * The X32 ABI does not have its dedicated Arch value, but is
+	 * piggybacked on X86_64. A special bit is then set in the system call
+	 * number to mark X32 system calls.
+	 **/
+	bool isX32() const {
+		if (!isEntry() || arch() != Arch::X86_64)
+			return false;
+		return (entryInfo()->syscallNr() & __X32_SYSCALL_BIT) != 0;
 	}
 
 	/// Returns the CPU instruction pointer value.
