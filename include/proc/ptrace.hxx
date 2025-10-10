@@ -219,6 +219,11 @@ public: // types
 			protected RawEntryInfo {
 	public: // functions
 
+		/// The number of the system call.
+		/**
+		 * This is the system call number in the context of the ABI
+		 * that is reported via the `Arch` enum.
+		 **/
 		uint64_t syscallNr() const {
 			return this->nr;
 		}
