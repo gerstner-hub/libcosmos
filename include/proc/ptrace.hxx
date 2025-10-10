@@ -187,8 +187,16 @@ enum class Request {
  * exotics archs.
  **/
 enum class Arch : uint32_t {
-	X86_64 = AUDIT_ARCH_X86_64,
-	I386   = AUDIT_ARCH_I386
+	X86_64  = AUDIT_ARCH_X86_64,
+	I386    = AUDIT_ARCH_I386,
+	AARCH64 = AUDIT_ARCH_AARCH64,
+	ARM     = AUDIT_ARCH_ARM,
+	ARMEB   = AUDIT_ARCH_ARMEB, ///< ARM 32-bit EABI big endian
+	MIPS    = AUDIT_ARCH_MIPS,
+	MIPS64  = AUDIT_ARCH_MIPS64,
+	PPC     = AUDIT_ARCH_PPC,
+	PPC64   = AUDIT_ARCH_PPC64,
+	PPC64LE = AUDIT_ARCH_PPC64LE,
 };
 
 /// Wrapper around data structure used with ptrace::Request::GET_SYSCALL_INFO.
