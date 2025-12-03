@@ -44,7 +44,7 @@ void DirStream::open(const SysString path, const FollowSymlinks follow_links) {
 	 */
 	auto res = ::open(
 		path.raw(),
-		O_RDONLY | O_CLOEXEC | O_DIRECTORY | (follow_links ? O_NOFOLLOW : 0)
+		O_RDONLY | O_CLOEXEC | O_DIRECTORY | (follow_links ? 0 : O_NOFOLLOW)
 	);
 
 	DirFD fd{FileNum{res}};
