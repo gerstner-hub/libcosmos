@@ -331,7 +331,12 @@ public: // functions
 	bool isX32() const {
 		if (!isEntry() || arch() != Arch::X86_64)
 			return false;
+
+#ifdef __X32_SYSCALL_BIT
 		return (entryInfo()->syscallNr() & __X32_SYSCALL_BIT) != 0;
+#else
+		return false;
+#endif
 	}
 
 	/// Returns the CPU instruction pointer value.
