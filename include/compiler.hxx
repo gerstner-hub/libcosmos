@@ -40,8 +40,21 @@ namespace cosmos::arch {
 #	define COSMOS_X86
 /// Whether we're sitting on 64-bit x64-64.
 constexpr inline bool X86_64 = true;
+
+/*
+ * There is scarce documentation about this, but to detect X32 ABI.
+ * These preprocessor defines can be checked. This refers to "integer/long/pointer == 32 bit".
+ */
+#	if defined(__ILP32__) || defined(_ILP32)
+#		define COSMOS_X32
+constexpr inline bool X32 = true;
+#	else
+constexpr inline bool X32 = false;
+#	endif
+
 #else
 constexpr inline bool X86_64 = false;
+constexpr inline bool X32 = false;
 #endif
 
 #ifdef __i386__
