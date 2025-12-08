@@ -70,11 +70,19 @@ constexpr inline bool I386 = false;
 constexpr inline bool X86 = X86_64 || I386;
 
 #ifdef __arm__
-/// Whether we're sitting on arm EABI
+/// Whether we're sitting on arm EABI (32-bit)
 #	define COSMOS_ARM
 constexpr inline bool ARM = true;
 #else
 constexpr inline bool ARM = false;
+#endif
+
+#ifdef __aarch64__
+/// Whether we're sitting on aarch64
+#	define COSMOS_AARCH64
+constexpr inline bool AARCH64 = true;
+#else
+constexpr inline bool AARCH64 = false;
 #endif
 
 } // end ns
