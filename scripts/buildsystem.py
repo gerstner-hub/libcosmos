@@ -337,12 +337,18 @@ def initSCons(project, rtti=True, deflibtype='shared'):
 
         defbuildroot = 'build'
 
+        flavour = ARGUMENTS.get('variant', flavour)
+
         if flavour:
             defbuildroot += f'.{flavour}'
         return ARGUMENTS.get('buildroot', defbuildroot)
 
     def getInstroot():
         definstroot = 'install'
+
+        variant = ARGUMENTS.get('variant', None)
+        if variant:
+            definstroot += f'.{variant}'
 
         ret = ARGUMENTS.get('instroot', definstroot)
 
