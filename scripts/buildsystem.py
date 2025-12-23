@@ -455,6 +455,14 @@ def initSCons(project, rtti=True, deflibtype='shared'):
     else:
         env['sanitizer'] = False
 
+    # support building e.g. for `-m32` for 32-bit emulation binaries on amd64
+    abi = ARGUMENTS.get('abi', None)
+    if abi:
+        abi_switch = [f"-m{abi}"]
+        env.Append(CXXFLAGS=abi_switch)
+        env.Append(CFLAGS=abi_switch)
+        env.Append(LINKFLAGS=abi_switch)
+
     if evalBool(ARGUMENTS.get('debug', '0')):
         env.Append(CXXFLAGS=['-O0'])
     elif evalBool(ARGUMENTS.get('optforsize', '0')):
