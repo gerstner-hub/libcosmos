@@ -8,6 +8,10 @@ sources = []
 test_env.ConfigureForLib('libcosmos', sources)
 run_env = test_env.Clone()
 run_env.ConfigureRunForLib('libcosmos')
+if env['sanitizer']:
+    # disable ODR violations, which trigger in some areas not under our
+    # control, like Glibc's dynamic loader.
+    run_env['ENV']['ASAN_OPTIONS'] = 'detect_odr_violation=0'
 
 for test in tests:
     label = '.'.join(test.split('.')[:-1])
