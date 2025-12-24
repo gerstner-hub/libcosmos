@@ -210,7 +210,7 @@ public:
 		// -
 		// but the default locale should be active for us
 		const std::string errmsg{"No such file or directory"};
-		for (const auto &item: {m_nonexisting_file, m_cat_path, errmsg}) {
+		for (const auto &item: {m_nonexisting_file, std::string{"cat:"}, errmsg}) {
 			EVAL_STEP(line.find(item) != line.npos);
 		}
 
