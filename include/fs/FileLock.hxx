@@ -30,9 +30,10 @@ namespace cosmos {
  *
  * For new programs the OFD style locks should always be used in preference
  * over the traditional locks, except if compatibility with existing software
- * is a requirement. This structure is used for both, traditional and OFD
- * locks. For OFD locks the `pid()` value must be zero, which is achieved by
- * calling the constructor, `clear()` or `clearPID()`.
+ * is a requirement.
+ * This structure is used for both, traditional and OFD locks. For OFD locks
+ * the `pid()` value must be zero, which is achieved by calling the
+ * constructor, `clear()` or `clearPID()`.
  *
  * Things to consider:
  *
@@ -43,9 +44,9 @@ namespace cosmos {
  *   but there are some limitations to this. OFD locks currently don't have
  *   deadlock detection.
  * - traditional locks are not inherited via `fork()`, but are preserved
- *   across `execve()`. A close on any file descriptor referring to the lock,
- *   will be remove the lock, even if other file descriptors for the open file
- *   description exist.
+ *   across `execve()`. A `close()` on any file descriptor referring to the
+ *   lock, will remove the lock, even if other file descriptors for the
+ *   open file description exist.
  * - traditional locks always conflict with OFD locks, even if the same
  *   process acquires them on the same file descriptor.
  * - OFD locks placed on the same open file description are always compatible
@@ -130,9 +131,9 @@ public: // functions
 
 	/// Check output data whether it describes an OFD lock.
 	/**
-	 * Data returned from FileDescriptor::getOFDLock() will set an invalid
-	 * process ID if the lock describes an OFD lock. Otherwise it is a
-	 * traditional POSIX compatible lock.
+	 * Data returned from FileDescriptor::getOFDLock() will be set to an
+	 * invalid process ID if the lock describes an OFD lock. Otherwise it
+	 * is a traditional POSIX compatible lock.
 	 **/
 	bool isOFDLock() const {
 		return pid() == ProcessID::INVALID;
