@@ -32,6 +32,7 @@ public:
 		testFileOwner();
 		testSignalSettings();
 		testFileLeases();
+		testRWHints();
 	}
 
 	void testStdinFD() {
@@ -262,6 +263,27 @@ public:
 		}
 
 		thread.join();
+	}
+
+	void testRWHints() {
+		START_TEST("Testing R/W hints");
+
+		cosmos::Pipe pip;
+		auto fd = pip.readEnd();
+
+		using Hint = cosmos::FileDescriptor::ReadWriteHint;
+		auto hint = fd.getInodeReadWriteHint();
+
+		RUN_STEP("rw-inode-hint-is-not-set-by-default", hint == Hint::LIFE_NOT_SET);
+		fd.setInodeReadWriteHint(Hint::LIFE_MEDIUM);
+		hint = fd.getInodeReadWriteHint();
+		RUN_STEP("rw-inode-hint-set-works", hint == Hint::LIFE_MEDIUM);
+
+		/*
+		 * the file-description related R/W hints seem unimplemented
+		 * in the kernel, it is unclear what happened to this part of
+		 * the API
+		 */
 	}
 protected: // data
 

@@ -293,6 +293,53 @@ void FileDescriptor::setLease(const LeaseType lease) {
 	}
 }
 
+void FileDescriptor::setInodeReadWriteHint(const ReadWriteHint hint) {
+	/* this expects a pointer to uint64_t, which we cannot get safely,
+	 * event though `hint` has uint64_t as underyling type.
+	 *
+	 * thus use an intermediate variable for this purpose.
+	 */
+	const uint64_t native_hint = cosmos::to_integral(hint);
+	const auto res = this->fcntl(F_SET_RW_HINT, &native_hint);
+
+	if (res != 0) {
+		throw ApiError{"fcntl(F_SET_RW_HINT)"};
+	}
+}
+
+FileDescriptor::ReadWriteHint FileDescriptor::getInodeReadWriteHint() const {
+	uint64_t native_hint;
+
+	const auto res = this->fcntl(F_GET_RW_HINT, &native_hint);
+
+	if (res != 0) {
+		throw ApiError{"fcntl(F_GET_RW_HINT)"};
+	}
+
+	return ReadWriteHint{native_hint};
+}
+
+void FileDescriptor::setFDReadWriteHint(const ReadWriteHint hint) {
+	const uint64_t native_hint = cosmos::to_integral(hint);
+	const auto res = this->fcntl(F_SET_FILE_RW_HINT, &native_hint);
+
+	if (res != 0) {
+		throw ApiError{"fnctl(F_SET_FILE_RW_HINT)"};
+	}
+}
+
+FileDescriptor::ReadWriteHint FileDescriptor::getFDReadWriteHint() const {
+	uint64_t native_hint;
+
+	const auto res = this->fcntl(F_GET_FILE_RW_HINT, &native_hint);
+
+	if (res != 0) {
+		throw ApiError{"fcntl(F_GET_FILE_RW_HINT)"};
+	}
+
+	return ReadWriteHint{native_hint};
+}
+
 FileDescriptor stdout(FileNum::STDOUT);
 FileDescriptor stderr(FileNum::STDERR);
 FileDescriptor stdin(FileNum::STDIN);

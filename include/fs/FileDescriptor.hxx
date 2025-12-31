@@ -1,6 +1,7 @@
 #pragma once
 
 // C++
+#include <cstdint>
 #include <optional>
 #include <tuple>
 
@@ -182,6 +183,31 @@ public: // types
 	protected: // data
 
 		f_owner_ex m_raw;
+	};
+
+	/// Hint values which can be used with setInodeReadWriteHint() and setFDReadWriteHint().
+	/**
+	 * These settings allow an application to inform the kernel about the
+	 * expected "write lifetime" of data written to a file or open file
+	 * description. The lifetime in this context means the time
+	 * the data written is expected to live on the storage device before
+	 * it will be overwritten or erased.
+	 *
+	 * The exact meaning of these values is rather fuzzy and only the
+	 * relative ordering between the different classes is maintained by
+	 * the storage-backend in the kernel.
+	 *
+	 * The hints can be applied to an open file description only or to the
+	 * inode which represents the file. The setInodeReadWriteHint() and
+	 * setFDReadWriteHint() member functions reflect this accordingly.
+	 **/
+	enum class ReadWriteHint : uint64_t {
+		LIFE_NOT_SET = RWH_WRITE_LIFE_NOT_SET, ///< no specific hint set (default).
+		LIFE_NONE    = RWH_WRITE_LIFE_NONE,    ///< no specific write lifetime associated.
+		LIFE_SHORT   = RWH_WRITE_LIFE_SHORT,   ///< short lifetime of data is expected.
+		LIFE_MEDIUM  = RWH_WRITE_LIFE_MEDIUM,  ///< longer lifetime than short is expected.
+		LIFE_LONG    = RWH_WRITE_LIFE_LONG,    ///< longer lifetime than medium is expected.
+		LIFE_EXTREME = RWH_WRITE_LIFE_EXTREME  ///< longer lifetime than long is expected.
 	};
 
 public: // functions
@@ -522,6 +548,44 @@ public: // functions
 	 * blocking on the lease.
 	 **/
 	void setLease(const LeaseType lease);
+
+	/// Get the currently configured read/write hint for the inode.
+	/**
+	 * This read/write hint concerns the inode which backs the current
+	 * file descriptor. It affects all open file descriptions in the
+	 * system.
+	 **/
+	ReadWriteHint getInodeReadWriteHint() const;
+
+	/// Set the read/write hint for the inode.
+	/**
+	 * This changes the read/write hint attached to the inode which backs
+	 * the current file descriptor.
+	 **/
+	void setInodeReadWriteHint(const ReadWriteHint hint);
+
+	/// Get the currently configured read/write hint for the open file description.
+	/**
+	 * This read/write hint concerns only the open file description the
+	 * current file descriptor is associated with. Other open file
+	 * descriptions are not affected by this hint.
+	 *
+	 * \note While `man 2 fcntl` mentions these file description related
+	 * R/W hints and while the according constants are also found in
+	 * userspace headers, the kernel seems not to implemented these
+	 * operations at all for unknown reasons.
+	 **/
+	ReadWriteHint getFDReadWriteHint() const;
+
+	/// Set the read/write hint for the open file description.
+	/**
+	 * This changes the read/write hint attached to the open file
+	 * description the current file descriptor is associated with.
+	 *
+	 * \see `getFDReadWriteHint()` regarding the availability of this API
+	 * in the Linux kernel.
+	 **/
+	void setFDReadWriteHint(const ReadWriteHint hint);
 
 protected: // functions
 
