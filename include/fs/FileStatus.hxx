@@ -50,6 +50,10 @@ public: // functions
 		updateFrom(fd, path, follow);
 	}
 
+	explicit FileStatus(const struct stat &st) {
+		updateFrom(st);
+	}
+
 	/// Obtains stat data for the file object at the given path (stat, lstat).
 	/**
 	 * On error an ApiError exception is thrown. Typical errors are:
@@ -85,7 +89,13 @@ public: // functions
 	 * descriptor (but this usage is not encouraged due to libcosmos' type
 	 * modeling).
 	 **/
-	void updateFrom(const DirFD fd, const SysString path, const FollowSymlinks follow = FollowSymlinks{false});
+	void updateFrom(const DirFD fd, const SysString path,
+			const FollowSymlinks follow = FollowSymlinks{false});
+
+	/// Copies data over from the given raw stat data structure.
+	void updateFrom(const struct stat &st) {
+		std::memcpy(&m_st, &st, sizeof(m_st));
+	}
 
 	void reset() {
 		// we identify an invalid stat structure by clearing the mode
@@ -252,6 +262,14 @@ public: // functions
 
 	bool operator!=(const FileStatus &other) {
 		return !(*this == other);
+	}
+
+	struct stat* raw() {
+		return &m_st;
+	}
+
+	const struct stat* raw() const {
+		return &m_st;
 	}
 
 protected: // functions
