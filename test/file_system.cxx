@@ -44,6 +44,7 @@ class FileSystemTest :
 		testCopyFileRange();
 		testAccess();
 		testLock();
+		testDevIDs();
 	}
 
 	std::pair<std::filesystem::path, cosmos::TempDir> getTestDir() {
@@ -745,6 +746,18 @@ class FileSystemTest :
 		RUN_STEP("flock(fd, LOCK_UN)", true);
 	}
 
+	void testDevIDs() {
+		START_TEST("DeviceID test");
+
+		cosmos::DeviceID devid{0xfc02};
+		const auto [major, minor] = cosmos::fs::split_device_id(devid);
+		RUN_STEP("major-id-matches", major == cosmos::DeviceMajor{0xfc});
+		RUN_STEP("minor-id-matches", minor == cosmos::DeviceMinor{0x02});
+
+		const auto devid2 = cosmos::fs::make_device(major, minor);
+
+		RUN_STEP("make_device()-matches", devid == devid2);
+	}
 };
 
 int main(const int argc, const char **argv) {

@@ -3,6 +3,7 @@
 #include <limits.h>
 #include <sys/file.h>
 #include <sys/stat.h>
+#include <sys/sysmacros.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -655,6 +656,22 @@ COSMOS_API void flock(const FileDescriptor fd, const LockOperation operation, co
 	if (::flock(to_integral(fd.raw()), cosmos::to_integral(operation) | flags.raw()) != 0) {
 		throw ApiError{"flock()"};
 	}
+}
+
+COSMOS_API std::pair<DeviceMajor, DeviceMinor> split_device_id(
+		const DeviceID id) {
+	const auto raw_id = cosmos::to_integral(id);
+	return std::make_pair(
+			DeviceMajor{::major(raw_id)},
+			DeviceMinor{::minor(raw_id)});
+}
+
+COSMOS_API DeviceID make_device(const DeviceMajor maj, const DeviceMinor min) {
+	const auto raw_id = ::makedev(
+			cosmos::to_integral(maj),
+			cosmos::to_integral(min));
+
+	return DeviceID{raw_id};
 }
 
 } // end ns

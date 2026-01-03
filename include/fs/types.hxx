@@ -44,8 +44,24 @@ enum class FileNum : int {
 enum class Inode : ino_t {
 };
 
-/// A device file identification type (consists of major:minor parts).
+/// A device file identification type.
+/**
+ * A DeviceID consists of a major and a minor part. The major part identifies
+ * the class of device while the minor part identifies the instance of the
+ * device (see makedev(3)).
+ *
+ * The major and minor parts can be extracted via
+ * cosmos::fs::split_device_id().
+ **/
 enum class DeviceID : dev_t {
+};
+
+/// The minor part of a DeviceID.
+enum class DeviceMinor : unsigned int {
+};
+
+/// The major part of a DeviceID.
+enum class DeviceMajor : unsigned int {
 };
 
 /// Strong enum type wrapper for the basic open() mode flag.

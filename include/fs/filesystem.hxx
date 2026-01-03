@@ -787,6 +787,14 @@ using LockFlags = BitMask<LockFlag>;
  *   `fcntl()` byte-range locking, which has different semantics (e.g. for
  *   placing write locks, the file descriptor has to be open for writing).
  **/
-COSMOS_API void flock(const FileDescriptor fd, const LockOperation operation, const LockFlags flags = {});
+COSMOS_API void flock(const FileDescriptor fd, const LockOperation operation,
+		const LockFlags flags = {});
+
+/// Decompose a DeviceID into its major and minor parts.
+COSMOS_API std::pair<DeviceMajor, DeviceMinor> split_device_id(
+		const DeviceID id);
+
+/// Construct a DeviceID from major and minor parts.
+COSMOS_API DeviceID make_device(const DeviceMajor, const DeviceMinor);
 
 } // end ns
