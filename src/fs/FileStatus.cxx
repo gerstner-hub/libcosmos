@@ -57,8 +57,13 @@ std::string FileMode::symbolic() const {
 	if (canOwnerWrite()) ret.push_back('w');
 	else ret.push_back('-');
 
-	if (isSetUID()) ret.push_back('s');
-	else if (canOwnerExec()) ret.push_back('x');
+	if (isSetUID()) {
+		// ls-style: upper case S means 'x' is not present
+		if (canOwnerExec())
+			ret.push_back('s');
+		else
+			ret.push_back('S');
+	} else if (canOwnerExec()) ret.push_back('x');
 	else ret.push_back('-');
 
 	if (canGroupRead()) ret.push_back('r');
@@ -67,8 +72,13 @@ std::string FileMode::symbolic() const {
 	if (canGroupWrite()) ret.push_back('w');
 	else ret.push_back('-');
 
-	if (isSetGID()) ret.push_back('s');
-	else if (canGroupExec()) ret.push_back('x');
+	if (isSetGID()) {
+		// ls-style: upper case S means 'x' is not present
+		if (canGroupExec())
+			ret.push_back('s');
+		else
+			ret.push_back('S');
+	} else if (canGroupExec()) ret.push_back('x');
 	else ret.push_back('-');
 
 	if (canOthersRead()) ret.push_back('r');
@@ -77,8 +87,13 @@ std::string FileMode::symbolic() const {
 	if (canOthersWrite()) ret.push_back('w');
 	else ret.push_back('-');
 
-	if (isSticky()) ret.push_back('t');
-	else if(canOthersExec()) ret.push_back('x');
+	if (isSticky()) {
+		// ls-style: upper case T means 'x' is nost present
+		if (canOthersExec())
+			ret.push_back('t');
+		else
+			ret.push_back('T');
+	} else if(canOthersExec()) ret.push_back('x');
 	else ret.push_back('-');
 
 	return ret;
