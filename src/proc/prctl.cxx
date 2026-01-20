@@ -1,12 +1,14 @@
-// Linux
-#include <asm/prctl.h>
-#include <sys/syscall.h>
-#include <unistd.h>
-
 // cosmos
 #include <cosmos/compiler.hxx>
 #include <cosmos/error/ApiError.hxx>
 #include <cosmos/proc/prctl.hxx>
+
+// Linux
+#ifdef COSMOS_X86
+#	include <asm/prctl.h>
+#	include <sys/syscall.h>
+#	include <unistd.h>
+#endif
 
 namespace cosmos::prctl {
 
