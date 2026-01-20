@@ -10,6 +10,31 @@
 #	include <unistd.h>
 #endif
 
+#ifndef COSMOS_X86
+/*
+ * for non x86 platforms to simplify the code below, which should thrown an
+ * ENOSYS ApiError on on x86 systems.
+ */
+#	ifndef ARCH_GET_FS
+#		define ARCH_GET_FS 0
+#	endif
+#	ifndef ARCH_SET_FS
+#		define ARCH_SET_FS 0
+#	endif
+#	ifndef ARCH_GET_GS
+#		define ARCH_GET_GS 0
+#	endif
+#	ifndef ARCH_SET_GS
+#		define ARCH_SET_GS 0
+#	endif
+#	ifndef ARCH_GET_CPUID
+#		define ARCH_GET_CPUID 0
+#	endif
+#	ifndef ARCH_SET_CPUID
+#		define ARCH_SET_CPUID 0
+#	endif
+#endif
+
 namespace cosmos::prctl {
 
 template <typename ADDR>
