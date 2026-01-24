@@ -15,6 +15,7 @@
 namespace cosmos {
 
 enum class ThreadID : pid_t {
+	INVALID = -1,
 	SELF = 0
 };
 
