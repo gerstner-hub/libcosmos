@@ -55,7 +55,7 @@ enum class ClockType : clockid_t {
 template <ClockType CLOCK>
 class TimeSpec :
 		public timespec {
-public:
+public: // functions
 	explicit TimeSpec(time_t seconds, long nano_seconds = 0) {
 		this->tv_sec = seconds;
 		this->tv_nsec = nano_seconds;
@@ -80,16 +80,16 @@ public:
 	void reset() { this->tv_sec = 0; this->tv_nsec = 0; }
 
 	time_t getSeconds() const { return this->tv_sec; }
-	long getNanoseconds() const { return this->tv_nsec; }
+	long getNanoSeconds() const { return this->tv_nsec; }
 
 	void setSeconds(const time_t seconds) { this->tv_sec = seconds; }
-	void setNanoseconds(const long nano_seconds) { this->tv_nsec = nano_seconds; }
+	void setNanoSeconds(const long nano_seconds) { this->tv_nsec = nano_seconds; }
 
 	void addSeconds(const time_t seconds) {
 		this->tv_sec += seconds;
 	}
 
-	void addNanoseconds(const long nano_seconds) {
+	void addNanoSeconds(const long nano_seconds) {
 		this->tv_nsec += nano_seconds;
 	}
 

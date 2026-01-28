@@ -48,7 +48,7 @@ class TimeTest :
 		auto timeres = mclock.resolution();
 
 		std::cout << "monotonic clock resolution:\n";
-		std::cout << timeres.getSeconds() << "s " << timeres.getNanoseconds() << "ns\n";
+		std::cout << timeres.getSeconds() << "s " << timeres.getNanoSeconds() << "ns\n";
 
 		EXPECT_EXCEPTION("setting-monoclock-fails", mclock.setTime(pre_sleep));
 	}
