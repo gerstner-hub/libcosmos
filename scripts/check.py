@@ -19,10 +19,11 @@ parser.add_argument('--skip-clang', action='store_true', help='don\'t build clan
 parser.add_argument('--skip-sanitizer', action='store_true', help='don\'t build saniizer=1 configuration')
 parser.add_argument('--skip-flake', nargs='*', action='append', help='skip flake8 check on Python source files')
 parser.add_argument('--extra-compiler', nargs='*', action='append', help='build configurations with additional custom compilers')
+parser.add_argument('--keep-existing-build', action='store_true', help='don\'t delete existing build trees (to speed-up fixing cycles)')
 
 args = parser.parse_args()
 
-BUILDROOT = "build.check"
+BUILDROOT_BASE = "build.check"
 root_dir = Path(os.path.realpath(__file__)).parent.parent
 while True:
     next_parent = root_dir.parent
@@ -33,6 +34,12 @@ while True:
 
 print('Running in top project directory', root_dir)
 os.chdir(root_dir)
+
+if not args.keep_existing_build:
+    try:
+        shutil.rmtree(BUILDROOT_BASE)
+    except FileNotFoundError:
+        pass
 
 
 def flakePython():
@@ -59,13 +66,10 @@ def flakePython():
     return res.returncode == 0
 
 
-def buildConfig(config, env=None, label=''):
-    try:
-        shutil.rmtree(BUILDROOT)
-    except FileNotFoundError:
-        pass
-    cmdline = ['scons', '-j5'] + config.split() + ['docs=0', f'buildroot={BUILDROOT}', '/']
-    print(f'[{label}] ' if label else '', 'Running ', ' '.join(cmdline), sep='')
+def buildConfig(label, config, env=None):
+    buildroot = f'{BUILDROOT_BASE}/{label}'
+    cmdline = ['scons', '-j5'] + config.split() + ['docs=0', f'buildroot={buildroot}', '/']
+    print(f'[{label.ljust(15)}] Running ', ' '.join(cmdline), sep='')
     subprocess.check_call(cmdline, stdout=subprocess.DEVNULL, env=env)
 
 
@@ -83,27 +87,30 @@ if args.extra_compiler:
 configurations = []
 
 
-def addConfig(config):
+def addConfig(label, config):
     for compiler in compilers:
         this_config = config
         if compiler:
             this_config += f' compiler={compiler}'
-        configurations.append(this_config)
+        else:
+            compiler = 'default'
+        configurations.append((f'{label}-{compiler}', this_config))
 
 
-addConfig('libtype=shared')
+addConfig('shared', 'libtype=shared')
 
 if not args.skip_static:
-    addConfig('libtype=static')
+    addConfig('static', 'libtype=static')
 if not args.skip_sanitizer:
-    configurations.append('sanitizer=1')
+    configurations.append(('sanitized', 'sanitizer=1'))
 
-for config in configurations:
-    buildConfig(config)
+for label, config in configurations:
+    buildConfig(label, config)
 
 if not args.skip_32bit and platform.uname().machine == 'x86_64':
     env32 = os.environ.copy()
     for var in ('CFLAGS', 'CXXFLAGS', 'LDFLAGS'):
         env32[var] = '-m32'
     for config in ('libtype=shared', 'libtype=static'):
-        buildConfig(config, env32, '32bit')
+        label = config.split('=')[1]
+        buildConfig(f'{label}-32', config, env32)
