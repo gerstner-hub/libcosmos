@@ -196,4 +196,54 @@ using ThreadCpuTime       = TimeSpec<ClockType::THREAD_CPUTIME>;
 /// TimeSpec used for relative time specifications not based on absolute clock time.
 using IntervalTime        = TimeSpec<ClockType::INVALID>;
 
+/// A C++ wrapper around the BSD `struct timeval`.
+/**
+ * This is a microsecond-granularity time structure which is used in some
+ * older APIs like `getrusage()` (ResourceUsage class).
+ **/
+class TimeVal :
+		public timeval {
+public: // functions
+
+	explicit TimeVal(time_t seconds, long micro_seconds = 0) {
+		this->tv_sec = seconds;
+		this->tv_usec = micro_seconds;
+	}
+
+	TimeVal() {
+		reset();
+	}
+
+	/// Deliberately don't initialize the members for performance reasons.
+	explicit TimeVal(const no_init_t) {
+	}
+
+	bool isZero() const { return this->tv_sec == 0 && this->tv_usec == 0; }
+	void reset() { this->tv_sec = 0; this->tv_usec = 0; }
+
+	time_t getSeconds() const {
+		return this->tv_sec;
+	}
+
+	void setSeconds(const time_t seconds) {
+		this->tv_sec = seconds;
+	}
+
+	long getMicroSeconds() const {
+		return this->tv_usec;
+	}
+
+	void setMicroSeconds(const long micro_seconds) {
+		this->tv_usec = micro_seconds;
+	}
+
+	bool operator==(const TimeVal &tv) const {
+		return tv.tv_sec == this->tv_sec && tv.tv_usec == this->tv_usec;
+	}
+
+	bool operator!=(const TimeVal &tv) const {
+		return !(*this == tv);
+	}
+};
+
 } // end ns

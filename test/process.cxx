@@ -13,6 +13,7 @@
 #include <cosmos/proc/clone.hxx>
 #include <cosmos/proc/process.hxx>
 #include <cosmos/proc/types.hxx>
+#include <cosmos/proc/ResourceUsage.hxx>
 
 // Test
 #include "TestBase.hxx"
@@ -27,6 +28,7 @@ class ProcessTest :
 		testExec();
 		testClone();
 		testPidFD();
+		testResourceUsage();
 	};
 
 	void testProperties() {
@@ -264,6 +266,37 @@ class ProcessTest :
 			// execute
 			cosmos::proc::exit(cosmos::ExitStatus{5});
 		}
+	}
+
+	void testResourceUsage() {
+		START_TEST("resource usage tests");
+		cosmos::ResourceUsage ru;
+		RUN_STEP("verify-0-by-default", ru.userTime() == cosmos::TimeVal(0, 0) &&
+				ru.systemTime() == cosmos::TimeVal(0, 0) &&
+				ru.maxRss() == 0 && ru.minorFault() == 0 &&
+				ru.majorFault() == 0 && ru.fsInputCount() == 0 &&
+				ru.fsOutputCount() == 0 && ru.numVoluntaryCtxSwitches() == 0 &&
+				ru.numInvoluntaryCtxSwitches() == 0);
+
+		constexpr auto WHO = cosmos::ResourceUsage::Who::CHILDREN;
+
+		ru.fetch(WHO);
+		cosmos::ResourceUsage ru2{WHO};
+
+		RUN_STEP("verify-fetch-equals-ctor",
+				memcmp(
+					reinterpret_cast<const char*>(&ru.raw()),
+					reinterpret_cast<const char*>(&ru2.raw()),
+					sizeof(ru.raw())) == 0);
+		std::cout << "user_time = " << ru.userTime().getSeconds() << "s " << ru.userTime().getMicroSeconds() << "us\n";
+		std::cout << "system_time = " << ru.systemTime().getSeconds() << "s " << ru.systemTime().getMicroSeconds() << "us\n";
+		std::cout << "max_rss = " << ru.maxRss() << "\n";
+		std::cout << "minor_fault = " << ru.minorFault() << "\n";
+		std::cout << "major_fault = " << ru.majorFault() << "\n";
+		std::cout << "fs_input_count = " << ru.fsInputCount() << "\n";
+		std::cout << "fs_output_count = " << ru.fsOutputCount() << "\n";
+		std::cout << "voluntary_ctx_swtchs = " << ru.numVoluntaryCtxSwitches() << "\n";
+		std::cout << "involuntary_ctx_swtchs = " << ru.numInvoluntaryCtxSwitches() << "\n";
 	}
 };
 
