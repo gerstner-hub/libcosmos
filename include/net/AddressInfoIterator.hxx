@@ -20,7 +20,7 @@ public: // functions
 
 	AddressInfoIterator() {}
 
-	explicit AddressInfoIterator(const AddressInfo *pos) :
+	explicit AddressInfoIterator(const addrinfo *pos) :
 		m_pos{pos}
 	{}
 
@@ -29,17 +29,17 @@ public: // functions
 			throw RuntimeError{"Attempt to increment past the end() AddressInfoIterator"};
 		}
 
-		m_pos = m_pos->next();
+		m_pos = m_pos->ai_next;
 
 		return *this;
 	}
 
-	const AddressInfo& operator*() {
+	const AddressInfo operator*() {
 		if (!m_pos) {
 			throw RuntimeError{"Attempt to dereference an invalid AddressInfoIterator"};
 		}
 
-		return *m_pos;
+		return AddressInfo{m_pos};
 	}
 
 	bool operator==(const AddressInfoIterator &other) const {
@@ -52,7 +52,7 @@ public: // functions
 
 protected: // data
 
-	const AddressInfo *m_pos = nullptr;
+	const addrinfo *m_pos = nullptr;
 };
 
 } // end ns

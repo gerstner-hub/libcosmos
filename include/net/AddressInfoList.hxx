@@ -93,7 +93,7 @@ public: // functions
 	}
 
 	AddressInfoIterator begin() const {
-		return AddressInfoIterator{reinterpret_cast<const AddressInfo*>(m_addrs)};
+		return AddressInfoIterator{m_addrs};
 	}
 
 	AddressInfoIterator end() const {
