@@ -230,15 +230,16 @@ public: // types
 		}
 
 		/// A pointer to the (up to) 6 system call arguments
-		const uint64_t* args() const {
-			// the typedef for __u64 is different to uint64_t, but
-			// we have a static_assert in the implementation to
-			// verify the sizes match.
-			return reinterpret_cast<const uint64_t*>(raw().args);
+		const __u64* args() const {
+			// the typedef for __u64 is different to uint64_t,
+			// thus we need to stick to __u64 here (otherwise we'd
+			// need to reinterpret_cast, breaking strict-aliasing
+			// rules)
+			return raw().args;
 		}
 
 		static constexpr size_t maxArgs() {
-			return sizeof(RawEntryInfo::args) / sizeof(uint64_t);
+			return sizeof(RawEntryInfo::args) / sizeof(__u64);
 		}
 
 		const RawEntryInfo& raw() const {
@@ -281,12 +282,12 @@ public: // types
 		}
 
 		/// Pointer to the (up to) 6 system call arguments.
-		const uint64_t* args() const {
-			return reinterpret_cast<const uint64_t*>(raw().args);
+		const __u64* args() const {
+			return raw().args;
 		}
 
 		static constexpr size_t maxArgs() {
-			return sizeof(RawSeccompInfo::args) / sizeof(uint64_t);
+			return sizeof(RawSeccompInfo::args) / sizeof(__u64);
 		}
 
 		/// Returns the SECCOMP_RET_DATA portion of the SECCOMP_RET_TRACE return value.
