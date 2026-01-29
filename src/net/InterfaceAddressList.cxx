@@ -4,11 +4,6 @@
 
 namespace cosmos {
 
-// this is only an interface wrapper around the system structure, no
-// additional data must be added so that pointers can be casted from ifaddrs
-// to InterfaceAddress.
-static_assert(sizeof(InterfaceAddress) == sizeof(struct ifaddrs));
-
 void InterfaceAddressList::fetch() {
 	clear();
 	if (::getifaddrs(&m_addrs) != 0) {

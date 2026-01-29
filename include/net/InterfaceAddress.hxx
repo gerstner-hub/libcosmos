@@ -64,9 +64,7 @@ using InterfaceFlags = BitMask<InterfaceFlag>;
  * unavailable. Various functions like hasAddress() need to be used to
  * determine whether a certain kind of interface address is stored at all.
  **/
-class InterfaceAddress :
-	protected ::ifaddrs {
-
+class InterfaceAddress {
 public: // functions
 
 	// this type is only available via InterfaceAddressList, so disallow
@@ -77,12 +75,12 @@ public: // functions
 
 	/// Returns the unique string that identifies the network device that this address belongs to.
 	SysString ifname() const {
-		return ifa_name;
+		return m_addr->ifa_name;
 	}
 
 	/// Returns the current interface status flags.
 	InterfaceFlags flags() const {
-		return InterfaceFlags{ifa_flags};
+		return InterfaceFlags{m_addr->ifa_flags};
 	}
 
 	/// Returns the SocketFamily this address is about.
@@ -94,17 +92,17 @@ public: // functions
 		if (!hasAddress())
 			return SocketFamily::UNSPEC;
 
-		return SocketFamily{ifa_addr->sa_family};
+		return SocketFamily{m_addr->ifa_addr->sa_family};
 	}
 
 	/// Returns whether an address is available in this entry.
 	bool hasAddress() const {
-		return ifa_addr != nullptr;
+		return m_addr->ifa_addr != nullptr;
 	}
 
 	/// Returns whether a netmask address is available in this entry.
 	bool hasNetmask() const {
-		return ifa_netmask != nullptr;
+		return m_addr->ifa_netmask != nullptr;
 	}
 
 	/// Returns whether a broadcast address is available in this entry.
@@ -116,7 +114,7 @@ public: // functions
 		if (!flags()[InterfaceFlag::BROADCAST])
 			return false;
 
-		return ifa_broadaddr != nullptr;
+		return m_addr->ifa_broadaddr != nullptr;
 	}
 
 	/// Returns whether a point-to-point destination is available in this entry.
@@ -124,7 +122,7 @@ public: // functions
 		if (!flags()[InterfaceFlag::POINTOPOINT])
 			return false;
 
-		return ifa_dstaddr != nullptr;
+		return m_addr->ifa_dstaddr != nullptr;
 	}
 
 	/// Returns whether the interface address is an IPv4 address.
@@ -147,7 +145,7 @@ public: // functions
 		if (!isIP4())
 			return std::nullopt;
 
-		return cosmos::IP4Address{*(reinterpret_cast<sockaddr_in*>(ifa_addr))};
+		return cosmos::IP4Address{*(reinterpret_cast<sockaddr_in*>(m_addr->ifa_addr))};
 	}
 
 	/// If this is an IPv6 address, return it.
@@ -155,7 +153,7 @@ public: // functions
 		if (!isIP6())
 			return std::nullopt;
 
-		return cosmos::IP6Address{*(reinterpret_cast<sockaddr_in6*>(ifa_addr))};
+		return cosmos::IP6Address{*(reinterpret_cast<sockaddr_in6*>(m_addr->ifa_addr))};
 	}
 
 	/// If this is a link layer address, return it.
@@ -163,40 +161,52 @@ public: // functions
 		if (!isLinkLayer())
 			return std::nullopt;
 
-		return cosmos::LinkLayerAddress{*(reinterpret_cast<sockaddr_ll*>(ifa_addr))};
+		return cosmos::LinkLayerAddress{*(reinterpret_cast<sockaddr_ll*>(m_addr->ifa_addr))};
 	}
 
 	/// If an IPv4 netmask is available, return it.
 	std::optional<cosmos::IP4Address> netmaskAsIP4() const {
-		if (!hasNetmask() || SocketFamily{ifa_netmask->sa_family} != SocketFamily::INET)
+		if (!hasNetmask() || SocketFamily{m_addr->ifa_netmask->sa_family} != SocketFamily::INET)
 			return std::nullopt;
 
-		return cosmos::IP4Address{*(reinterpret_cast<sockaddr_in*>(ifa_netmask))};
+		return cosmos::IP4Address{*(reinterpret_cast<sockaddr_in*>(m_addr->ifa_netmask))};
 	}
 
 	/// If an IPv6 netmask is available, return it.
 	std::optional<cosmos::IP6Address> netmaskAsIP6() const {
-		if (!hasNetmask() || SocketFamily{ifa_netmask->sa_family} != SocketFamily::INET6)
+		if (!hasNetmask() || SocketFamily{m_addr->ifa_netmask->sa_family} != SocketFamily::INET6)
 			return std::nullopt;
 
-		return cosmos::IP6Address{*(reinterpret_cast<sockaddr_in6*>(ifa_netmask))};
+		return cosmos::IP6Address{*(reinterpret_cast<sockaddr_in6*>(m_addr->ifa_netmask))};
 	}
 
 	/// If an IPv4 broadcast address is available, return it.
 	std::optional<cosmos::IP4Address> broadcastAsIP4() const {
-		if (!hasBroadcastAddress() || SocketFamily{ifa_broadaddr->sa_family} != SocketFamily::INET)
+		if (!hasBroadcastAddress() || SocketFamily{m_addr->ifa_broadaddr->sa_family} != SocketFamily::INET)
 			return std::nullopt;
 
-		return cosmos::IP4Address{*(reinterpret_cast<sockaddr_in*>(ifa_broadaddr))};
+		return cosmos::IP4Address{*(reinterpret_cast<sockaddr_in*>(m_addr->ifa_broadaddr))};
 	}
 
 	/// If an IPv4 point-to-point destination is available, return it.
 	std::optional<cosmos::IP4Address> pointToPointAsIP4() const {
-		if (!hasPointToPointDest() || SocketFamily{ifa_broadaddr->sa_family} != SocketFamily::INET)
+		if (!hasPointToPointDest() || SocketFamily{m_addr->ifa_broadaddr->sa_family} != SocketFamily::INET)
 			return std::nullopt;
 
-		return cosmos::IP4Address{*(reinterpret_cast<sockaddr_in*>(ifa_dstaddr))};
+		return cosmos::IP4Address{*(reinterpret_cast<sockaddr_in*>(m_addr->ifa_dstaddr))};
 	}
+
+protected: // functions
+
+	friend class InterfaceAddressIterator;
+
+	InterfaceAddress(struct ifaddrs *addr) :
+			m_addr{addr} {
+	}
+
+protected: // data
+
+	struct ifaddrs *m_addr;
 };
 
 } // end ns

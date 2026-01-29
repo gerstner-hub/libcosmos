@@ -30,12 +30,12 @@ public: // functions
 		return *this;
 	}
 
-	const InterfaceAddress& operator*() {
+	InterfaceAddress operator*() {
 		if (!m_pos) {
 			throw RuntimeError{"Attempt to dereference invalid InterfaceAddressIterator"};
 		}
 
-		return *(reinterpret_cast<InterfaceAddress*>(m_pos));
+		return InterfaceAddress{m_pos};
 	}
 
 	bool operator==(const InterfaceAddressIterator &other) const {
