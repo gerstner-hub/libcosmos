@@ -188,13 +188,6 @@ constexpr auto to_integral(const ENUM e) -> typename std::underlying_type<ENUM>:
 	return static_cast<typename std::underlying_type<ENUM>::type>(e);
 }
 
-/// Returns a pointer casted to the underlying type of the given enum.
-template<typename ENUM>
-auto to_raw_ptr(ENUM *e) {
-	using UT = typename std::underlying_type<ENUM>::type;
-	return reinterpret_cast<UT*>(e);
-}
-
 template <typename VARIANT>
 bool is_empty_variant(const VARIANT &var) {
 	return std::holds_alternative<std::monostate>(var);
