@@ -216,9 +216,16 @@ public: // types
 	using RawExitInfo = decltype(ptrace_syscall_info::exit);
 	using RawSeccompInfo = decltype(ptrace_syscall_info::seccomp);
 
-	class EntryInfo :
-			protected RawEntryInfo {
+	class EntryInfo {
 	public: // functions
+
+		EntryInfo(const EntryInfo &other) = delete;
+		EntryInfo& operator=(const EntryInfo &other) = delete;
+
+		EntryInfo(EntryInfo &&other) :
+				m_info{other.m_info} {
+			other.m_info = nullptr;
+		}
 
 		/// The number of the system call.
 		/**
@@ -226,7 +233,7 @@ public: // types
 		 * that is reported via the `Arch` enum.
 		 **/
 		uint64_t syscallNr() const {
-			return this->nr;
+			return m_info->nr;
 		}
 
 		/// A pointer to the (up to) 6 system call arguments
@@ -243,17 +250,38 @@ public: // types
 		}
 
 		const RawEntryInfo& raw() const {
-			return *this;
+			return *m_info;
 		}
+
+	protected: // functions
+
+		friend SyscallInfo;
+
+		explicit EntryInfo(const RawEntryInfo *info) :
+				m_info{info} {
+		}
+
+	protected: // data
+
+		const RawEntryInfo *m_info = nullptr;
 	};
 
-	class ExitInfo :
-			protected RawExitInfo {
+	class ExitInfo {
 	public: // functions
+
+		ExitInfo(const ExitInfo &other) = delete;
+		ExitInfo& operator=(const ExitInfo &other) = delete;
+
+		ExitInfo(ExitInfo &&other) :
+				m_info{other.m_info} {
+			other.m_info = nullptr;
+		}
+
+		ExitInfo() = delete;
 
 		/// Indicates wheter a system call return value is present or an error number return.
 		bool isError() const {
-			return this->is_error != 0;
+			return m_info->is_error != 0;
 		}
 
 		bool isValue() const {
@@ -261,24 +289,45 @@ public: // types
 		}
 
 		std::optional<int64_t> retVal() const {
-			return isError() ? std::nullopt : std::make_optional(this->rval);
+			return isError() ? std::nullopt : std::make_optional(m_info->rval);
 		}
 
 		std::optional<Errno> errVal() const {
-			return isError() ? std::make_optional(static_cast<Errno>(-this->rval)) : std::nullopt;
+			return isError() ? std::make_optional(static_cast<Errno>(-m_info->rval)) : std::nullopt;
 		}
 
 		const RawExitInfo& raw() const {
-			return *this;
+			return *m_info;
 		}
+
+	protected: // functions
+
+		friend SyscallInfo;
+
+		explicit ExitInfo(const RawExitInfo *info) :
+				m_info{info} {
+		}
+
+	protected: // data
+
+		const RawExitInfo *m_info = nullptr;
 	};
 
-	class SeccompInfo :
-			protected RawSeccompInfo {
+	class SeccompInfo {
 	public: // functions
 
+		SeccompInfo(const SeccompInfo &other) = delete;
+		SeccompInfo& operator=(const SeccompInfo &other) = delete;
+
+		SeccompInfo(SeccompInfo &&other) :
+				m_info{other.m_info} {
+			other.m_info = nullptr;
+		}
+
+		SeccompInfo() = delete;
+
 		uint64_t syscallNr() const {
-			return this->nr;
+			return m_info->nr;
 		}
 
 		/// Pointer to the (up to) 6 system call arguments.
@@ -292,12 +341,24 @@ public: // types
 
 		/// Returns the SECCOMP_RET_DATA portion of the SECCOMP_RET_TRACE return value.
 		uint32_t retData() const {
-			return this->ret_data;
+			return m_info->ret_data;
 		}
 
 		const RawSeccompInfo& raw() const {
-			return *this;
+			return *m_info;
 		}
+
+	protected: // functions
+
+		friend SyscallInfo;
+
+		explicit SeccompInfo(const RawSeccompInfo *info) :
+				m_info{info} {
+		}
+
+	protected: // data
+
+		const RawSeccompInfo *m_info = nullptr;
 	};
 
 public: // functions
@@ -351,30 +412,30 @@ public: // functions
 	}
 
 	/// If available return the syscall-entry-stop information from the struct.
-	const EntryInfo* entryInfo() const {
+	std::optional<EntryInfo> entryInfo() const {
 		if (!isEntry())
-			return nullptr;
+			return {};
 
 		auto raw = &m_info.entry;
-		return reinterpret_cast<const EntryInfo*>(raw);
+		return EntryInfo{raw};
 	}
 
 	/// If available return the syscall-exit-stop information from the struct.
-	const ExitInfo* exitInfo() const {
+	std::optional<ExitInfo> exitInfo() const {
 		if (!isExit())
-			return nullptr;
+			return {};
 
 		auto raw = &m_info.exit;
-		return reinterpret_cast<const ExitInfo*>(raw);
+		return ExitInfo{raw};
 	}
 
 	/// If available return the ptrace-event seccomp info from the struct.
-	const SeccompInfo* seccompInfo() const {
+	std::optional<SeccompInfo> seccompInfo() const {
 		if (!isSeccomp())
-			return nullptr;
+			return {};
 
 		auto raw = &m_info.seccomp;
-		return reinterpret_cast<const SeccompInfo*>(raw);
+		return SeccompInfo{raw};
 	}
 
 	auto raw() { return &m_info; }

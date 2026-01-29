@@ -7,15 +7,6 @@
 
 namespace cosmos::ptrace {
 
-static_assert(sizeof(SyscallInfo::EntryInfo) == sizeof(SyscallInfo::RawEntryInfo),
-		"SyscallInfo::EntryInfo size mismatch");
-static_assert(sizeof(SyscallInfo::ExitInfo) == sizeof(SyscallInfo::RawExitInfo),
-		"SyscallInfo::ExitInfo size mismatch");
-static_assert(sizeof(SyscallInfo::SeccompInfo) == sizeof(SyscallInfo::SeccompInfo),
-		"SyscallInfo::SeccompInfo size mismatch");
-static_assert(sizeof(uint64_t) == sizeof(__u64),
-		"mismatch between uint64_t and __64");
-
 namespace {
 
 	const char* to_label(const Request req) {
