@@ -53,7 +53,7 @@ using InterfaceFlags = BitMask<InterfaceFlag>;
 
 /// A single network interface address.
 /**
- * Instances of this type can be obtained from InterfaceAddressList. The type
+ * Instances of this type can be obtained from InterfaceAddressList. This type
  * describes a single local network interface address of a specific
  * SocketFamily. Typically each network interface supports multiple families
  * like IPv4/IPv6 and also lower level families like packet socket addresses
@@ -63,6 +63,11 @@ using InterfaceFlags = BitMask<InterfaceFlag>;
  * actually assigned to the network interface, some of the addresses might be
  * unavailable. Various functions like hasAddress() need to be used to
  * determine whether a certain kind of interface address is stored at all.
+ *
+ * Instances of this type are coupled to the InterfaceAddressList they are
+ * retrieved from and loose validty if the InterfaceAddressList is destroyed
+ * or its data replaced. You should only use this type in loops iterating over
+ * InterfaceAddressList to prevent object lifetime issues.
  **/
 class InterfaceAddress {
 public: // functions
