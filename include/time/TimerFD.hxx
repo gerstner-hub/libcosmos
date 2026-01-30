@@ -65,9 +65,27 @@ public: // types
 			public itimerspec {
 
 		/// Creates all zero time specs.
-		TimerSpec() {
-			initial().reset();
-			interval().reset();
+		TimerSpec() :
+				m_value{new (&this->it_value) TimeSpec<CLOCK>{}},
+				m_interval{new (&this->it_interval) TimeSpec<CLOCK>{}} {
+			/*
+			 * We use placement new to officially declare our
+			 * TimeSpec<CLOCK> wrapper type at the it_value and
+			 * it_interval memory locations. This is to address
+			 * strict aliasing rules. We will never access these
+			 * fields as a regular timespec afterwards.
+			 */
+		}
+
+		TimerSpec(const TimerSpec &other) :
+				TimerSpec{} {
+			*this = other;
+		}
+
+		TimerSpec& operator=(const TimerSpec &other) {
+			initial() = other.initial();
+			interval() = other.interval();
+			return *this;
 		}
 
 		/// The initial tick time (relative or absolute) for the timer.
@@ -81,9 +99,11 @@ public: // types
 		 * matter what value the interval() has.
 		 **/
 		TimeSpec<CLOCK>& initial() {
-			// this is a bit hacky but allows us to return the C++
-			// interface for the raw timespec value
-			return *reinterpret_cast<TimeSpec<CLOCK>*>(&(this->it_value));
+			return *m_value;
+		}
+
+		const TimeSpec<CLOCK>& initial() const {
+			return *m_value;
 		}
 
 		/// Timer tick repeat interval (relative) if any.
@@ -94,7 +114,11 @@ public: // types
 		 * once.
 		 **/
 		TimeSpec<CLOCK>& interval() {
-			return *reinterpret_cast<TimeSpec<CLOCK>*>(&(this->it_interval));
+			return *m_interval;
+		}
+
+		const TimeSpec<CLOCK>& interval() const {
+			return *m_interval;
 		}
 
 		/// Sets the interval to the same value as the initial time.
@@ -112,6 +136,10 @@ public: // types
 		void resetInterval() {
 			interval().reset();
 		}
+
+	protected: // data
+		TimeSpec<CLOCK> *m_value = nullptr;
+		TimeSpec<CLOCK> *m_interval = nullptr;
 	};
 
 	/// Helper type for construction of a ready-to-use TimerFD with default CreateFlags.
