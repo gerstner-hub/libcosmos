@@ -249,6 +249,11 @@ public: // types
 
 	public: // functions
 
+		ControlMessage() {
+			// explicitly do nothing here since we use placement
+			// new with this type on network data
+		}
+
 		/// This defines the basic option level this control message is for.
 		/**
 		 * The option level determines how the rest of the control
@@ -320,6 +325,7 @@ public: // types
 		explicit ControlMessageIterator(const ReceiveMessageHeader &header) :
 				m_pos{CMSG_FIRSTHDR(&header.m_header)},
 				m_header{&header} {
+			updateCurMsg();
 		}
 
 		/// Advance to the next ControlMessage, or to the end of the range.
@@ -328,6 +334,7 @@ public: // types
 				const msghdr *hdr = m_header->rawHeader();
 				const cmsghdr *chdr = m_pos;
 				m_pos = CMSG_NXTHDR(const_cast<msghdr*>(hdr), const_cast<cmsghdr*>(chdr));
+				updateCurMsg();
 			} else {
 				throw RuntimeError{"Attempt to increment ControlMessageIterator past the end"};
 			}
@@ -345,16 +352,27 @@ public: // types
 
 		/// Access the current ControlMessage the iterator points to.
 		const ControlMessage& operator*() {
-			if (!m_pos) {
+			if (!m_curmsg) {
 				throw RuntimeError{"Attempt to dereference an invalid ControlMessageIterator"};
 			}
 
-			return *reinterpret_cast<const ControlMessage*>(m_pos);
+			return *m_curmsg;
+		}
+
+	protected: // functions
+
+		void updateCurMsg() {
+			if (m_pos) {
+				m_curmsg = new (const_cast<cmsghdr*>(m_pos)) ControlMessage{};
+			} else {
+				m_curmsg = nullptr;
+			}
 		}
 
 	protected: // data
 
 		const cmsghdr *m_pos = nullptr;
+		const ControlMessage *m_curmsg = nullptr;
 		const ReceiveMessageHeader *m_header = nullptr;
 	};
 
