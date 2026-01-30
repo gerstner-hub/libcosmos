@@ -150,7 +150,6 @@ class IOVector :
 	friend class StreamIO;
 	friend class SendMessageHeader;
 	friend class ReceiveMessageHeader;
-	template <typename MSGHDR>
 	friend class MessageHeaderBase;
 
 public: // functions

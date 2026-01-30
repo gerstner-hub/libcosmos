@@ -4,13 +4,11 @@
 
 namespace cosmos {
 
-static_assert(sizeof(struct msghdr_const) == sizeof(struct msghdr),
-		"size mismatch between msghdr_const vs. struct msghdr in system headers");
 static_assert(sizeof(struct cmsghdr) == sizeof(ReceiveMessageHeader::ControlMessage),
 		"size mismatch between cmsghdr vs. struct ReceiveMessageHeader::ControlMessage in system headers");
 
 void SendMessageHeader::setAddress(const SocketAddress &addr) {
-	m_header.msg_name = reinterpret_cast<const void*>(addr.basePtr());
+	m_header.msg_name = const_cast<void*>(reinterpret_cast<const void*>(addr.basePtr()));
 	m_header.msg_namelen = addr.size();
 }
 
@@ -32,7 +30,7 @@ void SendMessageHeader::prepareSend(const SocketAddress *addr) {
 	setIov(iovec);
 
 	if (control_msg) {
-		m_header.msg_control = control_msg->raw();
+		m_header.msg_control = const_cast<void*>(control_msg->raw());
 		m_header.msg_controllen = control_msg->size();
 	} else {
 		m_header.msg_control = nullptr;

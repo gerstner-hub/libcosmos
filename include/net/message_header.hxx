@@ -26,33 +26,12 @@
 
 namespace cosmos {
 
-/// Remodelling of `struct msghdr` with const semantics.
-/**
- * As this struct takes pointers to payload and control data, these pointers
- * are subject to const semantics issues when sending data. We don't want to
- * const_cast pointers back and forth. For this reason remodel the system data
- * structure as a const variant for sending.
- **/
-struct msghdr_const {
-	const void *msg_name;
-	socklen_t msg_namelen;
-	const struct iovec *msg_iov;
-	size_t msg_iovlen;
-	const void *msg_control;
-	size_t msg_controllen;
-	int msg_flags;
-};
-
 /// Base class for SendMessageHeader and ReceiveMessageHeader.
 /**
  * Since the `struct msghdr` has quite different uses for sending vs.
  * receiving, we split up the libcosmos wrappers into two different types.
  * This base class shares common semantics between the two.
- *
- * MSGHDR is the actual `struct msghdr` to be used, since we remodelled
- * `msghdr` as `msghdr_const` for the SendMessageHeader case.
  **/
-template <typename MSGHDR>
 class MessageHeaderBase {
 public: // functions
 
@@ -112,7 +91,7 @@ protected: // functions
 protected: // data
 
 	/// The low level `struct msghdr`
-	MSGHDR m_header;
+	struct msghdr m_header;
 	/// The currently configured send/receive flags.
 	MessageFlags m_io_flags;
 };
@@ -139,7 +118,7 @@ protected: // data
  * data without any payload.
  **/
 class SendMessageHeader :
-		public MessageHeaderBase<msghdr_const> {
+		public MessageHeaderBase {
 	friend class Socket;
 public: // types
 
@@ -229,7 +208,7 @@ protected: // functions
 
 	/// Return a pointer to the raw `struct msghdr` for passing to the `sendmsg()` system call.
 	const struct msghdr* rawHeader() const {
-		return reinterpret_cast<const struct msghdr*>(&m_header);
+		return &m_header;
 	}
 };
 
@@ -248,7 +227,7 @@ protected: // functions
  * order and payload/ancillary data combination than it was sent.
  **/
 class COSMOS_API ReceiveMessageHeader :
-		public MessageHeaderBase<msghdr> {
+		public MessageHeaderBase {
 	friend class Socket;
 public: // types
 
