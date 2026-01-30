@@ -185,7 +185,7 @@ public: // types
 
 		/// Returns the amount of bytes that can be stored at data().
 		size_t dataSpace() const {
-			return data() - reinterpret_cast<const uint8_t*>(raw());
+			return data() - m_buffer.data();
 		}
 
 		/// Returns the pointer to the complete control message for the `msg_control` field in `struct msghdr`.
