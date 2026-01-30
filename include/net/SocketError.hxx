@@ -36,6 +36,11 @@ class SocketErrorT :
 		protected sock_extended_err {
 public: // types
 
+	SocketErrorT() {
+		// explicitly do nothing since we use this type with placement
+		// new on network data.
+	}
+
 	using IPAddress = typename FamilyTraits<FAMILY>::Address;
 
 	/// This defines where the extended error originated.

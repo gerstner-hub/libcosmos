@@ -16,6 +16,7 @@ void SocketErrorMessage<FAMILY>::deserialize(const ReceiveMessageHeader::Control
 	this->checkMsg(msg, FamilyTraits<FAMILY>::CtrlMsg::RECVERR);
 
 	m_data.clear();
+	m_error = nullptr;
 	auto data = msg.data();
 
 	// The SocketError can carry additional piggyback data not declared in
@@ -30,6 +31,11 @@ void SocketErrorMessage<FAMILY>::deserialize(const ReceiveMessageHeader::Control
 	m_data.resize(msg.dataLength());
 
 	std::memcpy(m_data.data(), data, msg.dataLength());
+
+	/*
+	 * use placement new to be type aliasing rules friendly.
+	 */
+	m_error = new (m_data.data()) SocketError{};
 }
 
 template class SocketErrorMessage<SocketFamily::INET>;

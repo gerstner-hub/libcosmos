@@ -35,18 +35,28 @@ public: // types
 
 public: // functions
 
+	SocketErrorMessage() = default;
+
+	explicit SocketErrorMessage(const ReceiveMessageHeader::ControlMessage &msg) {
+		deserialize(msg);
+	}
+
+	/*
+	 * disallow copy/assignment for now due to m_error ptr.
+	 */
+	SocketErrorMessage(const SocketErrorMessage &) = delete;
+	SocketErrorMessage& operator=(const SocketErrorMessage&)= delete;
+
 	void deserialize(const ReceiveMessageHeader::ControlMessage &msg);
 
 	/// Returns the currently deserialized SocketError, if any, otherwise nullptr.
 	const SocketError* error() const {
-		if (m_data.empty())
-			return nullptr;
-
-		return reinterpret_cast<const SocketError*>(m_data.data());
+		return m_error;
 	}
 
 protected: // functions
 	std::vector<uint8_t> m_data;
+	SocketError *m_error = nullptr;
 };
 
 using IP4SocketErrorMessage = SocketErrorMessage<SocketFamily::INET>;
