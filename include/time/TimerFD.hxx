@@ -183,7 +183,7 @@ public:
 	 * values. If spec.initial() is non-zero then the timer will be armed
 	 * and produce at least one tick event at the given time.
 	 **/
-	void setTime(const TimerSpec spec, const StartFlags flags = StartFlags{});
+	void setTime(const TimerSpec &spec, const StartFlags flags = StartFlags{});
 
 	/// Returns the current timer settings from the kernel.
 	/**

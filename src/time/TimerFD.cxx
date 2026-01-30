@@ -33,7 +33,7 @@ typename TimerFD<CLOCK>::TimerSpec TimerFD<CLOCK>::getTime() const {
 }
 
 template <ClockType CLOCK>
-void TimerFD<CLOCK>::setTime(const TimerSpec spec, const StartFlags flags) {
+void TimerFD<CLOCK>::setTime(const TimerSpec &spec, const StartFlags flags) {
 	if (timerfd_settime(
 				to_integral(m_fd.raw()),
 				flags.raw(),
