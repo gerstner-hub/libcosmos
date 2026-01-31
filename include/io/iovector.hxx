@@ -137,6 +137,13 @@ struct OutputMemoryRegion :
 		setLength(sv.size());
 	}
 
+	/// Return the native struct iovec corresponding to this region.
+	/**
+	 * The returned type should only be used for passing it to system
+	 * functions, not for accessing its individual fields, to prevent
+	 * strict aliasing issues (we are using iovec_const here, which is
+	 * type-punning).
+	 **/
 	auto asIovec() {
 		return reinterpret_cast<struct iovec*>(this);
 	}
