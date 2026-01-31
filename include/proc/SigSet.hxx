@@ -32,11 +32,17 @@ public: // types
 public: // functions
 
 	/// Creates an empty signal set.
-	SigSet() {}
+	SigSet() {
+		 clear();
+	}
+
+	/// Explicitly leave signal set uninitialized.
+	explicit SigSet(const no_init_t) {}
 	/// Creates a fully set signal set.
 	explicit SigSet(const fill_t) { fill(); }
 	/// Creates a signal set with the given list of signals set.
 	explicit SigSet(const std::initializer_list<Signal> &siglist) {
+		clear();
 		for (auto &sig: siglist) {
 			set(sig);
 		}
@@ -60,7 +66,7 @@ public: // functions
 
 protected: // data
 
-	sigset_t m_set{};
+	sigset_t m_set;
 };
 
 } // end ns

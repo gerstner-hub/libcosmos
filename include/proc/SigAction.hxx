@@ -4,6 +4,7 @@
 #include <signal.h>
 
 // C++
+#include <cstring>
 #include <optional>
 
 // cosmos
@@ -81,6 +82,7 @@ public: // functions
 
 	/// Creates a zero-initialized object.
 	SigAction() {
+		setupMask();
 		clear();
 	}
 
@@ -90,7 +92,21 @@ public: // functions
 	 * output parameter. Zero initializing it would be wasteful in this
 	 * case.
 	 **/
-	explicit SigAction(const no_init_t) {}
+	explicit SigAction(const no_init_t) {
+		setupMask();
+	}
+
+	SigAction(const SigAction &other) {
+		setupMask();
+		*this = other;
+	}
+
+	SigAction& operator=(const SigAction &other) {
+		/* we need to keep `m_mask` untouched */
+		std::memcpy(&m_raw, &other.m_raw, sizeof(m_raw));
+		m_handler = other.m_handler;
+		return *this;
+	}
 
 	/// overwrite the underlying data structure with zeroes.
 	void clear() {
@@ -121,8 +137,7 @@ public: // functions
 
 	/// Access the currently set signal mask.
 	const SigSet& mask() const {
-		const auto mask = reinterpret_cast<const SigSet*>(&m_raw.sa_mask);
-		return *mask;
+		return *m_mask;
 	}
 
 	/// Access and possibly change the configured signal mask.
@@ -132,8 +147,8 @@ public: // functions
 	 * always be blocked, unless Flags::NO_DEFER is set in Flags.
 	 **/
 	SigSet& mask() {
-		auto mask = reinterpret_cast<SigSet*>(&m_raw.sa_mask);
-		return *mask;
+		auto &cthis = static_cast<const SigAction&>(*this);
+		return const_cast<SigSet&>(cthis.mask());
 	}
 
 	/// Sets a new SimpleHandler style signal handler function.
@@ -176,6 +191,10 @@ public: // functions
 	}
 
 	/// Read-only low-level access to the underlying data structure.
+	/**
+	 * Note that you should not access the `sa_mask` member to avoid
+	 * strict-aliasing issues with respect to the type returned by mask().
+	 **/
 	const struct sigaction* raw() const {
 		return &m_raw;
 	}
@@ -189,10 +208,22 @@ protected: // functions
 
 	void updateFromOld(InfoHandler info, SimpleHandler simple);
 
+	void setupMask() {
+		/*
+		 * to avoid a reinterpret_cast and issues with strict aliasing
+		 * rules, create a new coupling of `sa_mask` to our `SigSet`
+		 * wrapper type.
+		 */
+		m_mask = new (&m_raw.sa_mask) SigSet{no_init};
+	}
+
 protected: // data
 
 	/// Low level sigaction struct.
 	struct sigaction m_raw;
+
+	/// type-punned pointer to m_raw.sa_mask
+	SigSet *m_mask = nullptr;
 
 	/// The currently configured callback.
 	std::variant<SimpleHandler,InfoHandler> m_handler;
