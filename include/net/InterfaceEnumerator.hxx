@@ -44,7 +44,7 @@ public: // functions
 	}
 
 protected: // data
-	InterfaceInfo *m_list = nullptr;
+	struct if_nameindex *m_list = nullptr;
 };
 
 } // end ns

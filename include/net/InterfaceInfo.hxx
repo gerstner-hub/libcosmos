@@ -8,26 +8,31 @@ namespace cosmos {
 
 /// Network interface name to index mapping info.
 /**
- * This type can only be obtained via InterfaceEnumerator.
+ * This type can only be obtained via InterfaceEnumerator. Is is only a view
+ * onto the underlying InterfaceEnumerator data and its lifetime is tied to
+ * it.
  **/
-struct InterfaceInfo :
-		protected ::if_nameindex {
+struct InterfaceInfo {
 
 	/// Returns the network interface name.
 	SysString name() const {
-		return SysString{this->if_name};
+		return SysString{m_info->if_name};
 	}
 
 	/// Returns the network interface index.
 	InterfaceIndex index() const {
-		return InterfaceIndex{static_cast<int>(this->if_index)};
+		return InterfaceIndex{static_cast<int>(m_info->if_index)};
 	}
 
 protected: // functions
 
-	constexpr InterfaceInfo() :
-			if_nameindex{0, nullptr} {
+	explicit InterfaceInfo(const struct if_nameindex *info) :
+			m_info{info} {
 	}
+
+protected: // data
+
+	const struct if_nameindex *m_info = nullptr;
 
 	friend class InterfaceIterator;
 	friend class InterfaceEnumerator;

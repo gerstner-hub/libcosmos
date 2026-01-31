@@ -22,7 +22,7 @@ public: // functions
 
 	constexpr InterfaceIterator() {}
 
-	InterfaceIterator(const InterfaceInfo *pos) :
+	InterfaceIterator(const struct if_nameindex *pos) :
 		m_pos{pos ? pos : &M_END}
 	{}
 
@@ -36,12 +36,12 @@ public: // functions
 		return *this;
 	}
 
-	const InterfaceInfo& operator*() {
+	const InterfaceInfo operator*() {
 		if (!m_pos || m_pos->if_name == nullptr) {
 			throw RuntimeError{"Attempt to dereference invalid InterfaceIterator"};
 		}
 
-		return *m_pos;
+		return InterfaceInfo{m_pos};
 	}
 
 	bool operator==(const InterfaceIterator &other) const {
@@ -60,9 +60,9 @@ public: // functions
 
 protected: // data
 
-	static constexpr InterfaceInfo M_END = InterfaceInfo{};
+	static constexpr struct if_nameindex M_END{};
 
-	const InterfaceInfo *m_pos = &M_END;
+	const struct if_nameindex *m_pos = &M_END;
 };
 
 } // end ns
