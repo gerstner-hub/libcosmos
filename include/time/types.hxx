@@ -69,6 +69,10 @@ public: // functions
 		set(ns);
 	}
 
+	explicit TimeSpec(const timespec &ts) :
+			timespec{ts} {
+	}
+
 	TimeSpec() { reset(); }
 
 	/// Deliberately don't initialize the members for performance reasons.
