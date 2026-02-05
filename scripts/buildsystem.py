@@ -295,6 +295,33 @@ def getSharedLibVersionInfo(self, libbase):
     return current_version, soname, current_tag
 
 
+def adjustInstallRPath(env, target, rpath):
+    """`target` is supposed to be an `Install()` node. This function adds a
+    post-build action to adjust the embedded rpath to `rpath`. $$ORIGIN in
+    `rpath` refers to the directory the ELF binary lives in currently.
+
+    This only works if the `patchelf` program is available, which is a
+    separate package not contained in the core toolchain of GCC. There seems
+    to be no other utility around, `elfedit` cannot do it, for example.
+    """
+    if not env['use_rpath']:
+        # no rpath use is active, so don't meddle with it
+        return
+
+    if 'HAVE_PATCHELF' not in env:
+        import shutil
+        env['HAVE_PATCHELF'] = shutil.which('patchelf') is not None
+
+    if not env['HAVE_PATCHELF']:
+        print("WARNING: no 'patchelf' found, cannot adjust install artifact RPATH for", target)
+        return
+
+    env.AddPostAction(
+        target,
+        f"patchelf --set-rpath '{rpath}' $TARGET"
+    )
+
+
 def enhanceEnv(env):
     env.AddMethod(gatherSources, 'GatherSources')
     env.AddMethod(registerLibConfig, 'RegisterLibConfig')
@@ -311,6 +338,7 @@ def enhanceEnv(env):
     env.AddMethod(getCurrentGitTag, 'GetCurrentGitTag')
     env.AddMethod(addVersionFileTarget, 'AddVersionFileTarget')
     env.AddMethod(cloneNoSanitizer, 'CloneNoSanitizer')
+    env.AddMethod(adjustInstallRPath, 'AdjustInstallRPath')
 
 
 def initSCons(project, rtti=True, deflibtype='shared'):
