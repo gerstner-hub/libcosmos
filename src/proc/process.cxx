@@ -16,7 +16,24 @@
 #include <cosmos/proc/process.hxx>
 #include <cosmos/utils.hxx>
 
-namespace cosmos::proc {
+namespace cosmos {
+
+WaitStatus::WaitStatus(const ChildState &state) {
+	if (state.dumped()) {
+		m_status |= to_integral(state.signal->raw());
+		m_status |= __WCOREFLAG;
+	} else if (state.stopped() || state.trapped()) {
+		m_status = __W_STOPCODE(to_integral(state.signal->raw()));
+	} else if (state.continued()) {
+		m_status = __W_CONTINUED;
+	} else if (state.killed()) {
+		m_status |= to_integral(state.signal->raw());
+	} else if (state.exited()) {
+		m_status = __W_EXITCODE(to_integral(*state.status), 0);
+	}
+}
+
+namespace proc {
 
 ProcessID get_own_pid() {
 	return ProcessID{::getpid()};
@@ -223,7 +240,8 @@ std::optional<ProcessID> fork() {
 
 PidInfo cached_pids;
 
-} // end ns
+} // end ns * 2
+}
 
 std::ostream& operator<<(std::ostream &o, const cosmos::ExitStatus status) {
 	/// this could be annotated with a special character so that it is

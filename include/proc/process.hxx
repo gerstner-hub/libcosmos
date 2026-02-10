@@ -9,12 +9,13 @@
 
 // cosmos
 #include <cosmos/BitMask.hxx>
+#include <cosmos/SysString.hxx>
+#include <cosmos/dso_export.h>
 #include <cosmos/fs/DirFD.hxx>
 #include <cosmos/proc/PidFD.hxx>
-#include <cosmos/proc/types.hxx>
 #include <cosmos/proc/SigInfo.hxx>
+#include <cosmos/proc/types.hxx>
 #include <cosmos/string.hxx>
-#include <cosmos/SysString.hxx>
 #include <cosmos/types.hxx>
 
 /**
@@ -76,11 +77,19 @@ using WaitFlags = BitMask<WaitFlag>;
  * This class can be used to access the details of the status in a typesafe
  * manner.
  **/
-class WaitStatus {
+class COSMOS_API WaitStatus {
 public: // functions
 
 	explicit WaitStatus(const int status=0) :
 			m_status{status} {}
+
+	/// Convert the given ChildState object into WaitStatus.
+	/**
+	 * ChildState and WaitStatus contain very similar information.
+	 * Sometimes it makes sense to uniformly handle WaitStatus objects
+	 * only, which is why this constructor exists.
+	 **/
+	explicit WaitStatus(const ChildState &state);
 
 	/// Returns whether the process exited regularly and status() is available.
 	bool exited() const {

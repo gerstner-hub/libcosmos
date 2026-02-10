@@ -29,6 +29,7 @@ class ProcessTest :
 		testClone();
 		testPidFD();
 		testResourceUsage();
+		testChildState2WaitStatus();
 	};
 
 	void testProperties() {
@@ -297,6 +298,53 @@ class ProcessTest :
 		std::cout << "fs_output_count = " << ru.fsOutputCount() << "\n";
 		std::cout << "voluntary_ctx_swtchs = " << ru.numVoluntaryCtxSwitches() << "\n";
 		std::cout << "involuntary_ctx_swtchs = " << ru.numInvoluntaryCtxSwitches() << "\n";
+	}
+
+	void testChildState2WaitStatus() {
+		START_TEST("test ChildState to WaitStatus conversion");
+
+		using enum cosmos::ChildState::Event;
+		using ExitStatus = cosmos::ExitStatus;
+
+		cosmos::ChildState cs;
+		cosmos::WaitStatus ws;
+
+		cs.event = EXITED;
+		cs.status = ExitStatus{10};
+		ws = cosmos::WaitStatus{cs};
+		RUN_STEP("EXITED-conversion-works", ws.exited() &&
+				ws.status() == ExitStatus{10} &&
+				!ws.signaled() && !ws.dumped() && !ws.continued() && !ws.stopped());
+		cs.event = KILLED;
+		cs.status.reset();
+		cs.signal = cosmos::signal::HANGUP;
+		ws = cosmos::WaitStatus{cs};
+		RUN_STEP("KILLED-conversion-works", ws.signaled() &&
+				ws.termSig() == cosmos::signal::HANGUP &&
+				!ws.exited() && !ws.dumped() && !ws.continued() && !ws.stopped());
+		cs.event = DUMPED;
+		cs.signal = cosmos::signal::TERMINATE;
+		ws = cosmos::WaitStatus{cs};
+		RUN_STEP("DUMPED-conversion-works", ws.signaled() &&
+				ws.termSig() == cosmos::signal::TERMINATE &&
+				!ws.exited() && ws.dumped() && !ws.continued() && !ws.stopped());
+		cs.event = TRAPPED;
+		cs.signal = cosmos::signal::TRAP;
+		ws = cosmos::WaitStatus{cs};
+		RUN_STEP("TRAPPED-conversion-works", !ws.signaled() &&
+				ws.stopSig() == cosmos::signal::TRAP &&
+				!ws.exited() && !ws.dumped() && !ws.continued() && ws.stopped());
+		cs.event = STOPPED;
+		cs.signal = cosmos::signal::STOP;
+		ws = cosmos::WaitStatus{cs};
+		RUN_STEP("STOPPED-conversion-works", !ws.signaled() &&
+				ws.stopSig() == cosmos::signal::STOP &&
+				!ws.exited() && !ws.dumped() && !ws.continued() && ws.stopped());
+		cs.event = CONTINUED;
+		cs.signal.reset();
+		ws = cosmos::WaitStatus{cs};
+		RUN_STEP("CONTINUED-conversion-works", !ws.signaled() &&
+				!ws.exited() && !ws.dumped() && ws.continued() && !ws.stopped());
 	}
 };
 
