@@ -97,7 +97,7 @@ public: // functions
 		return signaled() && WCOREDUMP(m_status);
 	}
 
-	/// Returns whether the process was stopped by a signal.
+	/// Returns whether the process was stopped by a signal a stopSig() is available..
 	/**
 	 * This information is only available for traced processes or if using
 	 * a `wait()` call with the WUNTRACED flag.
@@ -125,6 +125,13 @@ public: // functions
 			return {};
 
 		return Signal{SignalNr{WTERMSIG(m_status)}};
+	}
+
+	std::optional<Signal> stopSig() const {
+		if (!stopped())
+			return {};
+
+		return Signal{SignalNr{WSTOPSIG(m_status)}};
 	}
 
 protected: // data
