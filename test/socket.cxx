@@ -1,4 +1,5 @@
 // C++
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 
@@ -486,6 +487,36 @@ public:
 		}
 	}
 
+	void subCheckUnixCreds() {
+		auto [first, second] = cosmos::net::create_dgram_socket_pair();
+		auto opts = first.unixOptions();
+		auto creds = opts.credentials();
+
+		RUN_STEP("unix-credentials-match",
+				creds.processID() == cosmos::proc::get_own_pid() &&
+				creds.userID() == cosmos::proc::get_effective_user_id() &&
+				creds.groupID() == cosmos::proc::get_effective_group_id());
+
+		const auto local_groups = cosmos::proc::get_supplementary_groups();
+		const auto socket_groups = opts.supplementaryGroups();
+
+		RUN_STEP("same-number-of-supplementary-groups", local_groups.size() == socket_groups.size());
+		bool all_equal = true;
+
+		if (local_groups.size() == socket_groups.size()) {
+			for (const auto group: local_groups) {
+				if (std::find(
+						socket_groups.begin(),
+						socket_groups.end(),
+						group) == socket_groups.end()) {
+					all_equal = false;
+				}
+			}
+		}
+
+		RUN_STEP("supplementary-groups-equal", all_equal == true);
+	}
+
 	void checkUnix() {
 		START_TEST("unix domain socket test");
 		{
@@ -502,6 +533,7 @@ public:
 		subCheckUnixStreamConnections();
 		subCheckUnixSeqPacketConnections();
 		subCheckCreateSocketPair();
+		subCheckUnixCreds();
 	}
 
 	void checkMsgHeader() {

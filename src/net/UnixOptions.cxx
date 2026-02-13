@@ -10,4 +10,43 @@ UnixCredentials UnixOptions::credentials() const {
 	return ret;
 }
 
+std::vector<GroupID> UnixOptions::supplementaryGroups() const {
+	/*
+	 * This is not documented in a man page or anywhere else.
+	 * Linux kernel commit 28b5ba2a is the only bit of documentation out
+	 * there.
+	 * Returns is an array of gid_t. If the supplied buffer it so small
+	 * then `len` is updated to the necessary size and EFAULT or ERANGE is
+	 * returned.
+	 */
+
+	auto num_group_ids = [](socklen_t bytes) {
+		return bytes / sizeof(GroupID);
+	};
+	auto num_bytes = [](size_t elements) {
+		return elements * sizeof(GroupID);
+	};
+
+	std::vector<GroupID> ret{16};
+	socklen_t bytes;
+
+	while (true) {
+		try {
+			bytes = num_bytes(ret.size());
+			getsockopt(m_sock, M_LEVEL, OptName{SO_PEERGROUPS}, ret.data(), &bytes);
+			ret.resize(num_group_ids(bytes));
+			return ret;
+		} catch (const ApiError &err) {
+			if (err.errnum() != Errno::RANGE) {
+				throw;
+			} else if (bytes > 128 * sizeof(GroupID)) {
+				// safety limit to avoid unrestricted memory allocation.
+				throw;
+			}
+
+			ret.resize(num_group_ids(bytes));
+		}
+	}
+}
+
 }; // end ns

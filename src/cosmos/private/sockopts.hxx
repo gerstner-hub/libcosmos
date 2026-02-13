@@ -70,22 +70,34 @@ namespace {
 	}
 
 	/// Get a variable length socket option using an out pointer.
+	/**
+	 * If an exception is thrown then `ptr_len` might still have been
+	 * updated by the kernel (e.g. in case of ERANGE).
+	 **/
 	template <typename T>
-	socklen_t getsockopt(
+	void getsockopt(
 			FileDescriptor sock, const OptLevel lvl,
-			const OptName name, T *ptr, socklen_t ptr_len) {
+			const OptName name, T *ptr, socklen_t *ptr_len) {
 
 		const auto res = ::getsockopt(
 				to_integral(sock.raw()),
 				to_integral(lvl),
 				to_integral(name),
 				ptr,
-				&ptr_len);
+				ptr_len);
 
 		if (res != 0) {
 			throw ApiError{"getsockopt()"};
 		}
+	}
 
+	/// Get a variable length socket option returning the retrieved length by value.
+	template <typename T>
+	socklen_t getsockopt(
+			FileDescriptor sock, const OptLevel lvl,
+			const OptName name, T *ptr, socklen_t ptr_len) {
+
+		getsockopt(sock, lvl, name, ptr, &ptr_len);
 		return ptr_len;
 	}
 

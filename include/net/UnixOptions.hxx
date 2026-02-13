@@ -2,6 +2,7 @@
 
 // C++
 #include <chrono>
+#include <vector>
 
 // cosmos
 #include <cosmos/net/SockOptBase.hxx>
@@ -54,8 +55,20 @@ public: // functions
 	 * This is used for UnixDomainSockets to identify the credentials of
 	 * the peer process. These credentials are stored in the kernel during
 	 * `connect()` or `socketpair()` of the related socket.
+	 *
+	 * The returned UserID and GroupID are the effective UID and GID of
+	 * the peer process. The returned information is relating to the time
+	 * the peer process called `connect()` on the socket.
 	 **/
 	UnixCredentials credentials() const;
+
+	/// Returns a vector of supplementary group IDs the peer process owns.
+	/**
+	 * This is a poorly documented Linux-specific socket option which
+	 * allows to retrieve the list of supplementary group IDs the peer
+	 * process is associated with.
+	 **/
+	std::vector<GroupID> supplementaryGroups() const;
 
 	/// Sets an offset for the MessageFlag::PEEK receive() flag.
 	/**
