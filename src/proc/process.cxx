@@ -1,4 +1,6 @@
 // Linux
+#include <grp.h>
+#include <limits.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -11,6 +13,7 @@
 #include <cosmos/error/ApiError.hxx>
 #include <cosmos/error/FileError.hxx>
 #include <cosmos/error/UsageError.hxx>
+#include <cosmos/error/RuntimeError.hxx>
 #include <cosmos/proc/SigSet.hxx>
 #include <cosmos/proc/pidfd.h>
 #include <cosmos/proc/process.hxx>
@@ -57,6 +60,36 @@ GroupID get_real_group_id() {
 
 GroupID get_effective_group_id() {
 	return GroupID{::getegid()};
+}
+
+std::vector<GroupID> get_supplementary_groups() {
+	std::vector<GroupID> ret{32};
+	int num_groups = 0;
+
+	while (true) {
+		num_groups = ::getgroups(ret.size(), reinterpret_cast<gid_t*>(ret.data()));
+		if (num_groups != -1) {
+			ret.resize(num_groups);
+			return ret;
+		} else if (get_errno() == Errno::INVALID_ARG) {
+			ret.resize(ret.size() << 1);
+
+		       	if (ret.size() >= NGROUPS_MAX) {
+				// safety limit
+				throw RuntimeError{"excess number of supplementary groups"};
+			}
+
+			continue;
+		} else {
+			throw ApiError{"getgroups()"};
+		}
+	}
+}
+
+void set_supplementary_groups(const std::vector<GroupID> &groups) {
+	if (::setgroups(groups.size(), reinterpret_cast<const gid_t*>(groups.data())) != 0) {
+		throw ApiError{"setgroups()"};
+	}
 }
 
 ProcessGroupID get_own_process_group() {

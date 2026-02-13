@@ -6,6 +6,7 @@
 // C++
 #include <iosfwd>
 #include <optional>
+#include <vector>
 
 // cosmos
 #include <cosmos/BitMask.hxx>
@@ -178,6 +179,16 @@ COSMOS_API GroupID get_real_group_id();
  * \see get_effective_user_id()
  **/
 COSMOS_API GroupID get_effective_group_id();
+
+/// Returns the list of supplementary group IDs associated with the current process.
+COSMOS_API std::vector<GroupID> get_supplementary_groups();
+
+/// Change the list of supplementary groups associated with the current process.
+/**
+ * This requires the necessary privileges (CAP_SETGID in the current user
+ * namespace). Otherwise an ApiError is thrown.
+ **/
+COSMOS_API void set_supplementary_groups(const std::vector<GroupID> &groups);
 
 /// Returns the process group ID of the caller.
 COSMOS_API ProcessGroupID get_own_process_group();
