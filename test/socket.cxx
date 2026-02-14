@@ -515,6 +515,12 @@ public:
 		}
 
 		RUN_STEP("supplementary-groups-equal", all_equal == true);
+
+		auto proc_file = opts.pidfd();
+		/* difficult to do something useful with the pidfd in this
+		 * context. simply that the FD to ensure it is valid */
+		cosmos::FileStatus status{proc_file.fd()};
+		RUN_STEP("unix-pidfd-is-valid", true);
 	}
 
 	void checkUnix() {

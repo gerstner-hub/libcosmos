@@ -7,6 +7,7 @@
 // cosmos
 #include <cosmos/net/SockOptBase.hxx>
 #include <cosmos/net/unix_aux.hxx>
+#include <cosmos/proc/ProcessFile.hxx>
 
 namespace cosmos {
 
@@ -69,6 +70,16 @@ public: // functions
 	 * process is associated with.
 	 **/
 	std::vector<GroupID> supplementaryGroups() const;
+
+	/// Retrieve a ProcessFile representing the peer process.
+	/**
+	 * The returned PidFD, wrapper in a ProcessFile type, refers to the
+	 * peer connected to the UNIX domain socket.
+	 *
+	 * This a poorly documented Linux-specific socket option available
+	 * from kernel 6.9 onwards.
+	 **/
+	ProcessFile pidfd() const;
 
 	/// Sets an offset for the MessageFlag::PEEK receive() flag.
 	/**

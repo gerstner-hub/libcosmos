@@ -49,4 +49,16 @@ std::vector<GroupID> UnixOptions::supplementaryGroups() const {
 	}
 }
 
+ProcessFile UnixOptions::pidfd() const {
+	const auto raw_pidfd = getsockopt<int>(m_sock, M_LEVEL, OptName{SO_PEERPIDFD});
+
+	/*
+	 * This simply returns an `int` referring to the new file descriptor.
+	 * This is not documented in any man page or anywhere else, minimal
+	 * documentation is in kernel commit 7b26952a9.
+	 */
+
+	return ProcessFile{PidFD{FileNum{raw_pidfd}}};
+}
+
 }; // end ns

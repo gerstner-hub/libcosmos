@@ -15,8 +15,9 @@ namespace cosmos {
  * specific operations or lifetime management. Use cosmos::ProcessFile for
  * this.
  *
- * A PidFD can be obtained via cosmos::ProcessFile or from proc::clone(). The
- * uses of a PidFD are the following:
+ * A PidFD can be obtained via cosmos::ProcessFile, from proc::clone() or via
+ * the UnixOptions when operating on a UNIX domain socket. The uses of a PidFD
+ * are the following:
  *
  * - send a signal to the represented process
  * - monitor process termination using (e)poll or select, used e.g. in
