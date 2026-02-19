@@ -96,6 +96,8 @@ template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::Format
 template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::FormattedNumber<const int>&);
 template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::FormattedNumber<char>&);
 template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::FormattedNumber<const char>&);
+template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::FormattedNumber<unsigned char>&);
+template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::FormattedNumber<const unsigned char>&);
 
 // on 32-bit archs these can be the same, causing a duplicate instantiation
 #if SIZE_MAX != UINT_MAX
