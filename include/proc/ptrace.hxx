@@ -524,7 +524,7 @@ std::optional<long> COSMOS_API trace(const ptrace::Request req, const ProcessID 
  **/
 void COSMOS_API traceme();
 
-/// Extract the actual SugnalNr and ptrace Event from a siginfo_t.si_signo field.
+/// Extract the actual SignalNr and ptrace Event from a siginfo_t.si_signo field.
 /**
  * For PTRACE_EVENT_STOPs the signal field returned during `wait()` calls will
  * contain additional information about the type of event stop that occurred.
