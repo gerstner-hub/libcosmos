@@ -30,6 +30,7 @@ class ProcessTest :
 		testPidFD();
 		testResourceUsage();
 		testChildState2WaitStatus();
+		testMisc();
 	};
 
 	void testProperties() {
@@ -345,6 +346,12 @@ class ProcessTest :
 		ws = cosmos::WaitStatus{cs};
 		RUN_STEP("CONTINUED-conversion-works", !ws.signaled() &&
 				!ws.exited() && !ws.dumped() && ws.continued() && !ws.stopped());
+	}
+
+	void testMisc() {
+		START_TEST("testing misc proc functionality");
+		const auto proc_path = cosmos::proc::build_proc_path(cosmos::ProcessID{1}, "fd/0");
+		RUN_STEP("build-proc-path-matches", proc_path == "/proc/1/fd/0");
 	}
 };
 

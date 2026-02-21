@@ -526,6 +526,9 @@ struct PidInfo {
 /// A central PidInfo instance for quick access to process PID information.
 extern COSMOS_API PidInfo cached_pids;
 
+/// Builds a path towards "/proc/<pid>/<subpath>" for accessing per-pid proc pseudo-files.
+std::string COSMOS_API build_proc_path(const ProcessID pid, const std::string_view subpath);
+
 }; // end ns
 
 /// Outputs a human readable summary of `data`

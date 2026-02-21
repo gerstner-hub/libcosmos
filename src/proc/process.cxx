@@ -273,6 +273,14 @@ std::optional<ProcessID> fork() {
 
 PidInfo cached_pids;
 
+std::string build_proc_path(const ProcessID pid, const std::string_view subpath) {
+	std::string ret{"/proc/"};
+	ret += std::to_string(to_integral(pid));
+	ret += "/";
+	ret += subpath;
+	return ret;
+}
+
 } // end ns * 2
 }
 
