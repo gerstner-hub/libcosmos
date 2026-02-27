@@ -212,8 +212,7 @@ class ProcessTest :
 
 		cosmos::CloneArgs args;
 		cosmos::PidFD pid_fd;
-		args.setFlags({cosmos::CloneFlag::PIDFD});
-		args.setPidFD(pid_fd);
+		args.setPidFD(&pid_fd);
 		constexpr auto STATUS = cosmos::ExitStatus{20};
 
 		if (auto child = cosmos::proc::clone(args); child) {
@@ -231,8 +230,7 @@ class ProcessTest :
 		cosmos::EventFile ef{cosmos::EventFile::Counter{0}, cosmos::EventFile::Flags{}};
 		cosmos::CloneArgs args;
 		cosmos::PidFD pid_fd;
-		args.setFlags({cosmos::CloneFlag::PIDFD});
-		args.setPidFD(pid_fd);
+		args.setPidFD(&pid_fd);
 
 		if (auto child = cosmos::proc::clone(args); child) {
 			cosmos::ProcessFile pf{pid_fd};

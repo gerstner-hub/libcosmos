@@ -203,7 +203,7 @@ std::optional<SubProc> ChildCloner::runClone3() {
 	 */
 	PidFD pidfd;
 	CloneArgs clone_args;
-	clone_args.setPidFD(pidfd);
+	clone_args.setPidFD(&pidfd);
 	clone_args.setFlags({CloneFlag::CLEAR_SIGHAND, CloneFlag::PIDFD});
 
 	if (auto pid = proc::clone(clone_args); pid != std::nullopt) {

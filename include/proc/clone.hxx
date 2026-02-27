@@ -3,6 +3,9 @@
 // C
 #include <stdint.h>
 
+// C++
+#include <vector>
+
 // Linux
 #include <linux/sched.h> // sched headers are needed for clone()
 #include <sched.h>
@@ -57,8 +60,7 @@ enum class CloneFlag : uint64_t {
 using CloneFlags = BitMask<CloneFlag>;
 
 /// Argument struct for proc::clone().
-struct COSMOS_API CloneArgs :
-		::clone_args {
+struct COSMOS_API CloneArgs {
 
 	CloneArgs() {
 		clear();
@@ -72,20 +74,96 @@ struct COSMOS_API CloneArgs :
 	 **/
 	void clear();
 
-	void setFlags(const CloneFlags p_flags) {
-		this->flags = p_flags.raw();
+	void setFlag(const CloneFlag flag) {
+		setFlags(flags().set(flag));
 	}
 
-	void setPidFD(PidFD &fd) {
-		this->pidfd = reinterpret_cast<uintptr_t>(&fd.m_fd);
+	void resetFlag(const CloneFlag flag) {
+		setFlags(flags().reset(flag));
 	}
 
+	bool isSet(const CloneFlag flag) const {
+		return flags()[flag];
+	}
+
+	void setFlags(const CloneFlags flags) {
+		m_args.flags = flags.raw();
+	}
+	
+	CloneFlags flags() const {
+		return CloneFlags{m_args.flags};
+	}
+
+	/// Set the location where a PIDFD for the new child should be written to.
+	/**
+	 * Based on CloneFlag::PIDFD this sets the address where the kernel
+	 * will write the number of a file descriptor for a newly allocated
+	 * PIDFD referring to the new child process.
+	 *
+	 * If `fd == nullptr` then the feature will be disabled. The CloneFlags
+	 * will be adjusted implicitly to match the new setting.
+	 **/
+	void setPidFD(PidFD *fd) {
+		adjustFlag(CloneFlag::PIDFD, fd != nullptr);
+		m_args.pidfd = reinterpret_cast<uintptr_t>(&fd->m_fd);
+	}
+
+	/// Returns the currently set address where to store a PIDFD for the child.
+	/**
+	 * If the feature is disabled then this returns nullptr.
+	 **/
+	const PidFD* pidfd() const {
+		if (isSet(CloneFlag::PIDFD)) {
+			return reinterpret_cast<const PidFD*>(m_args.pidfd);
+		}
+
+		return nullptr;
+	}
+
+	/// Set the location where the child's TID will be stored in child process memory.
+	/**
+	 * Based on CloneFlag::CHILD_SETTID this sets the address where the
+	 * kernel will write the new child's TID in the child process's
+	 * memory.
+	 *
+	 * If `tid == nullptr` then the feature will be disabled. The
+	 * CloneFlags will be adjusted implicitly to match the new setting.
+	 *
+	 * \see CloneFlag::CHILD_SETTID.
+	 **/
 	void setChildTID(ThreadID *tid) {
-		this->child_tid = reinterpret_cast<uint64_t>(tid);
+		adjustFlag(CloneFlag::CHILD_SETTID, tid != nullptr);
+		m_args.child_tid = reinterpret_cast<uint64_t>(tid);
 	}
 
-	void setParentTID(ProcessID *pid) {
-		this->parent_tid = reinterpret_cast<uint64_t>(pid);
+	const ThreadID* childTID() const {
+		if (isSet(CloneFlag::CHILD_SETTID)) {
+			return reinterpret_cast<const ThreadID*>(m_args.child_tid);
+		}
+
+		return nullptr;
+	}
+
+	/// Sets the location where the child's TID will be stored in parent memory.
+	/**
+	 * Based on CloneFlag::PARENT_SETTID this sets the address where the
+	 * kernel will write the new child's TID in the parent process's
+	 * memory.
+	 *
+	 * If `tid == nullptr` then the feature will be disabled. The
+	 * CloneFlags will be adjusted implicitly to match the new setting.
+	 **/
+	void setParentTID(ThreadID *tid) {
+		adjustFlag(CloneFlag::PARENT_SETTID, tid != nullptr);
+		m_args.parent_tid = reinterpret_cast<uint64_t>(tid);
+	}
+
+	const ThreadID* parentTID() const {
+		if (isSet(CloneFlag::PARENT_SETTID)) {
+			return reinterpret_cast<const ThreadID*>(m_args.parent_tid);
+		}
+
+		return nullptr;
 	}
 
 	/// Sets the signal to be delivered upon child process termination.
@@ -96,7 +174,11 @@ struct COSMOS_API CloneArgs :
 	 * performing a proc::wait() on the child.
 	 **/
 	void setExitSignal(const Signal sig) {
-		this->exit_signal = static_cast<uint64_t>(to_integral(sig.raw()));
+		m_args.exit_signal = static_cast<uint64_t>(to_integral(sig.raw()));
+	}
+
+	cosmos::Signal exitSignal() const {
+		return cosmos::Signal{cosmos::SignalNr{static_cast<int>(m_args.exit_signal)}};
 	}
 
 	/// Sets the pointer to the lowest byte of the stack area.
@@ -105,8 +187,12 @@ struct COSMOS_API CloneArgs :
 	 * provided, otherwise the parent's stack is reused for the child if
 	 * this is set to 0.
 	 **/
-	void setStack(void *p_stack) {
-		this->stack = reinterpret_cast<uint64_t>(p_stack);
+	void setStack(void *stack) {
+		m_args.stack = reinterpret_cast<uint64_t>(stack);
+	}
+
+	const void* stack() const {
+		return reinterpret_cast<void*>(m_args.stack);
 	}
 
 	/// Allows to set an explicit thread ID to use for the child.
@@ -122,17 +208,65 @@ struct COSMOS_API CloneArgs :
 	 * snapshot.
 	 **/
 	void setTIDs(const ThreadID *tids, size_t num_tids) {
-		this->set_tid = reinterpret_cast<uint64_t>(tids);
-		this->set_tid_size = num_tids;
+		m_args.set_tid = reinterpret_cast<uint64_t>(tids);
+		m_args.set_tid_size = num_tids;
+	}
+
+	std::vector<ThreadID> tids() const {
+		std::vector<ThreadID> ret;
+		if (!m_args.set_tid)
+			return ret;
+
+		auto ids = reinterpret_cast<const ThreadID*>(m_args.set_tid);
+
+		for (size_t i = 0; i < m_args.set_tid_size; i++) {
+			ret.push_back(ids[i]);
+		}
+
+		return ret;
 	}
 
 	/// Sets the cgroup2 file descriptor of which the child should become a member.
 	/**
+	 * To disable the feature pass an invalid `fd`. The CloneFlags are
+	 * adjusted implicitly to match the new setting.
+	 *
 	 * \see CloneFlag::INTO_CGROUP.
 	 **/
 	void setCGroup(const FileDescriptor fd) {
-		this->cgroup = static_cast<uint64_t>(fd.raw());
+		adjustFlag(CloneFlag::INTO_CGROUP, fd.valid());
+		m_args.cgroup = static_cast<uint64_t>(fd.raw());
 	}
+
+	FileDescriptor cgroup() const {
+		if (isSet(CloneFlag::INTO_CGROUP)) {
+			return FileDescriptor{cosmos::FileNum{static_cast<int>(m_args.cgroup)}};
+		} else {
+			return FileDescriptor{};
+		}
+	}
+
+	const clone_args* raw() const {
+		return &m_args;
+	}
+
+	clone_args* raw() {
+		return &m_args;
+	}
+
+protected: // functions
+
+	void adjustFlag(const CloneFlag flag, const bool on_off) {
+		if (on_off) {
+			setFlag(flag);
+		} else {
+			resetFlag(flag);
+		}
+	}
+
+protected: // data
+
+	struct clone_args m_args;
 };
 
 namespace proc {

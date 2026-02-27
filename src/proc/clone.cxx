@@ -19,7 +19,7 @@ pid_t clone3(const struct clone_args &args) {
 namespace cosmos {
 
 void CloneArgs::clear() {
-	zero_object(static_cast<clone_args&>(*this));
+	zero_object(m_args);
 
 	// this must not be zero by default or we don't get any child exit
 	// signal notification.
@@ -29,7 +29,7 @@ void CloneArgs::clear() {
 namespace proc {
 
 std::optional<ProcessID> clone(const CloneArgs &args) {
-	const auto child = clone3(args);
+	const auto child = clone3(*args.raw());
 
 	if (child == -1) {
 		throw ApiError{"clone3()"};
