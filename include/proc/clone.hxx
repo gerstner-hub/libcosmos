@@ -181,18 +181,23 @@ struct COSMOS_API CloneArgs {
 		return cosmos::Signal{cosmos::SignalNr{static_cast<int>(m_args.exit_signal)}};
 	}
 
-	/// Sets the pointer to the lowest byte of the stack area.
+	/// Sets the pointer to the lowest byte of the stack area and its length.
 	/**
 	 * If CloneFlag::SHARE_VM is specified then this value *must* be
 	 * provided, otherwise the parent's stack is reused for the child if
 	 * this is set to 0.
 	 **/
-	void setStack(void *stack) {
+	void setStack(void *stack, uint64_t size) {
 		m_args.stack = reinterpret_cast<uint64_t>(stack);
+		m_args.stack_size = size;
 	}
 
 	const void* stack() const {
 		return reinterpret_cast<void*>(m_args.stack);
+	}
+
+	uint64_t stackSize() const {
+		return m_args.stack_size;
 	}
 
 	/// Allows to set an explicit thread ID to use for the child.
