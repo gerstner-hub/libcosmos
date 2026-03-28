@@ -190,6 +190,14 @@ public: // functions
 		return {};
 	}
 
+	bool isIgnored() const {
+		return getSimpleHandler() == IGNORE;
+	}
+
+	bool isDefaultAction() const {
+		return getSimpleHandler() == DEFAULT;
+	}
+
 	/// Read-only low-level access to the underlying data structure.
 	/**
 	 * Note that you should not access the `sa_mask` member to avoid
