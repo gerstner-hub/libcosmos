@@ -98,6 +98,7 @@ template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::Format
 template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::FormattedNumber<const char>&);
 template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::FormattedNumber<unsigned char>&);
 template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::FormattedNumber<const unsigned char>&);
+template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::FormattedNumber<long>&);
 
 // on 32-bit archs these can be the same, causing a duplicate instantiation
 #if SIZE_MAX != UINT_MAX
@@ -105,5 +106,6 @@ template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::Format
 // similarly this ULL definition is then missing on 32-bit archs, provide it
 #else
 template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::FormattedNumber<unsigned long long>&);
+template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::FormattedNumber<long long>&);
 template COSMOS_API std::ostream& operator<<(std::ostream&, const cosmos::FormattedNumber<unsigned long>&);
 #endif
