@@ -66,11 +66,15 @@ def flakePython():
     return res.returncode == 0
 
 
-def buildConfig(label, config, env=None):
+def buildConfig(label, config, abi=None):
     buildroot = f'{BUILDROOT_BASE}/{label}'
-    cmdline = ['scons', '-j5'] + config.split() + ['docs=0', f'buildroot={buildroot}', '/']
+    cmdline = ['scons', '-j5'] + config.split() + ['docs=0', f'buildroot={buildroot}']
+    if abi:
+        cmdline.append(f"abi={abi}")
+    # build all targets
+    cmdline.append('/')
     print(f'[{label.ljust(15)}] Running ', ' '.join(cmdline), sep='')
-    subprocess.check_call(cmdline, stdout=subprocess.DEVNULL, env=env)
+    subprocess.check_call(cmdline, stdout=subprocess.DEVNULL)
 
 
 if not args.skip_flake and not flakePython():
@@ -108,9 +112,6 @@ for label, config in configurations:
     buildConfig(label, config)
 
 if not args.skip_32bit and platform.uname().machine == 'x86_64':
-    env32 = os.environ.copy()
-    for var in ('CFLAGS', 'CXXFLAGS', 'LDFLAGS'):
-        env32[var] = '-m32'
     for config in ('libtype=shared', 'libtype=static'):
         label = config.split('=')[1]
-        buildConfig(f'{label}-32', config, env32)
+        buildConfig(f'{label}-32', config, abi="32")
