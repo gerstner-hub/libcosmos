@@ -48,6 +48,9 @@ static int arch_prctl(int op, ADDR addr, const bool eval_error = true) {
 
 	return res;
 #else
+	(void)op;
+	(void)addr;
+	(void)eval_error;
 	throw ApiError{"arch_prctl()", Errno::NO_SYS};
 #endif
 }
