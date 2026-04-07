@@ -50,6 +50,7 @@ std::vector<GroupID> UnixOptions::supplementaryGroups() const {
 }
 
 ProcessFile UnixOptions::pidfd() const {
+#ifdef SO_PEERPIDFD
 	const auto raw_pidfd = getsockopt<int>(m_sock, M_LEVEL, OptName{SO_PEERPIDFD});
 
 	/*
@@ -59,6 +60,9 @@ ProcessFile UnixOptions::pidfd() const {
 	 */
 
 	return ProcessFile{PidFD{FileNum{raw_pidfd}}};
+#else
+	throw cosmos::ApiError{"getsockopt()", Errno::NOT_SUPPORTED};
+#endif
 }
 
 }; // end ns

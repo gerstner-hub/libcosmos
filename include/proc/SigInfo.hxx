@@ -261,7 +261,9 @@ public: // types
 			PRECISE_MCD    = SEGV_ADIPERR, ///< precise MCD exception (Sparc ADI specific).
 			ASYNC_MTE      = SEGV_MTEAERR, ///< asynchronous ARM MTE error.
 			SYNC_MTE       = SEGV_MTESERR, ///< synchronous ARM MTE error.
+#ifdef SEGV_CPERR
 			CPROT_ERROR    = SEGV_CPERR,   ///< control protection error (aarch64 guarded control stack).
+#endif
 		};
 
 		struct Bound {
