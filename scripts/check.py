@@ -24,6 +24,7 @@ parser.add_argument('--keep-existing-build', action='store_true', help='don\'t d
 args = parser.parse_args()
 
 BUILDROOT_BASE = "build.check"
+INSTROOT_BASE = "install.check"
 root_dir = Path(os.path.realpath(__file__)).parent.parent
 while True:
     next_parent = root_dir.parent
@@ -34,12 +35,6 @@ while True:
 
 print('Running in top project directory', root_dir)
 os.chdir(root_dir)
-
-if not args.keep_existing_build:
-    try:
-        shutil.rmtree(BUILDROOT_BASE)
-    except FileNotFoundError:
-        pass
 
 
 def flakePython():
@@ -68,7 +63,16 @@ def flakePython():
 
 def buildConfig(label, config, abi=None):
     buildroot = f'{BUILDROOT_BASE}/{label}'
-    cmdline = ['scons', '-j5'] + config.split() + ['docs=0', f'buildroot={buildroot}']
+    instroot = f'{INSTROOT_BASE}/{label}'
+
+    if not args.keep_existing_build:
+        for _dir in (buildroot, instroot):
+            try:
+                shutil.rmtree(_dir)
+            except FileNotFoundError:
+                pass
+
+    cmdline = ['scons', '-j5'] + config.split() + ['docs=0', f'buildroot={buildroot}', f'instroot={instroot}']
     if abi:
         cmdline.append(f"abi={abi}")
     # build all targets
