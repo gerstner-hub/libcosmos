@@ -325,6 +325,7 @@ public: // functions
 	/// Returns the union of `first` and `second`.
 	friend BitMask operator|(const BitMask &first, const BitMask &second) {
 		BitMask ret{first.m_flags | second.m_flags};
+		return ret;
 	}
 
 protected: // data
