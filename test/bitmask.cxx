@@ -25,8 +25,13 @@ protected: // types
 		SOMEVAL = 0x5
 	};
 
+	enum class MaxEnum : uint64_t {
+		HIGH = 1ULL << 63
+	};
+
 	using MyBitMask = cosmos::BitMask<MyEnum>;
 	using OtherBitMask = cosmos::BitMask<OtherEnum>;
+	using MaxBitMask = cosmos::BitMask<MaxEnum>;
 public:
 	void runTests() override {
 		testCtors();
@@ -82,12 +87,18 @@ public:
 	void testStringRep() {
 		START_TEST("String Representation");
 
-		MyBitMask initlist({MyEnum::VAL2, MyEnum::VAL3});
+		MyBitMask initlist{{MyEnum::VAL2, MyEnum::VAL3}};
 		std::string expected(27, '0');
 		expected += "00110";
 
 		START_STEP("toString() of {VAL2, VAL3}");
 		FINISH_STEP(initlist.toString() == expected);
+
+		MaxBitMask maxmask({MaxEnum::HIGH});
+		std::string expected_max{"1"};
+		expected_max += std::string(63, '0');
+		START_STEP("toString() of 64th bit in mask");
+		FINISH_STEP(maxmask.toString() == expected_max);
 	}
 
 	void testSetters() {
