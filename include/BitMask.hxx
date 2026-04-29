@@ -69,7 +69,7 @@ public: // functions
 
 		// append each bit starting with the highest one
 		for (int bit = size() - 1; bit >= 0; bit--) {
-			const auto val = 1 << bit;
+			const auto val = 1ULL << bit;
 			ret.push_back(this->test(static_cast<ENUM>(val)) ? '1' : '0');
 		}
 
@@ -325,6 +325,7 @@ public: // functions
 	/// Returns the union of `first` and `second`.
 	friend BitMask operator|(const BitMask &first, const BitMask &second) {
 		BitMask ret{first.m_flags | second.m_flags};
+		return ret;
 	}
 
 protected: // data
