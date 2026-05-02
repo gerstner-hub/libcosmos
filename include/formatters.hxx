@@ -5,6 +5,7 @@
 
 // cosmos
 #include <cosmos/error/ApiError.hxx>
+#include <cosmos/error/ResolveError.hxx>
 #include <cosmos/error/errno.hxx>
 #include <cosmos/utils.hxx>
 
@@ -24,6 +25,19 @@ struct std::formatter<cosmos::Errno> :
 			std::format("{} ({})",
 				cosmos::ApiError::msg(err),
 				cosmos::to_integral(err)),
+			context
+		);
+	}
+};
+
+template<>
+struct std::formatter<cosmos::ResolveError::Code> :
+		public std::formatter<std::string> {
+
+	auto format(
+		const cosmos::ResolveError::Code &code, format_context &context) const {
+		return std::formatter<string>::format(
+			std::format("{}", cosmos::format(code)),
 			context
 		);
 	}

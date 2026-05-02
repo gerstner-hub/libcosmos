@@ -95,6 +95,8 @@ protected: // data
 	Errno m_system_errno;
 };
 
+COSMOS_API std::string format(const cosmos::ResolveError::Code &code);
+
 } // end ns
 
 COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::ResolveError::Code code);

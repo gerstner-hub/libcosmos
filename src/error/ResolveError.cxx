@@ -1,4 +1,5 @@
 // C++
+#include <format>
 #include <ostream>
 #include <sstream>
 
@@ -55,9 +56,16 @@ void ResolveError::generateMsg() const {
 	m_msg += ss.str();
 }
 
+std::string format(const cosmos::ResolveError::Code &code) {
+	return std::format("{} ({})",
+			cosmos::ResolveError::msg(code),
+			cosmos::resolve_code_label(code)
+	);
+}
+
 } // end ns
 
 std::ostream& operator<<(std::ostream &o, const cosmos::ResolveError::Code code) {
-	o << cosmos::ResolveError::msg(code) << " (" << cosmos::resolve_code_label(code)<< ")";
+	o << format(code);
 	return o;
 }

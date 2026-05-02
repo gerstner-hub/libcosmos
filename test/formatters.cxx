@@ -4,6 +4,7 @@
 
 // cosmos
 #include <cosmos/error/errno.hxx>
+#include <cosmos/error/ResolveError.hxx>
 #include <cosmos/formatters.hxx>
 
 // Test
@@ -13,6 +14,7 @@ class FormatterTest :
 		public cosmos::TestBase {
 	void runTests() override {
 		testErrnoFmt();
+		testResolveErrFmt();
 	}
 
 	void testErrnoFmt() {
@@ -21,6 +23,14 @@ class FormatterTest :
 		const auto fmt_err = std::format("{}", err);
 		RUN_STEP("fmt-string-matches",
 				fmt_err == "Resource temporarily unavailable (11)");
+	}
+
+	void testResolveErrFmt() {
+		START_TEST("format-resolve-error");
+		const cosmos::ResolveError::Code code{cosmos::ResolveError::Code::ADDR_FAMILY};
+		const auto fmt_err = std::format("{}", code);
+		RUN_STEP("fmt-string-matches",
+				fmt_err == "Address family for hostname not supported (EAI_ADDRFAMILY)");
 	}
 };
 
