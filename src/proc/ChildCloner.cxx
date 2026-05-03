@@ -6,6 +6,7 @@
 
 // C++
 #include <iostream>
+#include <format>
 
 // cosmos
 #include <cosmos/error/ApiError.hxx>
@@ -360,7 +361,7 @@ void ChildCloner::postFork() {
 			std::visit([](auto &&sched_settings) {
 				sched_settings.apply(ProcessID::SELF);
 			}, *m_sched_settings);
-		} catch(const std::exception &ex) {
+		} catch (const std::exception &ex) {
 			// treat this as non-critical, the process can still
 			// run, even if not prioritized.
 			print_child_error("sched_setscheduler", ex.what());
@@ -393,12 +394,26 @@ void ChildCloner::redirectFD(FileDescriptor orig, FileDescriptor redirect) {
 	redirect.duplicate(orig, CloseOnExec(false));
 }
 
+std::string ChildCloner::info() const {
+	std::string ret = "Arguments: ";
+	size_t num_arg = 0;
+	for (const auto &arg: m_argv) {
+		if (num_arg++ > 0) {
+			ret += " ";
+		}
+		ret += arg;
+	}
+
+	if (!m_cwd.empty()) {
+		ret += std::format("CWD: {}", getCWD());
+	}
+
+	return ret;
+}
+
 } // end ns
 
 std::ostream& operator<<(std::ostream &o, const cosmos::ChildCloner &proc) {
-	o << "Arguments: " << proc.getArgs() << "\n";
-	if (!proc.getCWD().empty())
-		o << "CWD: " << proc.getCWD() << "\n";
-
+	o << proc.info();
 	return o;
 }

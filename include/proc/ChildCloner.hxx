@@ -316,6 +316,9 @@ public: // functions
 	 **/
 	SubProc run();
 
+	/// Returns a string describing the child cloner's configuration.
+	std::string info() const;
+
 protected: // functions
 
 	/// Performs settings needed after forking i.e. in the child process but before exec()'ing.
@@ -387,8 +390,6 @@ protected: // data
 
 	/// Whether to forward errors occurring in child context to the parent
 	bool m_forward_child_errors = false;
-
-	friend std::ostream& operator<<(std::ostream&, const ChildCloner&);
 };
 
 } // end ns

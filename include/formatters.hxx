@@ -5,8 +5,9 @@
 
 // cosmos
 #include <cosmos/error/ApiError.hxx>
-#include <cosmos/error/ResolveError.hxx>
 #include <cosmos/error/errno.hxx>
+#include <cosmos/error/ResolveError.hxx>
+#include <cosmos/proc/ChildCloner.hxx>
 #include <cosmos/utils.hxx>
 
 /**
@@ -38,6 +39,19 @@ struct std::formatter<cosmos::ResolveError::Code> :
 		const cosmos::ResolveError::Code &code, format_context &context) const {
 		return std::formatter<string>::format(
 			std::format("{}", cosmos::format(code)),
+			context
+		);
+	}
+};
+
+template<>
+struct std::formatter<cosmos::ChildCloner> :
+		public std::formatter<std::string> {
+
+	auto format(const cosmos::ChildCloner &cloner,
+			format_context &context) const {
+		return std::formatter<string>::format(
+			std::format("{}", cloner.info()),
 			context
 		);
 	}
