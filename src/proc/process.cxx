@@ -284,19 +284,6 @@ std::string build_proc_path(const ProcessID pid, const std::string_view subpath)
 } // end ns * 2
 }
 
-std::ostream& operator<<(std::ostream &o, const cosmos::ExitStatus status) {
-	/// this could be annotated with a special character so that it is
-	/// clear right away that this is about an exit status
-	o << cosmos::to_integral(status);
-	switch (status) {
-		case cosmos::ExitStatus::INVALID: o << " (INVALID)"; break;
-		case cosmos::ExitStatus::SUCCESS: o << " (SUCCESS)"; break;
-		case cosmos::ExitStatus::FAILURE: o << " (FAILURE)"; break;
-		default: o << " (other)"; break;
-	}
-	return o;
-}
-
 std::ostream& operator<<(std::ostream &o, const cosmos::ChildState &info) {
 	using Event = cosmos::ChildState::Event;
 

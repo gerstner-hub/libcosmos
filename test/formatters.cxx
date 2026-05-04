@@ -15,6 +15,7 @@ class FormatterTest :
 	void runTests() override {
 		testErrnoFmt();
 		testResolveErrFmt();
+		testExitStatusFmt();
 	}
 
 	void testErrnoFmt() {
@@ -31,6 +32,13 @@ class FormatterTest :
 		const auto fmt_err = std::format("{}", code);
 		RUN_STEP("fmt-string-matches",
 				fmt_err == "Address family for hostname not supported (EAI_ADDRFAMILY)");
+	}
+
+	void testExitStatusFmt() {
+		START_TEST("format-exit-status");
+		const cosmos::ExitStatus status{cosmos::ExitStatus::FAILURE};
+		const auto fmt_status = std::format("{}", status);
+		RUN_STEP("fmt-string-matches", fmt_status == "1 (FAILURE)");
 	}
 };
 

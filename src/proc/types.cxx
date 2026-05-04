@@ -2,11 +2,11 @@
 #include <ostream>
 
 // cosmos
+#include <cosmos/formatters.hxx>
 #include <cosmos/formatting.hxx>
 #include <cosmos/proc/signal.hxx>
 #include <cosmos/proc/SigSet.hxx>
 #include <cosmos/proc/types.hxx>
-#include <cosmos/utils.hxx>
 
 // Linux
 #include <string.h> /* strsignal() */
@@ -25,5 +25,10 @@ static_assert(sizeof(SigSet) == sizeof(sigset_t), "bad SigSet size");
 std::ostream& operator<<(std::ostream &o, const cosmos::Signal sig) {
 	o << sig.name() << " (" << sig.raw() << ")";
 
+	return o;
+}
+
+std::ostream& operator<<(std::ostream &o, const cosmos::ExitStatus status) {
+	o << std::format("{}", status);
 	return o;
 }
