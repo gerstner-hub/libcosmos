@@ -2,6 +2,8 @@
 
 // C++
 #include <format>
+#include <map>
+#include <vector>
 
 // cosmos
 #include <cosmos/error/ApiError.hxx>
@@ -83,5 +85,39 @@ struct std::formatter<cosmos::ExitStatus> :
 			),
 			context
 		);
+	}
+};
+
+template<typename T>
+struct std::formatter<std::vector<T>> :
+		public std::formatter<std::string> {
+	auto format(const std::vector<T> &vec, format_context &context) const {
+		auto out = context.out();
+
+		size_t first = 0;
+
+		for (const auto &val: vec) {
+			if (first++) {
+				out = std::format_to(out, ", ");
+			}
+
+			out = std::format_to(out, "{}", val);
+		}
+
+		return out;
+	}
+};
+
+template<typename K, typename V>
+struct std::formatter<std::map<K, V>> :
+		public std::formatter<std::string> {
+	auto format(const std::map<K, V> &map, format_context &context) const {
+		auto out = context.out();
+
+		for (const auto &pair: map) {
+			out = std::format_to(out, "{}: {}\n", pair.first, pair.second);
+		}
+
+		return out;
 	}
 };
