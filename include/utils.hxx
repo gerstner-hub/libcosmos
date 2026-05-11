@@ -260,8 +260,8 @@ inline std::ostream& operator<<(std::ostream &o, const std::vector<T> &sv) {
 /// Output all the elements of a map as a "key:value" newline separated list.
 template <typename K, typename V>
 inline std::ostream& operator<<(std::ostream &o, const std::map<K,V> &m) {
-	for (auto it: m) {
-		o << it.first << ": " << it.second << "\n";
+	for (auto &pair: m) {
+		o << pair.first << ": " << pair.second << "\n";
 	}
 
 	return o;
