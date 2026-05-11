@@ -18,6 +18,7 @@ class FormatterTest :
 		testExitStatusFmt();
 		testVectorFmt();
 		testMapFmt();
+		testSignalFmt();
 	}
 
 	void testErrnoFmt() {
@@ -59,6 +60,12 @@ class FormatterTest :
 		m.insert({"string2", -6});
 		const auto fmt_map = std::format("{}", m);
 		RUN_STEP("fmt-string-matches", fmt_map == "string1: 5\nstring2: -6\n");
+	}
+
+	void testSignalFmt() {
+		START_TEST("format-signal");
+		const auto fmt_sig = std::format("{}", cosmos::signal::ILL);
+		RUN_STEP("fmt-string-matches", fmt_sig == "Illegal instruction (4)");
 	}
 };
 

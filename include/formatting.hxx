@@ -11,6 +11,7 @@
 // cosmos
 #include <cosmos/compiler.hxx>
 #include <cosmos/dso_export.h>
+#include <cosmos/formatters.hxx>
 #include <cosmos/fs/types.hxx>
 #include <cosmos/proc/types.hxx>
 #include <cosmos/string.hxx>
@@ -57,7 +58,7 @@ inline std::ostream& operator<<(std::ostream &o, const cosmos::GroupID &gid) {
 
 inline std::ostream& operator<<(std::ostream &o, const cosmos::SignalNr &sig) {
 	// similarly we could use special annotation here
-	o << cosmos::to_integral(sig);
+	o << std::format("{}", sig);
 	return o;
 }
 

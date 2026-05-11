@@ -88,6 +88,30 @@ struct std::formatter<cosmos::ExitStatus> :
 	}
 };
 
+template <>
+struct std::formatter<cosmos::SignalNr> :
+		public std::formatter<std::string> {
+	auto format(const cosmos::SignalNr nr, format_context &context) const {
+		return std::formatter<string>::format(
+			std::format("{}", cosmos::to_integral(nr)),
+			context
+		);
+	}
+};
+
+template <>
+struct std::formatter<cosmos::Signal> :
+		public std::formatter<std::string> {
+	auto format(const cosmos::Signal sig, format_context &context) const {
+		return std::formatter<string>::format(
+			std::format("{} ({})",
+				sig.name(), sig.raw()
+			),
+			context
+		);
+	}
+};
+
 template<typename T>
 struct std::formatter<std::vector<T>> :
 		public std::formatter<std::string> {
