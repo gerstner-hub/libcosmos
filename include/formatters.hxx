@@ -112,6 +112,42 @@ struct std::formatter<cosmos::Signal> :
 	}
 };
 
+template <>
+struct std::formatter<cosmos::ChildState> :
+		public std::formatter<std::string> {
+	auto format(const cosmos::ChildState &info, format_context &context) const {
+		auto out = context.out();
+		using Event = cosmos::ChildState::Event;
+
+		switch (info.event) {
+			case Event::EXITED: {
+				out = std::format_to(out, "Child exited with {}", *info.status);
+				break;
+			} case Event::KILLED: {
+				out = std::format_to(out, "Child killed by {}", *info.signal);
+				break;
+			} case Event::DUMPED: {
+				out = std::format_to(out, "Child killed by {} (dumped core)", *info.signal);
+				break;
+			} case Event::TRAPPED: {
+			     	out = std::format_to(out, "Child trapped");
+				break;
+			} case Event::STOPPED: {
+			      	out = std::format_to(out, "Child stopped by {}", *info.signal);
+				break;
+			} case Event::CONTINUED: {
+				out = std::format_to(out, "Child continued by {}", *info.signal);
+				break;
+			} default: {
+				out = std::format_to(out, "Bad ChildState");
+				break;
+			}
+		}
+
+		return out;
+	}
+};
+
 template<typename T>
 struct std::formatter<std::vector<T>> :
 		public std::formatter<std::string> {

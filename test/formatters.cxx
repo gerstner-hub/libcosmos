@@ -19,6 +19,7 @@ class FormatterTest :
 		testVectorFmt();
 		testMapFmt();
 		testSignalFmt();
+		testChildStateFmt();
 	}
 
 	void testErrnoFmt() {
@@ -66,6 +67,15 @@ class FormatterTest :
 		START_TEST("format-signal");
 		const auto fmt_sig = std::format("{}", cosmos::signal::ILL);
 		RUN_STEP("fmt-string-matches", fmt_sig == "Illegal instruction (4)");
+	}
+
+	void testChildStateFmt() {
+		START_TEST("child-state");
+		cosmos::ChildState state;
+		state.event = cosmos::ChildState::Event::STOPPED;
+		state.signal = cosmos::signal::STOP;
+		const auto fmt_state = std::format("{}", state);
+		RUN_STEP("fmt-string-matches", fmt_state == "Child stopped by Stopped (signal) (19)");
 	}
 };
 
