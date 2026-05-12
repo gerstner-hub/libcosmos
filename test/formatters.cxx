@@ -20,6 +20,7 @@ class FormatterTest :
 		testMapFmt();
 		testSignalFmt();
 		testChildStateFmt();
+		testFileModeFmt();
 	}
 
 	void testErrnoFmt() {
@@ -76,6 +77,13 @@ class FormatterTest :
 		state.signal = cosmos::signal::STOP;
 		const auto fmt_state = std::format("{}", state);
 		RUN_STEP("fmt-string-matches", fmt_state == "Child stopped by Stopped (signal) (19)");
+	}
+
+	void testFileModeFmt() {
+		START_TEST("file-mode");
+		cosmos::FileMode mode{cosmos::ModeT{0644}};
+		const auto fmt_mode = std::format("{}", mode);
+		RUN_STEP("fmt-string-matches", fmt_mode == "rw-r--r-- (0o0644)");
 	}
 };
 

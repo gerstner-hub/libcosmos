@@ -9,6 +9,7 @@
 #include <cosmos/error/ApiError.hxx>
 #include <cosmos/error/errno.hxx>
 #include <cosmos/error/ResolveError.hxx>
+#include <cosmos/fs/types.hxx>
 #include <cosmos/proc/ChildCloner.hxx>
 #include <cosmos/proc/types.hxx>
 #include <cosmos/utils.hxx>
@@ -145,6 +146,19 @@ struct std::formatter<cosmos::ChildState> :
 		}
 
 		return out;
+	}
+};
+
+template <>
+struct std::formatter<cosmos::FileMode> :
+		public std::formatter<std::string> {
+	auto format(const cosmos::FileMode mode, format_context &context) const {
+		return std::formatter<string>::format(
+			std::format("{} (0o{:04o})",
+				mode.symbolic(), cosmos::to_integral(mode.raw())
+			),
+			context
+		);
 	}
 };
 

@@ -1,9 +1,10 @@
 // cosmos
-#include <cosmos/fs/types.hxx>
+#include <cosmos/formatters.hxx>
 #include <cosmos/formatting.hxx>
+#include <cosmos/fs/types.hxx>
 
 std::ostream& operator<<(std::ostream &o, const cosmos::FileMode mode) {
-	o << mode.symbolic() << " (" << cosmos::OctNum{cosmos::to_integral(mode.raw()), 4} << ")";
+	o << std::format("{}", mode);
 	return o;
 }
 
