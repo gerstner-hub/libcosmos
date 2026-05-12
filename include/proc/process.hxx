@@ -4,7 +4,6 @@
 #include <sys/wait.h>
 
 // C++
-#include <iosfwd>
 #include <optional>
 #include <vector>
 
@@ -530,6 +529,3 @@ extern COSMOS_API PidInfo cached_pids;
 std::string COSMOS_API build_proc_path(const ProcessID pid, const std::string_view subpath);
 
 }; // end ns
-
-/// Outputs a human readable summary of `data`
-COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::ChildState &data);

@@ -283,19 +283,3 @@ std::string build_proc_path(const ProcessID pid, const std::string_view subpath)
 
 } // end ns * 2
 }
-
-std::ostream& operator<<(std::ostream &o, const cosmos::ChildState &info) {
-	using Event = cosmos::ChildState::Event;
-
-	switch (info.event) {
-		case Event::EXITED:    o << "Child exited with " << *info.status; break;
-		case Event::KILLED:    o << "Child killed by " << *info.signal; break;
-		case Event::DUMPED:    o << "Child killed by " << *info.signal << " (dumped core)"; break;
-		case Event::TRAPPED:   o << "Child trapped"; break;
-		case Event::STOPPED:   o << "Child stopped by " << *info.signal; break;
-		case Event::CONTINUED: o << "Child continued by " << *info.signal; break;
-		default: o << "Bad ChildState"; break;
-	}
-
-	return o;
-}

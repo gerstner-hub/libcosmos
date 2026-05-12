@@ -253,3 +253,5 @@ public: // data
 COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::Signal sig);
 /// Outputs the strongly typed ExitStatus as an integer.
 COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::ExitStatus status);
+/// Outputs a human readable summary of `data`
+COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::ChildState &data);
