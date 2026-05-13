@@ -12,6 +12,7 @@
 #include <cosmos/fs/types.hxx>
 #include <cosmos/proc/ChildCloner.hxx>
 #include <cosmos/proc/types.hxx>
+#include <cosmos/SysString.hxx>
 #include <cosmos/utils.hxx>
 
 /**
@@ -197,6 +198,17 @@ struct std::formatter<cosmos::OpenFlags> :
 		}
 
 		return out;
+	}
+};
+
+template <>
+struct std::formatter<cosmos::SysString> :
+		public std::formatter<std::string> {
+	auto format(const cosmos::SysString str, format_context &context) const {
+		return std::formatter<string>::format(
+			std::format("{}", str.raw()),
+			context
+		);
 	}
 };
 
