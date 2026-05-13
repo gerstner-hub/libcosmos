@@ -162,6 +162,44 @@ struct std::formatter<cosmos::FileMode> :
 	}
 };
 
+template <>
+struct std::formatter<cosmos::FileType> :
+		public std::formatter<std::string> {
+	auto format(const cosmos::FileType type, format_context &context) const {
+		return std::formatter<string>::format(
+			std::format("{}", type.symbolic()),
+			context
+		);
+	}
+};
+
+template <>
+struct std::formatter<cosmos::OpenFlags> :
+		public std::formatter<std::string> {
+	auto format(const cosmos::OpenFlags flags, format_context &context) const {
+		using enum cosmos::OpenFlag;
+		auto out = context.out();
+		bool first = true;
+
+		for (const auto flag: {
+				APPEND, ASYNC, CLOEXEC, CREATE, DIRECT, DIRECTORY,
+				DSYNC, EXCLUSIVE, NOATIME, NO_CONTROLLING_TTY,
+				NOFOLLOW, NONBLOCK, PATH, SYNC, TMPFILE, TRUNCATE}) {
+
+			if (flags[flag]) {
+				out = std::format_to(out, "{}{}",
+						first ? "" : "|",
+						cosmos::get_label(flag));
+
+				if (first)
+					first = false;
+			}
+		}
+
+		return out;
+	}
+};
+
 template<typename T>
 struct std::formatter<std::vector<T>> :
 		public std::formatter<std::string> {

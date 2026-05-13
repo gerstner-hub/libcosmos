@@ -21,6 +21,8 @@ class FormatterTest :
 		testSignalFmt();
 		testChildStateFmt();
 		testFileModeFmt();
+		testFileTypeFmt();
+		testOpenFlagsFmt();
 	}
 
 	void testErrnoFmt() {
@@ -84,6 +86,21 @@ class FormatterTest :
 		cosmos::FileMode mode{cosmos::ModeT{0644}};
 		const auto fmt_mode = std::format("{}", mode);
 		RUN_STEP("fmt-string-matches", fmt_mode == "rw-r--r-- (0o0644)");
+	}
+
+	void testFileTypeFmt() {
+		START_TEST("file-type");
+		cosmos::FileType type{cosmos::FileType::DIRECTORY};
+		const auto fmt_type = std::format("{}", type);
+		RUN_STEP("fmt-string-matches", fmt_type == "d");
+	}
+
+	void testOpenFlagsFmt() {
+		START_TEST("open-flags");
+		using enum cosmos::OpenFlag;
+		cosmos::OpenFlags flags{APPEND, CLOEXEC, TRUNCATE, CREATE};
+		const auto fmt_flags = std::format("{}", flags);
+		RUN_STEP("fmt-string-matches", fmt_flags == "APPEND|CLOEXEC|CREATE|TRUNCATE");
 	}
 };
 

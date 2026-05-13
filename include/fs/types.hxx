@@ -111,6 +111,9 @@ enum class OpenFlag : int {
 /// Collection of OpenFlag used for opening files.
 using OpenFlags = BitMask<OpenFlag>;
 
+/// Returns a string label matching the given `flag`.
+COSMOS_API const char* get_label(const OpenFlag flag);
+
 /// Combined file type and mode bits of a file (as found in st_mode struct stat).
 /**
  * In struct stat the st_mode field contains the file type value in the upper

@@ -3,6 +3,33 @@
 #include <cosmos/formatting.hxx>
 #include <cosmos/fs/types.hxx>
 
+namespace cosmos {
+
+const char* get_label(const OpenFlag flag) {
+	using enum OpenFlag;
+	switch (flag) {
+		case APPEND:    return "APPEND";
+		case ASYNC:     return "ASYNC";
+		case CLOEXEC:   return "CLOEXEC";
+		case CREATE:    return "CREATE";
+		case DIRECT:    return "DIRECT";
+		case DIRECTORY: return "DIRECTORY";
+		case DSYNC:     return "DSYNC";
+		case EXCLUSIVE: return "EXCLUSIVE";
+		case NOATIME:   return "NOATIME";
+		case NO_CONTROLLING_TTY: return "NO_CONTROLLING_TTY";
+		case NOFOLLOW:  return "NOFOLLOW";
+		case NONBLOCK:  return "NONBLOCK";
+		case PATH:      return "PATH";
+		case SYNC:      return "SYNC";
+		case TMPFILE:   return "TMPFILE";
+		case TRUNCATE:  return "TRUNCATE";
+		default:        return "???";
+	}
+}
+
+}
+
 std::ostream& operator<<(std::ostream &o, const cosmos::FileMode mode) {
 	o << std::format("{}", mode);
 	return o;
@@ -14,38 +41,6 @@ std::ostream& operator<<(std::ostream &o, const cosmos::FileType type) {
 }
 
 std::ostream& operator<<(std::ostream &o, const cosmos::OpenFlags flags) {
-	using Flag = cosmos::OpenFlag;
-	bool first = true;
-
-	for (const auto &pair: {
-			std::make_pair(Flag::APPEND,    "APPEND"),
-			              {Flag::ASYNC,     "ASYNC"},
-				      {Flag::CLOEXEC,   "CLOEXEC"},
-				      {Flag::CREATE,    "CREATE"},
-				      {Flag::DIRECT,    "DIRECT"},
-				      {Flag::DIRECTORY, "DIRECTORY"},
-				      {Flag::DSYNC,     "DSYNC"},
-				      {Flag::EXCLUSIVE, "EXCLUSIVE"},
-				      {Flag::NOATIME,   "NOATIME"},
-				      {Flag::NO_CONTROLLING_TTY, "NO_CONTROLLING_TTY"},
-				      {Flag::NOFOLLOW,  "NOFOLLOW"},
-				      {Flag::NONBLOCK,  "NONBLOCK"},
-				      {Flag::PATH,      "PATH"},
-				      {Flag::SYNC,      "SYNC"},
-				      {Flag::TMPFILE,   "TMPFILE"},
-				      {Flag::TRUNCATE,  "TRUNCATE"}
-	}) {
-		auto [flag, label] = pair;
-
-		if (flags[flag]) {
-			if (first)
-				first = false;
-			else
-				o << ", ";
-
-			o << label;
-		}
-	}
-
+	o << std::format("{}", flags);
 	return o;
 }
