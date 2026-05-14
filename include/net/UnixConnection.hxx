@@ -13,7 +13,8 @@ class UnixConnection :
 		public Socket {
 public: // functions
 
-	explicit UnixConnection(FileDescriptor fd, const AutoCloseFD auto_close = AutoCloseFD{true}) :
+	explicit UnixConnection(FileDescriptor fd = FileDescriptor(),
+			const AutoCloseFD auto_close = AutoCloseFD{true}) :
 			Socket{fd, auto_close} {
 	}
 

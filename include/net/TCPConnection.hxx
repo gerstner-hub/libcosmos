@@ -22,7 +22,8 @@ class TCPConnectionT :
 		public IPSocketT<FAMILY> {
 public: // functions
 
-	explicit TCPConnectionT(FileDescriptor fd, const AutoCloseFD auto_close = AutoCloseFD{true}) :
+	explicit TCPConnectionT(FileDescriptor fd = FileDescriptor(),
+			const AutoCloseFD auto_close = AutoCloseFD{true}) :
 			IPSocketT<FAMILY>{fd, auto_close} {
 	}
 
