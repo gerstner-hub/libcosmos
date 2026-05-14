@@ -6,6 +6,7 @@
 #include <vector>
 
 // cosmos
+#include <cosmos/concepts.hxx>
 #include <cosmos/error/ApiError.hxx>
 #include <cosmos/error/errno.hxx>
 #include <cosmos/error/ResolveError.hxx>
@@ -90,12 +91,12 @@ struct std::formatter<cosmos::ExitStatus> :
 	}
 };
 
-template <>
-struct std::formatter<cosmos::SignalNr> :
+template <cosmos::IntegralOutput T>
+struct std::formatter<T> :
 		public std::formatter<std::string> {
-	auto format(const cosmos::SignalNr nr, format_context &context) const {
+	auto format(const T t, format_context &context) const {
 		return std::formatter<string>::format(
-			std::format("{}", cosmos::to_integral(nr)),
+			std::format("{}", cosmos::to_integral(t)),
 			context
 		);
 	}
