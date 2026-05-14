@@ -10,12 +10,12 @@
 
 // cosmos
 #include <cosmos/compiler.hxx>
+#include <cosmos/concepts.hxx>
 #include <cosmos/dso_export.h>
 #include <cosmos/formatters.hxx>
 #include <cosmos/fs/types.hxx>
 #include <cosmos/proc/types.hxx>
 #include <cosmos/string.hxx>
-#include <cosmos/thread/thread.hxx>
 #include <cosmos/types.hxx>
 #include <cosmos/utils.hxx>
 
@@ -31,40 +31,12 @@ namespace cosmos {
 	struct FormattedNumber;
 }
 
-inline std::ostream& operator<<(std::ostream &o, const cosmos::ProcessID &pid) {
+template <cosmos::IntegralOutput T>
+inline std::ostream& operator<<(std::ostream &o, const T t) {
 	// we could also think about using a consistent annotation of process
 	// ids in the output like @1234 or <pid: 1234> something like that.
-	o << cosmos::to_integral(pid);
-	return o;
-}
-
-inline std::ostream& operator<<(std::ostream &o, const cosmos::ThreadID &tid) {
-	// similarly we could use special annotation here
-	o << cosmos::to_integral(tid);
-	return o;
-}
-
-inline std::ostream& operator<<(std::ostream &o, const cosmos::UserID &uid) {
-	// similarly we could use special annotation here
-	o << cosmos::to_integral(uid);
-	return o;
-}
-
-inline std::ostream& operator<<(std::ostream &o, const cosmos::GroupID &gid) {
-	// similarly we could use special annotation here
-	o << cosmos::to_integral(gid);
-	return o;
-}
-
-inline std::ostream& operator<<(std::ostream &o, const cosmos::SignalNr &sig) {
-	// similarly we could use special annotation here
-	o << std::format("{}", sig);
-	return o;
-}
-
-inline std::ostream& operator<<(std::ostream &o, const cosmos::FileNum &fd) {
-	// similarly we could use special annotation here
-	o << cosmos::to_integral(fd);
+	// similarly for the other types based on IntegralOutput.
+	o << cosmos::to_integral(t);
 	return o;
 }
 
