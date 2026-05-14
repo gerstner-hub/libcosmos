@@ -320,6 +320,17 @@ typedef TextOnColorT<TermColor::WHITE, ColorIntensity::BRIGHT> OnBrightWhite;
 
 } // end ns
 
+/*
+ * NOTE: we are not providing std::format specializations for these, since
+ * no I/O stream is associated with std::format, hence the implementation of a
+ * formatter would not be able to determine transparently whether the output
+ * will go to a TTY or not.
+ *
+ * Since these operators are for markup, not for actual content it makes sense
+ * to continue using the iostream operator<< for colors and use std::format
+ * only for actual output formatting.
+ */
+
 COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::term::ColorSpec &fc);
 COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::term::TermControl p);
 COSMOS_API std::ostream& operator<<(std::ostream &o, const cosmos::term::FeatureBase &fb);
