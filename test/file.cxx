@@ -29,8 +29,10 @@ public:
 		testOpen();
 		testOpenAt();
 		testReadFile();
+		testReadFileAtPosition();
 		testVectorReadFile();
 		testWriteFile();
+		testWriteFileAtPosition();
 		testPipeStream();
 		testTempFile();
 		testTempDir();
@@ -96,6 +98,23 @@ public:
 		FINISH_STEP(true);
 	}
 
+	void testReadFileAtPosition() {
+		START_TEST("Test reading files at position");
+		cosmos::TempFile tf{"/tmp/some.{}.txt"};
+		tf.write("12345678");
+		tf.seekFromStart(0);
+
+		std::string half;
+		half.resize(4);
+		const auto read = tf.readAtPos(&half[0], half.size(), 4);
+		if (read != half.size()) {
+			throw "incomplete read";
+		}
+
+		RUN_STEP("verify-read-at-pos-data", half == "5678");
+		RUN_STEP("verify-fpos-unchanged", tf.seekFromCurrent(0) == 0);
+	}
+
 	void testVectorReadFile() {
 		START_TEST("Test reading files using IOVector");
 
@@ -156,6 +175,25 @@ public:
 		EVAL_STEP(m_hosts_content == hosts2);
 		auto read = sf.read(hosts2.data(), 1);
 		FINISH_STEP(read == 0);
+	}
+
+	void testWriteFileAtPosition() {
+		START_TEST("Test write to file at position");
+		cosmos::TempFile tf{"/tmp/some.{}.txt"};
+		tf.write("12345678");
+		tf.seekFromStart(0);
+
+		std::string data{"4321"};
+		const auto written = tf.writeAtPos(data.c_str(), data.size(), 4);
+		if (written != data.size()) {
+			throw "incomplete write";
+		}
+
+		RUN_STEP("verify-fpos-unchanged", tf.seekFromCurrent(0) == 0);
+
+		tf.readAll(data, 8);
+
+		RUN_STEP("verify-file-data", data == "12344321");
 	}
 
 	void testPipeStream() {

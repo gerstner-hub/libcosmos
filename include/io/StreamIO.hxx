@@ -148,6 +148,28 @@ public: // functions
 		return writeAll(data.data(), data.size());
 	}
 
+	/// Read at the given file offset.
+	/**
+	 * This uses the `pread` system call to obtain data from the
+	 * underlying file at the given `offset`. The operation will not
+	 * modify the file's internal read/write offset. This call can
+	 * generate the same errors as read() and seek().
+	 **/
+	size_t readAtPos(void *buf, size_t length, off_t offset);
+
+	/// Write at the given file offset.
+	/**
+	 * This uses the `pwrite` system call to place data into the
+	 * underlying file at the given `offset`. The operation will not
+	 * modify the file's internal read/write offset. This call can
+	 * generate the same errors as write() and seek().
+	 *
+	 * \note On Linux, if a file has been opened with OpenFlag::APPEND,
+	 * `offset` will be ignored, and data is always appended at the end of
+	 * the file. This is contrary to the POSIX specification.
+	 **/
+	size_t writeAtPos(const void *buf, size_t length, off_t offset);
+
 	/// Read data from file into a vector of data regions.
 	/**
 	 * The `iovec` specifies memory regions into which data from the file
@@ -205,7 +227,7 @@ public: // functions
 		}
 	}
 
-	/// Seek to the given offset based on the given offset \p type.
+	/// Seek to the given offset based on the given offset `type`.
 	off_t seek(const SeekType type, off_t off);
 
 	/// Seek to the given offset relative to the start of the file.

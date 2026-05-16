@@ -36,6 +36,19 @@ size_t StreamIO::read(void *buf, size_t length) {
 	}
 }
 
+size_t StreamIO::readAtPos(void *buf, size_t length, off_t offset) {
+	while (true) {
+		auto res = ::pread64(to_integral(m_stream_fd.raw()), buf, length, offset);
+
+		if (res < 0) {
+			handleIOError("reading from position of file");
+			continue;
+		}
+
+		return static_cast<size_t>(res);
+	}
+}
+
 void StreamIO::readAll(void *buf, size_t length) {
 	size_t res;
 	while (length != 0) {
@@ -60,6 +73,20 @@ size_t StreamIO::write(const void *buf, size_t length) {
 
 		return static_cast<size_t>(res);
 	}
+}
+
+size_t StreamIO::writeAtPos(const void *buf, size_t length, off_t offset) {
+	while (true) {
+		auto res = ::pwrite64(to_integral(m_stream_fd.raw()), buf, length, offset);
+
+		if (res < 0) {
+			handleIOError("writing to position in file");
+			continue;
+		}
+
+		return static_cast<size_t>(res);
+	}
+
 }
 
 void StreamIO::writeAll(const void *buf, size_t length) {
