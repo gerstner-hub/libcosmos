@@ -4,6 +4,7 @@
 
 // cosmos
 #include <cosmos/utils.hxx>
+#include <cosmos/random.hxx>
 
 // Test
 #include "TestBase.hxx"
@@ -19,6 +20,7 @@ class MiscTest :
 		testResGuard();
 		testTwice();
 		testDeferGuard();
+		testRandom();
 	}
 
 	void testRanges() {
@@ -115,6 +117,39 @@ class MiscTest :
 		}
 
 		RUN_STEP("disarmed-guard-skipped", var == 10);
+	}
+
+	void testRandom() {
+		START_TEST("random");
+
+		uint8_t random_buf[64] = {0};
+
+		const auto filled = cosmos::get_random(random_buf, sizeof(random_buf)); 
+
+		// short-fills shouldn't occur in this configuration
+		RUN_STEP("got-random-data", filled == sizeof(random_buf));
+		bool found_non_zero = false;
+		for (size_t i = 0; i < sizeof(random_buf); i++) {
+			if (random_buf[i] != 0) {
+				found_non_zero = true;
+				break;
+			}
+		}
+
+		RUN_STEP("seeing-random-data", found_non_zero);
+
+		const auto random_vec = cosmos::get_random(128);
+
+		RUN_STEP("got-random-vector", random_vec.size() == 128);
+
+		found_non_zero = false;
+		for (const auto byte: random_vec) {
+			if (byte != 0) {
+				found_non_zero = true;
+				break;
+			}
+		}
+		RUN_STEP("seeing-random-data-in-vector", found_non_zero);
 	}
 };
 
