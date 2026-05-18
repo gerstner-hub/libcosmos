@@ -234,7 +234,13 @@ inline bool is_caller_process_group_leader() {
  *
  * The new session will not yet have a controlling terminal.
  **/
-COSMOS_API ProcessID create_new_session();
+COSMOS_API SessionID create_new_session();
+
+/// Returns the SessionID of the caller.
+COSMOS_API SessionID get_own_session_id();
+
+/// Returns the Session ID of the process identifier by `pid`.
+COSMOS_API SessionID get_session_of(const ProcessID pid);
 
 /// Fork the current process to create a child process.
 /**

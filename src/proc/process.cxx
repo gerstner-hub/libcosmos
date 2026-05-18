@@ -115,19 +115,34 @@ bool is_process_group_leader(const ProcessID pid) {
 	if (pid == ProcessID::INVALID)
 		return false;
 
-	auto pgid = get_process_group_of(pid);
+	const auto pgid = get_process_group_of(pid);
 
 	return to_integral(pid) == to_integral(pgid);
 }
 
-ProcessID create_new_session() {
-	auto res = ProcessID{::setsid()};
+SessionID create_new_session() {
+	const auto res = SessionID{::setsid()};
 
-	if (res == ProcessID::INVALID) {
+	if (res == SessionID::INVALID) {
 		throw ApiError{"setsid()"};
 	}
 
 	return res;
+}
+
+SessionID get_own_session_id() {
+	return get_session_of(ProcessID::SELF);
+}
+
+SessionID get_session_of(const ProcessID pid) {
+	const auto sid = getsid(cosmos::to_integral(pid));
+	const auto ret = SessionID{sid};
+
+	if (ret == SessionID::INVALID) {
+		throw ApiError{"getsid()"};
+	}
+
+	return ret;
 }
 
 namespace {

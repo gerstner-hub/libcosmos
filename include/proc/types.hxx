@@ -23,6 +23,12 @@
 
 namespace cosmos {
 
+/// Identifier for a process.
+/**
+ * This is most common type used to refer to processes in the system. These
+ * IDs are recycled after a process ends, therefore care needs to be taken not
+ * to be affected by race conditions when relying on ProcessIDs.
+ **/
 enum class ProcessID : pid_t {
 	INVALID = -1,
 	/// In a number of system calls zero refers to the calling thread.
@@ -31,9 +37,25 @@ enum class ProcessID : pid_t {
 	CHILD   = 0
 };
 
+/// Identifier for a process group.
+/**
+ * A process group is a group of ProcessIDs which are managed e.g. by a shell
+ * as part of a pipeline. These processes usually share a terminal and can be
+ * targeted by signals as a group.
+ **/
 enum class ProcessGroupID : pid_t {
 	INVALID = -1,
 	SELF = 0
+};
+
+/// Identifier of a session.
+/**
+ * A session is comprised of one or more process groups sharing the same
+ * controlling terminal. A session is usually established by the login(1)
+ * program or the display manager.
+ **/
+enum class SessionID : pid_t {
+	INVALID = -1
 };
 
 /// Information about the process a signal or wait() information is from or about.
