@@ -28,7 +28,7 @@ size_t StreamIO::read(void *buf, size_t length) {
 		auto res = ::read(to_integral(m_stream_fd.raw()), buf, length);
 
 		if (res < 0) {
-			handleIOError("reading from file");
+			handleIOError("read()");
 			continue;
 		}
 
@@ -41,7 +41,7 @@ size_t StreamIO::readAtPos(void *buf, size_t length, off_t offset) {
 		auto res = ::pread64(to_integral(m_stream_fd.raw()), buf, length, offset);
 
 		if (res < 0) {
-			handleIOError("reading from position of file");
+			handleIOError("pread64()");
 			continue;
 		}
 
@@ -67,7 +67,7 @@ size_t StreamIO::write(const void *buf, size_t length) {
 		auto res = ::write(to_integral(m_stream_fd.raw()), buf, length);
 
 		if (res < 0) {
-			handleIOError("writing to file");
+			handleIOError("write()");
 			continue;
 		}
 
@@ -80,7 +80,7 @@ size_t StreamIO::writeAtPos(const void *buf, size_t length, off_t offset) {
 		auto res = ::pwrite64(to_integral(m_stream_fd.raw()), buf, length, offset);
 
 		if (res < 0) {
-			handleIOError("writing to position in file");
+			handleIOError("pwrite64()");
 			continue;
 		}
 
@@ -105,7 +105,7 @@ bool StreamIO::read(ReadIOVector &iovec) {
 				to_integral(m_stream_fd.raw()), iovec.raw(), iovec.size());
 
 		if (res < 0) {
-			handleIOError("reading to vector from file");
+			handleIOError("readv()");
 			continue;
 		}
 
@@ -118,7 +118,7 @@ bool StreamIO::write(WriteIOVector &iovec) {
 		auto res = ::writev(to_integral(m_stream_fd.raw()), iovec.raw(), iovec.size());
 
 		if (res < 0) {
-			handleIOError("writing vector to file");
+			handleIOError("writev()");
 			continue;
 		}
 
