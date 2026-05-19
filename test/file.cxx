@@ -30,7 +30,8 @@ public:
 		testOpenAt();
 		testReadFile();
 		testReadFileAtPosition();
-		testVectorReadFile();
+		testVectorReadWriteFile();
+		testVectorReadWriteFileAtPosition();
 		testWriteFile();
 		testWriteFileAtPosition();
 		testPipeStream();
@@ -115,7 +116,7 @@ public:
 		RUN_STEP("verify-fpos-unchanged", tf.seekFromCurrent(0) == 0);
 	}
 
-	void testVectorReadFile() {
+	void testVectorReadWriteFile() {
 		START_TEST("Test reading files using IOVector");
 
 		const std::string header{"some header data"};
@@ -194,6 +195,71 @@ public:
 		tf.readAll(data, 8);
 
 		RUN_STEP("verify-file-data", data == "12344321");
+	}
+
+	void testVectorReadWriteFileAtPosition() {
+		START_TEST("Test read/write files using IOVector at position");
+
+		const std::string part1{"34"}, part2{"56"};
+
+		cosmos::TempFile tf{"/tmp/some.{}.txt"};
+		tf.write("12XXXX78");
+
+		{
+			cosmos::WriteIOVector iovec;
+			iovec.push_back(cosmos::OutputMemoryRegion{part1});
+			iovec.push_back(cosmos::OutputMemoryRegion{part2});
+
+			while (!tf.writeAtPos(iovec, 2, cosmos::StreamIO::ReadWriteFlag::HIGH_PRIO)) {
+				;
+			}
+		}
+
+		tf.seekFromStart(0);
+		std::string buf;
+		buf.resize(10);
+		auto count = tf.read(&buf[0], buf.size());
+		buf.resize(count);
+
+		RUN_STEP("file content as expected after pwritev2()", count == 8 && buf == "12345678");
+
+		tf.seekFromStart(0);
+
+		{
+			cosmos::WriteIOVector iovec;
+			iovec.push_back(cosmos::OutputMemoryRegion{part1});
+
+			while (!tf.writeAtPos(iovec, 0, cosmos::StreamIO::ReadWriteFlag::APPEND)) {
+				;
+			}
+		}
+
+		// "34" should have been appended now regardless of file
+		// pointer and offset
+		tf.seekFromStart(0);
+		buf.resize(20);
+		count = tf.read(&buf[0], buf.size());
+		buf.resize(count);
+		
+		RUN_STEP("file content was appended as expected", count == 10 && buf == "1234567834");
+
+		tf.seekFromEnd(0);
+
+		{
+			std::string in1, in2;
+			in1.resize(2);
+			in2.resize(2);
+			cosmos::ReadIOVector iovec;
+			iovec.push_back(cosmos::InputMemoryRegion{in1});
+			iovec.push_back(cosmos::InputMemoryRegion{in2});
+
+			while (!tf.readAtPos(iovec, 3)) {
+				;
+			}
+
+			RUN_STEP("buffer content as expected after preadv2()",
+					in1 == "45" && in2 == "67");
+		}
 	}
 
 	void testPipeStream() {

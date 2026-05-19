@@ -49,6 +49,20 @@ size_t StreamIO::readAtPos(void *buf, size_t length, off_t offset) {
 	}
 }
 
+bool StreamIO::readAtPos(ReadIOVector &iovec, off_t offset, const ReadWriteFlags flags) {
+	while (true) {
+		const auto res = ::preadv2(to_integral(m_stream_fd.raw()),
+				iovec.raw(), iovec.size(), offset, flags.raw());
+
+		if (res < 0) {
+			handleIOError("readv()");
+			continue;
+		}
+
+		return iovec.update(static_cast<size_t>(res));
+	}
+}
+
 void StreamIO::readAll(void *buf, size_t length) {
 	size_t res;
 	while (length != 0) {
@@ -87,6 +101,20 @@ size_t StreamIO::writeAtPos(const void *buf, size_t length, off_t offset) {
 		return static_cast<size_t>(res);
 	}
 
+}
+
+bool StreamIO::writeAtPos(WriteIOVector &iovec, off_t offset, const ReadWriteFlags flags) {
+	while (true) {
+		auto res = ::pwritev2(to_integral(m_stream_fd.raw()), iovec.raw(),
+				iovec.size(), offset, flags.raw());
+
+		if (res < 0) {
+			handleIOError("pwritev2()");
+			continue;
+		}
+
+		return iovec.update(static_cast<size_t>(res));
+	}
 }
 
 void StreamIO::writeAll(const void *buf, size_t length) {
