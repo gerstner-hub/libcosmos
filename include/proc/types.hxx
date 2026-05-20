@@ -13,7 +13,7 @@
 // cosmos
 #include <cosmos/dso_export.h>
 #include <cosmos/error/errno.hxx>
-#include <cosmos/types.hxx>
+#include <cosmos/creds.hxx>
 
 /**
  * @file

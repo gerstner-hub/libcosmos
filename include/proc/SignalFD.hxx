@@ -4,6 +4,7 @@
 #include <sys/signalfd.h>
 
 // cosmos
+#include <cosmos/creds.hxx>
 #include <cosmos/fs/FileDescriptor.hxx>
 #include <cosmos/proc/SigInfo.hxx>
 #include <cosmos/proc/SigSet.hxx>

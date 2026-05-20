@@ -5,6 +5,7 @@
 
 // cosmos
 #include <cosmos/proc/types.hxx>
+#include <cosmos/types.hxx>
 #include <cosmos/utils.hxx>
 
 namespace cosmos {

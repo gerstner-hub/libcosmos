@@ -11,6 +11,7 @@
 //#include <linux/signal.h>
 
 // cosmos
+#include <cosmos/creds.hxx>
 #include <cosmos/error/errno.hxx>
 #include <cosmos/fs/types.hxx>
 #include <cosmos/io/types.hxx>

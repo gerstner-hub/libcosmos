@@ -4,8 +4,8 @@
 #include <pwd.h>
 
 // cosmos
+#include <cosmos/creds.hxx>
 #include <cosmos/InfoBase.hxx>
-#include <cosmos/types.hxx>
 #include <cosmos/SysString.hxx>
 
 namespace cosmos {

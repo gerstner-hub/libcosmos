@@ -4,6 +4,7 @@
 #include <vector>
 
 // Cosmos
+#include <cosmos/creds.hxx>
 #include <cosmos/dso_export.h>
 #include <cosmos/fs/types.hxx>
 #include <cosmos/net/message_header.hxx>
