@@ -63,9 +63,16 @@ public: // types
 		HOLE = SEEK_HOLE
 	};
 
+/* this is a rather fresh addition from kernel 6.14 */
 #ifndef RWF_DONTACHE
-	/* this is a rather fresh addition from kernel 6.14 */
-	#define RWF_DONTCACHE 0x00000080
+#	define RWF_DONTCACHE 0x00000080
+#endif
+/* these two are also not available if current Ubuntu LTS, for example */
+#ifndef RWF_NOAPPEND
+#	define RWF_NOAPPEND 0x00000020
+#endif
+#ifndef RWF_ATOMIC
+#	define RWF_ATOMIC 0x00000040
 #endif
 
 	/// Flags to change read/write behaviour of readAtPos() and writeAtPos().
