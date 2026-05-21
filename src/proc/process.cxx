@@ -139,6 +139,50 @@ GroupID get_fs_group_id() {
 	return GroupID{static_cast<gid_t>(ret)};
 }
 
+void get_creds(UserCreds &creds) {
+	const auto res = ::getresuid(
+			reinterpret_cast<uid_t*>(&creds.real_uid),
+			reinterpret_cast<uid_t*>(&creds.effective_uid),
+			reinterpret_cast<uid_t*>(&creds.saved_uid));
+
+	if (res < 0) {
+		throw ApiError{"getresuid()"};
+	}
+}
+
+void get_creds(GroupCreds &creds) {
+	const auto res = ::getresgid(
+			reinterpret_cast<gid_t*>(&creds.real_gid),
+			reinterpret_cast<gid_t*>(&creds.effective_gid),
+			reinterpret_cast<gid_t*>(&creds.saved_gid));
+
+	if (res < 0) {
+		throw ApiError{"getresgid()"};
+	}
+}
+
+void set_creds(const UserCreds &creds) {
+	const auto res = ::setresuid(
+			cosmos::to_integral(creds.real_uid),
+			cosmos::to_integral(creds.effective_uid),
+			cosmos::to_integral(creds.saved_uid));
+
+	if (res < 0) {
+		throw ApiError{"setresuid()"};
+	}
+}
+
+void set_creds(const GroupCreds &creds) {
+	const auto res = ::setresgid(
+			cosmos::to_integral(creds.real_gid),
+			cosmos::to_integral(creds.effective_gid),
+			cosmos::to_integral(creds.saved_gid));
+
+	if (res < 0) {
+		throw ApiError{"setresgid()"};
+	}
+}
+
 ProcessGroupID get_own_process_group() {
 	return ProcessGroupID{getpgrp()};
 }

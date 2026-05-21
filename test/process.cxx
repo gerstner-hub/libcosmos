@@ -45,6 +45,21 @@ class ProcessTest :
 		RUN_STEP("not-setgid", cosmos::proc::get_real_group_id() == cosmos::proc::get_effective_group_id());
 		RUN_STEP("euid == fsuid", cosmos::proc::get_effective_user_id() == cosmos::proc::get_fs_user_id());
 		RUN_STEP("egid == fsgid", cosmos::proc::get_effective_group_id() == cosmos::proc::get_fs_group_id());
+
+		cosmos::UserCreds ucreds;
+		cosmos::GroupCreds gcreds;
+
+		cosmos::proc::get_creds(ucreds);
+		cosmos::proc::get_creds(gcreds);
+		RUN_STEP("process user creds all equal", (ucreds.real_uid == ucreds.effective_uid) && (ucreds.real_uid == ucreds.saved_uid));
+		RUN_STEP("process group creds all equal", (gcreds.real_gid == gcreds.effective_gid) && (gcreds.real_gid == gcreds.saved_gid));
+
+		try {
+			ucreds.effective_uid = cosmos::UserID{0};
+			cosmos::proc::set_creds(ucreds);
+		} catch (const cosmos::ApiError &ex) {
+			RUN_STEP("setuid(0) fails with EPERM", ex.errnum() == cosmos::Errno::PERMISSION);
+		}
 	}
 
 	void testEnv() {

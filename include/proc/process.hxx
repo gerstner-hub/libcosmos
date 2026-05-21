@@ -9,13 +9,14 @@
 
 // cosmos
 #include <cosmos/BitMask.hxx>
-#include <cosmos/SysString.hxx>
+#include <cosmos/creds.hxx>
 #include <cosmos/dso_export.h>
 #include <cosmos/fs/DirFD.hxx>
 #include <cosmos/proc/PidFD.hxx>
 #include <cosmos/proc/SigInfo.hxx>
 #include <cosmos/proc/types.hxx>
 #include <cosmos/string.hxx>
+#include <cosmos/SysString.hxx>
 #include <cosmos/types.hxx>
 
 /**
@@ -203,6 +204,66 @@ COSMOS_API UserID get_fs_user_id();
  * reports can occur.
  **/
 COSMOS_API UserID set_fs_user_id(const UserID uid);
+
+/// Obtain the set of active user credentials of the current process.
+/**
+ * This retrieves the real, effective and saved user ID of the calling
+ * process.
+ *
+ * This call can throw an ApiError with Errno::FAULT in case the memory
+ * `creds` is located in is outside the calling program's address space.
+ **/
+COSMOS_API void get_creds(UserCreds &creds);
+
+/// Change the currently active user credentials of the calling process.
+/**
+ * This modifies the real, effective and saved user ID of the calling process.
+ * If any of the uids in `creds` is set to UserID::INVALID then its value will
+ * be left untouched by this function call.
+ *
+ * If the calling process has the capability CAP_SETUID set then it is allowed
+ * to change the respective uids to arbitrary values. Otherwise the process is
+ * only allowed to change any uid to the value of any other uid present in the
+ * currently active UserCreds.
+ *
+ * The filesystem ID (\see set_fs_user_id()) is always synchronized with the
+ * current (possibly new) effective uid of the process, even if it wasn't
+ * changed by this call.
+ *
+ * This call can throw an ApiError with one of the following Errnos:
+ *
+ * - Errno::AGAIN: `creds.real_uid` was requested to be changed, but the
+ *   kernel currently lacks the resources to allocate the necessary data
+ *   structures.
+ * - Errno::AGAIN: `creds.read_uid` was requested to be changed, but the
+ *   change would exceed the target user's RLIMIT_NPROC limit. Since kernel
+ *   3.1 this no longer happens, though.
+ * - Errno::INVALID: one or more of the uids in `creds` is not valid in the
+ *   current user namespace of the process.
+ * - Errno::PERMISSION: the caller is lacking CAP_SETUID and tried to change a
+ *   uid to a value that is not allowed.
+ *
+ * \note On kernel level this call only changes the calling thread's
+ * credentials. The C library takes care of propagating the change to all
+ * other thread of the process (POSIX requirement).
+ **/
+COSMOS_API void set_creds(const UserCreds &creds);
+
+/// Obtain the set of active group credentials of the current process.
+/**
+ * This retrieves the real, effective and saved group ID of the calling
+ * process.
+ *
+ * \see get_creds(UserCreds&);
+ **/
+COSMOS_API void get_creds(GroupCreds &creds);
+
+/// Change the currently active group credentials for the calling process.
+/**
+ * This is analogous to set_creds(const UserCreds&) with the difference that
+ * CAP_SETGID is required to change the group credentials to arbitrary values.
+ **/
+COSMOS_API void set_creds(const GroupCreds &creds);
 
 /// Returns the currently set filesystem group ID of the current process.
 /**
