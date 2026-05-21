@@ -1,6 +1,7 @@
 // Linux
 #include <grp.h>
 #include <limits.h>
+#include <sys/fsuid.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -90,6 +91,52 @@ void set_supplementary_groups(const std::vector<GroupID> &groups) {
 	if (::setgroups(groups.size(), reinterpret_cast<const gid_t*>(groups.data())) != 0) {
 		throw ApiError{"setgroups()"};
 	}
+}
+
+UserID set_fs_user_id(const UserID uid) {
+	const auto raw_uid = cosmos::to_integral(uid);
+	const auto ret = ::setfsuid(raw_uid);
+
+	/* the call returns `int` instead of `uid_t` making necessary a cast. */
+	if ((uid_t)::setfsuid(-1) != raw_uid) {
+		/*
+		 * we cannot know the real error here, could also be something
+		 * like EINVAL.
+		 */
+		throw ApiError{"setfsuid()", Errno::PERMISSION};
+	}
+
+	return UserID{static_cast<uid_t>(ret)};
+}
+
+UserID get_fs_user_id() {
+	/* there's no dedicated getfsuid() system call, thus we need to use
+	 * the setter function which returns the "old" UID */
+	const auto ret = ::setfsuid(-1);
+	return UserID{static_cast<uid_t>(ret)};
+}
+
+GroupID set_fs_group_id(const GroupID gid) {
+	const auto raw_gid = cosmos::to_integral(gid);
+	const auto ret = ::setfsgid(raw_gid);
+
+	/* the call returns `int` instead of `gid_t` making necessary a cast. */
+	if ((gid_t)::setfsgid(-1) != raw_gid) {
+		/*
+		 * we cannot know the real error here, could also be something
+		 * like EINVAL.
+		 */
+		throw ApiError{"setfsgid()", Errno::PERMISSION};
+	}
+
+	return GroupID{static_cast<gid_t>(ret)};
+}
+
+GroupID get_fs_group_id() {
+	/* there's no dedicated getfsgid() system call, thus we need to use
+	 * the setter function which returns the "old" UID */
+	const auto ret = ::setfsgid(-1);
+	return GroupID{static_cast<gid_t>(ret)};
 }
 
 ProcessGroupID get_own_process_group() {

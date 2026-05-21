@@ -43,6 +43,8 @@ class ProcessTest :
 		RUN_STEP("not-setuid", cosmos::proc::get_real_user_id() == cosmos::proc::get_effective_user_id());
 		// we don't expect to run set-gid
 		RUN_STEP("not-setgid", cosmos::proc::get_real_group_id() == cosmos::proc::get_effective_group_id());
+		RUN_STEP("euid == fsuid", cosmos::proc::get_effective_user_id() == cosmos::proc::get_fs_user_id());
+		RUN_STEP("egid == fsgid", cosmos::proc::get_effective_group_id() == cosmos::proc::get_fs_group_id());
 	}
 
 	void testEnv() {

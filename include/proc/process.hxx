@@ -179,6 +179,43 @@ COSMOS_API GroupID get_real_group_id();
  **/
 COSMOS_API GroupID get_effective_group_id();
 
+/// Returns the currently set filesystem user ID of the current process.
+/**
+ * The filesystem user ID governs access checks for filesystem objects
+ * similarly as the effective user ID governs other kinds of access checks in
+ * the kernel. Usually effective and filesystem user ID match. The use of the
+ * filesystem uid/gid is marked as deprecated in the Linux API documentation.
+ *
+ * Any change of the effective user ID will implicitly sync the filesystem
+ * user ID.
+ **/
+COSMOS_API UserID get_fs_user_id();
+
+/// Sets a new filesystem user ID for the current process.
+/**
+ * This operation requires the CAP_SETUID privilege in the current process,
+ * otherwise it will fail. The previously set filesystem user ID is returned.
+ *
+ * On error a generic ApiError with Errno::PERMISSION is thrown, because the
+ * kernel does not offer proper error diagnostics for this call. Due to this
+ * limitation this function call is not multi-threading safe, if multiple
+ * threads should modify the filesystem UID in parallel then bogus error
+ * reports can occur.
+ **/
+COSMOS_API UserID set_fs_user_id(const UserID uid);
+
+/// Returns the currently set filesystem group ID of the current process.
+/**
+ * \see get_fs_user_id()
+ **/
+COSMOS_API GroupID get_fs_group_id();
+
+/// Sets a new filesystem group ID for the current process.
+/**
+ * \see set_fs_user_id()
+ **/
+COSMOS_API GroupID set_fs_group_id(const GroupID gid);
+
 /// Returns the list of supplementary group IDs associated with the current process.
 COSMOS_API std::vector<GroupID> get_supplementary_groups();
 
