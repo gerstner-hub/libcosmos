@@ -534,6 +534,113 @@ COSMOS_API std::string read_symlink(const SysString path);
  **/
 COSMOS_API std::string read_symlink_at(const DirFD dir_fd, const SysString path);
 
+/// Rename a path in the filesystem.
+/**
+ * An existing path in the filesystem `oldpath` will be renamed to `newpath`.
+ *
+ * `oldpath` can be any kind of filesystem object, but additional restrictions
+ * apply e.g. if `oldpath` refers to a directory. If `newpath` already exists
+ * then it will be replaced by `oldpath`, if possible. In this case the
+ * operation is atomic in so far as no process in the system will find
+ * `newpath` missing at any point. Should the operation fail then `newpath` is
+ * guaranteed to stay in place untouched.
+ *
+ * The rename is a per-filesystem operation and cannot be performed between
+ * different filesystems or even between different mounts of the same
+ * filesystem.
+ *
+ * On error an ApiError with one of the following Errnos will be thrown:
+ *
+ * - Errno::ACCESS: write permission for `newpath` or `oldpath` was denied or
+ *   search permission was denied for a prefix of `oldpath` or `newpath`.
+ * - Errno::ACCESS or Errno::PERMISSION: one of the involved directories has a
+ *   sticky bit set but the process lacks the permission to perform the
+ *   operation.
+ * - Errno::BUSY: `newpath` or `oldpath` is a directory and currently in use
+ *   by some process in a way that the system cannot handle the rename (e.g.
+ *   used as mount point, chroot, CWD etc.).
+ * - Errno::DISK_QUOTA: the caller's disk quote on the filesystem has been
+ *   exhausted.
+ * - Errno::FAULT: `newpath` or `oldpath` point to bad memory.
+ * - Errno::IS_DIRECTORY: `newpath` is a directory while `oldpath` is not.
+ * - Errno::NOT_A_DIR: A path prefix of one of the paths is not a directory,
+ *   or `oldpath` is a directory but `newpath` isn't.
+ * - Errno::INVALID_ARG: an attempt was made to make a directory a
+ *   sub-directory of itself.
+ * - Errno::LINK_LOOP: too many symbolic links encountered in any of the
+ *   paths.
+ * - Errno::TOO_MANY_LINKS: one of the involved directories has the maximum
+ *   number of links in it.
+ * - Errno::NAME_TOO_LONG: one of the two paths is too long.
+ * - Errno::NO_ENTRY: one of the paths or path prefixes does not exist, or the
+ *   paths are empty strings.
+ * - Errno::NO_MEM
+ * - Errno::NO_SPACE: the device containing the file has no room for the new
+ *   directory entry.
+ * - Errno::NOT_EMPTY or Errno::EXISTS: `newpath` is a directory but not
+ *   empty.
+ * - Errno::READ_ONLY_FS
+ * - Errno::CROSS_DEVICE: `oldpath` and `newpath` do not share the same
+ *   filesystem.
+ *
+ **/
+COSMOS_API void rename(const SysString oldpath, const SysString newpath);
+
+/// Flags used in conjunction with rename_at().
+enum class RenameFlag : unsigned int {
+	/// atomically exchange `oldpath` and `newpath`. Bot paths must exist but may be of different types.
+	EXCHANGE  = RENAME_EXCHANGE,
+	/// don't replace `newpath` if it already exists, fail instead. Cannot be used combined with EXCHANGE.
+	NOREPLACE = RENAME_NOREPLACE,
+	/// create a "whiteout" object at the source of the rename for use with overlayfs filesystems.
+	WHITEOUT  = RENAME_WHITEOUT,
+};
+
+using RenameFlags = BitMask<RenameFlag>;
+
+/// Rename a path relative to directory file descriptors.
+/**
+ * This renames the file `oldpath` found in the directory referred to by
+ * `olddir_fd` `newpath` in the directory referred to by `newdir_fd`. The
+ * optional `flags` allow for additional control of the rename operation as
+ * documented as `RenameFlag`.
+ *
+ * When `oldpath` and/or `newpath` are absolute paths then `olddir_fd` and/or
+ * `newdir_fd` are ignored. If both are absolute and `flags` are empty then
+ * this call behaves exactly like `rename()`. Otherwise the differences are as
+ * follows:
+ *
+ * The relative path found in `oldpath` and `newpath` are interpreted
+ * relative to `olddir_fd` and `newdir_fd`. The special constant
+ * cosmos::AT_CWD can be passed for `olddir_fd` / `newdir_fd` in which case
+ * the paths will be interpreted relative to the calling process's current
+ * working directory.
+ *
+ * The following additional errors can occur compared to what is documented at
+ * `rename()`:
+ *
+ * - Errno::BAD_FD: one of `oldpath` / `newpath` is relative but `olddir_fd` /
+ *   `newdir_fd` is invalid.
+ * - Errno::NOT_A_DIR: one of `oldpath` / `newpath` is relative but
+ *   `olddir_fd` / `newdir_fd` does not refer to a directory.
+ * - Errno::EXISTS: RenameFlag::NOREPLACE was given but `newpath` already
+ *   exists.
+ * - Errno::INVALID_ARG:
+ *   + an invalid flag was specified in `flags`.
+ *   + both RenameFlag::EXCHANGE and RenameFlag::NOREPLACE were specified in
+ *   `flags`.
+ *   + both RenameFlag::EXCHANGE and RenameFlag::WHITEOUT were specified in
+ *   `flags`.
+ *   + the underlying filesystem does not support one of the flags.
+ * - Errno::NO_ENTRY: RenameFlag::EXCHANGE was specified but `newpath` does
+ *   not exist.
+ * - Errno::PERMISSION: RenameFlag::WHITEOUT was specified but the caller
+ *   lacks the CAP_MKNOD capability.
+ **/
+COSMOS_API void rename_at(const DirFD olddir_fd, const SysString oldpath,
+		const DirFD newdir_fd, const SysString newpath,
+		const RenameFlags flags = {});
+
 /// Creates a new (hard) link of the file found in `old_path` at `new_path`.
 /**
  * Hard links only work on the same file system. An attempt to create a hard

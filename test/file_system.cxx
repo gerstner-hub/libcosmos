@@ -45,6 +45,7 @@ class FileSystemTest :
 		testAccess();
 		testLock();
 		testDevIDs();
+		testRename();
 	}
 
 	std::pair<std::filesystem::path, cosmos::TempDir> getTestDir() {
@@ -757,6 +758,44 @@ class FileSystemTest :
 		const auto devid2 = cosmos::fs::make_device(major, minor);
 
 		RUN_STEP("make_device()-matches", devid == devid2);
+	}
+
+	void testRename() {
+		START_TEST("rename() API test");
+		const auto tmp_dir = getTempDir();
+		const auto old_path = tmp_dir.path() + "/old";
+		const auto new_path = tmp_dir.path() + "/new";
+
+		{
+			cosmos::File test{old_path,
+				cosmos::OpenMode::WRITE_ONLY,
+				cosmos::OpenFlag::CREATE,
+				cosmos::FileMode{cosmos::ModeT{0700}}};
+		}
+
+
+		cosmos::fs::rename(old_path, new_path);
+		RUN_STEP("rename() renames", cosmos::fs::exists_file(new_path) && !cosmos::fs::exists_file(old_path));
+
+		cosmos::Directory tmp_dir_fd{tmp_dir.path()};
+		cosmos::fs::rename_at(tmp_dir_fd.fd(), "new", tmp_dir_fd.fd(), "new2");
+		RUN_STEP("rename_at() renames", !cosmos::fs::exists_file(new_path) && cosmos::fs::exists_file(tmp_dir.path() + "/new2"));
+
+		{
+			cosmos::File test{tmp_dir.path() + "/blocker",
+				cosmos::OpenMode::WRITE_ONLY,
+				cosmos::OpenFlag::CREATE,
+				cosmos::FileMode{cosmos::ModeT{0700}}};
+		}
+
+		try {
+			cosmos::fs::rename_at(tmp_dir_fd.fd(), "new2",
+					tmp_dir_fd.fd(), "blocker",
+					cosmos::fs::RenameFlag::NOREPLACE);
+			RUN_STEP("NOREPLACE doesn't replace", false);
+		} catch (const cosmos::ApiError &ex) {
+			RUN_STEP("NOREPLACE doesn't replace", ex.errnum() == cosmos::Errno::EXISTS);
+		}
 	}
 };
 

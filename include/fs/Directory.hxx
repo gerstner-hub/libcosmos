@@ -129,20 +129,28 @@ public: // functions
 
 	DirFD fd() const { return m_fd; }
 
-	// \see fs::unlink_file_at()
+	// \see fs::unlink_file_at().
 	inline void unlinkFileAt(const SysString path) const;
 
-	// \see fs::make_dir_at()
+	// \see fs::make_dir_at().
 	inline void makeDirAt(const SysString path, const FileMode mode) const;
 
-	// \see fs::remove_dir_at()
+	// \see fs::remove_dir_at().
 	inline void removeDirAt(const SysString path) const;
 
-	// \see fs::read_symlink_at()
+	// \see fs::read_symlink_at().
 	inline std::string readSymlinkAt(const SysString path) const;
 
-	// \see fs::make_symlink_at()
+	// \see fs::make_symlink_at().
 	inline void makeSymlinkAt(const SysString target, const SysString path) const;
+
+	// \see fs::rename_at().
+	/**
+	 * This performs a rename within the represented directory as if
+	 * `*this` would be passed as `olddir_fd` and `newdir_fd` to
+	 * fs::rename_at.
+	 **/
+	inline void renameAt(const SysString oldpath, const SysString newpath) const;
 
 protected: // data
 
@@ -175,6 +183,10 @@ std::string Directory::readSymlinkAt(const SysString path) const {
 
 void Directory::makeSymlinkAt(const SysString target, const SysString path) const {
 	fs::make_symlink_at(target, m_fd, path);
+}
+
+void Directory::renameAt(const SysString oldpath, const SysString newpath) const {
+	fs::rename_at(this->fd(), oldpath, this->fd(), newpath);
 }
 
 } // end ns

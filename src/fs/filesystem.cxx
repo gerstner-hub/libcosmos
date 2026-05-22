@@ -674,4 +674,21 @@ DeviceID make_device(const DeviceMajor maj, const DeviceMinor min) {
 	return DeviceID{raw_id};
 }
 
+void rename(const SysString oldpath, const SysString newpath) {
+	if (::rename(oldpath.raw(), newpath.raw()) != 0) {
+		throw ApiError{"rename()"};
+	}
+}
+
+void rename_at(const DirFD olddir_fd, const SysString oldpath,
+		const DirFD newdir_fd, const SysString newpath,
+		const RenameFlags flags) {
+
+	if (::renameat2(to_integral(olddir_fd.raw()), oldpath.raw(),
+				to_integral(newdir_fd.raw()), newpath.raw(),
+				flags.raw()) < 0) {
+		throw ApiError{"renameat2()"};
+	}
+}
+
 } // end ns
