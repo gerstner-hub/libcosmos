@@ -642,7 +642,7 @@ void check_access_at(const DirFD dir_fd, const SysString path,
 	throw ApiError{"faccessat()"};
 }
 
-COSMOS_API void check_access_fd(const FileDescriptor fd, const AccessChecks checks,
+void check_access_fd(const FileDescriptor fd, const AccessChecks checks,
 		const AccessFlags flags) {
 
 	if (::faccessat(to_integral(fd.raw()), "", checks.raw(), flags.raw() | AT_EMPTY_PATH) == 0) {
@@ -652,13 +652,13 @@ COSMOS_API void check_access_fd(const FileDescriptor fd, const AccessChecks chec
 	throw ApiError{"faccessat()"};
 }
 
-COSMOS_API void flock(const FileDescriptor fd, const LockOperation operation, const LockFlags flags) {
+void flock(const FileDescriptor fd, const LockOperation operation, const LockFlags flags) {
 	if (::flock(to_integral(fd.raw()), cosmos::to_integral(operation) | flags.raw()) != 0) {
 		throw ApiError{"flock()"};
 	}
 }
 
-COSMOS_API std::pair<DeviceMajor, DeviceMinor> split_device_id(
+std::pair<DeviceMajor, DeviceMinor> split_device_id(
 		const DeviceID id) {
 	const auto raw_id = cosmos::to_integral(id);
 	return std::make_pair(
@@ -666,7 +666,7 @@ COSMOS_API std::pair<DeviceMajor, DeviceMinor> split_device_id(
 			DeviceMinor{::minor(raw_id)});
 }
 
-COSMOS_API DeviceID make_device(const DeviceMajor maj, const DeviceMinor min) {
+DeviceID make_device(const DeviceMajor maj, const DeviceMinor min) {
 	const auto raw_id = ::makedev(
 			cosmos::to_integral(maj),
 			cosmos::to_integral(min));
