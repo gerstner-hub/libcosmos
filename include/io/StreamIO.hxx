@@ -64,7 +64,7 @@ public: // types
 	};
 
 /* this is a rather fresh addition from kernel 6.14 */
-#ifndef RWF_DONTACHE
+#ifndef RWF_DONTCACHE
 #	define RWF_DONTCACHE 0x00000080
 #endif
 /* these two are also not available if current Ubuntu LTS, for example */
