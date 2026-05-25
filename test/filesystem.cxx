@@ -9,13 +9,14 @@
 #include <cosmos/error/RuntimeError.hxx>
 #include <cosmos/formatting.hxx>
 #include <cosmos/fs/Directory.hxx>
-#include <cosmos/fs/filesystem.hxx>
-#include <cosmos/fs/FileStatus.hxx>
 #include <cosmos/fs/File.hxx>
+#include <cosmos/fs/FileStatus.hxx>
+#include <cosmos/fs/filesystem.hxx>
+#include <cosmos/fs/INotify.hxx>
 #include <cosmos/fs/TempFile.hxx>
+#include <cosmos/PasswdInfo.hxx>
 #include <cosmos/proc/ChildCloner.hxx>
 #include <cosmos/proc/process.hxx>
-#include <cosmos/PasswdInfo.hxx>
 
 // Test
 #include "TestBase.hxx"
@@ -46,6 +47,7 @@ class FileSystemTest :
 		testLock();
 		testDevIDs();
 		testRename();
+		testInotify();
 	}
 
 	std::pair<std::filesystem::path, cosmos::TempDir> getTestDir() {
@@ -785,7 +787,7 @@ class FileSystemTest :
 			cosmos::File test{tmp_dir.path() + "/blocker",
 				cosmos::OpenMode::WRITE_ONLY,
 				cosmos::OpenFlag::CREATE,
-				cosmos::FileMode{cosmos::ModeT{0700}}};
+				cosmos::ModeT{0700}};
 		}
 
 		try {
@@ -796,6 +798,142 @@ class FileSystemTest :
 		} catch (const cosmos::ApiError &ex) {
 			RUN_STEP("NOREPLACE doesn't replace", ex.errnum() == cosmos::Errno::EXISTS);
 		}
+	}
+
+	void testInotify() {
+		START_TEST("inotify() file monitoring test");
+		const auto tmp_dir = getTempDir();
+		const auto testfile_path = tmp_dir.path() + "/testfile";
+
+		{
+			cosmos::File file{testfile_path,
+				cosmos::OpenMode::WRITE_ONLY,
+				cosmos::OpenFlag::CREATE,
+				cosmos::ModeT{0600}};
+		}
+
+		using INotify = cosmos::INotify;
+
+		INotify notify;
+		/*
+		 * create a directory watch and a dedicated watch only on
+		 * testfile.
+		 */
+		const auto dir_watch = notify.addWatch(
+				tmp_dir.path(),
+				{INotify::CREATE, INotify::MOVED_FROM, INotify::MOVED_TO},
+				{INotify::ONLY_DIR});
+		const auto file_watch = notify.addWatch(
+				tmp_dir.path() + "/testfile",
+				{INotify::CLOSE_NOWRITE});
+
+		/*
+		 * generate a couple of events to verify
+		 */
+
+		{
+			/* this should generate CLOSE_NOWRITE on file_watch */
+			cosmos::File file{testfile_path, cosmos::OpenMode::READ_ONLY};
+		}
+
+		{
+			/* this should generate CREATE in dir_watch */
+			cosmos::File file{tmp_dir.path() + "/eventfile",
+				cosmos::OpenMode::WRITE_ONLY,
+				cosmos::OpenFlag::CREATE,
+				cosmos::ModeT{0600}};
+		}
+
+		/* this should generate MOVED_FROM and MOVED_TO in dir_watch */
+		cosmos::fs::rename(testfile_path, tmp_dir.path() + "/newfile");
+
+		enum class Found {
+			FILE_CLOSE_NOWRITE = 1,
+			DIR_CREATE = 1 << 1,
+			DIR_MOVED_FROM = 1 << 2,
+			DIR_MOVED_TO = 1 << 3,
+			SEEN_MATCHING_COOKIE = 1 << 4
+		};
+
+		INotify::Cookie rename_cookie = INotify::Cookie::NONE;
+
+		cosmos::BitMask<Found> found;
+
+		while (found.count() != 5) {
+			const auto ev = notify.readEvent();
+
+			if (ev.id() == file_watch) {
+				RUN_STEP("file-watch-event-is-close-no-write",
+					ev.event() == INotify::CLOSE_NOWRITE);
+				RUN_STEP("file-watch-event-has-empty-string",
+					ev.name().empty());
+				RUN_STEP("file-watch-event-seen-only-once",
+					!found[Found::FILE_CLOSE_NOWRITE]);
+				found.set(Found::FILE_CLOSE_NOWRITE);
+			} else if (ev.id() == dir_watch) {
+				RUN_STEP("dir-event-isdir-is-false", !ev.flags()[INotify::ISDIR]);
+				if (ev.event() == INotify::CREATE) {
+					RUN_STEP("dir-create-event-name-matches", ev.name() == "eventfile");
+					RUN_STEP("dir-create-event-seen-only-once", !found[Found::DIR_CREATE]);
+					found.set(Found::DIR_CREATE);
+				} else if (ev.event() == INotify::MOVED_FROM) {
+					RUN_STEP("dir-moved-from-event-name-matches", ev.name() == "testfile");
+					RUN_STEP("dir-moved-from-event-seen-only-once",
+							!found[Found::DIR_MOVED_FROM]);
+					found.set(Found::DIR_MOVED_FROM);
+					if (rename_cookie == INotify::Cookie::NONE) {
+						rename_cookie = ev.cookie();
+					} else if (rename_cookie == ev.cookie()) {
+						found.set(Found::SEEN_MATCHING_COOKIE);
+						RUN_STEP("found-matching-rename-cookie", true);
+					} else {
+						RUN_STEP("found-matching-rename-cookie", false);
+					}
+				} else if (ev.event() == INotify::MOVED_TO) {
+					RUN_STEP("dir-moved-to-event-name-matches", ev.name() == "newfile");
+					RUN_STEP("dir-moved-to-event-seen-only-once",
+							!found[Found::DIR_MOVED_TO]);
+					found.set(Found::DIR_MOVED_TO);
+					if (rename_cookie == INotify::Cookie::NONE) {
+						rename_cookie = ev.cookie();
+					} else if (rename_cookie == ev.cookie()) {
+						found.set(Found::SEEN_MATCHING_COOKIE);
+						RUN_STEP("found-matching-rename-cookie", true);
+					} else {
+						RUN_STEP("found-matching-rename-cookie", false);
+					}
+				} else {
+					RUN_STEP("seen-only-known-dir-events", false);
+				}
+			} else {
+				RUN_STEP("seen-only-known-watches", false);
+			}
+		}
+
+		notify.removeWatch(dir_watch);
+		notify.removeWatch(file_watch);
+
+		bool seen_file_ignore = false;
+		bool seen_dir_ignore = false;
+
+		while (!seen_file_ignore || !seen_dir_ignore) {
+			const auto ev = notify.readEvent();
+
+			if (ev.id() == file_watch) {
+				RUN_STEP("seen-file-watch-ignore-after-remove", ev.flags() == INotify::IGNORED);
+				seen_file_ignore = true;
+			} else if (ev.id() == dir_watch) {
+				RUN_STEP("seen-dir-watch-ignore-after-remove", ev.flags() == INotify::IGNORED);
+				seen_dir_ignore = true;
+			}
+		}
+
+		auto notify_fd = notify.fd();
+		notify_fd.setStatusFlags(cosmos::OpenFlag::NONBLOCK);
+
+		/* now test that non-blocking I/O yields nothing */
+		auto ev = notify.tryReadEvent();
+		RUN_STEP("non-blocking-read-yields-nullopt", ev == std::nullopt);
 	}
 };
 
