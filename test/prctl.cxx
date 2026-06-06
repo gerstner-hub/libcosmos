@@ -11,6 +11,8 @@ class TestPrctl :
 	void runTests() override {
 		checkCpuID();
 		checkFsGsRegs();
+		checkBoundingCaps();
+		checkAmbientCaps();
 	}
 
 	void checkCpuID() {
@@ -47,6 +49,44 @@ class TestPrctl :
 		RUN_STEP("set-gs-register-works", cosmos::prctl::x86_64::get_gs_register_base() == orig_gs);
 		cosmos::prctl::x86_64::set_gs_register_base(orig_gs);
 #endif
+	}
+
+	void checkBoundingCaps() {
+		const auto dac_over_in_set = cosmos::prctl::get_cap_in_bounding_set(cosmos::Capability::DAC_OVERRIDE);
+
+		RUN_STEP("get-cap-in-bounding-set-works", true);
+		std::cout << "DAC_OVERRIDE in bounding set? " << dac_over_in_set << "\n";
+
+		try {
+			cosmos::prctl::drop_cap_from_bounding_set(cosmos::Capability::DAC_OVERRIDE);
+			RUN_STEP("drop-cap-from-bounding-set-works", true);
+		} catch (const cosmos::ApiError &ex) {
+			RUN_STEP("drop-cap-from-bounding-set-eperm", ex.errnum() == cosmos::Errno::PERMISSION);
+		}
+	}
+
+	void checkAmbientCaps() {
+		START_TEST("ambient capabilities");
+
+		const auto in_amb = cosmos::prctl::get_cap_in_ambient_set(cosmos::Capability::KILL);
+
+		RUN_STEP("get-cap-in-ambient-set-works", true);
+		std::cout << "CAP_KILL in ambient set? " << in_amb << "\n";
+
+		try {
+			cosmos::prctl::raise_ambient_cap(cosmos::Capability::KILL);
+			RUN_STEP("raise-ambient-cap-works", true);
+		} catch (const cosmos::ApiError &ex) {
+			RUN_STEP("raise-ambient-cap-eperm", ex.errnum() == cosmos::Errno::PERMISSION);
+		}
+
+		cosmos::prctl::lower_ambient_cap(cosmos::Capability::KILL);
+
+		RUN_STEP("drop-ambient-cap-works", true);
+
+		cosmos::prctl::drop_all_ambient_caps();
+
+		RUN_STEP("drop-all-ambient-cap-works", true);
 	}
 };
 

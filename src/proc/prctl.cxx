@@ -1,7 +1,12 @@
+// C++
+#include <format>
+#include <optional>
+
 // cosmos
 #include <cosmos/compiler.hxx>
 #include <cosmos/error/ApiError.hxx>
 #include <cosmos/proc/prctl.hxx>
+#include <cosmos/utils.hxx>
 
 // Linux
 #ifdef COSMOS_X86
@@ -9,11 +14,13 @@
 #	include <sys/syscall.h>
 #	include <unistd.h>
 #endif
+#include <linux/prctl.h>
+#include <sys/prctl.h>
 
 #ifndef COSMOS_X86
 /*
- * for non x86 platforms to simplify the code below, which should thrown an
- * ENOSYS ApiError on on x86 systems.
+ * this is for non x86 platforms to simplify the code below, which should
+ * throw an ENOSYS ApiError on non-x86 systems.
  */
 #	ifndef ARCH_GET_FS
 #		define ARCH_GET_FS 0
@@ -37,8 +44,10 @@
 
 namespace cosmos::prctl {
 
+namespace {
+
 template <typename ADDR>
-static int arch_prctl(int op, ADDR addr, const bool eval_error = true) {
+int arch_prctl(int op, ADDR addr, const bool eval_error = true) {
 #ifdef COSMOS_X86
 	const auto res = syscall(SYS_arch_prctl, op, addr);
 
@@ -53,6 +62,53 @@ static int arch_prctl(int op, ADDR addr, const bool eval_error = true) {
 	(void)eval_error;
 	throw ApiError{"arch_prctl()", Errno::NO_SYS};
 #endif
+}
+
+int prctl_cap_ambient(const int subop, const char *label,
+		const std::optional<Capability> cap = {}) {
+	const auto ret = ::prctl(PR_CAP_AMBIENT, subop,
+			cap ? to_integral(*cap) : 0, 0, 0);
+
+	if (ret < 0) {
+		throw ApiError{std::format("prctl(PR_CAP_AMBIENT, {}", label)};
+	}
+
+	return ret;
+}
+
+} // end anon ns
+
+bool get_cap_in_bounding_set(const Capability cap) {
+	const auto ret = ::prctl(PR_CAPBSET_READ, to_integral(cap));
+
+	if (ret < 0) {
+		throw ApiError{"prctl(PR_CAPBSET_READ)"};
+	}
+
+	return ret != 0;
+}
+
+void drop_cap_from_bounding_set(const Capability cap) {
+	if (::prctl(PR_CAPBSET_DROP, to_integral(cap)) != 0) {
+		throw ApiError{"prctl(PR_CAPBSET_DROP)"};
+	}
+}
+
+void drop_all_ambient_caps() {
+	prctl_cap_ambient(PR_CAP_AMBIENT_CLEAR_ALL, "PR_CAP_AMBIENT_CLEAR_ALL");
+}
+
+bool get_cap_in_ambient_set(const Capability cap) {
+	return prctl_cap_ambient(PR_CAP_AMBIENT_IS_SET,
+			"PR_CAP_AMBIENT_IS_SET", cap) != 0;
+}
+
+void raise_ambient_cap(const Capability cap) {
+	prctl_cap_ambient(PR_CAP_AMBIENT_RAISE, "PR_CAP_AMBIENT_RAISE", cap);
+}
+
+void lower_ambient_cap(const Capability cap) {
+	prctl_cap_ambient(PR_CAP_AMBIENT_LOWER, "PR_CAP_AMBIENT_LOWER", cap);
 }
 
 namespace x86 {

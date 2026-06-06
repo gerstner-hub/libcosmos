@@ -2,8 +2,61 @@
 
 // cosmos
 #include <cosmos/dso_export.h>
+#include <cosmos/proc/caps.hxx>
+
+/**
+ * @file
+ *
+ * Wrappers around the prctl() ioctl-style system call.
+ **/
 
 namespace cosmos::prctl {
+
+/// Returns whether `cap` is in the calling process's bounding set.
+/**
+ * On error an ApiError with Errno::INVALID_ARG is thrown in case an invalid
+ * ´cap` is specified.
+ **/
+COSMOS_API bool get_cap_in_bounding_set(const Capability cap);
+
+/// Drops `cap` from the calling process's bounding set.
+/**
+ * On error an ApiError with Errno::INVALID_ARG is thrown in case an invalid
+ * `cap` is specified or the kernel doesn't have support for capabilities.
+ * Errno::PERMISSION occurs in case the caller lacks CAP_SETPCAP (even though
+ * this call effectively reduces capabilities).
+ **/
+COSMOS_API void drop_cap_from_bounding_set(const Capability cap);
+
+/// Drops all capabilities from the calling process's ambient set.
+COSMOS_API void drop_all_ambient_caps();
+
+/// Returns whether the given `cap` is currently in the ambient set.
+/**
+ * On error an ApiError with Errno::INVALID_ARG is thrown in case an invalid
+ * `cap` is specified.
+ **/
+COSMOS_API bool get_cap_in_ambient_set(const Capability cap);
+
+/// Adds the given capability to the ambient set.
+/**
+ * To perform this operation `cap` must already be present in the permitted
+ * and the inheritable capability set. Also the securebit
+ * SECBIT_NO_CAP_AMBIENT_RAISE must not be set.
+ *
+ * On error an ApiError with one of the following Errno values is thrown:
+ *
+ * - Errno::INVALID_ARG: invalid `cap` encountered.
+ * - Errno::PERMISSION: one of the documented preconditions is not met and the
+ *   change was denied.
+ **/
+COSMOS_API void raise_ambient_cap(const Capability cap);
+
+/// Removes the given capability from the ambient set.
+/**
+ * On error an ApiError with Errno::INVALID_ARG is thrown if `cap` is invalid.
+ **/
+COSMOS_API void lower_ambient_cap(const Capability cap);
 
 namespace x86 {
 
