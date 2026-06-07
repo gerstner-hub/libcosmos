@@ -35,6 +35,14 @@ class MappingTest :
 			cosmos::mem::AccessFlags{cosmos::mem::AccessFlag::READ, cosmos::mem::AccessFlag::WRITE},
 			cosmos::mem::MapFlags{cosmos::mem::MapFlag::ANONYMOUS}
 		}};
+		try {
+			mapping.setName("cosmosmapping");
+		} catch (const cosmos::ApiError &ex) {
+			if (ex.errnum() != cosmos::Errno::INVALID_ARG)
+				// this also happens if the kernel doesn't
+				// have support for naming VMA.
+				throw;
+		}
 		RUN_STEP("mapped-is-valid", mapping.valid());
 		RUN_STEP("mapped-addr-is-not-null", mapping.addr() != nullptr);
 		RUN_STEP("mapped-size-matches", mapping.size() == 1024);

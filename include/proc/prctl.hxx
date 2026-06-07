@@ -3,6 +3,7 @@
 // cosmos
 #include <cosmos/dso_export.h>
 #include <cosmos/proc/caps.hxx>
+#include <cosmos/SysString.hxx>
 
 /**
  * @file
@@ -87,6 +88,24 @@ bool get_dumpable();
 
 /// Modifies the calling process's dumpable attribute.
 void set_dumpable(const bool dumpable);
+
+/// Set a name for an anonymous memory area.
+/**
+ * The anonymous virtual memory area defined by `addr` and `len` will be
+ * assigned the friendly name found in `name`. `name` needs to null-terminated
+ * and cannot exceed 80 bytes. The characters in `name` can only contain
+ * printable ascii characters according to isprint(3), except for '[', ']',
+ * '\', '$' and '`', which are forbidden.
+ *
+ * See also `Mapping::setName()` for a convenience helper to apply names to
+ * suitable mappings.
+ *
+ * This can throw an ApiError with Errno::INVALID_ARG if `addr` or `name` are
+ * not valid arguments, or if the running kernel does not support assigning
+ * names to anonymous memory (CONFIG_ANON_VMA).
+ **/
+void set_anon_memory_name(const void *addr, const size_t len,
+		const SysString name);
 
 namespace x86 {
 

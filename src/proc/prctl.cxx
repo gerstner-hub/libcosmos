@@ -164,6 +164,14 @@ void set_dumpable(const bool dumpable) {
 	prctl_set_bool_attr(EXPAND_CTL(PR_SET_DUMPABLE), dumpable);
 }
 
+void set_anon_memory_name(const void *addr, const size_t len,
+		const SysString name) {
+	if (::prctl(PR_SET_VMA, PR_SET_VMA_ANON_NAME,
+				addr, len, name.raw()) != 0) {
+		throw ApiError{"prctl(PR_SET_VMA, PR_EST_VMA_ANON_NAME)"};
+	}
+}
+
 namespace x86 {
 
 bool get_cpuid_enabled() {

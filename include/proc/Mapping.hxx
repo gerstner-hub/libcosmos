@@ -2,6 +2,7 @@
 
 // libcosmos
 #include <cosmos/proc/mman.hxx>
+#include <cosmos/SysString.hxx>
 
 namespace cosmos {
 
@@ -118,6 +119,14 @@ public: // functions
 	void setProtection(const mem::AccessFlags flags) {
 		mem::protect(m_addr, m_size, flags);
 	}
+
+	/// Assign a name to an anonymous memory mapping.
+	/**
+	 * \see prctl::set_anon_memory_name() for the requirements of `name`.
+	 * This can throw an ApiError if the name cannot be applied or the
+	 * feature is not supported by the kernel..
+	 **/
+	void setName(const SysString name);
 
 protected: // functions
 
