@@ -26,6 +26,8 @@ namespace cosmos {
 
 namespace cosmos::signal {
 
+COSMOS_DEFAULT_VISIBILITY_ON
+
 /* constants for all well known signal numbers */
 
 constexpr Signal NONE          = Signal{SignalNr::NONE};
@@ -93,13 +95,13 @@ inline size_t num_rt_sigs() {
  *
  * \exception Throws an ApiError on error.
  **/
-COSMOS_API void raise(const Signal s);
+void raise(const Signal s);
 
 /// Sends a signal to another process based on process ID (kill).
 /**
  * \exception Throws an ApiError on error.
  **/
-COSMOS_API void send(const ProcessID proc, const Signal s);
+void send(const ProcessID proc, const Signal s);
 
 /// Sends a signal including data (`sigqueue()`).
 /**
@@ -112,7 +114,7 @@ COSMOS_API void send(const ProcessID proc, const Signal s);
  * The `data` can either be an `int` or a `void *`, which can have different
  * sizes on some architectures.
  **/
-COSMOS_API void send(const ProcessID proc, const Signal s, std::variant<void*, int> data);
+void send(const ProcessID proc, const Signal s, std::variant<void*, int> data);
 
 /// Sends a signal to another process based on a pidfd.
 /**
@@ -122,7 +124,7 @@ COSMOS_API void send(const ProcessID proc, const Signal s, std::variant<void*, i
  *
  * \exception Throws an ApiError on error.
  **/
-COSMOS_API void send(const PidFD pidfd, const Signal s);
+void send(const PidFD pidfd, const Signal s);
 
 /// Sends a signal to a specific thread of a process.
 /**
@@ -131,7 +133,7 @@ COSMOS_API void send(const PidFD pidfd, const Signal s);
  * thread in that process will receive the signal. To target a specific thread
  * this call can be used, which specifies a specific thread within a process.
  **/
-COSMOS_API void send(const ProcessID proc, const ThreadID thread, const Signal s);
+void send(const ProcessID proc, const ThreadID thread, const Signal s);
 
 /// Suspend execution of the calling thread until an asynchronous signal occurs.
 /**
@@ -139,7 +141,7 @@ COSMOS_API void send(const ProcessID proc, const ThreadID thread, const Signal s
  * terminates the process or causes the execution of an asynchronous signal
  * catching function (e.g. registered via cosmos::signal::set_action())..
  **/
-COSMOS_API void pause();
+void pause();
 
 /// Suspend execution with altered signal mask until an asynchronous signal occurs.
 /**
@@ -147,7 +149,7 @@ COSMOS_API void pause();
  * mask is temporarily replaced by `mask`. Upon return from the function, the
  * original signal mask will be restored.
  **/
-COSMOS_API void suspend(const SigSet &mask);
+void suspend(const SigSet &mask);
 
 /// Wait for a signal from `set` to occur.
 /**
@@ -163,7 +165,7 @@ COSMOS_API void suspend(const SigSet &mask);
  * On error an ApiError is thrown. Only Errno::INVALID is defined as a
  * possible error reason, when an invalid signal is seen in `set`.
  **/
-COSMOS_API Signal wait(const SigSet &set);
+Signal wait(const SigSet &set);
 
 /// Wait for a signal from `set` to occur and fill in `info` with signal details.
 /**
@@ -173,7 +175,7 @@ COSMOS_API Signal wait(const SigSet &set);
  * On errors an ApiError is thrown. The only documented error condition is
  * Errno::INTERRUPTED.
  **/
-COSMOS_API void wait_info(const SigSet &set, SigInfo &info);
+void wait_info(const SigSet &set, SigInfo &info);
 
 /// Strong type to express timed_wait() and poll_info() results.
 enum class WaitRes {
@@ -194,7 +196,7 @@ enum class WaitRes {
  * On errors an ApiError is thrown. Errno::INTERRUPT and Errno::INVALID (bad
  * timeout value) are the only documented errors.
  **/
-COSMOS_API WaitRes timed_wait(const SigSet &set, SigInfo &info, const IntervalTime timeout);
+WaitRes timed_wait(const SigSet &set, SigInfo &info, const IntervalTime timeout);
 
 /// Check for a pending signal from `set` and fill in `info` with signal details.
 /**
@@ -257,7 +259,7 @@ inline WaitRes poll_info(const SigSet &set, SigInfo &info) {
  * - Errno::FAULT: `action` or `old` do not have valid addresses.
  * - Errno::INVALID_ARG: `sig` is not a valid signal number.
  **/
-COSMOS_API void set_action(const Signal sig, const SigAction &action, SigAction *old = nullptr);
+void set_action(const Signal sig, const SigAction &action, SigAction *old = nullptr);
 
 /// Gets the currently installed SigAction configuration for `sig`.
 /**
@@ -271,7 +273,7 @@ COSMOS_API void set_action(const Signal sig, const SigAction &action, SigAction 
  * - Errno::FAULT: `action` does not have a valid address.
  * - Errno::INVALID_ARG: `sig` is not a valid signal number.
  **/
-COSMOS_API void get_action(const Signal sig, SigAction &action);
+void get_action(const Signal sig, SigAction &action);
 
 /// Blocks the given set of signals in the caller's signal mask.
 /**
@@ -284,16 +286,16 @@ COSMOS_API void get_action(const Signal sig, SigAction &action);
  * If `old` is provided then the previous signal mask is returned
  * into this SigSet object.
  **/
-COSMOS_API void block(const SigSet &s, SigSet *old = nullptr);
+void block(const SigSet &s, SigSet *old = nullptr);
 
 /// Unblocks the given set of signals in the caller's signal mask.
-COSMOS_API void unblock(const SigSet &s, SigSet *old = nullptr);
+void unblock(const SigSet &s, SigSet *old = nullptr);
 
 /// Completely replace the caller's signal mask by the given set of blocked signals.
-COSMOS_API void set_sigmask(const SigSet &s, SigSet *old = nullptr);
+void set_sigmask(const SigSet &s, SigSet *old = nullptr);
 
 /// Returns the currently active signal mask for the calling thread.
-COSMOS_API void get_sigmask(SigSet &old);
+void get_sigmask(SigSet &old);
 
 /// Restores the default signal handling behaviour for the given signal.
 inline void restore(const Signal sig) {
@@ -311,7 +313,7 @@ inline void ignore(const Signal sig) {
 }
 
 /// Data structure used for defining an alternate signal stack.
-class COSMOS_API Stack {
+class Stack {
 public: // types
 
 	/// Settings for alternate stack setup.
@@ -397,13 +399,15 @@ protected: // data
  * - Errno::NO_MEMORY: `stack.getSize()` is smaller than MIN_SIZE.
  * - Errno::PERMISSION: Attempted to change the stack while it was active.
  **/
-COSMOS_API void set_altstack(const Stack &stack, Stack *old = nullptr);
+void set_altstack(const Stack &stack, Stack *old = nullptr);
 
 /// Retrieve the current alternate signal stack configuration.
 /**
  * On error an ApiError is thrown. Errno::INVALID_ARG is documented for the
  * case when `old` is outside of the process's address space.
  **/
-COSMOS_API void get_altstack(Stack &old);
+void get_altstack(Stack &old);
+
+COSMOS_DEFAULT_VISIBILITY_OFF
 
 } // end ns

@@ -12,12 +12,14 @@
 
 namespace cosmos::prctl {
 
+COSMOS_DEFAULT_VISIBILITY_ON
+
 /// Returns whether `cap` is in the calling process's bounding set.
 /**
  * On error an ApiError with Errno::INVALID_ARG is thrown in case an invalid
  * ´cap` is specified.
  **/
-COSMOS_API bool get_cap_in_bounding_set(const Capability cap);
+bool get_cap_in_bounding_set(const Capability cap);
 
 /// Drops `cap` from the calling process's bounding set.
 /**
@@ -26,17 +28,17 @@ COSMOS_API bool get_cap_in_bounding_set(const Capability cap);
  * Errno::PERMISSION occurs in case the caller lacks CAP_SETPCAP (even though
  * this call effectively reduces capabilities).
  **/
-COSMOS_API void drop_cap_from_bounding_set(const Capability cap);
+void drop_cap_from_bounding_set(const Capability cap);
 
 /// Drops all capabilities from the calling process's ambient set.
-COSMOS_API void drop_all_ambient_caps();
+void drop_all_ambient_caps();
 
 /// Returns whether the given `cap` is currently in the ambient set.
 /**
  * On error an ApiError with Errno::INVALID_ARG is thrown in case an invalid
  * `cap` is specified.
  **/
-COSMOS_API bool get_cap_in_ambient_set(const Capability cap);
+bool get_cap_in_ambient_set(const Capability cap);
 
 /// Adds the given capability to the ambient set.
 /**
@@ -50,13 +52,13 @@ COSMOS_API bool get_cap_in_ambient_set(const Capability cap);
  * - Errno::PERMISSION: one of the documented preconditions is not met and the
  *   change was denied.
  **/
-COSMOS_API void raise_ambient_cap(const Capability cap);
+void raise_ambient_cap(const Capability cap);
 
 /// Removes the given capability from the ambient set.
 /**
  * On error an ApiError with Errno::INVALID_ARG is thrown if `cap` is invalid.
  **/
-COSMOS_API void lower_ambient_cap(const Capability cap);
+void lower_ambient_cap(const Capability cap);
 
 /// Returns whether the calling process is a child subreaper.
 /**
@@ -64,14 +66,14 @@ COSMOS_API void lower_ambient_cap(const Capability cap);
  * processes, i.e. it collects zombie processes. The setting is preserved
  * across execve() but not across fork() or clone().
  **/
-COSMOS_API bool get_child_subreaper();
+bool get_child_subreaper();
 
 /// Modifies the process's child subreaper setting.
 /**
  * When this is set to `true` then the calling process becomes child subreaper
  * for its descendant processes.
  **/
-COSMOS_API void set_child_subreaper(const bool is_subreaper);
+void set_child_subreaper(const bool is_subreaper);
 
 /// Returns the calling process's dumpable attribute.
 /**
@@ -81,10 +83,10 @@ COSMOS_API void set_child_subreaper(const bool is_subreaper);
  * This setting is automatically reset to a default in various circumstances
  * that alter the process's privileges (like executing a setuid-root program).
  **/
-COSMOS_API bool get_dumpable();
+bool get_dumpable();
 
 /// Modifies the calling process's dumpable attribute.
-COSMOS_API void set_dumpable(const bool dumpable);
+void set_dumpable(const bool dumpable);
 
 namespace x86 {
 
@@ -95,7 +97,7 @@ namespace x86 {
  * If the current process is not running on the x86_64 ABI then an ApiError
  * with Errno::NO_SYS is thrown.
  **/
-COSMOS_API bool get_cpuid_enabled();
+bool get_cpuid_enabled();
 
 /// Enables or disables the `cpuid` processor instruction.
 /**
@@ -109,7 +111,7 @@ COSMOS_API bool get_cpuid_enabled();
  * If the CPU does not support generating a SIGSEGV in this situation then an
  * ApiError with Errno::NO_DEVICE is thrown.
  **/
-COSMOS_API void set_cpuid_enabled(const bool on_off);
+void set_cpuid_enabled(const bool on_off);
 
 /*
  * these calls are only valid on x86 processors. in other contexts they throw
@@ -125,17 +127,19 @@ namespace x86_64 {
  */
 
 /// Gets the FS register base in effect for the calling thread.
-COSMOS_API unsigned long get_fs_register_base();
+unsigned long get_fs_register_base();
 
 /// Sets the FS register base for the calling thread.
-COSMOS_API void set_fs_register_base(const unsigned long addr);
+void set_fs_register_base(const unsigned long addr);
 
 /// Gets the GS register base in effect for the calling thread.
-COSMOS_API unsigned long get_gs_register_base();
+unsigned long get_gs_register_base();
 
 /// Sets the GS register base for the calling thread.
-COSMOS_API void set_gs_register_base(const unsigned long addr);
+void set_gs_register_base(const unsigned long addr);
 
 } // end ns x86_64
+
+COSMOS_DEFAULT_VISIBILITY_OFF
 
 } // end ns

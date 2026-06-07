@@ -27,6 +27,8 @@
 
 namespace cosmos {
 
+COSMOS_DEFAULT_VISIBILITY_ON
+
 /*
  * Declare these here, since they require pulling in the fat SigInfo header
  * and sys/wait.h, which would cause conflicts when done so in types.hxx
@@ -78,7 +80,7 @@ using WaitFlags = BitMask<WaitFlag>;
  * This class can be used to access the details of the status in a typesafe
  * manner.
  **/
-class COSMOS_API WaitStatus {
+class WaitStatus {
 public: // functions
 
 	explicit WaitStatus(const int status=0) :
@@ -155,13 +157,13 @@ protected: // data
 namespace cosmos::proc {
 
 /// Returns the process ID of the current process.
-COSMOS_API ProcessID get_own_pid();
+ProcessID get_own_pid();
 
 /// Returns the process ID of the parent of the current process.
-COSMOS_API ProcessID get_parent_pid();
+ProcessID get_parent_pid();
 
 /// Returns the real user ID the current process is running as.
-COSMOS_API UserID get_real_user_id();
+UserID get_real_user_id();
 
 /// Returns the effective user ID the current process is running as.
 /**
@@ -169,16 +171,16 @@ COSMOS_API UserID get_real_user_id();
  * temporarily drops privileges or an unprivileged user calls a
  * privileged program with setuid bit.
  **/
-COSMOS_API UserID get_effective_user_id();
+UserID get_effective_user_id();
 
 /// Returns the real group ID the current process is running as.
-COSMOS_API GroupID get_real_group_id();
+GroupID get_real_group_id();
 
 /// Returns the effective group ID the current process is running as.
 /**
  * \see get_effective_user_id()
  **/
-COSMOS_API GroupID get_effective_group_id();
+GroupID get_effective_group_id();
 
 /// Returns the currently set filesystem user ID of the current process.
 /**
@@ -190,7 +192,7 @@ COSMOS_API GroupID get_effective_group_id();
  * Any change of the effective user ID will implicitly sync the filesystem
  * user ID.
  **/
-COSMOS_API UserID get_fs_user_id();
+UserID get_fs_user_id();
 
 /// Sets a new filesystem user ID for the current process.
 /**
@@ -203,7 +205,7 @@ COSMOS_API UserID get_fs_user_id();
  * threads should modify the filesystem UID in parallel then bogus error
  * reports can occur.
  **/
-COSMOS_API UserID set_fs_user_id(const UserID uid);
+UserID set_fs_user_id(const UserID uid);
 
 /// Obtain the set of active user credentials of the current process.
 /**
@@ -213,7 +215,7 @@ COSMOS_API UserID set_fs_user_id(const UserID uid);
  * This call can throw an ApiError with Errno::FAULT in case the memory
  * `creds` is located in is outside the calling program's address space.
  **/
-COSMOS_API void get_creds(UserCreds &creds);
+void get_creds(UserCreds &creds);
 
 /// Change the currently active user credentials of the calling process.
 /**
@@ -247,7 +249,7 @@ COSMOS_API void get_creds(UserCreds &creds);
  * credentials. The C library takes care of propagating the change to all
  * other thread of the process (POSIX requirement).
  **/
-COSMOS_API void set_creds(const UserCreds &creds);
+void set_creds(const UserCreds &creds);
 
 /// Obtain the set of active group credentials of the current process.
 /**
@@ -256,45 +258,45 @@ COSMOS_API void set_creds(const UserCreds &creds);
  *
  * \see get_creds(UserCreds&);
  **/
-COSMOS_API void get_creds(GroupCreds &creds);
+void get_creds(GroupCreds &creds);
 
 /// Change the currently active group credentials for the calling process.
 /**
  * This is analogous to set_creds(const UserCreds&) with the difference that
  * CAP_SETGID is required to change the group credentials to arbitrary values.
  **/
-COSMOS_API void set_creds(const GroupCreds &creds);
+void set_creds(const GroupCreds &creds);
 
 /// Returns the currently set filesystem group ID of the current process.
 /**
  * \see get_fs_user_id()
  **/
-COSMOS_API GroupID get_fs_group_id();
+GroupID get_fs_group_id();
 
 /// Sets a new filesystem group ID for the current process.
 /**
  * \see set_fs_user_id()
  **/
-COSMOS_API GroupID set_fs_group_id(const GroupID gid);
+GroupID set_fs_group_id(const GroupID gid);
 
 /// Returns the list of supplementary group IDs associated with the current process.
-COSMOS_API std::vector<GroupID> get_supplementary_groups();
+std::vector<GroupID> get_supplementary_groups();
 
 /// Change the list of supplementary groups associated with the current process.
 /**
  * This requires the necessary privileges (CAP_SETGID in the current user
  * namespace). Otherwise an ApiError is thrown.
  **/
-COSMOS_API void set_supplementary_groups(const std::vector<GroupID> &groups);
+void set_supplementary_groups(const std::vector<GroupID> &groups);
 
 /// Returns the process group ID of the caller.
-COSMOS_API ProcessGroupID get_own_process_group();
+ProcessGroupID get_own_process_group();
 
 /// Returns the process group ID of the given process.
 /**
  * An ApiError with Errno::SEARCH is thrown if `pid` does not exist.
  **/
-COSMOS_API ProcessGroupID get_process_group_of(const ProcessID pid);
+ProcessGroupID get_process_group_of(const ProcessID pid);
 
 /// Move `pid` into the process group identified by `pgid`
 /**
@@ -308,14 +310,14 @@ COSMOS_API ProcessGroupID get_process_group_of(const ProcessID pid);
  * - Errno::SEARCH if `pid` is neither the calling process nor a child of the
  *   calling process.
  **/
-COSMOS_API void set_process_group_of(const ProcessID pid, const ProcessGroupID pgid);
+void set_process_group_of(const ProcessID pid, const ProcessGroupID pgid);
 
 inline void set_own_process_group(const ProcessGroupID pgid) {
 	set_process_group_of(ProcessID::SELF, pgid);
 }
 
 /// Returns whether given `pid` is a process group leader.
-COSMOS_API bool is_process_group_leader(const ProcessID pid);
+bool is_process_group_leader(const ProcessID pid);
 
 inline bool is_caller_process_group_leader() {
 	return is_process_group_leader(ProcessID::SELF);
@@ -332,13 +334,13 @@ inline bool is_caller_process_group_leader() {
  *
  * The new session will not yet have a controlling terminal.
  **/
-COSMOS_API SessionID create_new_session();
+SessionID create_new_session();
 
 /// Returns the SessionID of the caller.
-COSMOS_API SessionID get_own_session_id();
+SessionID get_own_session_id();
 
 /// Returns the Session ID of the process identifier by `pid`.
-COSMOS_API SessionID get_session_of(const ProcessID pid);
+SessionID get_session_of(const ProcessID pid);
 
 /// Fork the current process to create a child process.
 /**
@@ -353,7 +355,7 @@ COSMOS_API SessionID get_session_of(const ProcessID pid);
  * but no exit status will be returned, but an Errno::NO_CHILD will be thrown
  * instead.
  **/
-COSMOS_API std::optional<ProcessID> fork();
+std::optional<ProcessID> fork();
 
 /// Wait on the child process identified by `pid`.
 /**
@@ -364,7 +366,7 @@ COSMOS_API std::optional<ProcessID> fork();
  * will be waited for. By default a blocking wait for child process exit is
  * performed.
  **/
-COSMOS_API std::optional<ChildState> wait(const ProcessID pid, const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED});
+std::optional<ChildState> wait(const ProcessID pid, const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED});
 
 /// Wait for any process from the given process group.
 /**
@@ -373,14 +375,14 @@ COSMOS_API std::optional<ChildState> wait(const ProcessID pid, const WaitFlags f
  * pgid == ProcessGroupID::SELF then this waits for any process for the
  * caller's process group.
  **/
-COSMOS_API std::optional<ChildState> wait(const ProcessGroupID pgid, const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED});
+std::optional<ChildState> wait(const ProcessGroupID pgid, const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED});
 
 /// Wait for any child process of the calling process.
 /**
  * This is just like wait(const ProcessID, const WaitFlags) only that it waits
  * for any kind of child process, not any specific child process.
  **/
-COSMOS_API std::optional<ChildState> wait(const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED});
+std::optional<ChildState> wait(const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED});
 
 /// Wait for the process referred to by the given pidfd.
 /**
@@ -390,7 +392,7 @@ COSMOS_API std::optional<ChildState> wait(const WaitFlags flags = WaitFlags{Wait
  * The process represented by `fd` needs to be a child process of the calling
  * process, otherwise an ApiError with Errno::CHILD is thrown.
  **/
-COSMOS_API std::optional<ChildState> wait(const PidFD fd, const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED});
+std::optional<ChildState> wait(const PidFD fd, const WaitFlags flags = WaitFlags{WaitFlag::WAIT_FOR_EXITED});
 
 /// Replace the current process by executing the program found in `path`.
 /**
@@ -455,7 +457,7 @@ COSMOS_API std::optional<ChildState> wait(const PidFD fd, const WaitFlags flags 
  * - Errno::TEXT_FILE_BUSY: `path` is opened for writing by one or more
  *   processes.
  **/
-COSMOS_API void exec(const SysString path,
+void exec(const SysString path,
 		const CStringVector *args = nullptr, const CStringVector *env = nullptr);
 
 inline void exec(const SysString path, const CStringVector &args) {
@@ -519,7 +521,7 @@ inline void exec(const SysString path, const StringVector &args, const StringVec
  * If `follow_symlinks` is unset and the resulting path is a symbolic link
  * then the execution fails with an ApiError and Errno::LINK_LOOP.
  **/
-COSMOS_API void exec_at(const DirFD dir_fd, const SysString path,
+void exec_at(const DirFD dir_fd, const SysString path,
 		const CStringVector *args = nullptr, const CStringVector *env = nullptr,
 		const FollowSymlinks follow_symlinks = FollowSymlinks{false});
 
@@ -551,7 +553,7 @@ inline void exec_at(const DirFD dir_fd, const SysString path,
  * close-on-exec flag will cause the file descriptor leaking into the new
  * process.
  **/
-COSMOS_API void fexec(const FileDescriptor fd,
+void fexec(const FileDescriptor fd,
 		const CStringVector *args = nullptr, const CStringVector *env = nullptr);
 
 /// Variant of fexec() that takes a CStringVector& for `args` and inherits environment variables.
@@ -573,7 +575,7 @@ inline void fexec(const FileDescriptor fd, const CStringVector &args, const CStr
  * If multiple threads are running in the current process then they also will
  * be terminated.
  **/
-[[ noreturn ]] COSMOS_API void exit(ExitStatus status);
+[[ noreturn ]] void exit(ExitStatus status);
 
 /// Returns the value for the environment variable named `name`.
 /**
@@ -581,7 +583,7 @@ inline void fexec(const FileDescriptor fd, const CStringVector &args, const CStr
  * named `name` and returns its value. If no such variable is found then
  * nothing is returned.
  **/
-COSMOS_API std::optional<SysString> get_env_var(const SysString name);
+std::optional<SysString> get_env_var(const SysString name);
 
 /// Returns whether the given environment variable exists, ignoring its content.
 inline bool exists_env_var(const SysString name) {
@@ -601,7 +603,7 @@ using OverwriteEnv = NamedBool<struct overwrite_env_t, true>;
  * This call can fail with an exception (e.g. if the `name` contains invalid
  * characters).
  **/
-COSMOS_API void set_env_var(const SysString name, const SysString val, const OverwriteEnv overwrite);
+void set_env_var(const SysString name, const SysString val, const OverwriteEnv overwrite);
 
 /// Remove the given environment variable.
 /**
@@ -612,7 +614,7 @@ COSMOS_API void set_env_var(const SysString name, const SysString val, const Ove
  * This call can fail with an exception (e.g. if the `name` contains invalid
  * characters).
  **/
-COSMOS_API void clear_env_var(const SysString name);
+void clear_env_var(const SysString name);
 
 /// Helper type for caching PID an PPID information.
 struct PidInfo {
@@ -627,9 +629,11 @@ struct PidInfo {
 };
 
 /// A central PidInfo instance for quick access to process PID information.
-extern COSMOS_API PidInfo cached_pids;
+extern PidInfo cached_pids;
 
 /// Builds a path towards "/proc/<pid>/<subpath>" for accessing per-pid proc pseudo-files.
-std::string COSMOS_API build_proc_path(const ProcessID pid, const std::string_view subpath);
+std::string build_proc_path(const ProcessID pid, const std::string_view subpath);
+
+COSMOS_DEFAULT_VISIBILITY_OFF
 
 }; // end ns

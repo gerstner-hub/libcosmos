@@ -19,6 +19,8 @@
 
 namespace cosmos::mem {
 
+COSMOS_DEFAULT_VISIBILITY_ON
+
 /// The basic type of a memory mapping to be created.
 enum class MapType : int {
 	/// Creates a shared memory mapping that can be shared with other processes.
@@ -104,7 +106,7 @@ enum class MapFlag : int {
 };
 
 /// Flags used in MapSettings.
-class COSMOS_API MapFlags :
+class MapFlags :
 		public BitMask<MapFlag> {
 public:
 	using BitMask<MapFlag>::BitMask;
@@ -163,7 +165,7 @@ struct MapSettings {
  *   * MapFlag::HUGETLB is set, but the caller is not privileged to do so
  *   (CAP_IPC_LOCK capability, not a member of sysctl_hugetlb_shm_group).
  **/
-COSMOS_API void* map(const size_t length, const MapSettings &settings);
+void* map(const size_t length, const MapSettings &settings);
 
 /// Unmap an existing mapping at the given address and of the given length.
 /**
@@ -174,7 +176,7 @@ COSMOS_API void* map(const size_t length, const MapSettings &settings);
  * - Errno::NO_MEMORY: unmapping part of a larger mapping would cause the
  *   number of individual mappings for the process to be exceeded.
  **/
-COSMOS_API void unmap(void *addr, const size_t length);
+void unmap(void *addr, const size_t length);
 
 
 
@@ -208,7 +210,7 @@ using ProtectFlags = BitMask<ProtectFlag>;
  *     exceeding the limit of distinct memory mappings allowed for the
  *     process.
  **/
-COSMOS_API void protect(void *addr, const size_t length, const AccessFlags flags, const ProtectFlags extra = {});
+void protect(void *addr, const size_t length, const AccessFlags flags, const ProtectFlags extra = {});
 
 
 
@@ -268,7 +270,7 @@ using RemapFlags = BitMask<RemapFlag>;
  *     to be created that would exceed the available virtual memory, or the
  *     maximum number of allowed mappings.
  **/
-COSMOS_API void* remap(void *old_addr, const size_t old_size, const size_t new_size,
+void* remap(void *old_addr, const size_t old_size, const size_t new_size,
 		const RemapFlags flags = {}, std::optional<void*> new_addr = {});
 
 
@@ -304,7 +306,7 @@ using SyncFlags = BitMask<SyncFlag>;
  * - Errno::NO_MEMORY: The indicated memory range, or a part of it, is not
  *   mapped.
  **/
-COSMOS_API void sync(void *addr, const size_t length,
+void sync(void *addr, const size_t length,
 		const SyncFlags flags = SyncFlags{SyncFlag::SYNC});
 
 
@@ -347,7 +349,7 @@ using LockFlags = BitMask<LockFlag>;
  * - Errno::PERMISSION: the caller is not privileged to lock pages
  *    (CAP_IPC_LOCK).
  **/
-COSMOS_API void lock(void *addr, const size_t length, const LockFlags flags = {});
+void lock(void *addr, const size_t length, const LockFlags flags = {});
 
 /// Unlock previously locked pages.
 /**
@@ -359,7 +361,7 @@ COSMOS_API void lock(void *addr, const size_t length, const LockFlags flags = {}
  * Errno::INVALID_ARG, Errno::AGAIN, Errno::NO_MEMORY or Errno::PERMISSION, as
  * documented in cosmos::mem::lock().
  **/
-COSMOS_API void unlock(void *addr, const size_t length);
+void unlock(void *addr, const size_t length);
 
 
 
@@ -383,13 +385,15 @@ using LockAllFlags = BitMask<LockAllFlag>;
  * - Errno::INVALID_ARG: bad `flags` encountered, or LockAllFlag::ONFAULT was
  *   specified without any of the other flags.
  **/
-COSMOS_API void lock_all(const LockAllFlags flags);
+void lock_all(const LockAllFlags flags);
 
 /// Unlock all current process memory pages..
 /**
  * This is the inverse operation of lockall(), remove memory locking from all
  * currently loaded pages.
  **/
-COSMOS_API void unlock_all();
+void unlock_all();
+
+COSMOS_DEFAULT_VISIBILITY_OFF
 
 } // end ns

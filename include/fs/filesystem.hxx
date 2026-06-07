@@ -28,6 +28,8 @@
 
 namespace cosmos::fs {
 
+COSMOS_DEFAULT_VISIBILITY_ON
+
 /// Open a file using specific OpenFlags, potentially creating it first using the given `fmode`.
 /**
  * \warning If used for creating a file, then you need to specify
@@ -38,7 +40,7 @@ namespace cosmos::fs {
  * descriptor, you have to take care of closing it at the appropriate time
  * yourself!
  **/
-COSMOS_API FileDescriptor open(
+FileDescriptor open(
 		const SysString path, const OpenMode mode,
 		const OpenFlags flags, const std::optional<FileMode> fmode = {});
 
@@ -59,7 +61,7 @@ COSMOS_API FileDescriptor open(
  *   OpenFlag::PATH. The special DirFD value cosmos::AT_CWD can be
  *   used to open files relative to the current working directory.
  **/
-COSMOS_API FileDescriptor open_at(
+FileDescriptor open_at(
 		const DirFD dir_fd, const SysString path,
 		const OpenMode mode, const OpenFlags flags,
 		const std::optional<FileMode> fmode = {});
@@ -91,7 +93,7 @@ using CloseRangeFlags = BitMask<CloseRangeFlag>;
  * number of file descriptors is exceeded in combination with
  * CloseRangeFlag::UNSHARE.
  **/
-COSMOS_API void close_range(const FileNum first,
+void close_range(const FileNum first,
 		const FileNum last = FileNum::MAX_FD,
 		const CloseRangeFlags flags = CloseRangeFlags{});
 
@@ -124,7 +126,7 @@ COSMOS_API void close_range(const FileNum first,
  * it is no longer needed. The cosmos::TempFile class takes care of these
  * tasks, if necessary.
  **/
-COSMOS_API std::pair<FileDescriptor, std::string> make_tempfile(
+std::pair<FileDescriptor, std::string> make_tempfile(
 		const SysString _template, const OpenFlags flags = OpenFlags{OpenFlag::CLOEXEC});
 
 /// Safely create a temporary directory and return it's path.
@@ -143,7 +145,7 @@ COSMOS_API std::pair<FileDescriptor, std::string> make_tempfile(
  * \see TempDir for a convenience type that transparently handles removal of
  * the temporary directory.
  **/
-COSMOS_API std::string make_tempdir(const SysString _template);
+std::string make_tempdir(const SysString _template);
 
 /// Creates a named pipe at the given file system location.
 /**
@@ -167,7 +169,7 @@ COSMOS_API std::string make_tempdir(const SysString _template);
  * symlinks or reuse existing files. Instead an error is thrown if the path
  * already exists in any form.
  **/
-COSMOS_API void make_fifo(const SysString path, const FileMode mode);
+void make_fifo(const SysString path, const FileMode mode);
 
 /// Creates a named pipe relative to the given directory descriptor.
 /**
@@ -178,7 +180,7 @@ COSMOS_API void make_fifo(const SysString path, const FileMode mode);
  * - if `path` is relative and `dir_fd` has the special value cosmos::AT_CWD
  *   then it is interpreted relative to the current working directory.
  **/
-COSMOS_API void make_fifo_at(const DirFD dir_fd, const SysString path,
+void make_fifo_at(const DirFD dir_fd, const SysString path,
 		const FileMode mode);
 
 /// Sets the process's file creation mask.
@@ -210,7 +212,7 @@ COSMOS_API void make_fifo_at(const DirFD dir_fd, const SysString path,
  * process's umask you need to read the proc file system in `/proc/<pid>/status`
  * (umask is available there since Linux 4.7).
  **/
-COSMOS_API FileMode set_umask(const FileMode mode);
+FileMode set_umask(const FileMode mode);
 
 /// Returns whether the given file system object exists.
 /**
@@ -232,7 +234,7 @@ COSMOS_API FileMode set_umask(const FileMode mode);
  * This function does not determine the file *type* i.e. it could be also a
  * directory, socket etc.
  **/
-COSMOS_API bool exists_file(const SysString path);
+bool exists_file(const SysString path);
 
 /// Removes the file object found at `path`.
 /**
@@ -245,7 +247,7 @@ COSMOS_API bool exists_file(const SysString path);
  * If the `path` does not exist then this is considered an error and an
  * exception is thrown.
  **/
-COSMOS_API void unlink_file(const SysString path);
+void unlink_file(const SysString path);
 
 /// Removes the file object found at `path` relative to `dir_fd`.
 /**
@@ -259,20 +261,20 @@ COSMOS_API void unlink_file(const SysString path);
  * - if path is a relative path and `dir_fd` is a valid open directory file
  *   descriptor then `path` is looked up relative to that directory.
  **/
-COSMOS_API void unlink_file_at(const DirFD dir_fd, const SysString path);
+void unlink_file_at(const DirFD dir_fd, const SysString path);
 
 /// Change the calling process's current working directory to `path`.
 /**
  * On error a FileError exception is thrown.
  **/
-COSMOS_API void change_dir(const SysString path);
+void change_dir(const SysString path);
 
 /// Returns the process's current working directory.
 /**
  * This call can fail e.g. on out of memory conditions or if the CWD has been
  * unlinked. An ApiError is thrown in such cases.
  **/
-COSMOS_API std::string get_working_dir();
+std::string get_working_dir();
 
 /// Find the full path to the executable program `exec_base`.
 /**
@@ -287,7 +289,7 @@ COSMOS_API std::string get_working_dir();
  * If the program cannot be found or is not accessible then {} is returned.
  * This function does not throw exceptions, on error {} is returned.
  **/
-COSMOS_API std::optional<std::string> which(const std::string_view exec_base) noexcept;
+std::optional<std::string> which(const std::string_view exec_base) noexcept;
 
 /// Creates a directory at the given location.
 /**
@@ -298,7 +300,7 @@ COSMOS_API std::optional<std::string> which(const std::string_view exec_base) no
  * directory. The permissions are modified by the process's umask
  * (mode = mode * & ~umask)
  **/
-COSMOS_API void make_dir(const SysString path, const FileMode mode);
+void make_dir(const SysString path, const FileMode mode);
 
 /// Creates a directory at the location relative to `dir_fd`.
 /**
@@ -307,14 +309,14 @@ COSMOS_API void make_dir(const SysString path, const FileMode mode);
  *
  * \see unlink_file_at().
  **/
-COSMOS_API void make_dir_at(const DirFD dir_fd, const SysString path, const FileMode mode);
+void make_dir_at(const DirFD dir_fd, const SysString path, const FileMode mode);
 
 /// Removes an empty directory at the given location.
 /**
  * The directory must exist and must be empty for the call to succeed. On
  * error a FileError is thrown.
  **/
-COSMOS_API void remove_dir(const SysString path);
+void remove_dir(const SysString path);
 
 /// Removes an empty directory relative to `dir_fd`.
 /**
@@ -323,7 +325,7 @@ COSMOS_API void remove_dir(const SysString path);
  *
  * \see unlink_file_at().
  **/
-COSMOS_API void remove_dir_at(const DirFD dir_fd, const SysString path);
+void remove_dir_at(const DirFD dir_fd, const SysString path);
 
 /// Creates a directory, potentially creating multiple directory components.
 /**
@@ -339,7 +341,7 @@ COSMOS_API void remove_dir_at(const DirFD dir_fd, const SysString path);
  *         directory component) was created, Errno::EXISTS if the directory
  *         was already existing.
  **/
-COSMOS_API Errno make_all_dirs(const SysString path, const FileMode mode);
+Errno make_all_dirs(const SysString path, const FileMode mode);
 
 /// Recursively removes all directory content in `path`.
 /**
@@ -353,7 +355,7 @@ COSMOS_API Errno make_all_dirs(const SysString path, const FileMode mode);
  * within the calling or another process in the system can cause race
  * conditions that leads to undefined behaviour.
  **/
-COSMOS_API void remove_tree(const SysString path);
+void remove_tree(const SysString path);
 
 /// Changes the FileMode of the given path.
 /**
@@ -374,7 +376,7 @@ COSMOS_API void remove_tree(const SysString path);
  * - no permission to change the mode (Errno::PERMISSION)
  * - read only file system (Errno::READ_ONLY_FS)
  **/
-COSMOS_API void change_mode(const SysString path, const FileMode mode);
+void change_mode(const SysString path, const FileMode mode);
 
 /// Changes the FileMode of the given open file descriptor.
 /**
@@ -386,7 +388,7 @@ COSMOS_API void change_mode(const SysString path, const FileMode mode);
  *
  * - bad file descriptor (Errno::BAD_FD)
  **/
-COSMOS_API void change_mode(const FileDescriptor fd, const FileMode mode);
+void change_mode(const FileDescriptor fd, const FileMode mode);
 
 /// Change numerical owner and/or group ID of a file path.
 /**
@@ -402,7 +404,7 @@ COSMOS_API void change_mode(const FileDescriptor fd, const FileMode mode);
  * - no permission to change the owner (Errno::PERMISSION)
  * - read only file system (Errno::READ_ONLY_FS)
  **/
-COSMOS_API void change_owner(const SysString path, const UserID uid, const GroupID gid = GroupID::INVALID);
+void change_owner(const SysString path, const UserID uid, const GroupID gid = GroupID::INVALID);
 
 /// Change numerical owner and/or group ID of the given open file descriptor.
 /**
@@ -414,7 +416,7 @@ COSMOS_API void change_owner(const SysString path, const UserID uid, const Group
  *
  * - bad file descriptor (Errno::BAD_FD)
  **/
-COSMOS_API void change_owner(const FileDescriptor fd, const UserID uid, const GroupID gid = GroupID::INVALID);
+void change_owner(const FileDescriptor fd, const UserID uid, const GroupID gid = GroupID::INVALID);
 
 /// Change owner and/or group of the given path by user name and/or group name.
 /**
@@ -429,7 +431,7 @@ COSMOS_API void change_owner(const FileDescriptor fd, const UserID uid, const Gr
  * GroupInfo() and RuntimeError() in case the username or group do not
  * exist.
  **/
-COSMOS_API void change_owner(const SysString path, const SysString user,
+void change_owner(const SysString path, const SysString user,
 		const SysString group = {});
 
 /// Change owner and/or group of the given file descriptor by user name and/or group name.
@@ -438,7 +440,7 @@ COSMOS_API void change_owner(const SysString path, const SysString user,
  * UserID, GroupID). The description of change_owner(const SysString,
  * const SysString, const SysString) applies here as well.
  **/
-COSMOS_API void change_owner(const FileDescriptor fd, const SysString user,
+void change_owner(const FileDescriptor fd, const SysString user,
 		const SysString group = {});
 
 /// Convenience wrapper of change_owner() to change only the group of a file.
@@ -471,14 +473,14 @@ inline void change_group(const SysString path, const SysString group) {
  * If `path` is not a symlink then it's owner will still be changed and no
  * error is thrown.
  **/
-COSMOS_API void change_owner_nofollow(const SysString path, const UserID uid,
+void change_owner_nofollow(const SysString path, const UserID uid,
 		const GroupID gid = GroupID::INVALID);
 
 /// Changes owner and/or group of the given path while not following symlinks.
 /**
  * \see change_owner_nofollow(const SysString, const UserID, const GroupID)
  **/
-COSMOS_API void change_owner_nofollow(const SysString path, const SysString user,
+void change_owner_nofollow(const SysString path, const SysString user,
 		const SysString group = {});
 
 /// Creates a symbolic link at `path` pointing to `target`.
@@ -503,14 +505,14 @@ COSMOS_API void change_owner_nofollow(const SysString path, const SysString user
  *   (Errno::NO_ENTRY).
  * - `path` already exists (Errno::EXISTS).
  **/
-COSMOS_API void make_symlink(const SysString target, const SysString path);
+void make_symlink(const SysString target, const SysString path);
 
 /// Creates a symbolic link relative to `dir_fd` pointing to `target`.
 /**
  * This behaves just like make_symlink(). It relates to make_symlink() the
  * same way unlink_file_at() relates to unlink_file().
  **/
-COSMOS_API void make_symlink_at(const SysString target, const DirFD dir_fd,
+void make_symlink_at(const SysString target, const DirFD dir_fd,
 		const SysString path);
 
 /// Returns the target (content) of the symbolic link at `path`.
@@ -523,7 +525,7 @@ COSMOS_API void make_symlink_at(const SysString target, const DirFD dir_fd,
  * - invalid argument if `path` is not a symlink (Errno::INVALID_ARG)
  * - no entry if `path` does not exist (Errno::NO_ENTRY)
  **/
-COSMOS_API std::string read_symlink(const SysString path);
+std::string read_symlink(const SysString path);
 
 /// Returns the target (content) of the symbolic link `path` relative to `dir_fd`.
 /**
@@ -532,7 +534,7 @@ COSMOS_API std::string read_symlink(const SysString path);
  *
  * \see unlink_file_at().
  **/
-COSMOS_API std::string read_symlink_at(const DirFD dir_fd, const SysString path);
+std::string read_symlink_at(const DirFD dir_fd, const SysString path);
 
 /// Rename a path in the filesystem.
 /**
@@ -584,7 +586,7 @@ COSMOS_API std::string read_symlink_at(const DirFD dir_fd, const SysString path)
  *   filesystem.
  *
  **/
-COSMOS_API void rename(const SysString oldpath, const SysString newpath);
+void rename(const SysString oldpath, const SysString newpath);
 
 /// Flags used in conjunction with rename_at().
 enum class RenameFlag : unsigned int {
@@ -637,7 +639,7 @@ using RenameFlags = BitMask<RenameFlag>;
  * - Errno::PERMISSION: RenameFlag::WHITEOUT was specified but the caller
  *   lacks the CAP_MKNOD capability.
  **/
-COSMOS_API void rename_at(const DirFD olddir_fd, const SysString oldpath,
+void rename_at(const DirFD olddir_fd, const SysString oldpath,
 		const DirFD newdir_fd, const SysString newpath,
 		const RenameFlags flags = {});
 
@@ -660,7 +662,7 @@ COSMOS_API void rename_at(const DirFD olddir_fd, const SysString oldpath,
  * On success both names will refer to the same file and it cannot be
  * determined any more which was was the "original".
  **/
-COSMOS_API void link(const SysString old_path, const SysString new_path);
+void link(const SysString old_path, const SysString new_path);
 
 /// Creates a new (hard) link based on lookups relative to `old_dir` and `new_dir`.
 /**
@@ -676,7 +678,7 @@ COSMOS_API void link(const SysString old_path, const SysString new_path);
  * `follow_old` determines whether symlink's encountered at `old_path` will
  * be resolved or not.
  **/
-COSMOS_API void linkat(const DirFD old_dir, const SysString old_path,
+void linkat(const DirFD old_dir, const SysString old_path,
 		const DirFD new_dir, const SysString new_path,
 		const FollowSymlinks follow_old = FollowSymlinks{false});
 
@@ -701,7 +703,7 @@ COSMOS_API void linkat(const DirFD old_dir, const SysString old_path,
  * An alternative is to use regular linkat() and the /proc file system, see
  * `man 2 linkat`.
  **/
-COSMOS_API void linkat_fd(const FileDescriptor fd, const DirFD new_dir,
+void linkat_fd(const FileDescriptor fd, const DirFD new_dir,
 		const SysString new_path);
 
 /// Performs the same as linkat_fd() using linkat() and the /proc file system.
@@ -710,7 +712,7 @@ COSMOS_API void linkat_fd(const FileDescriptor fd, const DirFD new_dir,
  * linkat call uses a workaround based on the /proc file system to achieve the
  * same result, see `man 2 linkat`.
  **/
-COSMOS_API void linkat_proc_fd(const FileDescriptor fd, const DirFD new_dir,
+void linkat_proc_fd(const FileDescriptor fd, const DirFD new_dir,
 		const SysString new_path);
 
 /// Changes the file size of the file referred to by `fd` to `length` bytes.
@@ -722,7 +724,7 @@ COSMOS_API void linkat_proc_fd(const FileDescriptor fd, const DirFD new_dir,
  * This operation requires the file to be opened for writing. A successful
  * operation causes the inode of the file to be updated.
  **/
-COSMOS_API void truncate(const FileDescriptor fd, off_t length);
+void truncate(const FileDescriptor fd, off_t length);
 
 /// Changes the file size of the file found at the given `path` to `length` bytes.
 /**
@@ -730,7 +732,7 @@ COSMOS_API void truncate(const FileDescriptor fd, off_t length);
  * difference that the operation is performed on the given path. The file must
  * be writable.
  **/
-COSMOS_API void truncate(const SysString path, off_t length);
+void truncate(const SysString path, off_t length);
 
 /// set of parameters for copy_file_range().
 struct CopyFileRangeParameters {
@@ -773,7 +775,7 @@ struct CopyFileRangeParameters {
  * - sendfile(): this used to be limited to writing to sockets FDs. Also it
  *   only supports an input FD offset, no output FD offset.
  **/
-COSMOS_API size_t copy_file_range(CopyFileRangeParameters &pars);
+size_t copy_file_range(CopyFileRangeParameters &pars);
 
 /// Copy data between files directly in the kernel.
 /**
@@ -781,7 +783,7 @@ COSMOS_API size_t copy_file_range(CopyFileRangeParameters &pars);
  * that does not use explicit offsets. Instead the current file descriptor
  * offsets will be used and updated.
  **/
-COSMOS_API size_t copy_file_range(
+size_t copy_file_range(
 		const FileDescriptor fd_in, const FileDescriptor fd_out, const size_t len);
 
 /// Different access checks that can be performed in check_access().
@@ -816,7 +818,7 @@ using AccessChecks = BitMask<AccessCheck>;
  * Note that this call is often better replaced by direct open of a path, to
  * prevent any time-of-check/time-of-use race conditions.
  **/
-COSMOS_API void check_access(const SysString path, const AccessChecks checks = {});
+void check_access(const SysString path, const AccessChecks checks = {});
 
 /// Extra flags that influence the behaviour of check_access_at(), and check_access_fd().
 enum class AccessFlag : int {
@@ -838,7 +840,7 @@ using AccessFlags = BitMask<AccessFlag>;
  *
  * The `flags` argument further influences the behaviour of the check.
  **/
-COSMOS_API void check_access_at(const DirFD dir_fd, const SysString path,
+void check_access_at(const DirFD dir_fd, const SysString path,
 		const AccessChecks checks = {}, const AccessFlags flags = {});
 
 /// Check file access permissions of the already open file descriptor `fd`.
@@ -846,7 +848,7 @@ COSMOS_API void check_access_at(const DirFD dir_fd, const SysString path,
  * This call may be used on a file descriptor opened with OpenFlag::PATH,
  * which is likely also the main purpose of this variant of `check_access()`.
  **/
-COSMOS_API void check_access_fd(const FileDescriptor fd, const AccessChecks check = {},
+void check_access_fd(const FileDescriptor fd, const AccessChecks check = {},
 		const AccessFlags flags = {});
 
 /// Flags used with flock().
@@ -894,14 +896,16 @@ using LockFlags = BitMask<LockFlag>;
  *   `fcntl()` byte-range locking, which has different semantics (e.g. for
  *   placing write locks, the file descriptor has to be open for writing).
  **/
-COSMOS_API void flock(const FileDescriptor fd, const LockOperation operation,
+void flock(const FileDescriptor fd, const LockOperation operation,
 		const LockFlags flags = {});
 
 /// Decompose a DeviceID into its major and minor parts.
-COSMOS_API std::pair<DeviceMajor, DeviceMinor> split_device_id(
+std::pair<DeviceMajor, DeviceMinor> split_device_id(
 		const DeviceID id);
 
 /// Construct a DeviceID from major and minor parts.
-COSMOS_API DeviceID make_device(const DeviceMajor, const DeviceMinor);
+DeviceID make_device(const DeviceMajor, const DeviceMinor);
+
+COSMOS_DEFAULT_VISIBILITY_OFF
 
 } // end ns
