@@ -42,6 +42,10 @@
 #	endif
 #endif
 
+/* expands a PRCTL preprocessor define to its integer form and it's string
+ * form for error handling in prctl wrappers */
+#define EXPAND_CTL(x) x, #x
+
 namespace cosmos::prctl {
 
 namespace {
@@ -111,30 +115,27 @@ void drop_cap_from_bounding_set(const Capability cap) {
 }
 
 void drop_all_ambient_caps() {
-	prctl_cap_ambient(PR_CAP_AMBIENT_CLEAR_ALL, "PR_CAP_AMBIENT_CLEAR_ALL");
+	prctl_cap_ambient(EXPAND_CTL(PR_CAP_AMBIENT_CLEAR_ALL));
 }
 
 bool get_cap_in_ambient_set(const Capability cap) {
-	return prctl_cap_ambient(PR_CAP_AMBIENT_IS_SET,
-			"PR_CAP_AMBIENT_IS_SET", cap) != 0;
+	return prctl_cap_ambient(EXPAND_CTL(PR_CAP_AMBIENT_IS_SET), cap) != 0;
 }
 
 void raise_ambient_cap(const Capability cap) {
-	prctl_cap_ambient(PR_CAP_AMBIENT_RAISE, "PR_CAP_AMBIENT_RAISE", cap);
+	prctl_cap_ambient(EXPAND_CTL(PR_CAP_AMBIENT_RAISE), cap);
 }
 
 void lower_ambient_cap(const Capability cap) {
-	prctl_cap_ambient(PR_CAP_AMBIENT_LOWER, "PR_CAP_AMBIENT_LOWER", cap);
+	prctl_cap_ambient(EXPAND_CTL(PR_CAP_AMBIENT_LOWER), cap);
 }
 
 bool get_child_subreaper() {
-	return prctl_get_bool_attr(PR_GET_CHILD_SUBREAPER,
-			"PR_GET_CHILD_SUBREAPER");
+	return prctl_get_bool_attr(EXPAND_CTL(PR_GET_CHILD_SUBREAPER));
 }
 
 void set_child_subreaper(const bool is_subreaper) {
-	prctl_set_bool_attr(PR_SET_CHILD_SUBREAPER, "PR_SET_CHILD_SUBREAPER",
-			is_subreaper);
+	prctl_set_bool_attr(EXPAND_CTL(PR_SET_CHILD_SUBREAPER), is_subreaper);
 }
 
 namespace x86 {
