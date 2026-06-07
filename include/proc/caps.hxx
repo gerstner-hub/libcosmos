@@ -1,7 +1,7 @@
 #pragma once
 
 // Linux
-#include <sys/capability.h>
+#include <linux/capability.h>
 
 namespace cosmos {
 
