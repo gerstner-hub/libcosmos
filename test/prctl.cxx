@@ -14,6 +14,7 @@ class TestPrctl :
 		checkBoundingCaps();
 		checkAmbientCaps();
 		checkSubReaper();
+		checkDumpable();
 	}
 
 	void checkCpuID() {
@@ -102,6 +103,18 @@ class TestPrctl :
 		subreaper = cosmos::prctl::get_child_subreaper();
 
 		RUN_STEP("change-subreaper-works", subreaper == true);
+	}
+
+	void checkDumpable() {
+		START_TEST("dumpable attr");
+
+		const auto old_dumpable = cosmos::prctl::get_dumpable();
+
+		cosmos::prctl::set_dumpable(!old_dumpable);
+
+		const auto new_dumpable = cosmos::prctl::get_dumpable();
+
+		RUN_STEP("change-dumpable-works", old_dumpable != new_dumpable);
 	}
 };
 

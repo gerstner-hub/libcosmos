@@ -73,6 +73,19 @@ COSMOS_API bool get_child_subreaper();
  **/
 COSMOS_API void set_child_subreaper(const bool is_subreaper);
 
+/// Returns the calling process's dumpable attribute.
+/**
+ * This attribute determines whether a core dump is produced upon delivery of
+ * a signal whose default behaviour is to produce a core dump.
+ *
+ * This setting is automatically reset to a default in various circumstances
+ * that alter the process's privileges (like executing a setuid-root program).
+ **/
+COSMOS_API bool get_dumpable();
+
+/// Modifies the calling process's dumpable attribute.
+COSMOS_API void set_dumpable(const bool dumpable);
+
 namespace x86 {
 
 /// Returns whether the `cpuid` processor instruction is enabled.

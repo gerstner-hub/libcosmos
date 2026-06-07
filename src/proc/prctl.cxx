@@ -80,7 +80,11 @@ int prctl_cap_ambient(const int subop, const char *label,
 	return ret;
 }
 
-bool prctl_get_bool_attr(const int op, const char *label) {
+/*
+ * a generic wrapper for prctls which return a boolean value via an `int` out
+ * pointer parameter.
+ */
+bool prctl_get_bool_by_ptr(const int op, const char *label) {
 	int attr = 0;
 
 	if (::prctl(op, &attr) < 0) {
@@ -88,6 +92,20 @@ bool prctl_get_bool_attr(const int op, const char *label) {
 	}
 
 	return attr != 0;
+}
+
+/*
+ * a generic wrapper for prctls which return a boolean value as return value
+ * (< 0 means error, == 0 means false, > 0 means true).
+ */
+bool prctl_get_bool_by_value(const int op, const char *label) {
+	const auto val = ::prctl(op);
+
+	if (val < 0) {
+		throw ApiError{std::format("prctl({})", label)};
+	}
+
+	return val != 0;
 }
 
 void prctl_set_bool_attr(const int op, const char *label, const bool setting) {
@@ -131,11 +149,19 @@ void lower_ambient_cap(const Capability cap) {
 }
 
 bool get_child_subreaper() {
-	return prctl_get_bool_attr(EXPAND_CTL(PR_GET_CHILD_SUBREAPER));
+	return prctl_get_bool_by_ptr(EXPAND_CTL(PR_GET_CHILD_SUBREAPER));
 }
 
 void set_child_subreaper(const bool is_subreaper) {
 	prctl_set_bool_attr(EXPAND_CTL(PR_SET_CHILD_SUBREAPER), is_subreaper);
+}
+
+bool get_dumpable() {
+	return prctl_get_bool_by_value(EXPAND_CTL(PR_GET_DUMPABLE));
+}
+
+void set_dumpable(const bool dumpable) {
+	prctl_set_bool_attr(EXPAND_CTL(PR_SET_DUMPABLE), dumpable);
 }
 
 namespace x86 {
