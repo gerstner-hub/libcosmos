@@ -58,6 +58,21 @@ COSMOS_API void raise_ambient_cap(const Capability cap);
  **/
 COSMOS_API void lower_ambient_cap(const Capability cap);
 
+/// Returns whether the calling process is a child subreaper.
+/**
+ * A child subreaper fulfills the role of `init()` for its descendant
+ * processes, i.e. it collects zombie processes. The setting is preserved
+ * across execve() but not across fork() or clone().
+ **/
+COSMOS_API bool get_child_subreaper();
+
+/// Modifies the process's child subreaper setting.
+/**
+ * When this is set to `true` then the calling process becomes child subreaper
+ * for its descendant processes.
+ **/
+COSMOS_API void set_child_subreaper(const bool is_subreaper);
+
 namespace x86 {
 
 /// Returns whether the `cpuid` processor instruction is enabled.

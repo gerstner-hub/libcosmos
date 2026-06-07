@@ -13,6 +13,7 @@ class TestPrctl :
 		checkFsGsRegs();
 		checkBoundingCaps();
 		checkAmbientCaps();
+		checkSubReaper();
 	}
 
 	void checkCpuID() {
@@ -87,6 +88,20 @@ class TestPrctl :
 		cosmos::prctl::drop_all_ambient_caps();
 
 		RUN_STEP("drop-all-ambient-cap-works", true);
+	}
+
+	void checkSubReaper() {
+		START_TEST("child subreaper");
+
+		auto subreaper = cosmos::prctl::get_child_subreaper();
+
+		RUN_STEP("not-a-subreaper-by-default", !subreaper);
+
+		cosmos::prctl::set_child_subreaper(true);
+
+		subreaper = cosmos::prctl::get_child_subreaper();
+
+		RUN_STEP("change-subreaper-works", subreaper == true);
 	}
 };
 
