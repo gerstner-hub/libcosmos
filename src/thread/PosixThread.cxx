@@ -23,6 +23,8 @@ namespace {
 	struct Context {
 		std::variant<PosixThread::PosixEntry, PosixThread::Entry> entry;
 		ThreadArg arg;
+		/* maximum size of PR_SET_NAME attribute */
+		char name[16] = {0};
 	};
 
 	Context fetch_context(void *par) {
@@ -36,6 +38,10 @@ namespace {
 
 		Context ctx = fetch_context(par);
 
+		if (ctx.name[0] != '\0') {
+			thread::set_name(ctx.name);
+		}
+
 		if (std::holds_alternative<PosixThread::PosixEntry>(ctx.entry)) {
 			auto entry = std::get<PosixThread::PosixEntry>(ctx.entry);
 			auto ret = entry(ctx.arg);
@@ -47,7 +53,19 @@ namespace {
 		}
 	}
 
-	void create_thread(pthread_t &thread, Context *ctx) {
+	void create_thread(pthread_t &thread, Context *ctx,
+			const std::string_view name) {
+
+		if (name.data() != nullptr) {
+			/* pass on the friendly name to the thread to apply in
+			 * target thread context to avoid races in case the
+			 * thread's callback function also wants to change the
+			 * thread's name */
+			const auto name_max = std::min(
+					sizeof(ctx->name) - 1, name.size());
+			ctx->name[name_max] = '\0';
+			std::memcpy(ctx->name, &name[0], name_max);
+		}
 
 		const auto res = ::pthread_create(
 			&thread,
@@ -68,7 +86,7 @@ PosixThread::PosixThread(PosixEntry entry, pthread::ThreadArg arg, const std::st
 
 	m_pthread = pthread_t{};
 	try {
-		create_thread(m_pthread.value(), new Context{entry, arg});
+		create_thread(m_pthread.value(), new Context{entry, arg}, name);
 	} catch(...) {
 		m_pthread.reset();
 	}
@@ -78,7 +96,7 @@ PosixThread::PosixThread(Entry entry, const std::string_view name) :
 		m_name{buildName(name, ++num_threads)} {
 	m_pthread = pthread_t{};
 	try {
-		create_thread(m_pthread.value(), new Context{entry, pthread::ThreadArg{0}});
+		create_thread(m_pthread.value(), new Context{entry, pthread::ThreadArg{0}}, name);
 	} catch(...) {
 		m_pthread.reset();
 	}

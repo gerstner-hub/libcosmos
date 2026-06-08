@@ -6,6 +6,7 @@
 // cosmos
 #include <cosmos/cosmos.hxx>
 #include <cosmos/error/UsageError.hxx>
+#include <cosmos/proc/prctl.hxx>
 #include <cosmos/thread/Mutex.hxx>
 #include <cosmos/thread/PosixThread.hxx>
 #include <cosmos/thread/pthread.hxx>
@@ -149,6 +150,11 @@ protected: // functions
 
 		if (arg != ThreadArg{815}) {
 			std::cerr << "Received unexpected thread argument\n";
+			finishTest(false);
+		}
+
+		if (cosmos::prctl::get_thread_name() != "simplethread") {
+			std::cerr << "simplethread name does not match\n";
 			finishTest(false);
 		}
 

@@ -1,6 +1,7 @@
 #pragma once
 
 // cosmos
+#include <cosmos/SysString.hxx>
 #include <cosmos/dso_export.h>
 #include <cosmos/proc/types.hxx>
 #include <cosmos/utils.hxx>
@@ -39,6 +40,18 @@ ThreadID COSMOS_API get_tid();
  * In Linux terms this is also called the thread group leader.
  **/
 bool COSMOS_API is_main_thread();
+
+/// Returns the friendly name of the calling thread.
+/**
+ * \see cosmos::prctl::get_thread_name().
+ **/
+std::string COSMOS_API get_name();
+
+/// Sets the friendly name of the calling thread.
+/**
+ * \see cosmos::prctl::set_thread_name().
+ **/
+void COSMOS_API set_name(const SysString name);
 
 } // end ns
 } // end ns

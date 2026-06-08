@@ -83,11 +83,13 @@ public: // functions
 	 * 	The single parameter passed to the entry function.
 	 * \param[in] name
 	 * 	An optional friendly name for the thread that is used in
-	 * 	logging or possible in operating system facilities to more
-	 * 	easily identify threads. If this is not specified then an
-	 * 	automatically generated name will be used.
+	 * 	logging and on operating system level to more easily identify
+	 * 	threads. If this is not specified then an automatically
+	 * 	generated name will be used. Pass a default-constructed
+	 * 	string_view to disable the feature.
 	 **/
-	PosixThread(PosixEntry entry, pthread::ThreadArg arg, const std::string_view name = {});
+	PosixThread(PosixEntry entry, pthread::ThreadArg arg,
+			const std::string_view name = "");
 
 	/// Creates a thread running in the provided simple Entry function.
 	/**

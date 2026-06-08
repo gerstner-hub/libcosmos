@@ -3,6 +3,7 @@
 #include <unistd.h>
 
 // cosmos
+#include <cosmos/proc/prctl.hxx>
 #include <cosmos/proc/process.hxx>
 #include <cosmos/thread/thread.hxx>
 
@@ -15,6 +16,14 @@ ThreadID get_tid() {
 
 bool is_main_thread() {
 	return as_pid(get_tid()) == proc::get_own_pid();
+}
+
+std::string get_name() {
+	return prctl::get_thread_name();
+}
+
+void set_name(const SysString name) {
+	prctl::set_thread_name(name);
 }
 
 } // end ns
