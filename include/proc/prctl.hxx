@@ -174,7 +174,28 @@ bool get_no_new_privs();
  **/
 void set_no_new_privs();
 
+/// Set the PID of a process which is allowed to `ptrace()` the calling process.
+/**
+ * This setting is useful when the YAMA Linux kernel security module is in
+ * effect. This module prevents tracing of other processes, even when running
+ * under the same UID, when /proc/sys/kernel/yama/ptrace_scope is set to mode
+ * 1, except when there is a parent-child relationship between tracer and
+ * tracee.
+ *
+ * This prctl allows to explicitly declare a PID which is allowed to trace
+ * this process even if YAMA would otherwise deny it. Only a single PID can be
+ * set at any time. Passing ProcessID::SELF will reset the setting.
+ *
+ * Use `set_any_ptracer()` to allow any process to trace the calling process.
+ **/
+void set_ptracer(const ProcessID pid);
 
+/// Allow any PID to trace this process.
+/**
+ * This is a special variant of set_ptracer(), which allows any PID to trace
+ * the calling process (still subject to the usual ptrace() access checks).
+ **/
+void set_any_ptracer();
 
 namespace x86 {
 

@@ -112,14 +112,15 @@ bool prctl_get_bool_by_value(const int op, const char *label) {
 	return val != 0;
 }
 
-void prctl_set_int_attr(const int op, const char *label, const int setting) {
+template <typename T>
+void prctl_set_attr(const int op, const char *label, const T setting) {
 	if (::prctl(op, setting, 0, 0, 0) < 0) {
 		throw ApiError{std::format("prctl({})", label)};
 	}
 }
 
 void prctl_set_bool_attr(const int op, const char *label, const bool setting) {
-	prctl_set_int_attr(op, label, setting ? 1 : 0);
+	prctl_set_attr<int>(op, label, setting ? 1 : 0);
 }
 
 } // end anon ns
@@ -211,7 +212,17 @@ SignalNr get_parent_death_signal() {
 }
 
 void set_parent_death_signal(const SignalNr sig) {
-	prctl_set_int_attr(EXPAND_CTL(PR_SET_PDEATHSIG), to_integral(sig));
+	prctl_set_attr<int>(EXPAND_CTL(PR_SET_PDEATHSIG), to_integral(sig));
+}
+
+void set_ptracer(const ProcessID pid) {
+	prctl_set_attr<long>(EXPAND_CTL(PR_SET_PTRACER), to_integral(pid));
+}
+
+void set_any_ptracer() {
+	/* this special constant is -1, doesn't fit our ProcessID modeling
+	 * very well, thus rather provide a dedicated function for this */
+	prctl_set_attr<long>(EXPAND_CTL(PR_SET_PTRACER), PR_SET_PTRACER_ANY);
 }
 
 namespace x86 {

@@ -18,6 +18,7 @@ class TestPrctl :
 		checkThreadName();
 		checkNoNewPrivs();
 		checkParentDeathSig();
+		checkPTracer();
 	}
 
 	void checkCpuID() {
@@ -155,6 +156,14 @@ class TestPrctl :
 		death_sig = cosmos::prctl::get_parent_death_signal();
 
 		RUN_STEP("set-works", death_sig == cosmos::SignalNr::USR1);
+	}
+
+	void checkPTracer() {
+		START_TEST("ptracer pid");
+
+		cosmos::prctl::set_any_ptracer();
+
+		RUN_STEP("set-any-ptracer-nothrow", true);
 	}
 };
 
