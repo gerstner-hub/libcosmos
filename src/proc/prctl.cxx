@@ -99,7 +99,7 @@ bool prctl_get_bool_by_ptr(const int op, const char *label) {
  * (< 0 means error, == 0 means false, > 0 means true).
  */
 bool prctl_get_bool_by_value(const int op, const char *label) {
-	const auto val = ::prctl(op);
+	const auto val = ::prctl(op, 0, 0, 0, 0);
 
 	if (val < 0) {
 		throw ApiError{std::format("prctl({})", label)};
@@ -109,7 +109,7 @@ bool prctl_get_bool_by_value(const int op, const char *label) {
 }
 
 void prctl_set_bool_attr(const int op, const char *label, const bool setting) {
-	if (::prctl(op, setting ? 1 : 0) < 0) {
+	if (::prctl(op, setting ? 1 : 0, 0, 0, 0) < 0) {
 		throw ApiError{std::format("prctl({})", label)};
 	}
 }
