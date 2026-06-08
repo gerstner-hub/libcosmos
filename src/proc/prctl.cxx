@@ -188,6 +188,14 @@ void set_thread_name(const SysString name) {
 	}
 }
 
+bool get_no_new_privs() {
+	return prctl_get_bool_by_value(EXPAND_CTL(PR_GET_NO_NEW_PRIVS));
+}
+
+void set_no_new_privs() {
+	prctl_set_bool_attr(EXPAND_CTL(PR_SET_NO_NEW_PRIVS), true);
+}
+
 namespace x86 {
 
 bool get_cpuid_enabled() {

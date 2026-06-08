@@ -16,6 +16,7 @@ class TestPrctl :
 		checkSubReaper();
 		checkDumpable();
 		checkThreadName();
+		checkNoNewPrivs();
 	}
 
 	void checkCpuID() {
@@ -125,6 +126,20 @@ class TestPrctl :
 
 		RUN_STEP("new-thread-name-matches",
 				cosmos::prctl::get_thread_name() == "test-name");
+	}
+
+	void checkNoNewPrivs() {
+		START_TEST("no new privs");
+
+		auto no_new_privs = cosmos::prctl::get_no_new_privs();
+
+		RUN_STEP("default-off", !no_new_privs);
+		
+		cosmos::prctl::set_no_new_privs();
+
+		no_new_privs = cosmos::prctl::get_no_new_privs();
+
+		RUN_STEP("enabling-works", no_new_privs);
 	}
 };
 

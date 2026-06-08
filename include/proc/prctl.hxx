@@ -130,6 +130,22 @@ std::string get_thread_name();
  **/
 void set_thread_name(const SysString name);
 
+/// Returns the no_new_privs setting of the calling process.
+/**
+ * If this returns `true` then the calling process is not allowed to gain new
+ * privileges upon calls to `execve()` (e.g. via setuid-root bits or
+ * file-based capabilities). Once set this cannot be unset again.
+ **/
+bool get_no_new_privs();
+
+/// Enable the no_new_privs setting for the calling process.
+/**
+ * Once enabled this setting cannot be reversed.
+ *
+ * \see get_no_new_privs().
+ **/
+void set_no_new_privs();
+
 namespace x86 {
 
 /// Returns whether the `cpuid` processor instruction is enabled.
