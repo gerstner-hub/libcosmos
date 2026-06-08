@@ -1,5 +1,8 @@
 #pragma once
 
+// C++
+#include <string>
+
 // cosmos
 #include <cosmos/dso_export.h>
 #include <cosmos/proc/caps.hxx>
@@ -106,6 +109,26 @@ void set_dumpable(const bool dumpable);
  **/
 void set_anon_memory_name(const void *addr, const size_t len,
 		const SysString name);
+
+void set_thread_name(const SysString name);
+
+/// Returns the name of the calling thread.
+/**
+ * The returned name will be at most 16 bytes long including the null
+ * terminator. If no name was explicitly set earlier then this returns the
+ * process's executable name by default.
+ **/
+std::string get_thread_name();
+
+/// Sets the name of the calling thread.
+/**
+ * `name` can be at most 16 bytes long including the null terminator. If it is
+ * longer then it will be silently truncated.
+ *
+ * The per-thread name can be looked up in proc in
+ * `/proc/self/task/<tid>/comm` or be retrieved via `get_thread_name()`.
+ **/
+void set_thread_name(const SysString name);
 
 namespace x86 {
 

@@ -15,6 +15,7 @@ class TestPrctl :
 		checkAmbientCaps();
 		checkSubReaper();
 		checkDumpable();
+		checkThreadName();
 	}
 
 	void checkCpuID() {
@@ -115,6 +116,15 @@ class TestPrctl :
 		const auto new_dumpable = cosmos::prctl::get_dumpable();
 
 		RUN_STEP("change-dumpable-works", old_dumpable != new_dumpable);
+	}
+
+	void checkThreadName() {
+		START_TEST("thread name attr");
+
+		cosmos::prctl::set_thread_name("test-name");
+
+		RUN_STEP("new-thread-name-matches",
+				cosmos::prctl::get_thread_name() == "test-name");
 	}
 };
 

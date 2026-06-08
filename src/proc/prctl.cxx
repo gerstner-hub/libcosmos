@@ -172,6 +172,22 @@ void set_anon_memory_name(const void *addr, const size_t len,
 	}
 }
 
+std::string get_thread_name() {
+	char name[16];
+
+	if (::prctl(PR_GET_NAME, name) < 0) {
+		throw ApiError{"prctl(PR_GET_NAME)"};
+	}
+
+	return name;
+}
+
+void set_thread_name(const SysString name) {
+	if (::prctl(PR_SET_NAME, name.raw()) < 0) {
+		throw ApiError{"prctl(PR_SET_NAME)"};
+	}
+}
+
 namespace x86 {
 
 bool get_cpuid_enabled() {
