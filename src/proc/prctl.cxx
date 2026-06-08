@@ -80,18 +80,22 @@ int prctl_cap_ambient(const int subop, const char *label,
 	return ret;
 }
 
-/*
- * a generic wrapper for prctls which return a boolean value via an `int` out
- * pointer parameter.
- */
-bool prctl_get_bool_by_ptr(const int op, const char *label) {
+int prctl_get_int_by_ptr(const int op, const char *label) {
 	int attr = 0;
 
 	if (::prctl(op, &attr) < 0) {
 		throw ApiError{std::format("prctl({})", label)};
 	}
 
-	return attr != 0;
+	return attr;
+}
+
+/*
+ * a generic wrapper for prctls which return a boolean value via an `int` out
+ * pointer parameter.
+ */
+bool prctl_get_bool_by_ptr(const int op, const char *label) {
+	return prctl_get_int_by_ptr(op, label) != 0;
 }
 
 /*
@@ -108,10 +112,14 @@ bool prctl_get_bool_by_value(const int op, const char *label) {
 	return val != 0;
 }
 
-void prctl_set_bool_attr(const int op, const char *label, const bool setting) {
-	if (::prctl(op, setting ? 1 : 0, 0, 0, 0) < 0) {
+void prctl_set_int_attr(const int op, const char *label, const int setting) {
+	if (::prctl(op, setting, 0, 0, 0) < 0) {
 		throw ApiError{std::format("prctl({})", label)};
 	}
+}
+
+void prctl_set_bool_attr(const int op, const char *label, const bool setting) {
+	prctl_set_int_attr(op, label, setting ? 1 : 0);
 }
 
 } // end anon ns
@@ -194,6 +202,16 @@ bool get_no_new_privs() {
 
 void set_no_new_privs() {
 	prctl_set_bool_attr(EXPAND_CTL(PR_SET_NO_NEW_PRIVS), true);
+}
+
+SignalNr get_parent_death_signal() {
+	const auto raw_sig = prctl_get_int_by_ptr(EXPAND_CTL(PR_GET_PDEATHSIG));
+
+	return SignalNr{raw_sig};
+}
+
+void set_parent_death_signal(const SignalNr sig) {
+	prctl_set_int_attr(EXPAND_CTL(PR_SET_PDEATHSIG), to_integral(sig));
 }
 
 namespace x86 {

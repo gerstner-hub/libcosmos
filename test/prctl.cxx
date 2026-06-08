@@ -17,6 +17,7 @@ class TestPrctl :
 		checkDumpable();
 		checkThreadName();
 		checkNoNewPrivs();
+		checkParentDeathSig();
 	}
 
 	void checkCpuID() {
@@ -140,6 +141,20 @@ class TestPrctl :
 		no_new_privs = cosmos::prctl::get_no_new_privs();
 
 		RUN_STEP("enabling-works", no_new_privs);
+	}
+
+	void checkParentDeathSig() {
+		START_TEST("parent death sig");
+
+		auto death_sig = cosmos::prctl::get_parent_death_signal();
+
+		RUN_STEP("default-unset", death_sig == cosmos::SignalNr::NONE);
+
+		cosmos::prctl::set_parent_death_signal(cosmos::SignalNr::USR1);
+
+		death_sig = cosmos::prctl::get_parent_death_signal();
+
+		RUN_STEP("set-works", death_sig == cosmos::SignalNr::USR1);
 	}
 };
 

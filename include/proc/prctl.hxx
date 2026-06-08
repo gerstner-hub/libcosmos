@@ -6,6 +6,7 @@
 // cosmos
 #include <cosmos/dso_export.h>
 #include <cosmos/proc/caps.hxx>
+#include <cosmos/proc/types.hxx>
 #include <cosmos/SysString.hxx>
 
 /**
@@ -79,6 +80,33 @@ bool get_child_subreaper();
  **/
 void set_child_subreaper(const bool is_subreaper);
 
+/// Returns the currently configured parent-death-signal for the calling thread.
+/**
+ * The parent-death-signal is sent to the calling thread once the thread that
+ * created the calling thread exits. "parent" not refer to the parent process
+ * as a whole, but specifically to the parent thread here.
+ *
+ * When the signal is caught in a signal handler using the SA_SIGINFO flag
+ * then the `si_pid` field of the signal information data will contain the PID
+ * of the process which that terminated.
+ *
+ * This attribute is reset during fork(). It is also reset during execve() if
+ * the call grants new credentials (setuid-root, capabilities). It is
+ * furthermore reset when the calling thread's effective user/group/file
+ * system IDs change.
+ *
+ * If no signal is configured then SignalNr::NONE is returned here.
+ **/
+SignalNr get_parent_death_signal();
+
+/// Configures the parent-death-signal for the calling thread.
+/**
+ * \see get_parent_death_signal().
+ *
+ * To disable the feature pass SignalNr::NONE here.
+ **/
+void set_parent_death_signal(const SignalNr sig);
+
 /// Returns the calling process's dumpable attribute.
 /**
  * This attribute determines whether a core dump is produced upon delivery of
@@ -145,6 +173,8 @@ bool get_no_new_privs();
  * \see get_no_new_privs().
  **/
 void set_no_new_privs();
+
+
 
 namespace x86 {
 
