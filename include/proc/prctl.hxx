@@ -197,6 +197,20 @@ void set_ptracer(const ProcessID pid);
  **/
 void set_any_ptracer();
 
+/// Get the currently set secure bits for the calling thread.
+SecureBits get_secure_bits();
+
+/// Set the secure bits for the calling thread.
+/**
+ * Changing the secure bits requires Capability::SETPCAP. On error this throws
+ * an ApiError with on of the following Errno values:
+ *
+ * - Errno::INVALID: bad `bits` flags.
+ * - Errno::PERMISSION: caller lacks Capability::SETPCAP, tried to unset a
+ *   LOCKED flag or tried to change the value of a flag which is LOCKED.
+ **/
+void set_secure_bits(const SecureBits bits);
+
 namespace x86 {
 
 /// Returns whether the `cpuid` processor instruction is enabled.

@@ -19,6 +19,7 @@ class TestPrctl :
 		checkNoNewPrivs();
 		checkParentDeathSig();
 		checkPTracer();
+		checkSecureBits();
 	}
 
 	void checkCpuID() {
@@ -164,6 +165,19 @@ class TestPrctl :
 		cosmos::prctl::set_any_ptracer();
 
 		RUN_STEP("set-any-ptracer-nothrow", true);
+	}
+
+	void checkSecureBits() {
+		START_TEST("secure bits");
+
+		const auto bits = cosmos::prctl::get_secure_bits();
+
+		RUN_STEP("securebits-empty", bits.none());
+
+		/*
+		 * we cannot test setting these bits, since this requires
+		 * special privileges.
+		 */
 	}
 };
 

@@ -2,6 +2,10 @@
 
 // Linux
 #include <linux/capability.h>
+#include <linux/securebits.h>
+
+// cosmos
+#include <cosmos/BitMask.hxx>
 
 namespace cosmos {
 
@@ -41,7 +45,7 @@ enum class Capability : long {
 	 * Analogous got CAP_SETGID for user IDs.
 	 **/
 	SETUID           = CAP_SETUID,
-	/// Perform arbitrary modifications on a process's capability sets.
+	/// Perform arbitrary modifications of a process's capability set.
 	/**
 	 * - transfer any capability from the bounding set to the inheritable
 	 *   set.
@@ -125,5 +129,35 @@ enum class Capability : long {
 	 **/
 	CHECKPOINT_RESTORE = CAP_CHECKPOINT_RESTORE,
 };
+
+/// Flags which influence the handling of capabilities for UID 0 processes.
+/**
+ * These flags allow control of how capability sets are dealt with when
+ * processes obtain or loose UID 0 privileges.
+ *
+ * Each flag has a companion *_LOCKED flag, which, when set, makes it
+ * impossible to change the base setting anymore for the lifetime of the
+ * affected process.
+ *
+ * These flags are used with prctl::set_secure_bits() and
+ * prctl::get_secure_bits() to manipulate / inspect the calling process's
+ * secure bits.
+ **/
+enum class SecureBit : unsigned long {
+	/// Keep permitted capabilities even when all UIDs are switched to non-zero.
+	KEEP_CAPS                   = SECBIT_KEEP_CAPS,
+	KEEP_CAPS_LOCKED            = SECBIT_KEEP_CAPS_LOCKED,
+	/// Don't change capability sets when effective or fs UIDs are switched from/to zero.
+	NO_SETUID_FIXUP             = SECBIT_NO_SETUID_FIXUP,
+	NO_SETUID_FIXUP_LOCKED      = SECBIT_NO_SETUID_FIXUP_LOCKED,
+	/// Don't adjust capability sets when setuid-root programs are executed.
+	NOROOT                      = SECBIT_NOROOT,
+	NOROOT_LOCKED               = SECBIT_NOROOT_LOCKED,
+	/// Disallow raising ambient capabilities via prctl::raise_ambient_cap().
+	NO_CAP_AMBIENT_RAISE        = SECBIT_NO_CAP_AMBIENT_RAISE,
+	NO_CAP_AMBIENT_RAISE_LOCKED = SECBIT_NO_CAP_AMBIENT_RAISE_LOCKED
+};
+
+using SecureBits = BitMask<SecureBit>;
 
 } // end ns

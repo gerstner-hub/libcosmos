@@ -98,18 +98,22 @@ bool prctl_get_bool_by_ptr(const int op, const char *label) {
 	return prctl_get_int_by_ptr(op, label) != 0;
 }
 
-/*
- * a generic wrapper for prctls which return a boolean value as return value
- * (< 0 means error, == 0 means false, > 0 means true).
- */
-bool prctl_get_bool_by_value(const int op, const char *label) {
+bool prctl_get_int_by_value(const int op, const char *label) {
 	const auto val = ::prctl(op, 0, 0, 0, 0);
 
 	if (val < 0) {
 		throw ApiError{std::format("prctl({})", label)};
 	}
 
-	return val != 0;
+	return val;
+}
+
+/*
+ * a generic wrapper for prctls which return a boolean value as return value
+ * (< 0 means error, == 0 means false, > 0 means true).
+ */
+bool prctl_get_bool_by_value(const int op, const char *label) {
+	return prctl_get_int_by_value(op, label) != 0;
 }
 
 template <typename T>
@@ -223,6 +227,16 @@ void set_any_ptracer() {
 	/* this special constant is -1, doesn't fit our ProcessID modeling
 	 * very well, thus rather provide a dedicated function for this */
 	prctl_set_attr<long>(EXPAND_CTL(PR_SET_PTRACER), PR_SET_PTRACER_ANY);
+}
+
+SecureBits get_secure_bits() {
+	const auto bits = prctl_get_int_by_value(EXPAND_CTL(PR_GET_SECUREBITS));
+
+	return SecureBits{static_cast<unsigned long>(bits)};
+}
+
+void set_secure_bits(const SecureBits bits) {
+	prctl_set_attr(EXPAND_CTL(PR_SET_SECUREBITS), bits.raw());
 }
 
 namespace x86 {
