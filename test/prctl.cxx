@@ -22,6 +22,7 @@ class TestPrctl :
 		checkSecureBits();
 		checkClearTidAddr();
 		checkTimerSlack();
+		checkMemoryExecProtection();
 	}
 
 	void checkCpuID() {
@@ -202,6 +203,22 @@ class TestPrctl :
 		const auto active_slack = cosmos::prctl::get_timer_slack();
 
 		RUN_STEP("timer-slack-setting-works", active_slack == NEW_SLACK);
+	}
+
+	void checkMemoryExecProtection() {
+		START_TEST("memory exec protection");
+
+		auto flags = cosmos::prctl::get_memory_write_exec_flags();
+
+		RUN_STEP("default-flags-empty", flags.none());
+
+		flags = cosmos::prctl::MemoryWriteExecFlags{cosmos::prctl::MemoryWriteExecFlag::REFUSE_EXEC_GAIN};
+
+		cosmos::prctl::set_memory_write_exec_flags(flags);
+
+		const auto new_flags = cosmos::prctl::get_memory_write_exec_flags();
+
+		RUN_STEP("changing-flags-works", flags == new_flags);
 	}
 };
 

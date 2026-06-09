@@ -14,7 +14,6 @@
 #	include <sys/syscall.h>
 #	include <unistd.h>
 #endif
-#include <linux/prctl.h>
 #include <sys/prctl.h>
 
 #ifndef COSMOS_X86
@@ -258,6 +257,16 @@ std::chrono::nanoseconds get_timer_slack() {
 void set_timer_slack(const std::chrono::nanoseconds ns) {
 	const unsigned long ns_raw = ns.count();
 	prctl_set_attr(EXPAND_CTL(PR_SET_TIMERSLACK), ns_raw);
+}
+
+MemoryWriteExecFlags get_memory_write_exec_flags() {
+	const auto mask = prctl_get_int_by_value(EXPAND_CTL(PR_GET_MDWE));
+
+	return MemoryWriteExecFlag{static_cast<unsigned long>(mask)};
+}
+
+void set_memory_write_exec_flags(const MemoryWriteExecFlags flags) {
+	prctl_set_attr(EXPAND_CTL(PR_SET_MDWE), flags.raw());
 }
 
 namespace x86 {

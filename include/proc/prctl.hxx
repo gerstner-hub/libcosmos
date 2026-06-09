@@ -1,10 +1,14 @@
 #pragma once
 
+// Linux
+#include <linux/prctl.h>
+
 // C++
 #include <chrono>
 #include <string>
 
 // cosmos
+#include <cosmos/BitMask.hxx>
 #include <cosmos/dso_export.h>
 #include <cosmos/proc/caps.hxx>
 #include <cosmos/proc/types.hxx>
@@ -245,6 +249,35 @@ std::chrono::nanoseconds get_timer_slack();
  * This setting is inherited across fork() and execve().
  **/
 void set_timer_slack(const std::chrono::nanoseconds ns);
+
+/// Protection bits used with set_memory_write_exec_flags().
+enum class MemoryWriteExecFlag : unsigned long {
+	/// Deny additional execution rights on mappings.
+	/**
+	 * New memory mappings cannot be writable and executable. Existing
+	 * mappings cannot become executable.
+	 **/
+	REFUSE_EXEC_GAIN = PR_MDWE_REFUSE_EXEC_GAIN,
+	/// Do not inherit protection settings to child processes.
+	/**
+	 * This flag is only valid in combination with REFUSE_EXEC_GAIN.
+	 **/
+	NO_INHERIT       = PR_MDWE_NO_INHERIT
+};
+
+using MemoryWriteExecFlags = BitMask<MemoryWriteExecFlag>;
+
+/// Returns the MemoryWriteExecFlags in effect for the calling process.
+/**
+ * \see set_memory_write_exec_flags().
+ **/
+MemoryWriteExecFlags get_memory_write_exec_flags();
+
+/// Change the MemoryWriteExecFlags for the calling process.
+/**
+ * Once these bits are set they cannot be changed.
+ **/
+void set_memory_write_exec_flags(const MemoryWriteExecFlags flags);
 
 namespace x86 {
 
