@@ -1,6 +1,7 @@
 #pragma once
 
 // C++
+#include <chrono>
 #include <string>
 
 // cosmos
@@ -221,6 +222,29 @@ void set_secure_bits(const SecureBits bits);
  * supports CONFIG_CHEKCKPOINT_RESTORE.
  **/
 int* get_clear_child_tid_addr();
+
+/// Returns the current timer slack value for the calling thread.
+/**
+ * \see set_timer_slack().
+ **/
+std::chrono::nanoseconds get_timer_slack();
+
+/// Sets the active timer slack value for the calling thread.
+/**
+ * This value determines by how many nanoseconds timer operations in the
+ * calling thread can be "late". The value is used to group timer operations
+ * for the calling thread that are close to one another.
+ *
+ * There is a default timer slack setting which can be restored by passing
+ * zero for `ns`. According to documentation the current default is 50,000
+ * nanoseconds (50 ms).
+ *
+ * Timer slack is not applied to threads running under a real-time scheduling
+ * policy.
+ *
+ * This setting is inherited across fork() and execve().
+ **/
+void set_timer_slack(const std::chrono::nanoseconds ns);
 
 namespace x86 {
 

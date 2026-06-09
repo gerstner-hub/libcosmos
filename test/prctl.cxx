@@ -21,6 +21,7 @@ class TestPrctl :
 		checkPTracer();
 		checkSecureBits();
 		checkClearTidAddr();
+		checkTimerSlack();
 	}
 
 	void checkCpuID() {
@@ -188,6 +189,19 @@ class TestPrctl :
 		(void)addr;
 
 		RUN_STEP("get-clear-child-tid-addr-works", true);
+	}
+
+	void checkTimerSlack() {
+		START_TEST("timer slack");
+
+		constexpr auto NEW_SLACK = std::chrono::nanoseconds{100000};
+
+
+		cosmos::prctl::set_timer_slack(NEW_SLACK);
+
+		const auto active_slack = cosmos::prctl::get_timer_slack();
+
+		RUN_STEP("timer-slack-setting-works", active_slack == NEW_SLACK);
 	}
 };
 

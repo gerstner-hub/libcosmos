@@ -249,6 +249,17 @@ int* get_clear_child_tid_addr() {
 	return prctl_get_attr_by_ptr<int*>(EXPAND_CTL(PR_GET_TID_ADDRESS));
 }
 
+std::chrono::nanoseconds get_timer_slack() {
+	const auto slack = prctl_get_int_by_value(EXPAND_CTL(PR_GET_TIMERSLACK));
+
+	return std::chrono::nanoseconds{slack};
+}
+
+void set_timer_slack(const std::chrono::nanoseconds ns) {
+	const unsigned long ns_raw = ns.count();
+	prctl_set_attr(EXPAND_CTL(PR_SET_TIMERSLACK), ns_raw);
+}
+
 namespace x86 {
 
 bool get_cpuid_enabled() {
