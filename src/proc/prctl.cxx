@@ -80,8 +80,9 @@ int prctl_cap_ambient(const int subop, const char *label,
 	return ret;
 }
 
-int prctl_get_int_by_ptr(const int op, const char *label) {
-	int attr = 0;
+template <typename T>
+T prctl_get_attr_by_ptr(const int op, const char *label) {
+	T attr{};
 
 	if (::prctl(op, &attr) < 0) {
 		throw ApiError{std::format("prctl({})", label)};
@@ -90,12 +91,17 @@ int prctl_get_int_by_ptr(const int op, const char *label) {
 	return attr;
 }
 
+
+int prctl_get_int_by_ptr(const int op, const char *label) {
+	return prctl_get_attr_by_ptr<int>(op, label);
+}
+
 /*
  * a generic wrapper for prctls which return a boolean value via an `int` out
  * pointer parameter.
  */
 bool prctl_get_bool_by_ptr(const int op, const char *label) {
-	return prctl_get_int_by_ptr(op, label) != 0;
+	return prctl_get_attr_by_ptr<int>(op, label) != 0;
 }
 
 bool prctl_get_int_by_value(const int op, const char *label) {
@@ -237,6 +243,10 @@ SecureBits get_secure_bits() {
 
 void set_secure_bits(const SecureBits bits) {
 	prctl_set_attr(EXPAND_CTL(PR_SET_SECUREBITS), bits.raw());
+}
+
+int* get_clear_child_tid_addr() {
+	return prctl_get_attr_by_ptr<int*>(EXPAND_CTL(PR_GET_TID_ADDRESS));
 }
 
 namespace x86 {

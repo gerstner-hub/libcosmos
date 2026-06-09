@@ -20,6 +20,7 @@ class TestPrctl :
 		checkParentDeathSig();
 		checkPTracer();
 		checkSecureBits();
+		checkClearTidAddr();
 	}
 
 	void checkCpuID() {
@@ -178,6 +179,15 @@ class TestPrctl :
 		 * we cannot test setting these bits, since this requires
 		 * special privileges.
 		 */
+	}
+
+	void checkClearTidAddr() {
+		START_TEST("clear tid addr");
+
+		const auto addr = cosmos::prctl::get_clear_child_tid_addr();
+		(void)addr;
+
+		RUN_STEP("get-clear-child-tid-addr-works", true);
 	}
 };
 

@@ -211,6 +211,17 @@ SecureBits get_secure_bits();
  **/
 void set_secure_bits(const SecureBits bits);
 
+/// Return the currently set "clear child tid" address for the calling thread.
+/**
+ * For an explanation of this feature see CloneFlag::CHILD_CLEARTID. When this
+ * address is configured then a futex wake operation is performed on this
+ * address as soon as the corresponding thread exists.
+ *
+ * By default this is `nullptr`. The feature is only available if the kernel
+ * supports CONFIG_CHEKCKPOINT_RESTORE.
+ **/
+int* get_clear_child_tid_addr();
+
 namespace x86 {
 
 /// Returns whether the `cpuid` processor instruction is enabled.
