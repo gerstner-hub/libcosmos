@@ -104,7 +104,7 @@ bool prctl_get_bool_by_ptr(const int op, const char *label) {
 	return prctl_get_attr_by_ptr<int>(op, label) != 0;
 }
 
-bool prctl_get_int_by_value(const int op, const char *label) {
+int prctl_get_int_by_value(const int op, const char *label) {
 	const auto val = ::prctl(op, 0, 0, 0, 0);
 
 	if (val < 0) {
