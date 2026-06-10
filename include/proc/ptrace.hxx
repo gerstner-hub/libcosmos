@@ -12,6 +12,7 @@
 
 // C++
 #include <optional>
+#include <span>
 #include <stdint.h>
 
 // Linux
@@ -217,6 +218,10 @@ public: // types
 	using RawSeccompInfo = decltype(ptrace_syscall_info::seccomp);
 
 	class EntryInfo {
+	public: // data
+
+		static constexpr size_t MAX_ARGS = sizeof(RawEntryInfo::args) / sizeof(__u64);
+
 	public: // functions
 
 		EntryInfo(const EntryInfo &other) = delete;
@@ -236,17 +241,13 @@ public: // types
 			return m_info->nr;
 		}
 
-		/// A pointer to the (up to) 6 system call arguments
-		const __u64* args() const {
+		/// A span providing access to the (up to) 6 system call arguments
+		const std::span<const __u64, MAX_ARGS> args() const {
 			// the typedef for __u64 is different to uint64_t,
 			// thus we need to stick to __u64 here (otherwise we'd
 			// need to reinterpret_cast, breaking strict-aliasing
 			// rules)
 			return raw().args;
-		}
-
-		static constexpr size_t maxArgs() {
-			return sizeof(RawEntryInfo::args) / sizeof(__u64);
 		}
 
 		const RawEntryInfo& raw() const {
@@ -279,7 +280,7 @@ public: // types
 
 		ExitInfo() = delete;
 
-		/// Indicates wheter a system call return value is present or an error number return.
+		/// Indicates whether a system call return value is present or an error number return.
 		bool isError() const {
 			return m_info->is_error != 0;
 		}
