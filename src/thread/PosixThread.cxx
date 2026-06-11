@@ -64,7 +64,7 @@ namespace {
 			const auto name_max = std::min(
 					sizeof(ctx->name) - 1, name.size());
 			ctx->name[name_max] = '\0';
-			std::memcpy(ctx->name, &name[0], name_max);
+			std::memcpy(ctx->name, name.data(), name_max);
 		}
 
 		const auto res = ::pthread_create(

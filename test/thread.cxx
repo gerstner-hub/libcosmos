@@ -77,7 +77,7 @@ protected: // functions
 		START_TEST("exit test");
 		cosmos::PosixThread thread{
 			{std::bind(&ThreadTest::exitEntry, this, std::placeholders::_1)},
-				ThreadArg{4711}, "exitthread"};
+				ThreadArg{4711}};
 
 		auto res = thread.join();
 
