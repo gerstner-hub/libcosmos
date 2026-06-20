@@ -26,6 +26,7 @@ protected: // types
 	};
 
 	enum class MaxEnum : uint64_t {
+		LOW  = 1ULL << 16,
 		HIGH = 1ULL << 63
 	};
 
@@ -42,6 +43,7 @@ public:
 		testLimit();
 		testTest();
 		testSteal();
+		testCount();
 	}
 
 	bool processBitMask(const MyBitMask mask) {
@@ -205,6 +207,14 @@ public:
 		RUN_STEP("Verify steal() of unset value does nothing", mask.steal(MyEnum::VAL1) == false && !mask[MyEnum::VAL1]);
 		mask.set(MyEnum::VAL1);
 		RUN_STEP("Verify steal() of set value works", mask.steal(MyEnum::VAL1) == true && !mask[MyEnum::VAL1]);
+	}
+
+	void testCount() {
+		START_TEST("Test counting bits");
+		MaxBitMask maxmask{MaxEnum::LOW};
+		RUN_STEP("verify count == 1", maxmask.count() == 1);
+		maxmask.set(MaxEnum::HIGH);
+		RUN_STEP("verify count == 2", maxmask.count() == 2);
 	}
 };
 

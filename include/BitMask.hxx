@@ -180,7 +180,7 @@ public: // functions
 		size_t ret = 0;
 
 		for (size_t bit = 0; bit < size(); bit++) {
-			auto val = 1 << bit;
+			const auto val = EnumBaseType{1} << bit;
 			if (this->test(static_cast<ENUM>(val)))
 				ret++;
 		}
