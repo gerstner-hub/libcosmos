@@ -186,10 +186,18 @@ class TestPrctl :
 	void checkClearTidAddr() {
 		START_TEST("clear tid addr");
 
-		const auto addr = cosmos::prctl::get_clear_child_tid_addr();
-		(void)addr;
+		try {
+			const auto addr = cosmos::prctl::get_clear_child_tid_addr();
+			(void)addr;
+			RUN_STEP("get-clear-child-tid-addr-works", true);
+		} catch (const cosmos::ApiError &error) {
+			/* EINVAL occurs when the kernel was build without
+			 * CONFIG_CHECKPOINT_RESTORE */
+			if (error.errnum() != cosmos::Errno::INVALID_ARG)
+				throw;
+			RUN_STEP("get-clear-child-tid-addr-returned-EINVAL", true);
+		}
 
-		RUN_STEP("get-clear-child-tid-addr-works", true);
 	}
 
 	void checkTimerSlack() {
