@@ -5,7 +5,9 @@
 
 // C++
 #include <chrono>
+#include <cstddef>
 #include <string>
+#include <vector>
 
 // cosmos
 #include <cosmos/BitMask.hxx>
@@ -278,6 +280,17 @@ MemoryWriteExecFlags get_memory_write_exec_flags();
  * Once these bits are set they cannot be changed.
  **/
 void set_memory_write_exec_flags(const MemoryWriteExecFlags flags);
+
+/// Obtain the auxiliary vector data of the current process.
+/**
+ * This returns a blob of data which contains the "auxiliary vector"
+ * associated with the current process. See `man 3 getauxval` for more
+ * information about what this data structure contains.
+ *
+ * You can use cosmos::AuxVector to parse and inspect the data returned by
+ * this call.
+ **/
+std::vector<std::byte> get_aux_vector();
 
 namespace x86 {
 

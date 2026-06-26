@@ -5,6 +5,7 @@
 // cosmos
 #include <cosmos/compiler.hxx>
 #include <cosmos/error/ApiError.hxx>
+#include <cosmos/error/RuntimeError.hxx>
 #include <cosmos/proc/prctl.hxx>
 #include <cosmos/utils.hxx>
 
@@ -267,6 +268,28 @@ MemoryWriteExecFlags get_memory_write_exec_flags() {
 
 void set_memory_write_exec_flags(const MemoryWriteExecFlags flags) {
 	prctl_set_attr(EXPAND_CTL(PR_SET_MDWE), flags.raw());
+}
+
+std::vector<std::byte> get_aux_vector() {
+	// at the moment on x86_64 the vector is some ~350 bytes long.
+	std::vector<std::byte> ret{512};
+
+	while (true) {
+		const auto res = ::prctl(PR_GET_AUXV, reinterpret_cast<void*>(ret.data()), ret.size(), 0, 0);
+
+		if (res < 0)
+			throw ApiError{"prctl{PR_GET_AUXV}"};
+
+		const auto size = static_cast<size_t>(res);
+
+		if (size <= ret.size()) {
+			return ret;
+		} else if (size > 1024 * 64) {
+			throw RuntimeError{"suspicously large AUXV encountered"};
+		} else {
+			ret.resize(size);
+		}
+	}
 }
 
 namespace x86 {

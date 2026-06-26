@@ -1,6 +1,8 @@
 // cosmos
 #include <cosmos/compiler.hxx>
 #include <cosmos/proc/prctl.hxx>
+#include <cosmos/proc/AuxVector.hxx>
+#include <cosmos/proc/process.hxx>
 
 // Test
 #include "TestBase.hxx"
@@ -23,6 +25,7 @@ class TestPrctl :
 		checkClearTidAddr();
 		checkTimerSlack();
 		checkMemoryExecProtection();
+		checkAuxV();
 	}
 
 	void checkCpuID() {
@@ -227,6 +230,53 @@ class TestPrctl :
 		const auto new_flags = cosmos::prctl::get_memory_write_exec_flags();
 
 		RUN_STEP("changing-flags-works", flags == new_flags);
+	}
+
+	void checkAuxV() {
+		START_TEST("auxv processing");
+
+		cosmos::AuxVector auxv{cosmos::prctl::get_aux_vector()};
+		using enum cosmos::AuxVector::Type;
+		const auto random = auxv.lookupValue(RANDOM);
+		RUN_STEP("random-data-size-matches", random &&
+				std::get<std::span<const std::byte>>(*random).size() == 16);
+
+		const auto uid = *auxv.lookupValue(UID);
+		RUN_STEP("uid matches", std::get<cosmos::UserID>(uid) == cosmos::proc::get_real_user_id());
+
+		const auto map = auxv.asMap();
+
+		RUN_STEP("map size realistic", map.size() > 20 && map.size() < 200);
+
+		processAuxvMap(map);
+
+		{
+			const auto auxv2_raw = cosmos::prctl::get_aux_vector();
+			cosmos::AuxVector auxv2{auxv2_raw};
+			processAuxvMap(auxv2.asMap());
+		}
+
+		{
+			const auto auxv2_raw = cosmos::prctl::get_aux_vector();
+			cosmos::AuxVector auxv2{std::span<const std::byte>(auxv2_raw.data(),
+					auxv2_raw.size())};
+			processAuxvMap(auxv2.asMap());
+		}
+	}
+
+	void processAuxvMap(const std::map<cosmos::AuxVector::Type, cosmos::AuxVector::Data> &map) {
+		for (const auto &entry: map) {
+			const auto data = entry.second;
+			if (std::holds_alternative<std::string_view>(data)) {
+				std::cout << "string: " << std::get<std::string_view>(data) << "\n";
+			} else if (std::holds_alternative<unsigned long>(data)) {
+				std::cout << "ulong: " << std::get<unsigned long>(data) << "\n";
+			} else if (std::holds_alternative<bool>(data)) {
+				std::cout << "bool: " << std::get<bool>(data) << "\n";
+			} else if (std::holds_alternative<void*>(data)) {
+				std::cout << "void*: " << std::get<void*>(data) << "\n";
+			}
+		}
 	}
 };
 
