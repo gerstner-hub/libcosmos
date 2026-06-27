@@ -53,6 +53,13 @@ namespace {
 			return type == SECURE;
 		}
 
+		/*
+		 * this special entry terminates the vector, the data returned
+		 * by the kernel is a fixed buffer with excess bytes.
+		 */
+		bool isNull() const {
+			return type == AuxVector::Type{AT_NULL};
+		}
 	};
 
 	AuxVector::Data make_data(const RawEntry &entry) {
@@ -85,7 +92,7 @@ namespace {
 		const size_t num_entries = buffer.size() / sizeof(RawEntry);
 		const struct RawEntry *entry = reinterpret_cast<const RawEntry*>(buffer.data());
 
-		for (size_t num = 0; num < num_entries; num++, entry++) {
+		for (size_t num = 0; num < num_entries && !entry->isNull(); num++, entry++) {
 			if (!cb(*entry)) {
 				return;
 			}

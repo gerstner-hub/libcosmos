@@ -247,8 +247,9 @@ class TestPrctl :
 		const auto map = auxv.asMap();
 
 		RUN_STEP("map size realistic", map.size() > 20 && map.size() < 200);
+		std::cout << "map size: " << map.size() << "\n";
 
-		processAuxvMap(map);
+		processAuxvMap(map, true);
 
 		{
 			const auto auxv2_raw = cosmos::prctl::get_aux_vector();
@@ -264,17 +265,26 @@ class TestPrctl :
 		}
 	}
 
-	void processAuxvMap(const std::map<cosmos::AuxVector::Type, cosmos::AuxVector::Data> &map) {
+	void processAuxvMap(const std::map<cosmos::AuxVector::Type, cosmos::AuxVector::Data> &map,
+			const bool print=false) {
+
 		for (const auto &entry: map) {
 			const auto data = entry.second;
 			if (std::holds_alternative<std::string_view>(data)) {
-				std::cout << "string: " << std::get<std::string_view>(data) << "\n";
+				if (print)
+					std::cout << "string: " << std::get<std::string_view>(data) << "\n";
 			} else if (std::holds_alternative<unsigned long>(data)) {
-				std::cout << "ulong: " << std::get<unsigned long>(data) << "\n";
+				if (print)
+					std::cout << "ulong: " << std::get<unsigned long>(data) << "\n";
 			} else if (std::holds_alternative<bool>(data)) {
-				std::cout << "bool: " << std::get<bool>(data) << "\n";
+				if (print)
+					std::cout << "bool: " << std::get<bool>(data) << "\n";
 			} else if (std::holds_alternative<void*>(data)) {
-				std::cout << "void*: " << std::get<void*>(data) << "\n";
+				if (print)
+					std::cout << "void*: " << std::get<void*>(data) << "\n";
+			} else {
+				if (print)
+					std::cout << "other value\n";
 			}
 		}
 	}
