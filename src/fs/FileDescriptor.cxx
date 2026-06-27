@@ -340,6 +340,12 @@ FileDescriptor::ReadWriteHint FileDescriptor::getFDReadWriteHint() const {
 	return ReadWriteHint{native_hint};
 }
 
+void FileDescriptor::setAdvice(off_t offset, off_t size, const AccessAdvice advice) {
+	if (posix_fadvise(to_integral(m_fd), offset, size, to_integral(advice)) != 0) {
+		throw ApiError{"posix_fadvice()"};
+	}
+}
+
 FileDescriptor stdout(FileNum::STDOUT);
 FileDescriptor stderr(FileNum::STDERR);
 FileDescriptor stdin(FileNum::STDIN);

@@ -210,6 +210,22 @@ public: // types
 		LIFE_EXTREME = RWH_WRITE_LIFE_EXTREME  ///< longer lifetime than long is expected.
 	};
 
+	/// An I/O access pattern advice which can be applied to a data range in a file.
+	enum class AccessAdvice : int {
+		/// default behaviour.
+		NORMAL     = POSIX_FADV_NORMAL,
+		/// sequential access is expected (lower offsets read first)
+		SEQUENTIAL = POSIX_FADV_SEQUENTIAL,
+		/// the specified data will be accessed in random order.
+		RANDOM     = POSIX_FADV_RANDOM,
+		/// the specified data will only be accessed once.
+		NOREUSE    = POSIX_FADV_NOREUSE,
+		/// the specified data will be accessed in the near future.
+		WILLNEED   = POSIX_FADV_WILLNEED,
+		/// the specified data will not be accessed in the near future.
+		DONTNEED   = POSIX_FADV_DONTNEED,
+	};
+
 public: // functions
 
 	constexpr FileDescriptor() = default;
@@ -586,6 +602,21 @@ public: // functions
 	 * in the Linux kernel.
 	 **/
 	void setFDReadWriteHint(const ReadWriteHint hint);
+
+	/// Set an I/O access advice for the given data range in the file.
+	/**
+	 * The specified region must not necessarily exist yet. The advice is
+	 * not binding, it just expresses an expectation by the application.
+	 *
+	 * This call can throw an ApiError containing one of the following
+	 * Errno values:
+	 *
+	 * - Errno::INVALID_ARG: bad `advice` was specified.
+	 * - Errno::BAD_FD: bad file descriptor.
+	 * - Errno::IS_PIPE: FD refers to a pipe or FIFO, which is not
+	 *   supported.
+	 **/
+	void setAdvice(off_t offset, off_t size, const AccessAdvice advice);
 
 protected: // functions
 

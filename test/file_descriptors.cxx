@@ -285,6 +285,15 @@ public:
 		 * the API
 		 */
 	}
+
+	void testAccessAdvice() {
+		START_TEST("Testing POSIX fadvise");
+
+		cosmos::TempFile file{"/tmp/fadvise_test.{}"};
+
+		file.fd().setAdvice(0, 1024, cosmos::FileDescriptor::AccessAdvice::SEQUENTIAL);
+		RUN_STEP("fadvise-works", true);
+	}
 protected: // data
 
 	cosmos::FileDescriptor m_stdin_fd;
