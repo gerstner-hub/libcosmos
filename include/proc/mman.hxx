@@ -57,6 +57,9 @@ enum class MapFlag : int {
 	 * This was needed performance reasons on some early x86-64 processors.
 	 **/
 	INTO_32BIT      = MAP_32BIT,
+#else
+	// use a zero value to allow cross-platform builds, it will never match anything.
+	INTO_32BIT      = 0,
 #endif
 	/// Create a mapping that is not backed by a file, contents are initialized to zero.
 	/**
