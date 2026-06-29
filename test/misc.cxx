@@ -3,8 +3,10 @@
 #include <cassert>
 
 // cosmos
-#include <cosmos/utils.hxx>
+#include <cosmos/compiler.hxx>
 #include <cosmos/random.hxx>
+#include <cosmos/uname.hxx>
+#include <cosmos/utils.hxx>
 
 // Test
 #include "TestBase.hxx"
@@ -21,6 +23,7 @@ class MiscTest :
 		testTwice();
 		testDeferGuard();
 		testRandom();
+		testUname();
 	}
 
 	void testRanges() {
@@ -150,6 +153,29 @@ class MiscTest :
 			}
 		}
 		RUN_STEP("seeing-random-data-in-vector", found_non_zero);
+	}
+
+	void testUname() {
+		START_TEST("uname");
+
+		cosmos::Uname uname;
+
+		RUN_STEP("sys-name-is-linux", uname.sysName() == "Linux");
+		RUN_STEP("nodename-not-empty", !uname.nodeName().empty());
+		RUN_STEP("domainname-not-empty", !uname.domainName().empty());
+		RUN_STEP("release-not-empty", !uname.release().empty());
+		RUN_STEP("version-not-empty", !uname.version().empty());
+		RUN_STEP("machine-not-empty", !uname.machine().empty());
+#ifdef COSMOS_X86_64
+		RUN_STEP("machine-matches", uname.machine() == "x86_64");
+#endif
+		std::cout
+			<< "sysname: " << uname.sysName() << "\n"
+			<< "nodename: " << uname.nodeName() << "\n"
+			<< "domainname: " << uname.domainName() << "\n"
+			<< "release: " << uname.release() << "\n"
+			<< "version: " << uname.version() << "\n"
+			<< "machine: " << uname.machine() << "\n";
 	}
 };
 
