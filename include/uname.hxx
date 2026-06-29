@@ -23,11 +23,12 @@ namespace cosmos {
 class COSMOS_API Uname {
 public: // functions
 
-	/// Fetch the system information.
+	/// Create the object and optionally fetch the system information.
 	/**
-	 * Since this performs a system an ApiError can be thrown.
+	 * If `fetch_data` is set then update() is called right away.
+	 * Otherwise empty strings will be stored in the object.
 	 **/
-	explicit Uname();
+	explicit Uname(const bool fetch_data = true);
 
 	~Uname();
 
@@ -48,6 +49,13 @@ public: // functions
 
 	/// Returns a hardware identifier (like "x86_64").
 	std::string_view machine() const;
+
+	/// Fetch current information from the kernel into the struct.
+	/**
+	 * This operation can thrown an ApiError (only in case of memory
+	 * corruption).
+	 **/
+	void update();
 
 protected: // data
 

@@ -7,9 +7,16 @@
 
 namespace cosmos {
 
-Uname::Uname() : m_buf{new utsname} {
-	if (::uname(m_buf.get()) != 0) {
-		throw ApiError{"uname()"};
+Uname::Uname(const bool fetch_data) : m_buf{new utsname} {
+	if (fetch_data) {
+		update();
+	} else {
+		m_buf->sysname[0] = 0;
+		m_buf->nodename[0] = 0;
+		m_buf->domainname[0] = 0;
+		m_buf->release[0] = 0;
+		m_buf->version[0] = 0;
+		m_buf->machine[0] = 0;
 	}
 }
 
@@ -39,6 +46,12 @@ std::string_view Uname::version() const {
 
 std::string_view Uname::machine() const {
 	return m_buf->machine;
+}
+
+void Uname::update() {
+	if (::uname(m_buf.get()) != 0) {
+		throw ApiError{"uname()"};
+	}
 }
 
 } // end ns
