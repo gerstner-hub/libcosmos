@@ -39,6 +39,8 @@ public: // types
 
 	using OpenFlags = BitMask<OpenFlag>;
 
+	using enum OpenFlag;
+
 public: // functions
 
 	/// Creates a new coupling to the given process ID.
@@ -110,8 +112,11 @@ public: // functions
 	PidFD fd() const { return m_fd; }
 
 	/// Send a signal to the represented process.
-	void sendSignal(const Signal sig) const {
-		signal::send(m_fd, sig);
+	/**
+	 * \see cosmos::signal::send(const PidFD, const Signal, const SendFlags)
+	 **/
+	void sendSignal(const Signal sig, const signal::SendFlags flags={}) const {
+		signal::send(m_fd, sig, flags);
 	}
 
 	/// Duplicate a file descriptor from the target process into the current process.

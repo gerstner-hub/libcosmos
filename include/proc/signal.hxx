@@ -116,15 +116,33 @@ void send(const ProcessID proc, const Signal s);
  **/
 void send(const ProcessID proc, const Signal s, std::variant<void*, int> data);
 
+/// Flags which determine the scope of a signal sent over a PidFD.
+enum class SendFlag : unsigned int {
+#ifdef PIDFD_SIGNAL_THREAD /* all three only available since Linux 6.9 */
+	THREAD = PIDFD_SIGNAL_THREAD,
+	THREAD_GROUP = PIDFD_SIGNAL_THREAD_GROUP,
+	PROCESS_GROUP = PIDFD_SIGNAL_PROCESS_GROUP
+#endif
+};
+
+using SendFlags = BitMask<SendFlag>;
+
 /// Sends a signal to another process based on a pidfd.
 /**
  * \param[in] pidfd needs to refer to a valid PidFD type file
  * descriptor. The process represented by it will be sent the
  * specified signal `s`.
  *
+ * \param[in] flags Bitmask which currently determines the scope of the signal
+ * to be sent out. If this is left at zero then the scope will be inferred
+ * from the `pidfd` creation context, e.g. if the pidfd was created via
+ * ProcessFile::THREAD then the scope will the SendFlag::ThreadGroup. The same
+ * is valid for a pidfd obtained from `proc::clone()` using CloneFlag::PIDFD
+ * together with CloneFlag::THREAD.
+ *
  * \exception Throws an ApiError on error.
  **/
-void send(const PidFD pidfd, const Signal s);
+void send(const PidFD pidfd, const Signal s, const SendFlags flags = {});
 
 /// Sends a signal to a specific thread of a process.
 /**

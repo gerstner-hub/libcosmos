@@ -62,14 +62,15 @@ void send(const ProcessID proc, const ThreadID thread, const Signal s) {
 	}
 }
 
-void send(const PidFD pidfd, const Signal s) {
+void send(const PidFD pidfd, const Signal s, const SendFlags flags) {
 	if (!running_on_valgrind) {
 		// there's no glibc wrapper for this yet
 		//
 		// the third siginfo_t argument allows more precise control of the
 		// signal auxiliary data, but the defaults are just like kill(), so
 		// let's use them for now.
-		if (::pidfd_send_signal(to_integral(pidfd.raw()), to_integral(s.raw()), nullptr, 0) != 0) {
+		if (::pidfd_send_signal(to_integral(pidfd.raw()), to_integral(s.raw()),
+					nullptr, flags.raw()) != 0) {
 			throw ApiError{"pidfd_send_signal()"};
 		}
 	} else {
@@ -102,6 +103,11 @@ void send(const PidFD pidfd, const Signal s) {
 				throw RuntimeError{"failed to determine PID for PIDFD (valgrind fallback logic)"};
 			}
 
+			/*
+			 * TODO: with custom `flags` this might become more
+			 * difficult to get right. so much effort just to
+			 * service Valgrind?
+			 */
 			signal::send(ProcessID{pid}, s);
 			return;
 		}
