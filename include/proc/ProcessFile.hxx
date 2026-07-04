@@ -5,11 +5,12 @@
 
 // cosmos
 #include <cosmos/BitMask.hxx>
-#include <cosmos/proc/pidfd.h>
 #include <cosmos/proc/PidFD.hxx>
+#include <cosmos/proc/pidfd.h>
 #include <cosmos/proc/process.hxx>
 #include <cosmos/proc/signal.hxx>
 #include <cosmos/proc/types.hxx>
+#include <cosmos/thread/thread.hxx>
 
 namespace cosmos {
 
@@ -18,12 +19,22 @@ namespace cosmos {
  * This wraps a PidFD just like a File object wraps a FileDescriptor. It adds
  * lifetime handling i.e. closes the PidFD when no longer needed and also
  * offers domain specific operations that can be performed on the PidFD.
+ *
+ * A PidFD allows to perform certain operations on a process in a race-free
+ * fashion (note that obtaining the PidFD can still be subject to a race
+ * condition). Normally a PidFD needs to refer to a thread group leader (main
+ * thread) of a process. Since kernel 6.9 it may also refer to a thread if
+ * OpenFlag::THREAD is passed. ProcessFile offers a dedicated constructor
+ * accepting a ThreadID for this purpose.
  **/
 class COSMOS_API ProcessFile {
 public: // types
 
 	enum class OpenFlag : unsigned int {
-		NONBLOCK = PIDFD_NONBLOCK ///< open the file descriptor in non-blocking mode - proc::wait() will never block.
+		NONBLOCK = PIDFD_NONBLOCK, ///< open the file descriptor in non-blocking mode - proc::wait() will never block.
+#ifdef PIDFD_THREAD
+		THREAD   = PIDFD_THREAD,   ///< Allowing opening a specific thread,otherwise `pid` must refer to a thread group leader.
+#endif
 	};
 
 	using OpenFlags = BitMask<OpenFlag>;
@@ -41,6 +52,17 @@ public: // functions
 	 * to cleanup the child process in case it exits.
 	 **/
 	explicit ProcessFile(const ProcessID pid, const OpenFlags flags = OpenFlags{});
+
+#ifdef PIDFD_THREAD
+	/// Creates a new coupling to the given thread ID.
+	/**
+	 * This implicitly passes OpenFlag::THREAD and allows to open a
+	 * ProcessFile for a specific thread of a process.
+	 **/
+	explicit ProcessFile(const ThreadID tid, const OpenFlags flags = OpenFlags{}) :
+		ProcessFile{as_pid(tid), flags | OpenFlag::THREAD} {
+	}
+#endif
 
 	/// Wraps the given PidFD and takes ownership of it.
 	/**
