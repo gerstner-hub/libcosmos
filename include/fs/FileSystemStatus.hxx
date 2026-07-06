@@ -31,7 +31,7 @@ public: // types
 
 	/*
 	 * some of these are declared in linux/magic.h, but it's too
-	 * incomplete * so let's take over all the constants stated in the man
+	 * incomplete so let's take over all the constants stated in the man
 	 * page.
 	 */
 
@@ -67,9 +67,8 @@ public: // types
 		/* Linux 2.0 and earlier */
 		EXT           = 0x137d,
 		EXT2_OLD      = 0xef51,
-		EXT2          = 0xef53,
-		EXT3          = 0xef53,
-		EXT4          = 0xef53,
+		/* used for EXT2 onwards */
+		EXT2_3_4      = 0xef53,
 		F2FS          = 0xf2f52010,
 		FUSE          = 0x65735546,
 		/* Unused */
