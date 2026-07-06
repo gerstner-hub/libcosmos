@@ -11,6 +11,7 @@
 #include <cosmos/fs/Directory.hxx>
 #include <cosmos/fs/File.hxx>
 #include <cosmos/fs/FileStatus.hxx>
+#include <cosmos/fs/FileSystemStatus.hxx>
 #include <cosmos/fs/filesystem.hxx>
 #include <cosmos/fs/INotify.hxx>
 #include <cosmos/fs/TempFile.hxx>
@@ -48,6 +49,7 @@ class FileSystemTest :
 		testDevIDs();
 		testRename();
 		testInotify();
+		testFileSystemStatus();
 	}
 
 	std::pair<std::filesystem::path, cosmos::TempDir> getTestDir() {
@@ -934,6 +936,25 @@ class FileSystemTest :
 		/* now test that non-blocking I/O yields nothing */
 		auto ev = notify.tryReadEvent();
 		RUN_STEP("non-blocking-read-yields-nullopt", ev == std::nullopt);
+	}
+
+	void testFileSystemStatus() {
+		START_TEST("fstatfs() & friends");
+		cosmos::FileSystemStatus stat;
+		RUN_STEP("default-ctor-invalid", !stat.valid());
+		stat.updateFrom("/proc");
+		RUN_STEP("update-from-proc-is-valid", stat.valid());
+
+		RUN_STEP("proc-fs-type-matches", stat.fsType() == cosmos::FileSystemStatus::Magic::PROC);
+		RUN_STEP("proc-fs-block-size-not-zero", stat.blockSize() != 0);
+		RUN_STEP("proc-fs-no-atime",
+				stat.options()[cosmos::FileSystemStatus::MountOption::RELATIME]);
+
+		stat.reset();
+		RUN_STEP("invalid-after-reset", !stat.valid());
+		cosmos::Directory proc_fd{"/proc"};
+		stat.updateFrom(proc_fd.fd());
+		RUN_STEP("valid-after-update-from-fd", stat.valid());
 	}
 };
 
