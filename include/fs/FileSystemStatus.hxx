@@ -294,6 +294,14 @@ public: // functions
 		return MountOptions{static_cast<unsigned int>(m_stat.f_flags)};
 	}
 
+	struct statfs* raw() {
+		return &m_stat;
+	}
+
+	const struct statfs* raw() const {
+		return &m_stat;
+	}
+
 protected: // data
 
 	struct statfs m_stat;
