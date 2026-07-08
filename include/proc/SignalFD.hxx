@@ -4,6 +4,7 @@
 #include <sys/signalfd.h>
 
 // cosmos
+#include <cosmos/BitMask.hxx>
 #include <cosmos/creds.hxx>
 #include <cosmos/fs/FileDescriptor.hxx>
 #include <cosmos/proc/SigInfo.hxx>
@@ -34,11 +35,23 @@ namespace cosmos {
  * The readEvent() function fills in SignalFD::Info, a data structure that is
  * very similar to the SigInfo structure, but not quite, which made it
  * necessary to model a distinct type for use with SignalFD.
+ *
+ * By default newly created SignalFD file descriptors are marked
+ * close-on-exec. Use SignalFD::Flags to adjust close-on-exec and non-blocking
+ * behaviour.
  **/
 class COSMOS_API SignalFD {
 public: // types
 
 	class Info;
+
+	/// SignalFD creation flags.
+	enum class Flag : int {
+		NONBLOCK = SFD_NONBLOCK,
+		CLOEXEC  = SFD_CLOEXEC
+	};
+
+	using Flags = BitMask<Flag>;
 
 public: // functions
 
@@ -47,19 +60,19 @@ public: // functions
 
 	~SignalFD();
 
-	/// Creates a signal FD listening on the given signals.
-	explicit SignalFD(const SigSet &mask) {
-		create(mask);
+	/// Creates a signal FD listening on the given mask of signals.
+	explicit SignalFD(const SigSet &mask, const Flags flags = Flag::CLOEXEC) {
+		create(mask, flags);
 	}
 
 	/// Creates a signal FD listening on the given list of signals.
-	explicit SignalFD(const std::initializer_list<Signal> siglist) {
-		create(SigSet{siglist});
+	explicit SignalFD(const std::initializer_list<Signal> siglist, const Flags flags = Flag::CLOEXEC) {
+		create(SigSet{siglist}, flags);
 	}
 
 	/// Creates a signal FD listening on exactly the given signal.
-	explicit SignalFD(const Signal s) {
-		create(SigSet{{s}});
+	explicit SignalFD(const Signal s, const Flags flags = Flag::CLOEXEC) {
+		create(SigSet{{s}}, flags);
 	}
 
 	// Prevent copying due to the file descriptor ownership.
@@ -71,7 +84,7 @@ public: // functions
 	 * if a SignalFD is already open then it will be closed first. If an
 	 * error occurs creating the new SignalFD then an exception is thrown.
 	 **/
-	void create(const SigSet &mask);
+	void create(const SigSet &mask, const Flags flags = Flag::CLOEXEC);
 
 	void close() { m_fd.close(); }
 
@@ -84,7 +97,7 @@ public: // functions
 	 **/
 	void adjustMask(const SigSet &mask);
 
-	/// Reads the next event event from the SignalFD.
+	/// Reads the next event from the SignalFD.
 	/**
 	 * This is a blocking operation so you should use an efficient poll
 	 * mechanism like select() to determine whether there is anything to
@@ -103,7 +116,7 @@ protected: // data
 	FileDescriptor m_fd;
 };
 
-/// SigInfo style data structure returned by SignalFD::readEvent().
+/// SigInfo-style data structure returned by SignalFD::readEvent().
 /**
  * This is mostly the same as SigInfo, but tailored towards SignalFD. The
  * underlying data structures differ too much to merge them into one on

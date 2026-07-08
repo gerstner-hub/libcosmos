@@ -22,9 +22,9 @@ SignalFD::~SignalFD() {
 	}
 }
 
-void SignalFD::create(const SigSet &mask) {
+void SignalFD::create(const SigSet &mask, const Flags flags) {
 	close();
-	auto fd = ::signalfd(-1, mask.raw(), SFD_CLOEXEC);
+	auto fd = ::signalfd(-1, mask.raw(), flags.raw());
 	if (fd == -1) {
 		throw ApiError{"signalfd()"};
 	}
@@ -38,8 +38,10 @@ void SignalFD::adjustMask(const SigSet &mask) {
 	}
 
 	// NOTE: it's unclear from the man page whether flags are used when
-	// modifying an existing signal fd. Let's pass on zero, hoping that no
-	// flags will be taken away again through this.
+	// modifying an existing signal fd.
+	// From looking at the kernel code it can be seen that flags are
+	// checked against invalid values in this case but not used otherwise,
+	// so passing zero should be fine.
 	auto fd = ::signalfd(to_integral(m_fd.raw()), mask.raw(), 0);
 	if (fd == -1) {
 		throw ApiError{"signalfd()"};
