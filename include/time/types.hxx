@@ -207,9 +207,13 @@ using IntervalTime        = TimeSpec<ClockType::INVALID>;
  **/
 class TimeVal :
 		public timeval {
+public: // types
+
+	using sub_second_t = decltype(timeval{}.tv_usec);
+
 public: // functions
 
-	explicit TimeVal(time_t seconds, long micro_seconds = 0) {
+	explicit TimeVal(time_t seconds, sub_second_t micro_seconds = 0) {
 		this->tv_sec = seconds;
 		this->tv_usec = micro_seconds;
 	}
@@ -233,11 +237,11 @@ public: // functions
 		this->tv_sec = seconds;
 	}
 
-	long getMicroSeconds() const {
+	sub_second_t getMicroSeconds() const {
 		return this->tv_usec;
 	}
 
-	void setMicroSeconds(const long micro_seconds) {
+	void setMicroSeconds(const sub_second_t micro_seconds) {
 		this->tv_usec = micro_seconds;
 	}
 
