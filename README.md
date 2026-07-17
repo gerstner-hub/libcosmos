@@ -55,6 +55,7 @@ settings are supported:
 |   `optforsize=<bool>`       | Optimize for size instead for speed. |
 |   `libtype=[shared\|static]` | Whether to build a shared or a static library. |
 |   `libcosmos-soname=<soname>| Specify a custom SONAME for the shared library. |
+|   `compdb=1`                | Whether to build a clang compilation database in the root of the current buildroot. |
 
 You can also specify the `CXXFLAGS` environment variable to add additional
 compiler switches to the build process.

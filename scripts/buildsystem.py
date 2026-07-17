@@ -446,6 +446,12 @@ def initSCons(project, rtti=True, deflibtype='shared'):
             'CC' : compiler
         })
 
+    build_compdb = evalBool(ARGUMENTS.get('compdb', '0'))
+
+    if build_compdb:
+        # support for generating a Clang tooling compatible compilation database
+        env_options['tools'].extend(['compilation_db'])
+
     env = Environment(**env_options)
     # this entry can be used to add global entries visible by all other cloned
     # environments
@@ -551,6 +557,10 @@ def initSCons(project, rtti=True, deflibtype='shared'):
     # installed for the 'install' target. turn this off for pure application
     # projects.
     env['install_dev_files'] = True
+
+    if build_compdb:
+        db = env.CompilationDatabase(f"{buildroot}/compile_commands.json")
+        env.Default(db)
 
     enhanceEnv(env)
 
