@@ -269,6 +269,12 @@ void unlink_file_at(const DirFD dir_fd, const SysString path);
  **/
 void change_dir(const SysString path);
 
+/// Change the calling process's CWD to the directory represented by `dir_fd`.
+/**
+ * On error an ApiError is thrown.
+ **/
+void change_dir(const DirFD dir_fd);
+
 /// Returns the process's current working directory.
 /**
  * This call can fail e.g. on out of memory conditions or if the CWD has been

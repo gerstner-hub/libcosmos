@@ -202,6 +202,12 @@ void change_dir(const SysString path) {
 	}
 }
 
+void change_dir(const DirFD dir_fd) {
+	if (::fchdir(cosmos::to_integral(dir_fd.raw())) < 0) {
+		throw ApiError{"fchdir()"};
+	}
+}
+
 std::string get_working_dir() {
 	std::string ret;
 	ret.resize(128);

@@ -69,6 +69,12 @@ class FileSystemTest :
 		RUN_STEP("setcwd-tmp", cosmos::fs::get_working_dir() == "/tmp");
 		cosmos::fs::change_dir(orig_cwd);
 
+		cosmos::Directory tmp_dir{"/tmp"};
+		cosmos::fs::change_dir(tmp_dir.fd());
+		RUN_STEP("fchdir-tmp", cosmos::fs::get_working_dir() == "/tmp");
+
+		cosmos::fs::change_dir(orig_cwd);
+
 		START_STEP("which-ls");
 		auto ls_bin = cosmos::fs::which("ls");
 
