@@ -388,7 +388,7 @@ public:
 		auto [len2, fromaddr] = first.receiveFrom(msg.data(), msg.size());
 
 		RUN_STEP("verify abstract-from-addr received", fromaddr != std::nullopt);
-		std::cout << "from addr: " << fromaddr->label() << std::endl;
+		RUN_STEP("verify from-addr-labdl", fromaddr->label() == "@otherpath");
 		RUN_STEP("verify from-addr-is-abstract", fromaddr->isAbstract());
 		RUN_STEP("verify from-addr-matches-addr", fromaddr == otheraddr);
 	}

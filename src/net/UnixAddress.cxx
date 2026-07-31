@@ -48,7 +48,7 @@ std::string UnixAddress::label() const {
 	} else if(isAbstract()) {
 		std::string ret;
 		ret.push_back('@');
-		ret.append(getPath().begin() + 1, m_path_len);
+		ret.append(getPath().begin(), m_path_len);
 		return ret;
 	} else {
 		return std::string{getPath()};
