@@ -70,6 +70,15 @@ public: // functions
 		setPath(path, abstract);
 	}
 
+	explicit UnixAddress(const sockaddr_un &raw, const size_t len) {
+		m_addr = raw;
+		if (len >= BASE_SIZE) {
+			m_path_len = len - BASE_SIZE;
+		} else {
+			m_path_len = 0;
+		}
+	}
+
 	SocketFamily family() const override {
 		return SocketFamily::UNIX;
 	}
