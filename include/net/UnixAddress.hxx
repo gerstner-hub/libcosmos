@@ -120,7 +120,8 @@ public: // functions
 	 **/
 	std::string_view getPath() const {
 		if (isAbstract()) {
-			return std::string_view{m_addr.sun_path + 1, m_path_len};
+			return std::string_view{m_addr.sun_path + 1,
+				m_path_len - 1};
 		} else {
 			return std::string_view{m_addr.sun_path, m_path_len};
 		}
