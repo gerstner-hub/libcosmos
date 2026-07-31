@@ -133,8 +133,8 @@ public: // functions
 		return sizeof(m_addr);
 	}
 
-	net::NetInt16 port() const { return net::NetInt16{net::RawNetInt16{m_addr.sin_port}}; }
-	void setPort(const net::NetInt16 port) { m_addr.sin_port = to_integral(port.raw()); }
+	IPPort port() const { return IPPort{net::RawNetInt16{m_addr.sin_port}}; }
+	void setPort(const IPPort port) { m_addr.sin_port = to_integral(port.raw()); }
 
 	IP4RawAddress addr() const { return IP4RawAddress{net::RawNetInt32{m_addr.sin_addr.s_addr}}; }
 	void setAddr(const IP4RawAddress addr) { m_addr.sin_addr.s_addr = to_integral(addr.raw()); }
