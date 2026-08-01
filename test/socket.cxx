@@ -388,9 +388,26 @@ public:
 		auto [len2, fromaddr] = first.receiveFrom(msg.data(), msg.size());
 
 		RUN_STEP("verify abstract-from-addr received", fromaddr != std::nullopt);
-		RUN_STEP("verify from-addr-labdl", fromaddr->label() == "@otherpath");
+		RUN_STEP("verify from-addr-label", fromaddr->label() == "@otherpath");
 		RUN_STEP("verify from-addr-is-abstract", fromaddr->isAbstract());
 		RUN_STEP("verify from-addr-matches-addr", fromaddr == otheraddr);
+
+		{
+			sockaddr_un sun;
+			cosmos::zero_object(sun);
+			sun.sun_family = AF_UNIX;
+			memcpy(sun.sun_path, "\0test", 5);
+
+			cosmos::UnixAddress ua{sun, 2 + 5};
+
+			RUN_STEP("verify UnixAddress-from-raw-abstract label",
+					ua.label() == "@test");
+
+			memcpy(sun.sun_path, "/tmp/test", 9);
+			ua = cosmos::UnixAddress{sun, 2 + 9};
+			RUN_STEP("verify UnixAddress-from-raw label",
+					ua.label() == "/tmp/test");
+		}
 	}
 
 	void subCheckUnixStreamConnections() {

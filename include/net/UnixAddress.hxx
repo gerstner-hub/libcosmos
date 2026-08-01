@@ -74,6 +74,9 @@ public: // functions
 		m_addr = raw;
 		if (len >= BASE_SIZE) {
 			m_path_len = len - BASE_SIZE;
+			if (isAbstract()) {
+				m_path_len--;
+			}
 		} else {
 			m_path_len = 0;
 		}
@@ -121,7 +124,7 @@ public: // functions
 	std::string_view getPath() const {
 		if (isAbstract()) {
 			return std::string_view{m_addr.sun_path + 1,
-				m_path_len - 1};
+				m_path_len};
 		} else {
 			return std::string_view{m_addr.sun_path, m_path_len};
 		}
