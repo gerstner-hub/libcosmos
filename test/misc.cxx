@@ -7,6 +7,7 @@
 #include <cosmos/random.hxx>
 #include <cosmos/uname.hxx>
 #include <cosmos/utils.hxx>
+#include <cosmos/SizedArray.hxx>
 
 // Test
 #include "TestBase.hxx"
@@ -24,6 +25,7 @@ class MiscTest :
 		testDeferGuard();
 		testRandom();
 		testUname();
+		testSizedArray();
 	}
 
 	void testRanges() {
@@ -176,6 +178,76 @@ class MiscTest :
 			<< "release: " << uname.release() << "\n"
 			<< "version: " << uname.version() << "\n"
 			<< "machine: " << uname.machine() << "\n";
+	}
+
+	void testSizedArray() {
+		START_TEST("SizedArray");
+		cosmos::SizedArray<int, 6> array{3, 2};
+
+		RUN_STEP("init-size-valid", array.size() == 2);
+		bool good = true;
+		size_t count = 0;
+		for (auto elem: array) {
+			if (elem != 3) {
+				good = false;
+			}
+
+			count++;
+		}
+		RUN_STEP("init-elems-valid", good && count == 2);
+		RUN_STEP("array-ptr-valid", array.data()[0] == 3 &&
+				array.data()[1] == 3);
+
+		RUN_STEP("operator[] works", array[0] == 3);
+		RUN_STEP("at() works", array.at(1) == 3);
+		try {
+			array.at(3);
+			RUN_STEP("at() throws oor", false);
+		} catch (const std::out_of_range &) {
+			RUN_STEP("at() throws oor", true);
+
+		}
+
+		array.push_back(5);
+
+		RUN_STEP("push-back-increases-size", array.size() == 3);
+
+		array.clear();
+
+		RUN_STEP("empty-after-clear",
+				array.empty() && array.size() == 0);
+
+		for (size_t i = 0; i < array.max_size(); i++) {
+			array.push_back(i);
+		}
+
+		try {
+			array.push_back(100);
+			RUN_STEP("push_back() beyond size throws", false);
+		} catch (const std::bad_alloc &) {
+			RUN_STEP("push_back() beyond size throws", true);
+		}
+
+		count = 0;
+
+		while (!array.empty()) {
+			array.pop_back();
+			count++;
+		}
+
+		RUN_STEP("pop_back() until empty works",
+				count == array.max_size());
+
+		array.clear();
+
+		array.push_back(10);
+		for (size_t i = 0; i < 3; i++) {
+			array.push_back(i);
+		}
+		array.push_back(-5);
+
+		RUN_STEP("front() works", array.front() == 10);
+		RUN_STEP("back() works", array.back() == -5);
 	}
 };
 
