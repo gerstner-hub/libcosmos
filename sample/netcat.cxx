@@ -10,16 +10,16 @@
 #include <cosmos/fs/FileDescriptor.hxx>
 #include <cosmos/io/Poller.hxx>
 #include <cosmos/main.hxx>
-#include <cosmos/net/AddressInfoList.hxx>
-#include <cosmos/net/TCPClientSocket.hxx>
-#include <cosmos/net/TCPConnection.hxx>
-#include <cosmos/net/TCPListenSocket.hxx>
+#include <cosmos/net/inet/AddressInfoList.hxx>
+#include <cosmos/net/inet/TCPClientSocket.hxx>
+#include <cosmos/net/inet/TCPConnection.hxx>
+#include <cosmos/net/inet/TCPListenSocket.hxx>
+#include <cosmos/net/inet/UDPSocket.hxx>
 #include <cosmos/net/types.hxx>
-#include <cosmos/net/UDPSocket.hxx>
-#include <cosmos/net/UnixClientSocket.hxx>
-#include <cosmos/net/UnixConnection.hxx>
-#include <cosmos/net/UnixDatagramSocket.hxx>
-#include <cosmos/net/UnixListenSocket.hxx>
+#include <cosmos/net/unix/UnixClientSocket.hxx>
+#include <cosmos/net/unix/UnixConnection.hxx>
+#include <cosmos/net/unix/UnixDatagramSocket.hxx>
+#include <cosmos/net/unix/UnixListenSocket.hxx>
 #include <cosmos/string.hxx>
 
 struct SocketConfig {

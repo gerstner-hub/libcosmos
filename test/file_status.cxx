@@ -12,7 +12,7 @@
 #include <cosmos/fs/FileStatus.hxx>
 #include <cosmos/fs/filesystem.hxx>
 #include <cosmos/fs/File.hxx>
-#include <cosmos/net/UnixListenSocket.hxx>
+#include <cosmos/net/unix/UnixListenSocket.hxx>
 
 // Test
 #include "TestBase.hxx"

@@ -1,4 +1,4 @@
-#include <cosmos/net/AddressInfoList.hxx>
+#include <cosmos/net/inet/AddressInfoList.hxx>
 #include <cosmos/error/ResolveError.hxx>
 
 // Test

@@ -4,7 +4,7 @@
 // cosmos
 #include <cosmos/error/ApiError.hxx>
 #include <cosmos/error/RuntimeError.hxx>
-#include <cosmos/net/UnixConnection.hxx>
+#include <cosmos/net/unix/UnixConnection.hxx>
 #include <cosmos/net/network.hxx>
 #include <cosmos/utils.hxx>
 

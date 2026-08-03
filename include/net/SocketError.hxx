@@ -12,7 +12,7 @@
 
 // Cosmos
 #include <cosmos/error/errno.hxx>
-#include <cosmos/net/IPAddress.hxx>
+#include <cosmos/net/inet/IPAddress.hxx>
 #include <cosmos/net/traits.hxx>
 #include <cosmos/net/types.hxx>
 

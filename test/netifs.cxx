@@ -2,8 +2,8 @@
 #include <map>
 
 // cosmos
-#include <cosmos/net/InterfaceEnumerator.hxx>
-#include <cosmos/net/InterfaceAddressList.hxx>
+#include <cosmos/net/ifs/InterfaceEnumerator.hxx>
+#include <cosmos/net/ifs/InterfaceAddressList.hxx>
 #include <cosmos/net/network.hxx>
 
 // Test

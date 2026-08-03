@@ -2,7 +2,7 @@
 #include <iostream>
 
 // cosmos
-#include <cosmos/net/IPAddress.hxx>
+#include <cosmos/net/inet/IPAddress.hxx>
 #include <cosmos/net/network.hxx>
 
 // Test
