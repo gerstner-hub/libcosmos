@@ -26,17 +26,17 @@ using namespace std::string_literals;
 #define START_TEST(name) TestMarkGuard _g{*this, name}
 #define START_STEP(text) startStep(text)
 #define EVAL_STEP(expr) do { \
-		const bool good = expr; \
-		if (!good) { \
+		const bool _good = expr; \
+		if (!_good) { \
 			finishStep(false, #expr, __LINE__); \
 			finishTest(false); \
 			return; \
 		} \
 	} while(false)
 #define FINISH_STEP(expr) do { \
-		const bool good = expr; \
-		finishStep(good, #expr, __LINE__); \
-		if (!good) { \
+		const bool _good = expr; \
+		finishStep(_good, #expr, __LINE__); \
+		if (!_good) { \
 			finishTest(false); \
 			return; \
 		} \
