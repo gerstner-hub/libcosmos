@@ -62,6 +62,18 @@ public: // functions
 	/// Returns the current address that the socket is bound to, if any.
 	void getSockName(SocketAddress &addr);
 
+	/// Returns the address the socket is currently connected to, if any.
+	/**
+	 * On connection-oriented sockets this returns the peer's address, if
+	 * the socket is currently connected. On datagram sockets this returns
+	 * the purely local information that was previously set during a
+	 * `connect()` operation on the socket.
+	 *
+	 * If the socket is not connected then an ApiError with
+	 * Errno::NOT_CONNECTED is thrown.
+	 **/
+	void getPeerName(SocketAddress &addr);
+
 	/// Shutdown part or all of the connection on protocol level.
 	/**
 	 * This is distinct from a close() operation in that it performs a

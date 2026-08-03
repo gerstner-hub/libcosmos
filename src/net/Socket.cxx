@@ -117,7 +117,22 @@ void Socket::getSockName(SocketAddress &addr) {
 
 	if (SocketFamily{base->sa_family} != addr.family()) {
 		addr.clear();
-		throw RuntimeError{"getsockname: wrong type of SocketAddress was passed"};
+		throw RuntimeError{"getsockname: unexpected type of SocketAddress was returned"};
+	}
+
+	addr.update(size);
+}
+
+void Socket::getPeerName(SocketAddress &addr) {
+	socklen_t size = addr.maxSize();
+	auto base = addr.basePtr();
+	if (::getpeername(to_integral(m_fd.raw()), base, &size) != 0) {
+		throw ApiError{"getpeername()"};
+	}
+
+	if (SocketFamily{base->sa_family} != addr.family()) {
+		addr.clear();
+		throw RuntimeError{"getpeername: unexpected type of SocketAddress was returned"};
 	}
 
 	addr.update(size);

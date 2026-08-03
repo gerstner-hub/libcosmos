@@ -38,6 +38,11 @@ public: // functions
 		Socket::getSockName(addr);
 	}
 
+	/// Returns the current address that the socket is connected to, if any.
+	void getPeerName(IPAddress &addr) {
+		Socket::getPeerName(addr);
+	}
+
 protected: // functions
 
 	/// \see Socket::Socket(const SocketFamily)

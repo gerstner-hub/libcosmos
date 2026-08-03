@@ -203,6 +203,13 @@ public:
 			here.connect(there_addr);
 			there.connect(here_addr);
 
+			{
+				cosmos::IP4Address peer_addr;
+				here.getPeerName(peer_addr);
+				RUN_STEP("peer-name-matches",
+						peer_addr == there_addr);
+			}
+
 			here.send("from-here");
 			there.send("from-there");
 			std::string msg;

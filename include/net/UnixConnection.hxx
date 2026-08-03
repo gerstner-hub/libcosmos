@@ -36,6 +36,16 @@ public: // functions
 	Socket::AddressFilledIn receiveMessage(ReceiveMessageHeader &header) {
 		return Socket::receiveMessage(header);
 	}
+
+	/// Returns the current address that the socket is bound to, if any.
+	void getSockName(UnixAddress &addr) {
+		Socket::getSockName(addr);
+	}
+
+	/// Returns the current address that the socket is connected to, if any.
+	void getPeerName(UnixAddress &addr) {
+		Socket::getPeerName(addr);
+	}
 };
 
 } // end ns
