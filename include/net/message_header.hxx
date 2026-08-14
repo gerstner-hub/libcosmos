@@ -410,11 +410,11 @@ public: // functions
 		setControlBufferSize(0);
 	}
 
-	ControlMessageIterator begin() {
+	ControlMessageIterator begin() const {
 		return ControlMessageIterator{*this};
 	}
 
-	ControlMessageIterator end() {
+	ControlMessageIterator end() const {
 		return ControlMessageIterator{};
 	}
 
