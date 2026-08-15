@@ -304,6 +304,10 @@ public: // types
 			return length() - sizeof(m_header);
 		}
 
+		const struct cmsghdr& raw() const {
+			return m_header;
+		}
+
 	protected: // data
 
 		/// The raw control message header of this ancillary message.
