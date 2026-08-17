@@ -45,14 +45,28 @@ void UnixAddress::update(size_t new_length) {
 std::string UnixAddress::label() const {
 	if (isUnnamed()) {
 		return "<unnamed>";
-	} else if(isAbstract()) {
-		std::string ret;
+	}
+
+	std::string ret;
+
+	if(isAbstract()) {
 		ret.push_back('@');
 		ret.append(getPath());
-		return ret;
 	} else {
-		return std::string{getPath()};
+		ret = std::string{getPath()};
 	}
+
+	while (ret.back() == '\0') {
+		ret.pop_back();
+	}
+
+	for (auto it = ret.begin(); it != ret.end(); it++) {
+		if (!std::isprint(*it)) {
+			*it = '?';
+		}
+	}
+
+	return ret;
 }
 
 } // end ns
