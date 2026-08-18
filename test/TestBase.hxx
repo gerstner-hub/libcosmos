@@ -8,15 +8,16 @@
 
 // cosmos
 #include <cosmos/cosmos.hxx>
+#include <cosmos/error/FileError.hxx>
 #include <cosmos/error/RuntimeError.hxx>
 #include <cosmos/error/UsageError.hxx>
 #include <cosmos/formatting.hxx>
 #include <cosmos/fs/DirStream.hxx>
+#include <cosmos/fs/TempDir.hxx>
 #include <cosmos/fs/filesystem.hxx>
 #include <cosmos/fs/path.hxx>
-#include <cosmos/fs/TempDir.hxx>
-#include <cosmos/io/colors.hxx>
 #include <cosmos/io/StdLogger.hxx>
+#include <cosmos/io/colors.hxx>
 #include <cosmos/proc/ChildCloner.hxx>
 #include <cosmos/proc/process.hxx>
 #include <cosmos/utils.hxx>
@@ -183,15 +184,25 @@ protected: // functions
 
 	std::string findHelper(const std::string &base) {
 		std::string dir{m_argv.at(0)};
-		dir = dir.substr(0, dir.rfind('/'));
-		const auto relpath = "/helpers/"s + base;
-		auto helper = dir + relpath;
-		helper = cosmos::fs::canonicalize_path(helper);
-		if (!cosmos::fs::exists_file(helper)) {
-			throw cosmos::RuntimeError{cosmos::sprintf("couldn't find helper tool '%s'", base.c_str())};
+
+		while (true) {
+			auto sep_pos = dir.rfind('/');
+			if (sep_pos == dir.npos)
+				break;
+			dir = dir.substr(0, sep_pos);
+			const auto relpath = "/helpers/"s + base;
+			auto helper = dir + relpath;
+			try {
+				helper = cosmos::fs::canonicalize_path(helper);
+				if (cosmos::fs::exists_file(helper)) {
+					return helper;
+				}
+			} catch (const cosmos::FileError &) {
+				continue;
+			}
 		}
 
-		return helper;
+		throw cosmos::RuntimeError{cosmos::sprintf("couldn't find helper tool '%s'", base.c_str())};
 	}
 
 	virtual void runTests() = 0;
