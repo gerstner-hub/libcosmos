@@ -20,6 +20,24 @@ namespace cosmos {
  * ancillary messages used with SocketFamily::UNIX.
  **/
 
+// hint: the SCM prefix stands for socket-level control message
+
+/// Ancillary message types available for UNIX domain sockets.
+enum class UnixMessage : int {
+	RIGHTS = SCM_RIGHTS, ///< file descriptor passing.
+	CREDENTIALS = SCM_CREDENTIALS
+	//SECURITY = SCM_SECURITY // the define for this seems to be missing?
+};
+
+/// Return the UnixMessage ancillary message type stored in `msg`, if applicable.
+inline std::optional<UnixMessage> as_unix_message(const ReceiveMessageHeader::ControlMessage &msg) {
+	if (msg.level() == OptLevel::SOCKET) {
+		return UnixMessage{msg.raw().cmsg_type};
+	}
+
+	return std::nullopt;
+}
+
 /// User and group credentials of a peer process.
 /**
  * This type is used to indicate process credentials passed over a UNIX domain
@@ -122,6 +140,15 @@ public: // functions
 		closeUnclaimed();
 	}
 
+	/// Returns whether the given `msg` contains a UnixRightsMessage.
+	static bool matches(const ReceiveMessageHeader::ControlMessage &msg) {
+		if (auto type = as_unix_message(msg); type) {
+			return *type == UnixMessage::RIGHTS;
+		} else {
+			return false;
+		}
+	}
+
 	/// Parse received file descriptors from the given ControlMessage.
 	/**
 	 * If `msg` is not of the right type then an exception is thrown.
@@ -191,6 +218,15 @@ protected: // data
 class COSMOS_API UnixCredentialsMessage :
 		public AncillaryMessage<OptLevel::SOCKET, UnixMessage> {
 public: // functions
+
+	/// Returns whether the given `msg` contains a UnixRightsMessage.
+	static bool matches(const ReceiveMessageHeader::ControlMessage &msg) {
+		if (const auto type = as_unix_message(msg); type) {
+			return *type == UnixMessage::CREDENTIALS;
+		} else {
+			return false;
+		}
+	}
 
 	void deserialize(const ReceiveMessageHeader::ControlMessage &msg);
 

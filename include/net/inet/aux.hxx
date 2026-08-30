@@ -1,15 +1,13 @@
 #pragma once
 
 // C++
-#include <cstring>
 #include <vector>
 
-// Cosmos
+// cosmos
 #include <cosmos/dso_export.h>
+#include <cosmos/net/inet/types.hxx>
 #include <cosmos/net/message_header.hxx>
 #include <cosmos/net/SocketError.hxx>
-
-namespace cosmos {
 
 /**
  * @file
@@ -17,6 +15,26 @@ namespace cosmos {
  * The types in this header support serialization and deserialization of
  * ancillary messages used with SocketFamily::INET{,6}.
  **/
+
+namespace cosmos {
+
+/// Return the IP4Message ancillary message type stored in `msg`, if applicable.
+inline std::optional<IP4Message> as_ip4_message(const ReceiveMessageHeader::ControlMessage &msg) {
+	if (msg.level() == OptLevel::IP) {
+		return IP4Message{msg.raw().cmsg_type};
+	}
+
+	return std::nullopt;
+}
+
+/// Return the IP6Message ancillary message type stored in `msg`, if applicable.
+inline std::optional<IP6Message> as_ip6_message(const ReceiveMessageHeader::ControlMessage &msg) {
+	if (msg.level() == OptLevel::IPV6) {
+		return IP6Message{msg.raw().cmsg_type};
+	}
+
+	return std::nullopt;
+}
 
 /// Wrapper for the IPMessage::RECVERR ancillary message.
 /**
@@ -39,6 +57,23 @@ public: // functions
 
 	explicit SocketErrorMessage(const ReceiveMessageHeader::ControlMessage &msg) {
 		deserialize(msg);
+	}
+
+	/// Returns whether `msg` contains a SocketErrorMessage.
+	static bool matches(const ReceiveMessageHeader::ControlMessage &msg) {
+		if constexpr (FAMILY == SocketFamily::INET) {
+			if (const auto type4 = as_ip4_message(msg); type4) {
+				return *type4 == IP4Message::RECVERR;
+			}
+		}
+
+		if constexpr (FAMILY == SocketFamily::INET6) {
+			if (const auto type6 = as_ip6_message(msg); type6) {
+				return *type6 == IP6Message::RECVERR;
+			}
+		}
+
+		return false;
 	}
 
 	/*

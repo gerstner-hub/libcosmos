@@ -1,6 +1,7 @@
 #pragma once
 
 // cosmos
+#include <cosmos/net/inet/types.hxx>
 #include <cosmos/net/types.hxx>
 
 /**

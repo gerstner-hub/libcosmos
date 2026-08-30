@@ -10,8 +10,6 @@
 // pulled in in the wrong order.
 #include <linux/if_arp.h>
 #include <netdb.h>
-#include <netinet/in.h>
-#include <netinet/ip.h>
 #include <sys/socket.h>
 
 // cosmos
@@ -252,34 +250,5 @@ enum class MessageFlag : int {
 };
 
 using MessageFlags = BitMask<MessageFlag>;
-
-// hint: the SCM prefix stands for socket-level control message
-
-/// Ancillary message types available for UNIX domain sockets.
-enum class UnixMessage : int {
-	RIGHTS = SCM_RIGHTS, ///< file descriptor passing.
-	CREDENTIALS = SCM_CREDENTIALS
-	//SECURITY = SCM_SECURITY // the define for this seems to be missing?
-};
-
-/// Ancillary message types available for IPv4 based sockets.
-enum class IP4Message : int {
-	/// \see IPOptions::setReceiveErrors().
-	RECVERR = IP_RECVERR,
-	/// \see IPOptions::setReceivePktInfo().
-	PKTINFO = IP_PKTINFO,
-	/// \see IPOptions::setReceiveOrigDestAddr().
-	ORIGDSTADDR = IP_ORIGDSTADDR,
-	/// \see IPOptions::setReceiveTOS().
-	TOS = IP_TOS,
-	/// \see IPOptions::setReceiveTTL().
-	TTL = IP_TTL,
-};
-
-/// Ancillary message types available for IPv6 based sockets.
-enum class IP6Message : int {
-	RECVERR = IPV6_RECVERR,
-	PKTINFO = IPV6_PKTINFO
-};
 
 } // end ns

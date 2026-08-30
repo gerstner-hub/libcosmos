@@ -219,7 +219,7 @@ protected: // functions
 	/**
 	 * This call is like receive() but fills in the sender's address in
 	 * `addr`, if possible. This generally doesn't make sense with
-	 * connection mode socket types (where the peer is defined during
+	 * connection-based socket types (where the peer is defined during
 	 * connect() time). If the sender's address isn't available then
 	 * `addr` is left unchanged.
 	 *

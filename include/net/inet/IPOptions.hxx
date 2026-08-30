@@ -1,5 +1,8 @@
 #pragma once
 
+// Linux
+#include <netinet/ip.h>
+
 // C++
 #include <string>
 #include <utility>

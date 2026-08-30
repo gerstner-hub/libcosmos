@@ -263,31 +263,6 @@ public: // types
 			return OptLevel{m_header.cmsg_level};
 		}
 
-		/// Return the UnixMessage ancillary message type, if applicable.
-		std::optional<UnixMessage> asUnixMessage() const {
-			if (level() == OptLevel::SOCKET) {
-				return UnixMessage{type()};
-			}
-
-			return std::nullopt;
-		}
-
-		std::optional<IP4Message> asIP4Message() const {
-			if (level() == OptLevel::IP) {
-				return IP4Message{type()};
-			}
-
-			return std::nullopt;
-		}
-
-		std::optional<IP6Message> asIP6Message() const {
-			if (level() == OptLevel::IPV6) {
-				return IP6Message{type()};
-			}
-
-			return std::nullopt;
-		}
-
 		/// Returns the data portion of the control message.
 		/**
 		 * This pointer is not necessarily suitably aligned to access
