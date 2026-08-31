@@ -21,6 +21,13 @@ namespace cosmos {
  **/
 class COSMOS_API InterfaceEnumerator {
 public: // functions
+
+	explicit InterfaceEnumerator(const bool initial_fetch = false) {
+		if (initial_fetch) {
+			fetch();
+		}
+	}
+
 	~InterfaceEnumerator() {
 		clear();
 	}
