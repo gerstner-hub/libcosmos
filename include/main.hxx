@@ -44,6 +44,21 @@ protected: // functions
 	friend int main(const int argc, const char **argv);
 };
 
+/// Like MainContainerArgs but solely relying on exception for ExitStatus propagation.
+/**
+ * If the main() member function returns normally then ExitStatus::SUCCESS is
+ * implied. Otherwise the implementation can throw cosmos::ExitStatus to
+ * propagate different exit states.
+ **/
+class MainContainerArgsNoRetval {
+protected: // functions
+
+	virtual void main(const std::string_view argv0, const StringViewVector &args) = 0;
+
+	template <typename MAIN>
+	friend int main(const int argc, const char **argv);
+};
+
 /// C++ wrapper for the main() application entry point.
 /**
  * This wrapper can be used to invoke a class member function to gain a
@@ -85,6 +100,11 @@ int main(const int argc, const char **argv) {
 				status = static_cast<MainContainerArgs&>(instance).main(
 						std::string_view{argv[0]},
 						StringViewVector{argv+1, argv+argc});
+			} else if constexpr (std::is_base_of_v<MainContainerArgsNoRetval, MAIN>) {
+				static_cast<MainContainerArgsNoRetval&>(instance).main(
+						std::string_view{argv[0]},
+						StringViewVector{argv+1, argv+argc});
+				status = ExitStatus::SUCCESS;
 			} else {
 				// we cannot use `false` here, because if the
 				// condition does not depend on the template
