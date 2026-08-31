@@ -21,6 +21,8 @@ namespace cosmos {
  * These values are in host byte order.
  **/
 enum class EthernetProtocol : unsigned short {
+	NONE        = 0,               ///< Special value used with PacketSocket.
+	ALL         = ETH_P_ALL,       ///< Special value used with PacketSocket.
 	LOOP        = ETH_P_LOOP,      ///< Ethernet Loopback packet
 	PUP         = ETH_P_PUP,       ///< Xerox PUP packet
 	PUPAT       = ETH_P_PUPAT,     ///< Xerox PUP Addr Trans packet

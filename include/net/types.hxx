@@ -90,7 +90,8 @@ enum class OptLevel : int {
 	IP     = IPPROTO_IP,
 	IPV6   = IPPROTO_IPV6,
 	TCP    = IPPROTO_TCP,
-	UDP    = IPPROTO_UDP
+	UDP    = IPPROTO_UDP,
+	PACKET = SOL_PACKET,
 };
 
 /// Representation of socket option names.
@@ -250,5 +251,14 @@ enum class MessageFlag : int {
 };
 
 using MessageFlags = BitMask<MessageFlag>;
+
+/// A 16-bit VLAN TCI (Tag Control Information) value.
+/**
+ * bits 0-11 contain the VLAN-ID
+ * bit 12 is DEI (drop eligible indicator)
+ * bits 13-15 is the PCP (priority code point)
+ **/
+enum class VLANTag : uint16_t {
+};
 
 } // end ns

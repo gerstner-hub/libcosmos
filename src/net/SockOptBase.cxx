@@ -69,9 +69,10 @@ std::string SockOptBase<LEVEL>::getPeerSec() const {
 }
 
 // explicit template instantiations for exporting the template implementation
-template class SockOptBase<OptLevel::SOCKET>;
 template class SockOptBase<OptLevel::IP>;
 template class SockOptBase<OptLevel::IPV6>;
+template class SockOptBase<OptLevel::PACKET>;
+template class SockOptBase<OptLevel::SOCKET>;
 template class SockOptBase<OptLevel::TCP>;
 template class SockOptBase<OptLevel::UDP>;
 
