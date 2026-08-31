@@ -38,9 +38,6 @@ public: // functions
 	/// Create a MSGHDR initialized to all zeroes and with default flags applied.
 	MessageHeaderBase() {
 		clear();
-		// by default mark file descriptor received via unix domain
-		// sockets CLOEXEC.
-		setIOFlags(MessageFlags{MessageFlag::CLOEXEC});
 	}
 
 	/// Clear the complete system call structure with zeroes.
@@ -63,6 +60,11 @@ public: // functions
 		m_io_flags = flags;
 	}
 
+	/// Returns the currently set MessageFlags for send/receive.
+	MessageFlags ioFlags() const {
+		return m_io_flags;
+	}
+
 protected: // functions
 
 	/// Reset the address portion of the msghdr struct.
@@ -81,11 +83,6 @@ protected: // functions
 			m_header.msg_iov = iovec.raw();
 			m_header.msg_iovlen = iovec.size();
 		}
-	}
-
-	/// Returns the currently set MessageFlags for send/receive.
-	MessageFlags ioFlags() const {
-		return m_io_flags;
 	}
 
 protected: // data

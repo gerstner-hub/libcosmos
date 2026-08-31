@@ -34,6 +34,7 @@ public: // functions
 	}
 
 	Socket::AddressFilledIn receiveMessage(ReceiveMessageHeader &header) {
+		header.setIOFlags(header.ioFlags() | MessageFlag::CLOEXEC);
 		return Socket::receiveMessage(header);
 	}
 

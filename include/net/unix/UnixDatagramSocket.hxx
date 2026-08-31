@@ -94,10 +94,16 @@ public: // functions
 	}
 
 	void receiveMessage(ReceiveMessageHeader &header) {
+		/* always add the CLOEXEC flags for UNIX sockets. sadly we
+		 * cannot apply this in the MessageHeaderBase constructor,
+		 * because the kernel will reject this flag with EINVAL when
+		 * used on other socket types than UNIX domain sockets */
+		header.setIOFlags(header.ioFlags() | MessageFlag::CLOEXEC);
 		(void)Socket::receiveMessage(header);
 	}
 
 	std::optional<UnixAddress> receiveMessageFrom(ReceiveMessageHeader &header) {
+		header.setIOFlags(header.ioFlags() | MessageFlag::CLOEXEC);
 		UnixAddress addr;
 		auto filled = Socket::receiveMessage(header, &addr);
 
