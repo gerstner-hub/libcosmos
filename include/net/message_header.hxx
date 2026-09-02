@@ -65,6 +65,18 @@ public: // functions
 		return m_io_flags;
 	}
 
+	/// Returns the amount of bytes successfully sent/received by the last I/O operation.
+	/**
+	 * The message header I/O vectors are updated after each I/O operation
+	 * to reflect portions of data that have _not_ been processed by the
+	 * system call. For a quick way to determine the amount of data that
+	 * actually has been processed the return value of this function can
+	 * be used.
+	 **/
+	size_t lastIOCount() const {
+		return m_last_io_cnt;
+	}
+
 protected: // functions
 
 	/// Reset the address portion of the msghdr struct.
@@ -91,6 +103,8 @@ protected: // data
 	struct msghdr m_header;
 	/// The currently configured send/receive flags.
 	MessageFlags m_io_flags;
+	/// Last amount of sent/received bytes.
+	size_t m_last_io_cnt = 0;
 };
 
 /// Wrapper for `struct msghdr` for sending messages via Socket::sendMessage().
@@ -198,6 +212,7 @@ protected: // functions
 	void postSend(size_t sent) {
 		iovec.update(sent);
 		control_msg.reset();
+		m_last_io_cnt = sent;
 	}
 
 	/// Fill in the target address fields of the `struct msghdr` for the given address object.
@@ -402,6 +417,7 @@ protected: // functions
 	/// Perform any cleanup or bookkeeping after a successful `recvmsg()` operation.
 	void postReceive(size_t received) {
 		iovec.update(received);
+		m_last_io_cnt = received;
 	}
 
 	/// Fill in the source address storage fields of the `struct msghdr` for the given address object.
