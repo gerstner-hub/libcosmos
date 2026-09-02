@@ -200,10 +200,10 @@ protected: // functions
 	 *
 	 * The amount of sent data is reflected in an updated `iovec` member
 	 * of the `header` parameter. Partial sends are possible. If a
-	 * `control_msg` is set in `header` and at least one succesful (even
+	 * `control_msg` is set in `header` and at least one successful (even
 	 * partial) sendMessage() call was performed, then the control message
 	 * will have been processed completely. The `control_msg` member will
-	 * be reset automaically in this case to avoid it being sent multiple
+	 * be reset automatically in this case to avoid it being sent multiple
 	 * times without intent.
 	 **/
 	void sendMessage(SendMessageHeader &header, const SocketAddress* addr = nullptr);
@@ -233,7 +233,7 @@ protected: // functions
 	/// Receives a message from the socket using extended ReceiveMessageHeader data.
 	/**
 	 * This variant of the receive family of functions allows the
-	 * following advanced features compared to recvFrom():
+	 * following advanced features compared to receiveFrom():
 	 *
 	 * - receiving data into multiple scatter/gather memory locations
 	 *   using the ReadIOVector `iovec` member of `header`.
