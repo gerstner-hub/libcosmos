@@ -75,7 +75,10 @@ public: // functions
 	 * deliver a control message which can be handled by the PacketAuxData
 	 * type.
 	 **/
-	void enableAuxData(const bool on_off);
+	void setEnableAuxData(const bool on_off);
+
+	/// Returns the current enable-aux-data setting.
+	bool getEnableAuxData() const;
 
 	/// Enables the bypass of the kernel's qdisc (traffic control) layer.
 	/**
@@ -84,6 +87,9 @@ public: // functions
 	 * purposes.
 	 **/
 	void setQDiscBypass(const bool on_off);
+
+	/// Return the current qdisc bypass setting.
+	bool getQDiscByPass() const;
 
 protected: // functions
 

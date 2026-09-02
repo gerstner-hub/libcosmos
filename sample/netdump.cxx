@@ -114,7 +114,7 @@ protected:
 					cosmos::PacketOptions::MembershipReq{m_dump_if}.setPromiscuous());
 		}
 
-		options.enableAuxData(true);
+		options.setEnableAuxData(true);
 	}
 
 	cosmos::InterfaceIndex m_dump_if = cosmos::InterfaceIndex::ANY;

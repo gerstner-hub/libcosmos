@@ -47,12 +47,20 @@ void PacketOptions::dropMembership(const MembershipReq &req) {
 	setsockopt(m_sock, M_LEVEL, OptName{PACKET_DROP_MEMBERSHIP}, req);
 }
 
-void PacketOptions::enableAuxData(const bool on_off) {
+void PacketOptions::setEnableAuxData(const bool on_off) {
 	setBoolOption(OptName{PACKET_AUXDATA}, on_off);
+}
+
+bool PacketOptions::getEnableAuxData() const {
+	return getBoolOption(OptName{PACKET_AUXDATA});
 }
 
 void PacketOptions::setQDiscBypass(const bool on_off) {
 	setBoolOption(OptName{PACKET_QDISC_BYPASS}, on_off);
+}
+
+bool PacketOptions::getQDiscByPass() const {
+	return getBoolOption(OptName{PACKET_QDISC_BYPASS});
 }
 
 } // end ns
