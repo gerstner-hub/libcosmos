@@ -185,7 +185,7 @@ public: // functions
 	 * setter.
 	 **/
 	ARPType arpType() const {
-		return ARPType{net::to_host_order(m_addr.sll_hatype)};
+		return ARPType{m_addr.sll_hatype};
 	}
 
 	/// Returns the packet type portion of the address.
