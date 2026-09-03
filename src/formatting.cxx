@@ -62,6 +62,28 @@ std::string sprintf(const char *fmt, ...) {
 	return ret;
 }
 
+std::string hexdump(const std::span<const std::byte> data, const HexDumpFlags flags) {
+	using enum HexDumpFlag;
+	std::string ret;
+	bool first = true;
+	for (const auto byte: data) {
+		if (flags[COLON_SEP]) {
+			if (first) {
+				first = false;
+			} else {
+				ret += ":";
+			}
+		}
+
+		if (flags[UPPER_CASE]) {
+			ret += std::format("{:02X}", static_cast<unsigned int>(byte));
+		} else {
+			ret += std::format("{:02x}", static_cast<unsigned int>(byte));
+		}
+	}
+	return ret;
+}
+
 } // end ns
 
 template <typename NUM>

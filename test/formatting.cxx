@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 // cosmos
 #include <cosmos/formatting.hxx>
@@ -16,6 +17,7 @@ class FormattingTest :
 		testHexnum();
 		testOctnum();
 		testSprintf();
+		testHexdump();
 	}
 
 	void check(const std::string &val, const std::string &cmp) {
@@ -65,6 +67,20 @@ class FormattingTest :
 
 		START_STEP("sprintf-with-args");
 		check(printed, "this is a test string: varstring 50\n");
+	}
+
+	void testHexdump() {
+		START_TEST("hexdump");
+
+		std::vector<std::byte> data{std::byte{0x1}, std::byte{0xab}, std::byte{0}, std::byte{0xeb}, std::byte{0x6}};
+
+		auto dump = cosmos::hexdump(data);
+		RUN_STEP("default hexdump matches", dump == "01ab00eb06");
+		using enum cosmos::HexDumpFlag;
+		dump = cosmos::hexdump(data, UPPER_CASE);
+		RUN_STEP("upper case hexdump matches", dump == "01AB00EB06");
+		dump = cosmos::hexdump(data, COLON_SEP);
+		RUN_STEP(":hexdump: matches", dump == "01:ab:00:eb:06");
 	}
 };
 

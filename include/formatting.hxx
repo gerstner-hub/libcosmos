@@ -1,12 +1,11 @@
 #pragma once
 
 // C++
-#include <iomanip>
 #include <functional>
 #include <ostream>
-#include <string>
+#include <span>
 #include <sstream>
-#include <type_traits>
+#include <string>
 
 // cosmos
 #include <cosmos/compiler.hxx>
@@ -140,5 +139,18 @@ auto to_printable_integer(T num) -> decltype(+num) {
  * On error an empty string is returned.
  **/
 COSMOS_API std::string sprintf(const char *fmt, ...) COSMOS_FORMAT_PRINTF(1, 2);
+
+/// Flags influencing the behaviour of cosmos::hexdump() output.
+enum class HexDumpFlag {
+	/// Use upper case letters instead of lower case for A-F.
+	UPPER_CASE = 1 << 0,
+	/// Use ':' separators between each byte.
+	COLON_SEP  = 1 << 1
+};
+
+using HexDumpFlags = cosmos::BitMask<HexDumpFlag>;
+
+/// returns a hex string for binary data like "0a130d".
+COSMOS_API std::string hexdump(const std::span<const std::byte> data, const HexDumpFlags flags = {});
 
 } // end ns cosmos
