@@ -708,54 +708,56 @@ public:
 			header.setControlBufferSize(1024);
 			RUN_STEP("verify-empty-control-buffer-emptyctrl-messages", header.begin() == header.end());
 
-			child_sock.receiveMessage(header);
-
 			bool saw_rights_msg = false;
 			bool saw_creds_msg = false;
 
-			for (const auto &ctrl_message: header) {
-				if (const auto unix_msg = cosmos::as_unix_message(ctrl_message); unix_msg) {
-					switch(*unix_msg) {
-						case cosmos::UnixMessage::RIGHTS: {
-							saw_rights_msg = true;
-							cosmos::UnixRightsMessage msg;
-							msg.deserialize(ctrl_message);
+			while (!saw_rights_msg || !saw_creds_msg) {
+				child_sock.receiveMessage(header);
 
-							RUN_STEP("verify-one-fd-unclaimed", msg.numFDs() == 1);
+				for (const auto &ctrl_message: header) {
+					if (const auto unix_msg = cosmos::as_unix_message(ctrl_message); unix_msg) {
+						switch(*unix_msg) {
+							case cosmos::UnixMessage::RIGHTS: {
+								saw_rights_msg = true;
+								cosmos::UnixRightsMessage msg;
+								msg.deserialize(ctrl_message);
 
-							cosmos::UnixRightsMessage::FileNumVector vec;
-							msg.takeFDs(vec);
+								RUN_STEP("verify-one-fd-unclaimed", msg.numFDs() == 1);
 
-							RUN_STEP("verify-one-fd-taken", vec.size() == 1);
-							RUN_STEP("verify-no-fds-left", msg.numFDs() == 0);
+								cosmos::UnixRightsMessage::FileNumVector vec;
+								msg.takeFDs(vec);
 
-							const auto hosts_num = vec[0];
+								RUN_STEP("verify-one-fd-taken", vec.size() == 1);
+								RUN_STEP("verify-no-fds-left", msg.numFDs() == 0);
 
-							cosmos::FileDescriptor hosts_fd{hosts_num};
-							cosmos::File hosts_file{hosts_fd, cosmos::AutoCloseFD{true}};
+								const auto hosts_num = vec[0];
 
-							RUN_STEP("verify-fd-valid", hosts_fd.valid());
-							RUN_STEP("verify-file-valid", hosts_file.isOpen());
+								cosmos::FileDescriptor hosts_fd{hosts_num};
+								cosmos::File hosts_file{hosts_fd, cosmos::AutoCloseFD{true}};
 
-							cosmos::File hosts_file2{"/etc/hosts", cosmos::OpenMode::READ_ONLY};
-							cosmos::FileStatus hosts_stat1{hosts_fd};
-							cosmos::FileStatus hosts_stat2{hosts_file2.fd()};
+								RUN_STEP("verify-fd-valid", hosts_fd.valid());
+								RUN_STEP("verify-file-valid", hosts_file.isOpen());
 
-							RUN_STEP("verify-hosts-fd-is-for-hosts", hosts_stat1.isSameFile(hosts_stat2));
-							break;
+								cosmos::File hosts_file2{"/etc/hosts", cosmos::OpenMode::READ_ONLY};
+								cosmos::FileStatus hosts_stat1{hosts_fd};
+								cosmos::FileStatus hosts_stat2{hosts_file2.fd()};
+
+								RUN_STEP("verify-hosts-fd-is-for-hosts", hosts_stat1.isSameFile(hosts_stat2));
+								break;
+							}
+							case cosmos::UnixMessage::CREDENTIALS: {
+								saw_creds_msg = true;
+								cosmos::UnixCredentialsMessage msg;
+								msg.deserialize(ctrl_message);
+								auto peer_creds = msg.creds();
+
+								RUN_STEP("verify-peer-pid-matches-parent", peer_creds.processID() == parent_pid);
+								RUN_STEP("verify-peer-uid-matches-parent", peer_creds.userID() == parent_euid);
+								RUN_STEP("verify-peer-gid-matches-parent", peer_creds.groupID() == parent_egid);
+
+								break;
+							}
 						}
-						case cosmos::UnixMessage::CREDENTIALS: {
-							saw_creds_msg = true;
-							cosmos::UnixCredentialsMessage msg;
-							msg.deserialize(ctrl_message);
-							auto peer_creds = msg.creds();
-
-							RUN_STEP("verify-peer-pid-matches-parent", peer_creds.processID() == parent_pid);
-							RUN_STEP("verify-peer-uid-matches-parent", peer_creds.userID() == parent_euid);
-							RUN_STEP("verify-peer-gid-matches-parent", peer_creds.groupID() == parent_egid);
-
-							break;
-					        }
 					}
 				}
 			}
