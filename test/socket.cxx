@@ -6,16 +6,20 @@
 // cosmos
 #include <cosmos/fs/File.hxx>
 #include <cosmos/fs/FileStatus.hxx>
+#include <cosmos/net/inet/aux.hxx>
 #include <cosmos/net/inet/TCPClientSocket.hxx>
 #include <cosmos/net/inet/TCPListenSocket.hxx>
 #include <cosmos/net/inet/UDPSocket.hxx>
-#include <cosmos/net/inet/aux.hxx>
 #include <cosmos/net/message_header.hxx>
+#include <cosmos/net/netlink/aux.hxx>
+#include <cosmos/net/netlink/headers.hxx>
+#include <cosmos/net/netlink/NetlinkOptions.hxx>
+#include <cosmos/net/netlink/NetlinkSocket.hxx>
 #include <cosmos/net/network.hxx>
+#include <cosmos/net/unix/aux.hxx>
 #include <cosmos/net/unix/UnixClientSocket.hxx>
 #include <cosmos/net/unix/UnixDatagramSocket.hxx>
 #include <cosmos/net/unix/UnixListenSocket.hxx>
-#include <cosmos/net/unix/aux.hxx>
 #include <cosmos/proc/process.hxx>
 #include <cosmos/thread/PosixThread.hxx>
 
@@ -37,6 +41,7 @@ public:
 		checkTCP();
 		checkUnix();
 		checkMsgHeader();
+		checkNetlink();
 	}
 
 	void subCheckSocketLevelOpts(cosmos::Socket &socket) {
@@ -797,6 +802,87 @@ public:
 			std::cout << "offender is: " << offender->ipAsString() << ":" << offender->port() << std::endl;
 		}
 		RUN_STEP("seen-socket-error", found_sockerr);
+	}
+
+	void checkNetlink() {
+		START_TEST("netlink socket test");
+		cosmos::NetlinkSocket
+			sock1{cosmos::NetlinkFamily::USERSOCK},
+			sock2{cosmos::NetlinkFamily::USERSOCK};
+		sock1.options().setExtendedACKs(true);
+		sock2.options().setEnablePacketInfo(true);
+
+		sock1.bind(cosmos::NetlinkAddress{});
+		sock2.bind(cosmos::NetlinkAddress{});
+
+		cosmos::NetlinkAddress addr1, addr2;
+
+		sock1.getSockName(addr1);
+		sock2.getSockName(addr2);
+
+		std::cout << "sock1 bound to port " << cosmos::to_integral(addr1.port()) << "\n";
+		std::cout << "sock2 bound to port " << cosmos::to_integral(addr2.port()) << "\n";
+
+		sock1.connect(addr2);
+		sock2.connect(addr1);
+
+		RUN_STEP("sock1 <-> sock2 connected", true);
+
+		using NLHeader = cosmos::NetlinkHeader;
+
+		std::string payload{"testpayload"};
+		NLHeader header;
+		header.setPayloadLength(payload.size());
+		header.setType(NLHeader::MsgType{1234});
+		header.setFlags(NLHeader::Flag::REQUEST);
+		header.setSeqNr(123);
+		header.setSenderID(addr1.port());
+
+		std::vector<std::byte> data;
+		data.resize(sizeof(header));
+		std::memcpy(data.data(), &header, data.size());
+
+		data.resize(data.size() + payload.size());
+		std::memcpy(data.data() + sizeof(header), payload.c_str(), payload.size());
+
+		const auto send_bytes = data.size();
+		sock1.send(data.data(), send_bytes);
+
+		data.resize(1024);
+
+		NLHeader header2;
+
+		cosmos::ReceiveMessageHeader msg_hdr;
+		msg_hdr.iovec.resize(2);
+		msg_hdr.iovec[0].setBase(&header2);
+		msg_hdr.iovec[0].setLength(sizeof(header2));
+		msg_hdr.iovec[1].setBase(data.data());
+		msg_hdr.iovec[1].setLength(data.size());
+		msg_hdr.setControlBufferSize(1024);
+		const auto peer_addr = sock2.receiveMessage(msg_hdr);
+
+		RUN_STEP("header-fully-received", msg_hdr.iovec[0].getLength() == 0);
+		RUN_STEP("payload-fully-received", msg_hdr.iovec[1].getLength() == 1024 - payload.size());
+		RUN_STEP("send_bytes matches recv_bytes", send_bytes == msg_hdr.lastIOCount());
+
+		data.resize(data.size() - msg_hdr.iovec[1].getLength());
+
+		RUN_STEP("peer-matches", peer_addr.family() == cosmos::SocketFamily::NETLINK && peer_addr.port() == addr1.port());
+
+		RUN_STEP("payload-matches", std::memcmp(payload.data(), data.data(), payload.size()) == 0);
+
+		bool found_info_msg = false;
+
+		for (const auto &ctrl_msg: msg_hdr) {
+			if (cosmos::NetlinkPacketInfoMessage::matches(ctrl_msg)) {
+				cosmos::NetlinkPacketInfoMessage info_msg{ctrl_msg};
+				RUN_STEP("packet-info-matches",
+						info_msg.info().group() == cosmos::NetlinkGroup{});
+				found_info_msg = true;
+			}
+		}
+
+		RUN_STEP("found-netlink-pkt-info-aux-msg", found_info_msg);
 	}
 };
 

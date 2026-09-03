@@ -32,6 +32,11 @@ protected: // functions
 	/// Set an integer option.
 	void setIntOption(const OptName name, const int val);
 
+	/// Return an unsigned integer option.
+	unsigned int getUIntOption(const OptName name) const;
+	/// Set an unsigned integer option.
+	void setUIntOption(const OptName name, const unsigned int val);
+
 	/// Return a null terminated string option.
 	std::string getStringOption(const OptName name, size_t max_len) const;
 	/// Set a null terminated string option.

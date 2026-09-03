@@ -86,12 +86,13 @@ using SocketFlags = BitMask<SocketFlag>;
  * based on this option level.
  **/
 enum class OptLevel : int {
-	SOCKET = SOL_SOCKET, ///< used for generic socket options and UNIX domain sockets
-	IP     = IPPROTO_IP,
-	IPV6   = IPPROTO_IPV6,
-	TCP    = IPPROTO_TCP,
-	UDP    = IPPROTO_UDP,
-	PACKET = SOL_PACKET,
+	SOCKET  = SOL_SOCKET, ///< used for generic socket options and UNIX domain sockets
+	IP      = IPPROTO_IP,
+	IPV6    = IPPROTO_IPV6,
+	TCP     = IPPROTO_TCP,
+	UDP     = IPPROTO_UDP,
+	PACKET  = SOL_PACKET,
+	NETLINK = SOL_NETLINK
 };
 
 /// Representation of socket option names.

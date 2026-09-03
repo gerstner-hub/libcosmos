@@ -27,6 +27,16 @@ void SockOptBase<LEVEL>::setIntOption(const OptName name, const int val) {
 }
 
 template <OptLevel LEVEL>
+unsigned int SockOptBase<LEVEL>::getUIntOption(const OptName name) const {
+	return getsockopt<unsigned int>(m_sock, M_LEVEL, name);
+}
+
+template <OptLevel LEVEL>
+void SockOptBase<LEVEL>::setUIntOption(const OptName name, const unsigned int val) {
+	setsockopt(m_sock, M_LEVEL, name, val);
+}
+
+template <OptLevel LEVEL>
 std::string SockOptBase<LEVEL>::getStringOption(const OptName name, size_t max_len) const {
 	std::string ret(max_len, '\0');
 	max_len = getsockopt(m_sock, M_LEVEL, name, ret.data(), ret.size());
@@ -71,6 +81,7 @@ std::string SockOptBase<LEVEL>::getPeerSec() const {
 // explicit template instantiations for exporting the template implementation
 template class SockOptBase<OptLevel::IP>;
 template class SockOptBase<OptLevel::IPV6>;
+template class SockOptBase<OptLevel::NETLINK>;
 template class SockOptBase<OptLevel::PACKET>;
 template class SockOptBase<OptLevel::SOCKET>;
 template class SockOptBase<OptLevel::TCP>;
