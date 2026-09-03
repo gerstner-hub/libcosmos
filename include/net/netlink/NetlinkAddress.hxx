@@ -40,6 +40,10 @@ public: // types
 
 public: // functions
 
+	explicit NetlinkAddress(const sockaddr_nl &addr) {
+		m_addr = addr;
+	}
+
 	explicit NetlinkAddress(const NetlinkPort port = NetlinkPort::KERNEL) {
 		clear();
 		setPort(port);
