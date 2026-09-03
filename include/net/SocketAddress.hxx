@@ -58,6 +58,15 @@ public: // functions
 		return size();
 	}
 
+	/// Returns a const pointer to the raw sockaddr structure.
+	/**
+	 * For being able to use SocketAddress types with other APIs this
+	 * pointer to the raw OS structure can be used.
+	 **/
+	const sockaddr* raw() const {
+		return basePtr();
+	}
+
 protected: // functions
 
 	/// Returns a mutable pointer to the `sockaddr*` base structure.
