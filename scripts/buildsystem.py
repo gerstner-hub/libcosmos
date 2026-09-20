@@ -1,5 +1,7 @@
-from SCons.Script import Dir, File, SConscript, ARGUMENTS, Environment, Export, Entry
+from SCons.Script import Builder, Dir, File, SConscript, \
+        ARGUMENTS, Environment, Export, Entry, BUILD_TARGETS
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -309,7 +311,6 @@ def adjustInstallRPath(env, target, rpath):
         return
 
     if 'HAVE_PATCHELF' not in env:
-        import shutil
         env['HAVE_PATCHELF'] = shutil.which('patchelf') is not None
 
     if not env['HAVE_PATCHELF']:
@@ -339,6 +340,37 @@ def enhanceEnv(env):
     env.AddMethod(addVersionFileTarget, 'AddVersionFileTarget')
     env.AddMethod(cloneNoSanitizer, 'CloneNoSanitizer')
     env.AddMethod(adjustInstallRPath, 'AdjustInstallRPath')
+
+
+def setupCompDB(env):
+    compdb = shutil.which("compdb")
+    buildroot = env['buildroot']
+
+    if not compdb:
+        db = env.CompilationDatabase(f"{buildroot}/compile_commands.json")
+        env.Alias('compdb', db)
+        URL = "https://github.com/Sarcasm/compdb.git"
+        print("no 'compdb' utility found'")
+        print("you can improve clangd's heuristics by installing it:", URL)
+        return
+
+    # building the extended DB is a bit awkward, since 'compdb' expects the
+    # input database in a fixed location of the sub-directory.
+    # so build the regular DB in a more deeply-nested directory, point
+    # 'compdb' to it and let redirect its output for the extended DB to the
+    # actual build tree.
+
+    ext_db_builder = Builder(
+        action='compdb -p ${SOURCE.dir} list >$TARGET',
+    )
+
+    env.Append(BUILDERS={
+        'ExtCompDB': ext_db_builder
+    })
+
+    simple_db = env.CompilationDatabase(f"{buildroot}/.simpledb/compile_commands.json")
+    db = env.ExtCompDB(f"{buildroot}/compile_commands.json", simple_db)
+    env.Alias('compdb', db)
 
 
 def initSCons(project, rtti=True, deflibtype='shared'):
@@ -446,7 +478,7 @@ def initSCons(project, rtti=True, deflibtype='shared'):
             'CC' : compiler
         })
 
-    build_compdb = evalBool(ARGUMENTS.get('compdb', '0'))
+    build_compdb = 'compdb' in BUILD_TARGETS
 
     if build_compdb:
         # support for generating a Clang tooling compatible compilation database
@@ -559,8 +591,7 @@ def initSCons(project, rtti=True, deflibtype='shared'):
     env['install_dev_files'] = True
 
     if build_compdb:
-        db = env.CompilationDatabase(f"{buildroot}/compile_commands.json")
-        env.Default(db)
+        setupCompDB(env)
 
     enhanceEnv(env)
 

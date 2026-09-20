@@ -39,26 +39,34 @@ things, or the order of existence. I like order in programming.
 Building the Library
 ====================
 
-*libcosmos* currently uses the [SCons](https://www.scons.org) build system. You
-can build it simply by invoking `scons`. Settings can be passed to the `scons`
-command line in the form of `scons setting=value`. The following custom build
-settings are supported:
+*libcosmos* currently uses the [SCons](https://www.scons.org) build system.
+You can build the library simply by invoking `scons install`. Settings can be
+passed to the `scons` command line in the form of `scons setting=value`. The
+following custom build settings are supported:
 
-|          Setting            |                     Description                         |
-| --------------------------- | ------------------------------------------------------- |
-|   `buildroot=somedir`       | Where to place the build tree. By default a sub-directory like `build` is used. |
-|   `instroot=somedir`        | Where to install build artifacts and library files.  By default a sub-directory like `install` is used. |
-|   `compiler=my-arch-gcc`    | Use the given compiler which can be a `gcc` based cross compiler or `clang`. By default the system gcc is used. |
-|   `use-rpath=<bool>`        | Whether to add an RPATH to linked executables to find shared libraries automatically in the build tree. Good for development, not so good for packaging. |
-|   `sanitizer=<bool>`        | Whether to build with address, leak and undefined sanitizers for detecting memory corruption, undefined behaviour or memory leaks during runtime. |
-|   `debug=<bool>`            | Whether to build without compiler optimizations for simplified debugging. |
-|   `optforsize=<bool>`       | Optimize for size instead for speed. |
+|          Setting             |                     Description                         |
+| ---------------------------- | ------------------------------------------------------- |
+|   `buildroot=somedir`        | Where to place the build tree. By default a sub-directory like `build` is used. |
+|   `instroot=somedir`         | Where to install build artifacts and library files.  By default a sub-directory like `install` is used. |
+|   `compiler=my-arch-gcc`     | Use the given compiler which can be a `gcc` based cross compiler or `clang`. By default the system gcc is used. |
+|   `use-rpath=<bool>`         | Whether to add an RPATH to linked executables to find shared libraries automatically in the build tree. Good for development, not so good for packaging. |
+|   `sanitizer=<bool>`         | Whether to build with address, leak and undefined sanitizers for detecting memory corruption, undefined behaviour or memory leaks during runtime. |
+|   `debug=<bool>`             | Whether to build without compiler optimizations for simplified debugging. |
+|   `optforsize=<bool>`        | Optimize for size instead for speed. |
 |   `libtype=[shared\|static]` | Whether to build a shared or a static library. |
-|   `libcosmos-soname=<soname>| Specify a custom SONAME for the shared library. |
-|   `compdb=1`                | Whether to build a clang compilation database in the root of the current buildroot. |
+|   `libcosmos-soname=<soname>`| Specify a custom SONAME for the shared library. |
 
 You can also specify the `CXXFLAGS` environment variable to add additional
-compiler switches to the build process.
+compiler switches to the build process, similarly `LDFLAGS` for additional
+linker flags.
+
+The special `compdb` target allows to build a clang-compatible
+`compile_commands.json` in the currently active `buildroot`. The database can
+be used in conjunction with `clangd` for context-sensitive development. The
+`compd` target attempts to use the `compdb` utility to generate an extended
+database including information about the headers in the project, which
+improves on the heuristics employed by `clangd`. If the `compdb` tool
+is missing than only a simple compilation database will be built.
 
 Installing the Library
 ======================
