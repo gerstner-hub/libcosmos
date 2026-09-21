@@ -371,6 +371,7 @@ def setupCompDB(env):
     simple_db = env.CompilationDatabase(f"{buildroot}/.simpledb/compile_commands.json")
     db = env.ExtCompDB(f"{buildroot}/compile_commands.json", simple_db)
     env.Alias('compdb', db)
+    env.AlwaysBuild(db)
 
 
 def initSCons(project, rtti=True, deflibtype='shared'):
