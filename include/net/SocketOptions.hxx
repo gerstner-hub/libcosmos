@@ -40,8 +40,8 @@ public: // types
 		friend SocketOptions;
 
 		Linger() :
-				Linger{false, std::chrono::seconds{0}}
-		{}
+			Linger{false, std::chrono::seconds{0}} {
+		}
 
 		Linger(const bool on_off, const std::chrono::seconds time) {
 			setEnabled(on_off);
@@ -62,6 +62,14 @@ public: // types
 
 		std::chrono::seconds time() const {
 			return std::chrono::seconds{l_linger};
+		}
+
+		const struct linger* raw() const {
+			return this;
+		}
+
+		struct linger* raw() {
+			return this;
 		}
 	};
 
