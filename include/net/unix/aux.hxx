@@ -69,6 +69,14 @@ struct COSMOS_API UnixCredentials :
 	auto processID() const { return ProcessID{pid}; }
 	auto userID() const { return UserID{uid}; }
 	auto groupID() const { return GroupID{gid}; }
+
+	struct ucred* raw() {
+		return this;
+	}
+
+	const struct ucred* raw() const {
+		return this;
+	}
 };
 
 /// Wrapper for the SCM_RIGHTS socket ancillary message to pass file descriptors to other processes.
