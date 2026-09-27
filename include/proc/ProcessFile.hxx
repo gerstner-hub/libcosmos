@@ -77,6 +77,11 @@ public: // functions
 			m_fd{fd}
 	{}
 
+	/// Creates an invalid ProcessFile.
+	ProcessFile() :
+		m_fd{} {
+	}
+
 	/* non-copyable and move semantics */
 
 	ProcessFile(const ProcessFile&) = delete;

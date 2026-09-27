@@ -244,6 +244,11 @@ class ProcessTest :
 
 	void testPidFD() {
 		START_TEST("pidfd tests");
+		{
+			cosmos::ProcessFile def_pf;
+			RUN_STEP("default-proess-file-not-open", !def_pf.open());
+		}
+
 		cosmos::EventFile ef{cosmos::EventFile::Counter{0}, cosmos::EventFile::Flags{}};
 		cosmos::CloneArgs args;
 		cosmos::PidFD pid_fd;
