@@ -73,11 +73,17 @@ public: // functions
 
 	/// Retrieve a ProcessFile representing the peer process.
 	/**
-	 * The returned PidFD, wrapper in a ProcessFile type, refers to the
+	 * The returned PidFD, wrapped in a ProcessFile type, refers to the
 	 * peer connected to the UNIX domain socket.
 	 *
 	 * This a poorly documented Linux-specific socket option available
 	 * from kernel 6.9 onwards.
+	 *
+	 * The returned file will have the O_CLOEXEC flag set.
+	 *
+	 * This can throw an ApiError with:
+	 * - Errno::SEARCH if the peer process no longer exists.
+	 * - Errno::NO_DATA if the information is not available.
 	 **/
 	ProcessFile pidfd() const;
 
