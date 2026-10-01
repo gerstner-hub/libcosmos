@@ -113,13 +113,13 @@ public: // functions
 	void deserialize(const ReceiveMessageHeader::ControlMessage &msg);
 
 	/// Returns the last network namespace ID which was deserialized.
-	NetworkNS networkNSID() const {
+	NetlinkNSID networkNSID() const {
 		return m_net_ns;
 	}
 
 protected: // data
 
-	NetworkNS m_net_ns{0};
+	NetlinkNSID m_net_ns{0};
 };
 
 } // end ns
