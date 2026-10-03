@@ -24,6 +24,14 @@ public: // functions
 	explicit UnixListenSocket(const SocketType type,
 			const SocketFlags flags = SocketFlags{SocketFlag::CLOEXEC});
 
+	SocketFamily family() const override {
+		return SocketFamily::UNIX;
+	}
+
+	SocketType type() const override {
+		return m_type;
+	}
+
 	auto unixOptions() {
 		return UnixOptions{m_fd};
 	}
@@ -48,6 +56,9 @@ public: // functions
 		auto fd = Socket::accept(addr, flags);
 		return UnixConnection{fd};
 	}
+protected: // data
+
+	const SocketType m_type = SocketType::ANY;
 };
 
 /// Implementation of a UNIX domain socket listener of SocketType::STREAM.

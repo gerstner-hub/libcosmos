@@ -43,6 +43,10 @@ public: // functions
 		Socket::getPeerName(addr);
 	}
 
+	SocketFamily family() const override {
+		return FAMILY;
+	}
+
 protected: // functions
 
 	/// \see Socket::Socket(const SocketFamily)

@@ -196,6 +196,9 @@ public:
 				error = e.errnum();
 			}
 
+			RUN_STEP("udp4-socket-family-matches", socket.family() == cosmos::SocketFamily::INET);
+			RUN_STEP("udp4-socket-type-matches", socket.type() == cosmos::SocketType::DGRAM);
+
 			RUN_STEP("send-without-bind-fails", error == cosmos::Errno::DEST_ADDR_REQ);
 		}
 		const cosmos::IP4Address here_addr{cosmos::IP4_LOOPBACK_ADDR, 1234};
@@ -280,6 +283,8 @@ public:
 
 	void subCheckTCP4ConnectionClientThread(const std::string client_msg, const std::string server_msg) {
 		cosmos::TCP4ClientSocket socket;
+		RUN_STEP("tcp4-client-socket-family", socket.family() == cosmos::SocketFamily::INET);
+		RUN_STEP("tcp4-client-socket-type", socket.type() == cosmos::SocketType::STREAM);
 		auto conn = socket.connect(cosmos::IP4Address{cosmos::IP4_LOOPBACK_ADDR, 1234});
 
 		conn.send(client_msg);
@@ -299,6 +304,9 @@ public:
 		listener.bind(cosmos::IP4Address{cosmos::IP4_LOOPBACK_ADDR, 1234});
 		listener.listen(10);
 
+		RUN_STEP("tcp4-listen-socket-family", listener.family() == cosmos::SocketFamily::INET);
+		RUN_STEP("tcp4-listen-socket-type", listener.type() == cosmos::SocketType::STREAM);
+
 		std::string server_msg{"message-from-server"};
 		const std::string client_msg{"message-from-client"};
 
@@ -306,6 +314,8 @@ public:
 
 		cosmos::IP4Address peer;
 		auto conn = listener.accept(&peer);
+		RUN_STEP("tcp4-connection-socket-family", conn.family() == cosmos::SocketFamily::INET);
+		RUN_STEP("tcp4-connection-socket-type", conn.type() == cosmos::SocketType::STREAM);
 		DOES_NOT_THROW("accepting-client", conn.isOpen());
 		std::cout << "client connected from " << peer.ipAsString() << ":" << peer.port() << "\n";
 
@@ -344,6 +354,9 @@ public:
 
 	void subCheckUnixDgramXchange() {
 		cosmos::UnixDatagramSocket first, second;
+
+		RUN_STEP("unix-dgram-family", first.family() == cosmos::SocketFamily::UNIX);
+		RUN_STEP("unix-dgram-type", first.type() == cosmos::SocketType::DGRAM);
 
 		auto tempdir = getTempDir();
 		const auto sockpath = tempdir.path() + "/unix-dgram-test";
@@ -425,11 +438,19 @@ public:
 	void subCheckUnixStreamConnections() {
 		cosmos::UnixStreamListenSocket listener;
 		cosmos::UnixStreamClientSocket client;
+
 		const auto addr = cosmos::UnixAddress{"someaddr", cosmos::UnixAddress::Abstract{true}};
 		listener.bind(addr);
 		listener.listen(10);
 		auto conn = client.connect(addr);
 		auto conn2 = listener.accept();
+
+		RUN_STEP("unix-stream-listen-family", listener.family() == cosmos::SocketFamily::UNIX);
+		RUN_STEP("unix-stream-listen-type", listener.type() == cosmos::SocketType::STREAM);
+		RUN_STEP("unix-stream-client-family", client.family() == cosmos::SocketFamily::UNIX);
+		RUN_STEP("unix-stream-client-type", client.type() == cosmos::SocketType::STREAM);
+		RUN_STEP("unix-stream-conn-family", conn.family() == cosmos::SocketFamily::UNIX);
+		RUN_STEP("unix-stream-conn-type", conn.type() == cosmos::SocketType::STREAM);
 
 		RUN_STEP("client-after-connect-invalid", !client.isOpen());
 		RUN_STEP("connection-after-connect-valid", conn.isOpen());
@@ -457,6 +478,13 @@ public:
 		listener.listen(10);
 		auto conn = client.connect(addr);
 		auto conn2 = listener.accept();
+
+		RUN_STEP("unix-seq-listen-family", listener.family() == cosmos::SocketFamily::UNIX);
+		RUN_STEP("unix-seq-listen-type", listener.type() == cosmos::SocketType::SEQPACKET);
+		RUN_STEP("unix-seq-client-family", client.family() == cosmos::SocketFamily::UNIX);
+		RUN_STEP("unix-seq-client-type", client.type() == cosmos::SocketType::SEQPACKET);
+		RUN_STEP("unix-seq-conn-family", conn.family() == cosmos::SocketFamily::UNIX);
+		RUN_STEP("unix-seq-conn-type", conn.type() == cosmos::SocketType::SEQPACKET);
 
 		const std::string send_msg{"seqpacket-mode-test"};
 		conn.send(send_msg);
@@ -811,6 +839,10 @@ public:
 		cosmos::NetlinkSocket
 			sock1{cosmos::NetlinkFamily::USERSOCK},
 			sock2{cosmos::NetlinkFamily::USERSOCK};
+
+		RUN_STEP("netlink-socket-family", sock1.family() == cosmos::SocketFamily::NETLINK);
+		RUN_STEP("netlink-socket-type", sock1.type() == cosmos::SocketType::DGRAM);
+
 		sock1.options().setExtendedACKs(true);
 		sock2.options().setEnablePacketInfo(true);
 

@@ -34,6 +34,10 @@ public: // functions
 			IPSocketT<FAMILY>{TYPE, flags} {
 	}
 
+	SocketType type() const override {
+		return TYPE;
+	}
+
 	auto udpOptions() {
 		return UDPOptions{this->m_fd};
 	}

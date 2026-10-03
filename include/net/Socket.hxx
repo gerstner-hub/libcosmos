@@ -85,6 +85,12 @@ public: // functions
 	 **/
 	void shutdown(const Direction dir);
 
+	/// Returns the SocketFamily of the concrete socket instance.
+	virtual SocketFamily family() const = 0;
+
+	/// Returns the SocketType of the concrete socket instance.
+	virtual SocketType type() const = 0;
+
 protected: // functions
 
 	/// Creates a new socket using the given properties.

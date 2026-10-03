@@ -44,6 +44,14 @@ public: // functions
 				static_cast<SocketProtocol>(family)} {
 	}
 
+	SocketFamily family() const override {
+		return SocketFamily::NETLINK;
+	}
+
+	SocketType type() const override {
+		return SocketType::DGRAM;
+	}
+
 	auto options() {
 		return NetlinkOptions{this->m_fd};
 	}

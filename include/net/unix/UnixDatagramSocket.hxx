@@ -30,6 +30,14 @@ public: // functions
 	explicit UnixDatagramSocket(const FileDescriptor fd, const AutoCloseFD auto_close = AutoCloseFD{true}) :
 			Socket{fd, auto_close} {}
 
+	SocketFamily family() const override {
+		return SocketFamily::UNIX;
+	}
+
+	SocketType type() const override {
+		return TYPE;
+	}
+
 	auto unixOptions() {
 		return UnixOptions{this->m_fd};
 	}

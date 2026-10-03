@@ -35,6 +35,10 @@ public: // functions
 		return TCPOptions{this->m_fd};
 	}
 
+	SocketType type() const override {
+		return SocketType::STREAM;
+	}
+
 	using Socket::receive;
 	using Socket::send;
 

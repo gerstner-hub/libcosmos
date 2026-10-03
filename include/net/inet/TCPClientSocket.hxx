@@ -37,6 +37,10 @@ public: // functions
 			IPSocketT<FAMILY>{TYPE, flags} {
 	}
 
+	SocketType type() const override {
+		return TYPE;
+	}
+
 	auto tcpOptions() {
 		return TCPOptions{this->m_fd};
 	}

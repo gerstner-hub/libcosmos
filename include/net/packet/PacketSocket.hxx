@@ -49,6 +49,10 @@ public: // functions
 		return PacketOptions{m_fd};
 	}
 
+	SocketFamily family() const override {
+		return SocketFamily::PACKET;
+	}
+
 	/// Bind to the given protocol / network interface.
 	void bind(const LinkLayerAddress &addr) {
 		Socket::bind(addr);
@@ -129,6 +133,10 @@ public: // functions
 			const SocketFlags flags = SocketFlags{SocketFlag::CLOEXEC}) :
 			PacketSocket{SocketType::RAW, protocol, flags} {
 	}
+
+	SocketType type() const override {
+		return SocketType::RAW;
+	}
 };
 
 /// A PacketSocket with automatic link layer header management.
@@ -147,6 +155,10 @@ public: // functions
 	explicit CookedPacketSocket(const EthernetProtocol protocol,
 			const SocketFlags flags = SocketFlags{SocketFlag::CLOEXEC}) :
 			PacketSocket{SocketType::DGRAM, protocol, flags} {
+	}
+
+	SocketType type() const override {
+		return SocketType::DGRAM;
 	}
 };
 

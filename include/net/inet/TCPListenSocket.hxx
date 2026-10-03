@@ -34,6 +34,14 @@ public: // functions
 			ListenSocket{FAMILY, TYPE, flags} {
 	}
 
+	SocketFamily family() const override {
+		return FAMILY;
+	}
+
+	SocketType type() const override {
+		return TYPE;
+	}
+
 	auto ipOptions() {
 		return typename FamilyTraits<FAMILY>::Options{m_fd};
 	}

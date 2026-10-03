@@ -24,6 +24,10 @@ public: // functions
 
 	explicit UnixClientSocket(const SocketType type, const SocketFlags flags = SocketFlags{SocketFlag::CLOEXEC});
 
+	SocketFamily family() const override {
+		return SocketFamily::UNIX;
+	}
+
 	auto unixOptions() {
 		return UnixOptions{this->m_fd};
 	}
@@ -93,6 +97,10 @@ public: // functions
 
 	explicit UnixStreamClientSocket(const SocketFlags flags = SocketFlags{SocketFlag::CLOEXEC}) :
 			UnixClientSocket{TYPE, flags} {}
+
+	SocketType type() const override {
+		return TYPE;
+	}
 };
 
 /// Implementation of a UNIX domain client socket of SocketType::SEQPACKET.
@@ -106,6 +114,10 @@ public: // functions
 
 	explicit UnixSeqPacketClientSocket(const SocketFlags flags = SocketFlags{SocketFlag::CLOEXEC}) :
 			UnixClientSocket{TYPE, flags} {}
+
+	SocketType type() const override {
+		return SocketType::SEQPACKET;
+	}
 };
 
 } // end ns

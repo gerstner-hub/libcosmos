@@ -9,7 +9,7 @@
 namespace cosmos {
 
 /// An active UNIX domain socket connection.
-class UnixConnection :
+class COSMOS_API UnixConnection :
 		public Socket {
 public: // functions
 
@@ -17,6 +17,12 @@ public: // functions
 			const AutoCloseFD auto_close = AutoCloseFD{true}) :
 			Socket{fd, auto_close} {
 	}
+
+	SocketFamily family() const override {
+		return SocketFamily::UNIX;
+	}
+
+	SocketType type() const override;
 
 	auto unixOptions() {
 		return UnixOptions{this->m_fd};
