@@ -154,6 +154,10 @@ public:
 		START_TEST("basic socket tests");
 		cosmos::UDP4Socket socket;
 		RUN_STEP("check-initial-open-state", socket.isOpen());
+		RUN_STEP("check-socket-protocol",
+				socket.sockOptions().getProtocol() == cosmos::SocketProtocol{IPPROTO_UDP});
+		RUN_STEP("check-socket-type",
+				socket.sockOptions().getType() == cosmos::SocketType::DGRAM);
 		const cosmos::IP4Address addr{cosmos::IP4_LOOPBACK_ADDR, 1234};
 		cosmos::IP4Address addr2;
 
@@ -842,6 +846,9 @@ public:
 
 		RUN_STEP("netlink-socket-family", sock1.family() == cosmos::SocketFamily::NETLINK);
 		RUN_STEP("netlink-socket-type", sock1.type() == cosmos::SocketType::DGRAM);
+
+		RUN_STEP("netlink-domain",
+				sock1.sockOptions().getDomain() == cosmos::SocketFamily::NETLINK);
 
 		sock1.options().setExtendedACKs(true);
 		sock2.options().setEnablePacketInfo(true);

@@ -206,6 +206,10 @@ public: // functions
 		setBoolOption(OptName{SO_KEEPALIVE}, on_off);
 	}
 
+	bool getKeepalive() const {
+		return getBoolOption(OptName{SO_KEEPALIVE});
+	}
+
 	/// Sets a mark for this socket.
 	/**
 	 * The mark value can be used for socket based routing e.g. iptables
@@ -243,12 +247,190 @@ public: // functions
 
 	/// Sets the minimum size of input bytes to pass on to userspace.
 	/**
-	 * Settings this option causes all input operations on the socket to
+	 * Setting this option causes all input operations on the socket to
 	 * block until at least `bytes` many bytes are available. This also
 	 * affects `select()` and `poll()` APIs.
 	 **/
 	void setReceiveLowerBound(const int bytes) {
 		setIntOption(OptName{SO_RCVLOWAT}, bytes);
+	}
+
+	int getReceiveLowerBound() const {
+		return getIntOption(OptName{SO_RCVLOWAT});
+	}
+
+	/// Sets the minimum size of output bytes to pass on to the protocol layer.
+	/**
+	 * Setting this option causes data to be collected in the kernel's
+	 * send buffer until at least `bytes` bytes are available to pass on
+	 * to the protocol layer for the next stage of send processing.
+	 **/
+	void setSendLowerBound(const int bytes) {
+		setIntOption(OptName{SO_SNDLOWAT}, bytes);
+	}
+
+	int getSendLowerBound() const {
+		return getIntOption(OptName{SO_SNDLOWAT});
+	}
+
+	/// Sets the maximum socket receiver buffer used in the kernel.
+	/**
+	 * On Linux the kernel doubles this value, which is also the value
+	 * returned by getMaxReceiveBuffer().
+	 *
+	 * If `force` is set then an attempt is made to bypass the `rmem_max`
+	 * limit of the calling process, which requires `CAP_NET_ADMIN`.
+	 **/
+	void setMaxReceiveBuffer(const int bytes, const bool force = false) {
+		setIntOption(OptName{force ? SO_RCVBUFFORCE : SO_RCVBUF}, bytes);
+	}
+
+	int getMaxReceiveBuffer() const {
+		return getIntOption(OptName{SO_RCVBUF});
+	}
+
+	/// Sets the maximum socket send buffer used in the kernel.
+	/**
+	 * This is analogous to `setMaxReceiveBuffer()`.
+	 **/
+	void setMaxSendBuffer(const int bytes, const bool force = false) {
+		setIntOption(OptName{force ? SO_SNDBUFFORCE : SO_SNDBUF}, bytes);
+	}
+
+	int getMaxSendBuffer() const {
+		return getIntOption(OptName{SO_SNDBUF});
+	}
+
+	void setMaxBuffer(const int rcv, const int send, const bool force = false) {
+		setMaxReceiveBuffer(rcv, force);
+		setMaxSendBuffer(send, force);
+	}
+
+	/// Sets the broadcast flag on the socket.
+	/**
+	 * This has only an effect on datagram or raw sockets.
+	 **/
+	void setBroadcast(const bool on_off) {
+		setBoolOption(OptName{SO_BROADCAST}, on_off);
+	}
+
+	bool getBroadcast() const {
+		return getBoolOption(OptName{SO_BROADCAST});
+	}
+
+	/// Enables socket debugging.
+	/**
+	 * Setting this requires `CAP_NET_ADMIN` or an effective UID of 0.
+	 * Despite these checks there seems currently nothing left in the
+	 * kernel that evaluates this setting i.e. this likely has no effect.
+	 **/
+	void setDebug(const bool on_off) {
+		setBoolOption(OptName{SO_DEBUG}, on_off);
+	}
+
+	bool getDebug() const {
+		return getBoolOption(OptName{SO_DEBUG});
+	}
+
+	/// Returns the socket domain.
+	/**
+	 * The domain is defined during creation of the socket and is thus a
+	 * read-only socket option. In case the domain is not yet covered by
+	 * libcosmos, no constant will be defined for the returned value.
+	 **/
+	SocketFamily getDomain() const {
+		return SocketFamily{getIntOption(OptName{SO_DOMAIN})};
+	}
+
+	/// Returns the socket protocol value.
+	/**
+	 * The protocol is defined during creation of the socket and is only
+	 * set to something meaningful for special socket types like
+	 * PacketSocket.
+	 *
+	 * The kernel and/or the C library may implicitly change
+	 * SocketProtocol::DEFAULT to something more specific like
+	 * SocketProtocol{IPPROTO_UDP} for UDPSocket.
+	 *
+	 * This is a read-only socket option.
+	 **/
+	SocketProtocol getProtocol() const {
+		return SocketProtocol{getIntOption(OptName{SO_PROTOCOL})};
+	}
+
+	/// Returns the socket type.
+	/**
+	 * The type is defined during creation of the socket and is thus
+	 * read-only.
+	 **/
+	SocketType getType() const {
+		return SocketType{getIntOption(OptName{SO_TYPE})};
+	}
+
+	/// Control the "don't route" option on the socket.
+	/**
+	 * When set then data won't be sent over gateways, but only to
+	 * directly connected hosts. This is a permanent variant of
+	 * MessageFlag::DONT_ROUTE, which can be specified in individual send
+	 * operations.
+	 **/
+	void setDontRoute(const bool on_off) {
+		setBoolOption(OptName{SO_DONTROUTE}, on_off);
+	}
+
+	bool getDontRoute() const {
+		return getBoolOption(OptName{SO_DONTROUTE});
+	}
+
+	/// Lock any BPF filters installed on the socket.
+	/**
+	 * This is a one-way option which can only be enabled.
+	 **/
+	void setLockFilter() {
+		setBoolOption(OptName{SO_LOCK_FILTER}, true);
+	}
+
+	bool getLockFilter() const {
+		return getBoolOption(OptName{SO_LOCK_FILTER});
+	}
+
+	/// Controls checksum calculation for outgoing UDP packets.
+	void setNoChecksum(const bool on_off) {
+		setBoolOption(OptName{SO_NO_CHECK}, on_off);
+	}
+
+	bool getNoChecksum() const {
+		return getBoolOption(OptName{SO_NO_CHECK});
+	}
+
+	/// Controls the mode of reception of out-of-band data.
+	/**
+	 * If this is enabled then out-of-band data on the socket is directly
+	 * placed into the receive data stream. Otherwise it is only passed
+	 * when MessageFlag::OUT_OF_BAND is specified in receive operations.
+	 **/
+	void setOOBInline(const bool on_off) {
+		setBoolOption(OptName{SO_OOBINLINE}, on_off);
+	}
+
+	bool getOOBInline() const {
+		return getBoolOption(OptName{SO_OOBINLINE});
+	}
+
+	/// Sets the priority for outgoing packets.
+	/**
+	 * Linux uses this values for ordering networking queues.
+	 * Higher-priority packets may be processed first depending on other
+	 * factors in the network and kernel configuration. Only the range of
+	 * 0 .. 6 may be used by unprivileged callers, otherwise
+	 * `CAP_NET_ADMIN` is required.
+	 **/
+	void setPriority(const int priority) {
+		setIntOption(OptName{SO_PRIORITY}, priority);
+	}
+
+	int getPriority() const {
+		return getIntOption(OptName{SO_PRIORITY});
 	}
 
 protected: // functions
