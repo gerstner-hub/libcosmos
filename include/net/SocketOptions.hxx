@@ -80,7 +80,7 @@ public: // functions
 		return getBoolOption(OptName{SO_ACCEPTCONN});
 	}
 
-	/// Bind the socket to a specific network device.
+	/// Bind the socket to a specific network device by name.
 	/**
 	 * When a socket is bound to a network device then only packets seen
 	 * on this network device will be processed by the socket.
@@ -91,12 +91,30 @@ public: // functions
 	void bindToDevice(const SysString ifname);
 
 	/// Returns the name of the network device this socket is bound to, if any.
-	std::string boundDevice() const;
+	/**
+	 * In case there is no binding established, then an empty string is
+	 * returned.
+	 **/
+	std::string boundDeviceName() const;
 
 	/// Removes a previously established binding to a network device.
 	void unbindDevice() {
-		bindToDevice("");
+		bindToDevice(InterfaceIndex::INVALID);
 	}
+
+	/// Bind the socket to a specific network device by index.
+	/**
+	 * This is similar to bindToDevice(const SysString), but uses an
+	 * InterfaceIndex to identify the device to bind to.
+	 **/
+	void bindToDevice(const InterfaceIndex index);
+
+	/// Returns the interface index of the network devices this socket is bound to, if any.
+	/**
+	 * In case there is no binding established, InterfaceIndex::INVALID is
+	 * returned.
+	 **/
+	InterfaceIndex boundDeviceIndex() const;
 
 	/// Enable socket debugging.
 	/**

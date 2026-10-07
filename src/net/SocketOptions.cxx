@@ -10,8 +10,16 @@ void SocketOptions::bindToDevice(const SysString ifname) {
 	setStringOption(OptName{SO_BINDTODEVICE}, ifname);
 }
 
-std::string SocketOptions::boundDevice() const {
+void SocketOptions::bindToDevice(const InterfaceIndex index) {
+	setIntOption(OptName{SO_BINDTOIFINDEX}, cosmos::to_integral(index));
+}
+
+std::string SocketOptions::boundDeviceName() const {
 	return getStringOption(OptName{SO_BINDTODEVICE}, MAX_NET_INTERFACE_NAME);
+}
+
+InterfaceIndex SocketOptions::boundDeviceIndex() const {
+	return InterfaceIndex{getIntOption(OptName{SO_BINDTOIFINDEX})};
 }
 
 void SocketOptions::setMark(const uint32_t mark) {

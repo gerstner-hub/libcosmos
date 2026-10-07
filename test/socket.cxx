@@ -50,7 +50,7 @@ public:
 		RUN_STEP("check-type", opts.type() == cosmos::SocketType::DGRAM);
 		RUN_STEP("check-no-accept-state", opts.acceptsConnections() == false);
 		opts.bindToDevice("lo");
-		RUN_STEP("check-bound-device-matches", opts.boundDevice() == "lo");
+		RUN_STEP("check-bound-device-matches", opts.boundDeviceName() == "lo");
 		RUN_STEP("check-no-last-error", opts.lastError() == cosmos::Errno::NO_ERROR);
 		opts.setReuseAddress(true);
 		opts.setReusePort(true);
