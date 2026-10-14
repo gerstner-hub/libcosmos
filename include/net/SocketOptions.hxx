@@ -4,9 +4,11 @@
 #include <chrono>
 
 // cosmos
+#include <cosmos/BitMask.hxx>
 #include <cosmos/dso_export.h>
 #include <cosmos/error/errno.hxx>
 #include <cosmos/fs/FileDescriptor.hxx>
+#include <cosmos/namespace.hxx>
 #include <cosmos/net/SockOptBase.hxx>
 #include <cosmos/net/types.hxx>
 
@@ -218,6 +220,9 @@ public: // functions
 	 **/
 	void setMark(const uint32_t mark);
 
+	/// Returns the mark configured for this socket.
+	uint32_t getMark() const;
+
 	/// Gets the current linger setting for this socket.
 	/**
 	 * \see setLinger()
@@ -289,6 +294,28 @@ public: // functions
 		return getIntOption(OptName{SO_RCVBUF});
 	}
 
+	enum class BufLockFlag : int {
+		SNDBUF = SOCK_SNDBUF_LOCK,
+		RCVBUF = SOCK_RCVBUF_LOCK
+	};
+
+	using BufLockFlags = BitMask<BufLockFlag>;
+
+	/// Control buffer size locking.
+	/**
+	 * The kernel may change receive and send buffer sizes for the socket
+	 * in certain situations. This option allows to prevent this by
+	 * locking the buffer size. Send and receive buffer can be locked
+	 * independently by specifying the appropriate bits in `flags`.
+	 **/
+	void setBufLock(const BufLockFlags flags) {
+		setIntOption(OptName{SO_BUF_LOCK}, flags.raw());
+	}
+
+	BufLockFlags getBufLock() const {
+		return BufLockFlags{getIntOption(OptName{SO_BUF_LOCK})};
+	}
+
 	/// Sets the maximum socket send buffer used in the kernel.
 	/**
 	 * This is analogous to `setMaxReceiveBuffer()`.
@@ -304,6 +331,19 @@ public: // functions
 	void setMaxBuffers(const int rcv, const int send, const bool force = false) {
 		setMaxReceiveBuffer(rcv, force);
 		setMaxSendBuffer(send, force);
+	}
+
+	/// Ask the kernel to pre-allocate `bytes` memory for socket operations.
+	/**
+	 * This asks the kernel to pre-allocate memory for this socket to
+	 * avoid memory management overhead during socket operation.
+	 **/
+	void setReserveMem(const int bytes) {
+		setIntOption(OptName{SO_RESERVE_MEM}, bytes);
+	}
+
+	int getReserveMem() const {
+		return getIntOption(OptName{SO_RESERVE_MEM});
 	}
 
 	/// Sets the broadcast flag on the socket.
@@ -431,6 +471,119 @@ public: // functions
 
 	int getPriority() const {
 		return getIntOption(OptName{SO_PRIORITY});
+	}
+
+	/// Controls whether the kernel may rethink the TX queue to use.
+	/**
+	 * If enabled then the kernel is allowed to rethink the TX queue to
+	 * use for this socket in certain situations.
+	 **/
+	void setTxReHash(const bool on_off) {
+		setBoolOption(OptName{SO_TXREHASH}, on_off);
+	}
+
+	bool getTxReHash() const {
+		return getBoolOption(OptName{SO_TXREHASH});
+	}
+
+	/// Specifies a busy-poll duration to be used by the kernel.
+	/**
+	 * Instruct the kernel to busy-poll for `duration` microseconds for
+	 * incoming data.
+	 **/
+	void setBusyPoll(const std::chrono::microseconds duration) {
+		setIntOption(OptName{SO_BUSY_POLL}, duration.count());
+	}
+
+	std::chrono::microseconds getBusyPoll() const {
+		return std::chrono::microseconds{getIntOption(OptName{SO_BUSY_POLL})};
+	}
+
+	/// Declares that the application will regularly busy-poll the socket.
+	/**
+	 * Enabling this option declares a promise towards the kernel that the
+	 * application will regularly busy-poll the socket, allowing the
+	 * kernel to disable interrupts.
+	 **/
+	void setPreferBusyPoll(const bool on_off) {
+		setBoolOption(OptName{SO_PREFER_BUSY_POLL}, on_off);
+	}
+
+	bool getPreferBusyPoll() const {
+		return getBoolOption(OptName{SO_PREFER_BUSY_POLL});
+	}
+
+	/// Sets the maximum number of packets which may be processed by busy-polling.
+	/**
+	 * This is a limit of the maximum number of packets a single busy poll
+	 * on the socket is allowed to process.
+	 **/
+	void setBusyPollBudget(const int packets) {
+		setIntOption(OptName{SO_BUSY_POLL_BUDGET}, packets);
+	}
+
+	int getBusyPollBudget() const {
+		return getIntOption(OptName{SO_BUSY_POLL_BUDGET});
+	}
+
+	/// Returns the network namespace identifier the socket belongs to.
+	NetworkNS getNetNSCookie() const;
+
+	/// Disable checksum calculation on TX packets.
+	/**
+	 * This option only has an effect on PacketSocket types at the moment.
+	 * It instructs the kernel not to calculate checksums on outgoing
+	 * packets.
+	 **/
+	void setNoFrameCheckSequence(const bool on_off) {
+		setBoolOption(OptName{SO_NOFCS}, on_off);
+	}
+
+	bool getNoFrameCheckSequence() const {
+		return getBoolOption(OptName{SO_NOFCS});
+	}
+
+	/// Informs the kernel that the current network route for the socket is bad.
+	/**
+	 * This is less a socket option than a one-shot command which informs
+	 * the kernel that the application believes the current network route
+	 * to be bad. The kernel may or may not act on this information.
+	 **/
+	void setConnectionAdvice() {
+		setIntOption(OptName{SO_CNX_ADVICE}, 1);
+	}
+
+	// this structure definition is not available in userspace headers,
+	// and the kernel header causes conflicts.
+	struct DMABufToken {
+		uint32_t token_start = 0;
+		uint32_t token_count = 0;
+	};
+
+	/// Inform the kernel about DMA buffers no longer needed by the application.
+	/**
+	 * This is used in conjunction with DMA buffer based I/O related to
+	 * MessageFlag::DEVMEM. It informs the kernel about DMA buffers no
+	 * longer needed by the application. It is therefore less a socket
+	 * option than a command.
+	 **/
+	void setDevMemDontNeed(const DMABufToken tokens);
+
+	/// Detach any installed packet filter program.
+	void detachBPF() {
+		/* doesn't actually take any value at all */
+		setBoolOption(OptName{SO_DETACH_FILTER}, true);
+	}
+
+	/// Detach any installed reuse port related filter program.
+	void detachReusePortBPF() {
+		/* doesn't actually take any value at all */
+		setBoolOption(OptName{SO_DETACH_REUSEPORT_BPF}, true);
+	}
+
+	/// Returns the ID of the RX queue used to receive packets on this socket.
+	int getNAPI_ID() const {
+		return getIntOption(OptName{SO_INCOMING_NAPI_ID});
 	}
 
 protected: // functions

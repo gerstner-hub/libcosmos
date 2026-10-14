@@ -168,6 +168,11 @@ public:
 			EXPECT_EXCEPTION("getsockname-throws-on-bad-addr", static_cast<cosmos::Socket&>(socket).getSockName(addr3));
 		}
 		RUN_STEP("getsockname-matches-bound-addr", addr == addr2);
+
+		socket.sockOptions().setBufLock(cosmos::SocketOptions::BufLockFlag::RCVBUF);
+
+		RUN_STEP("get-buf-lock-matches", socket.sockOptions().getBufLock() == cosmos::SocketOptions::BufLockFlag::RCVBUF);
+
 		socket.close();
 		RUN_STEP("check-after-close-state", !socket.isOpen());
 	}

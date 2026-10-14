@@ -248,7 +248,9 @@ enum class MessageFlag : int {
 	 * To use this flag socket SocketOptions::setZeroCopy() needs to be
 	 * set on the socket.
 	 **/
-	ZEROCOPY = MSG_ZEROCOPY
+	ZEROCOPY = MSG_ZEROCOPY,
+	/// Indicates the application is prepared to receive SCM_DEVMEM_DMABUF ancillary messages.
+	DEVMEM = MSG_SOCK_DEVMEM,
 };
 
 using MessageFlags = BitMask<MessageFlag>;

@@ -29,6 +29,10 @@ void SocketOptions::setMark(const uint32_t mark) {
 	setsockopt<uint32_t>(m_sock, M_LEVEL, OptName{SO_MARK}, mark);
 }
 
+uint32_t SocketOptions::getMark() const {
+	return getsockopt<uint32_t>(m_sock, M_LEVEL, OptName{SO_MARK});
+}
+
 SocketOptions::Linger SocketOptions::getLinger() const {
 	Linger ret;
 	auto len = getsockopt(m_sock, M_LEVEL, OptName{SO_LINGER}, &ret, sizeof(ret));
@@ -42,6 +46,16 @@ SocketOptions::Linger SocketOptions::getLinger() const {
 
 void SocketOptions::setLinger(const Linger &linger) {
 	setsockopt(m_sock, M_LEVEL, OptName{SO_LINGER}, &linger, sizeof(linger));
+}
+
+NetworkNS SocketOptions::getNetNSCookie() const {
+	const auto raw_id = getsockopt<uint64_t>(m_sock, M_LEVEL, OptName{SO_NETNS_COOKIE});
+
+	return NetworkNS{raw_id};
+}
+
+void SocketOptions::setDevMemDontNeed(const DMABufToken tokens) {
+	setsockopt(m_sock, M_LEVEL, OptName{SO_DEVMEM_DONTNEED}, tokens);
 }
 
 } // end ns
