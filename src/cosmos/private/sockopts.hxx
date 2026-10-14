@@ -5,6 +5,7 @@
 #include <cosmos/error/RangeError.hxx>
 #include <cosmos/error/RuntimeError.hxx>
 #include <cosmos/fs/FileDescriptor.hxx>
+#include <cosmos/net/types.hxx>
 #include <cosmos/utils.hxx>
 
 namespace cosmos {
@@ -105,7 +106,7 @@ namespace {
 	template <typename T>
 	void setsockopt(
 			FileDescriptor sock, const OptLevel lvl,
-			const OptName name, const T val) {
+			const OptName name, const T &val) {
 		static_assert(std::is_pointer<T>::value != true,
 				"this doesn't work for pointer types");
 		const auto res = ::setsockopt(
