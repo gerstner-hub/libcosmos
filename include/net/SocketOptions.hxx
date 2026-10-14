@@ -301,7 +301,7 @@ public: // functions
 		return getIntOption(OptName{SO_SNDBUF});
 	}
 
-	void setMaxBuffer(const int rcv, const int send, const bool force = false) {
+	void setMaxBuffers(const int rcv, const int send, const bool force = false) {
 		setMaxReceiveBuffer(rcv, force);
 		setMaxSendBuffer(send, force);
 	}
