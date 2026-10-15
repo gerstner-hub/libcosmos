@@ -205,10 +205,16 @@ public:
 				error = e.errnum();
 			}
 
+			RUN_STEP("send-without-bind-fails", error == cosmos::Errno::DEST_ADDR_REQ);
+
 			RUN_STEP("udp4-socket-family-matches", socket.family() == cosmos::SocketFamily::INET);
 			RUN_STEP("udp4-socket-type-matches", socket.type() == cosmos::SocketType::DGRAM);
-
-			RUN_STEP("send-without-bind-fails", error == cosmos::Errno::DEST_ADDR_REQ);
+			const auto rcv_to = cosmos::TimeVal{5, 512};
+			socket.sockOptions().setReceiveTimeout(rcv_to);
+			const auto rcv_to_back = socket.sockOptions().getReceiveTimeout();
+			/* only compare the seconds, the sub-second part is
+			 * subject to some granularity changes it seems */
+			RUN_STEP("rcv-timeo-matches", rcv_to.tv_sec == rcv_to_back.tv_sec);
 		}
 		const cosmos::IP4Address here_addr{cosmos::IP4_LOOPBACK_ADDR, 1234};
 		const cosmos::IP4Address there_addr{cosmos::IP4_LOOPBACK_ADDR, 1235};

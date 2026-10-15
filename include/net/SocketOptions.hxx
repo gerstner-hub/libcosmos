@@ -11,6 +11,7 @@
 #include <cosmos/namespace.hxx>
 #include <cosmos/net/SockOptBase.hxx>
 #include <cosmos/net/types.hxx>
+#include <cosmos/time/types.hxx>
 
 namespace cosmos {
 
@@ -584,6 +585,30 @@ public: // functions
 	/// Returns the ID of the RX queue used to receive packets on this socket.
 	int getNAPI_ID() const {
 		return getIntOption(OptName{SO_INCOMING_NAPI_ID});
+	}
+
+	/// Sets a receive operation timeout on the socket.
+	/**
+	 * This enables a timeout for receive operations on the socket. When
+	 * the given relative time has passed receive operations will returns
+	 * similar to the operation on a non-blocking socket:
+	 * 
+	 * - if some data was received, that data is returned.
+	 * - otherwise Errno::AGAIN, Errno::IN_PROGRESS and similar error
+	 *   codes are returned, depending on the context.
+	 **/
+	void setReceiveTimeout(const TimeVal &tv);
+
+	TimeVal getReceiveTimeout() const;
+
+	/// Set a send operation timeout analogous to setReceiveTimeout().
+	void setSendTimeout(const TimeVal &tv);
+
+	TimeVal getSendTimeout() const;
+
+	void setTimeouts(const TimeVal &send_tv, const TimeVal &rcv_tv) {
+		setSendTimeout(send_tv);
+		setReceiveTimeout(rcv_tv);
 	}
 
 protected: // functions

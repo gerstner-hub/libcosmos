@@ -58,4 +58,20 @@ void SocketOptions::setDevMemDontNeed(const DMABufToken tokens) {
 	setsockopt(m_sock, M_LEVEL, OptName{SO_DEVMEM_DONTNEED}, tokens);
 }
 
+void SocketOptions::setReceiveTimeout(const TimeVal &tv) {
+	setsockopt(m_sock, M_LEVEL, OptName{SO_RCVTIMEO}, tv);
+}
+
+void SocketOptions::setSendTimeout(const TimeVal &tv) {
+	setsockopt(m_sock, M_LEVEL, OptName{SO_SNDTIMEO}, tv);
+}
+
+TimeVal SocketOptions::getReceiveTimeout() const {
+	return getsockopt<TimeVal>(m_sock, M_LEVEL, OptName{SO_RCVTIMEO});
+}
+
+TimeVal SocketOptions::getSendTimeout() const {
+	return getsockopt<TimeVal>(m_sock, M_LEVEL, OptName{SO_SNDTIMEO});
+}
+
 } // end ns
