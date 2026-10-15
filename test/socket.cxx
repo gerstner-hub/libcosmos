@@ -64,6 +64,14 @@ public:
 		auto linger = opts.getLinger();
 		std::cout << "default linger on_off = " << linger.isEnabled() << " time = " << linger.time().count() << "\n";
 		opts.setReceiveLowerBound(512);
+
+		const auto mem_info = opts.getMemInfo();
+
+		RUN_STEP("mem-info-size-matches", mem_info.size() == SK_MEMINFO_VARS);
+		std::cout << "SNDBUF size: " << mem_info[cosmos::SocketOptions::MemInfo::SNDBUF] << "\n";
+		for (const auto val: mem_info) {
+			std::cerr << val << "\n";
+		}
 	}
 
 	void subCheckIP4LevelOpts(cosmos::IP4Socket &socket) {

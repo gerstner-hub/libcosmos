@@ -3,9 +3,13 @@
 // C++
 #include <chrono>
 
+// Linux
+#include <linux/sock_diag.h>
+
 // cosmos
 #include <cosmos/BitMask.hxx>
 #include <cosmos/dso_export.h>
+#include <cosmos/EnumArray.hxx>
 #include <cosmos/error/errno.hxx>
 #include <cosmos/fs/FileDescriptor.hxx>
 #include <cosmos/namespace.hxx>
@@ -75,6 +79,21 @@ public: // types
 			return this;
 		}
 	};
+
+	/// Index type for array of memory buffer sizes as returned by getMemInfo().
+	enum class MemInfo {
+		RMEM_ALLOC  = SK_MEMINFO_RMEM_ALLOC,
+		RCVBUF      = SK_MEMINFO_RCVBUF,
+		WMEM_ALLOC  = SK_MEMINFO_WMEM_ALLOC,
+		SNDBUF      = SK_MEMINFO_SNDBUF,
+		FWD_ALLOC   = SK_MEMINFO_FWD_ALLOC,
+		WMEM_QUEUED = SK_MEMINFO_WMEM_QUEUED,
+		OPTMEM      = SK_MEMINFO_OPTMEM,
+		BACKLOG     = SK_MEMINFO_BACKLOG,
+		DROPS       = SK_MEMINFO_DROPS
+	};
+
+	using MemInfoArray = cosmos::EnumArray<MemInfo, uint32_t, SK_MEMINFO_VARS>;
 
 public: // functions
 
@@ -610,6 +629,9 @@ public: // functions
 		setSendTimeout(send_tv);
 		setReceiveTimeout(rcv_tv);
 	}
+
+	/// Returns an array of memory buffer sizes used in the kernel for the socket.
+	MemInfoArray getMemInfo() const;
 
 protected: // functions
 

@@ -74,4 +74,8 @@ TimeVal SocketOptions::getSendTimeout() const {
 	return getsockopt<TimeVal>(m_sock, M_LEVEL, OptName{SO_SNDTIMEO});
 }
 
+SocketOptions::MemInfoArray SocketOptions::getMemInfo() const {
+	return getsockopt<MemInfoArray>(m_sock, M_LEVEL, OptName{SO_MEMINFO});
+}
+
 } // end ns
