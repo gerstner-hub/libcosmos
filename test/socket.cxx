@@ -6,6 +6,7 @@
 // cosmos
 #include <cosmos/fs/File.hxx>
 #include <cosmos/fs/FileStatus.hxx>
+#include <cosmos/net/aux.hxx>
 #include <cosmos/net/inet/aux.hxx>
 #include <cosmos/net/inet/TCPClientSocket.hxx>
 #include <cosmos/net/inet/TCPListenSocket.hxx>
@@ -629,6 +630,7 @@ public:
 		subCheckUDPMsgHeader();
 		subCheckUnixAncillaryMessage();
 		subCheckIPSocketError();
+		subCheckSocketAncillaryMessage();
 	}
 
 	void subCheckTCPMsgHeaderThread() {
@@ -714,6 +716,40 @@ public:
 
 			RUN_STEP("verify-parts-from-there", recv_part1 == send_part1 && recv_part2 == send_part2);
 		}
+	}
+
+	void subCheckSocketAncillaryMessage() {
+		cosmos::UDP4Socket sock_send, sock_recv;
+		sock_recv.bind(cosmos::IP4Address{});
+		cosmos::IP4Address addr;
+		sock_recv.getSockName(addr);
+
+		sock_send.sendTo("test", addr);
+		sock_recv.sockOptions().setReceivePriority(true);
+
+		cosmos::ReceiveMessageHeader header;
+		std::string message;
+		message.resize(100);
+		header.iovec.push_back(cosmos::InputMemoryRegion{message.data(), message.size()});
+		header.setControlBufferSize(1024);
+		sock_recv.receiveMessage(header);
+
+		message.resize(header.iovec[0].getLength());
+		bool seen_priority = false;
+
+		for (const auto &cmsg: header) {
+			if (!cosmos::PriorityMessage::matches(cmsg)) {
+				continue;
+			}
+
+			cosmos::PriorityMessage msg{cmsg};
+
+			std::cout << "receive priority = " << msg.item() << "\n";
+			seen_priority = true;
+			break;
+		}
+
+		RUN_STEP("seen-receive-priority-auxdata", seen_priority);
 	}
 
 	void subCheckUnixAncillaryMessage() {

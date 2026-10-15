@@ -642,6 +642,38 @@ public: // functions
 	/// Returns an array of memory buffer sizes used in the kernel for the socket.
 	MemInfoArray getMemInfo() const;
 
+	/// Controls the reception of SO_MARK ancillary messages.
+	/**
+	 * Setting this option requires CAP_NET_ADMIN or CAP_NET_RAW
+	 * privileges.
+	 *
+	 * Use the MarkMessage type to extract this ancillary message during
+	 * reception. The mark is an identifier which can be used e.g.  for
+	 * routing decisions and is similar to the Netfiler MARK feature, but
+	 * on socket level.
+	 **/
+	void setReceiveMark(const bool on_off) {
+		setBoolOption(OptName{SO_RCVMARK}, on_off);
+	}
+
+	bool getReceiveMark() const {
+		return getBoolOption(OptName{SO_RCVMARK});
+	}
+
+	/// Controls the reception of SO_PRIORITY ancillary messages.
+	/**
+	 * Use the PriorityMessage type to extract this ancillary message
+	 * during reception. The priority relates to the receive queue
+	 * priority in the kernel.
+	 **/
+	void setReceivePriority(const bool on_off) {
+		setBoolOption(OptName{SO_RCVPRIORITY}, on_off);
+	}
+
+	bool getReceivePriority() const {
+		return getBoolOption(OptName{SO_RCVPRIORITY});
+	}
+
 protected: // functions
 
 	friend class Socket;

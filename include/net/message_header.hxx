@@ -444,16 +444,16 @@ protected: // data
  * the API of SendMessageHeader::ControlMessage without adding a lot of friend
  * declarations for each type of ancillary message.
  **/
-template <OptLevel level, typename MSG_TYPE>
+template <OptLevel LEVEL, typename MSG_TYPE>
 class AncillaryMessage {
 protected: // functions
 
 	SendMessageHeader::ControlMessage createMsg(MSG_TYPE type, const size_t data_len) const {
-		return SendMessageHeader::ControlMessage{level, to_integral(type), data_len};
+		return SendMessageHeader::ControlMessage{LEVEL, to_integral(type), data_len};
 	}
 
 	void checkMsg(const ReceiveMessageHeader::ControlMessage &msg, MSG_TYPE type) const {
-		if (msg.level() != level || type != MSG_TYPE(msg.type())) {
+		if (msg.level() != LEVEL || type != MSG_TYPE(msg.type())) {
 			throw RuntimeError{"ancillary message type mismatch"};
 		}
 	}
@@ -461,6 +461,48 @@ protected: // functions
 	uint8_t* data(SendMessageHeader::ControlMessage &msg) const {
 		return msg.data();
 	}
+};
+
+/// Base class for simple ancilarry receive messages containing a single scalar data type.
+template <OptLevel LEVEL, typename MSG_TYPE, MSG_TYPE MSG, typename ITEM>
+class ScalarAuxInputMessage :
+		public AncillaryMessage<LEVEL, MSG_TYPE> {
+public: // functions
+
+	ScalarAuxInputMessage() = default;
+
+	explicit ScalarAuxInputMessage(const ReceiveMessageHeader::ControlMessage &msg) {
+		deserialize(msg);
+	}
+
+	static bool matches(const ReceiveMessageHeader::ControlMessage &msg) {
+		if (msg.level() != LEVEL) {
+			return false;
+		}
+
+		const MSG_TYPE type{msg.raw().cmsg_type};
+
+		return type == MSG;
+	}
+
+	void deserialize(const ReceiveMessageHeader::ControlMessage &msg) {
+		this->checkMsg(msg, MSG);
+
+		if (msg.dataLength() != sizeof(m_item)) {
+			throw RuntimeError{"unexpected ancillary data size"};
+		}
+
+		std::memcpy(&m_item, msg.data(), sizeof(m_item));
+	}
+
+	/// Provides access to the last deserialized data item.
+	const ITEM item() const {
+		return m_item;
+	}
+
+protected: // data
+
+	ITEM m_item{};
 };
 
 } // end ns
