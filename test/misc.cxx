@@ -4,10 +4,11 @@
 
 // cosmos
 #include <cosmos/compiler.hxx>
+#include <cosmos/EnumArray.hxx>
 #include <cosmos/random.hxx>
+#include <cosmos/SizedArray.hxx>
 #include <cosmos/uname.hxx>
 #include <cosmos/utils.hxx>
-#include <cosmos/SizedArray.hxx>
 
 // Test
 #include "TestBase.hxx"
@@ -26,6 +27,7 @@ class MiscTest :
 		testRandom();
 		testUname();
 		testSizedArray();
+		testEnumArray();
 	}
 
 	void testRanges() {
@@ -248,6 +250,30 @@ class MiscTest :
 
 		RUN_STEP("front() works", array.front() == 10);
 		RUN_STEP("back() works", array.back() == -5);
+	}
+
+	void testEnumArray() {
+		START_TEST("EnumArray");
+		enum class Index {
+			FIRST = 1,
+			FIFTH = 5
+		};
+
+		cosmos::EnumArray<Index, int, 10> array;
+
+		size_t count = 0;
+
+		for (const auto el: array) {
+			(void)el;
+			count ++;
+		}
+
+		array[Index::FIRST] = 50;
+		array.plain()[5] = -50;
+
+		RUN_STEP("iteration works", count == array.size());
+		RUN_STEP("assignment works", array.plain()[1] == 50);
+		RUN_STEP("reading works", array[Index::FIFTH] == -50);
 	}
 };
 
