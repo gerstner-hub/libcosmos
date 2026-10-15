@@ -23,4 +23,8 @@ namespace cosmos {
 struct no_init_t {};
 constexpr inline no_init_t no_init;
 
+/// Specification of a CPU number e.g. for pinning execution on a CPU.
+enum class CpuNr : int {
+};
+
 } // end ns

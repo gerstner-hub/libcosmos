@@ -606,6 +606,15 @@ public: // functions
 		return getIntOption(OptName{SO_INCOMING_NAPI_ID});
 	}
 
+	/// The the CPU affinity of the socket.
+	CpuNr getIncomingCpu() const {
+		return CpuNr{getIntOption(OptName{SO_INCOMING_CPU})};
+	}
+
+	void setIncomingCpu(const CpuNr nr) {
+		setIntOption(OptName{SO_INCOMING_CPU}, to_integral(nr));
+	}
+
 	/// Sets a receive operation timeout on the socket.
 	/**
 	 * This enables a timeout for receive operations on the socket. When
