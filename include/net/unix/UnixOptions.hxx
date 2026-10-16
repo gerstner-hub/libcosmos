@@ -173,6 +173,10 @@ public: // functions
 		setIntOption(OptName{SO_PEEK_OFF}, off);
 	}
 
+	int getPeekOffset() const {
+		return getIntOption(OptName{SO_PEEK_OFF});
+	}
+
 	using SockOptBase::getPeerSec;
 
 	/// Controls the reception of UnixMessage::INQ ancillary messages.
