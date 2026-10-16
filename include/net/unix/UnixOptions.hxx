@@ -1,7 +1,6 @@
 #pragma once
 
 // C++
-#include <chrono>
 #include <vector>
 
 // cosmos
@@ -104,6 +103,21 @@ public: // functions
 	}
 
 	using SockOptBase::getPeerSec;
+
+	/// Controls the reception of UnixMessage::INQ ancillary messages.
+	/**
+	 * Use the InQueueMessage type to extract this ancillary message
+	 * during reception. This message informs userspace about the
+	 * remaining amount of data in the kernel's receive queue for the
+	 * socket.
+	 **/
+	void setReceiveInQueue(const bool on_off) {
+		setBoolOption(OptName{SO_INQ}, on_off);
+	}
+
+	bool getReceiveInQueue() const {
+		return getBoolOption(OptName{SO_INQ});
+	}
 
 protected: // functions
 

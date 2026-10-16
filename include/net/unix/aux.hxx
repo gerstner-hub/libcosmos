@@ -24,9 +24,10 @@ namespace cosmos {
 
 /// Ancillary message types available for UNIX domain sockets.
 enum class UnixMessage : int {
-	RIGHTS = SCM_RIGHTS, ///< file descriptor passing.
-	CREDENTIALS = SCM_CREDENTIALS
-	//SECURITY = SCM_SECURITY // the define for this seems to be missing?
+	RIGHTS      = SCM_RIGHTS,      ///< file descriptor passing.
+	CREDENTIALS = SCM_CREDENTIALS, ///< new process credentials (privilege escalation)
+	SECURITY    = SCM_SECURITY,    ///< SELinux context of the peer socket.
+	INQ         = SCM_INQ,         ///< remaining amount of bytes in kernel receive queue.
 };
 
 /// Return the UnixMessage ancillary message type stored in `msg`, if applicable.
@@ -252,5 +253,8 @@ protected: // data
 
 	UnixCredentials m_creds;
 };
+
+using InQueueMessage = ScalarAuxInputMessage<OptLevel::SOCKET, UnixMessage,
+      UnixMessage::INQ, uint32_t>;
 
 } // end ns
