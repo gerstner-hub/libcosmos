@@ -42,12 +42,20 @@ public: // functions
 		setBoolOption(OptName{SO_PASSCRED}, on_off);
 	}
 
+	bool getPassCredentials() const {
+		return getBoolOption(OptName{SO_PASSCRED});
+	}
+
 	/// This enables or disables the reception of SCM_SECURITY ancillary messages.
 	/**
 	 * This message contains the SELinux security label of the peer socket.
 	 **/
 	void setPassSecurity(const bool on_off) {
 		setBoolOption(OptName{SO_PASSSEC}, on_off);
+	}
+
+	void getPassSecurity() const {
+		getBoolOption(OptName{SO_PASSSEC});
 	}
 
 	/// Returns the credentials of the peer process.
