@@ -674,6 +674,21 @@ public: // functions
 		return getBoolOption(OptName{SO_RCVPRIORITY});
 	}
 
+	/// Controls the reception of SO_RXQ_OVFL ancillary messages.
+	/**
+	 * Use the RxQueueOverflowMessage type to extract this ancillary
+	 * message during reception. This message will be received when
+	 * packets are dropped from the kernel's receive queue due to a lack
+	 * of space.
+	 **/
+	void setReceiveRxQueueOverflow(const bool on_off) {
+		setBoolOption(OptName{SO_RXQ_OVFL}, on_off);
+	}
+
+	bool getReceiveRxQueueOverflow() const {
+		return getBoolOption(OptName{SO_RXQ_OVFL});
+	}
+
 protected: // functions
 
 	friend class Socket;
