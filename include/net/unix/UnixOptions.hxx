@@ -20,7 +20,7 @@ class COSMOS_API UnixOptions :
 	friend class UnixClientSocket;
 public: // functions
 
-	/// This enables or disables the transfer of SCM_CREDENTIALS control messages.
+	/// Enable or disable the transfer of UnixMessage::CREDENTIALS ancillary messages.
 	/**
 	 * If enabled then this message can be passed between processes that
 	 * communicate via a UNIX domain socket. Note that both sides of the
@@ -46,7 +46,7 @@ public: // functions
 		return getBoolOption(OptName{SO_PASSCRED});
 	}
 
-	/// This enables or disables the reception of SCM_SECURITY ancillary messages.
+	/// Enable or disable the reception of UnixMessage::SECURITY ancillary messages.
 	/**
 	 * This message contains the SELinux security label of the peer socket.
 	 **/
@@ -56,6 +56,25 @@ public: // functions
 
 	void getPassSecurity() const {
 		getBoolOption(OptName{SO_PASSSEC});
+	}
+
+	/// Enable or disable the reception of UnixMessage::PASSPIDFD ancillary messages.
+	/**
+	 * This ancillary message transfers a PIDFD file descriptor for the
+	 * peer socket into the receiving process. Note that every receive
+	 * operation on the socket will provide one such socket until the
+	 * option is disabled again. Thus this is mostly useful for
+	 * UnixDatagramSocket where multiple peers can talk to the same
+	 * socket.
+	 *
+	 * \see PidFdMessage
+	 **/
+	void setPassPidFd(const bool on_off) {
+		setBoolOption(OptName{SO_PASSPIDFD}, on_off);
+	}
+
+	bool getPassPidFD() const {
+		return getBoolOption(OptName{SO_PASSPIDFD});
 	}
 
 	/// Returns the credentials of the peer process.
@@ -118,6 +137,8 @@ public: // functions
 	 * during reception. This message informs userspace about the
 	 * remaining amount of data in the kernel's receive queue for the
 	 * socket.
+	 *
+	 * \see InQueueMessage
 	 **/
 	void setReceiveInQueue(const bool on_off) {
 		setBoolOption(OptName{SO_INQ}, on_off);

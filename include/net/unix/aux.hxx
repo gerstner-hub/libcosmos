@@ -9,6 +9,7 @@
 #include <cosmos/fs/types.hxx>
 #include <cosmos/net/message_header.hxx>
 #include <cosmos/net/types.hxx>
+#include <cosmos/proc/ProcessFile.hxx>
 #include <cosmos/proc/process.hxx>
 
 namespace cosmos {
@@ -26,6 +27,7 @@ namespace cosmos {
 enum class UnixMessage : int {
 	RIGHTS      = SCM_RIGHTS,      ///< file descriptor passing.
 	CREDENTIALS = SCM_CREDENTIALS, ///< new process credentials (privilege escalation)
+	PIDFD       = SCM_PIDFD,       ///< PIDFD referring to the socket peer.
 	SECURITY    = SCM_SECURITY,    ///< SELinux context of the peer socket.
 	INQ         = SCM_INQ,         ///< remaining amount of bytes in kernel receive queue.
 };
@@ -219,7 +221,7 @@ protected: // data
  *  processes with CAP_SYS_ADMIN may specify arbitrary ProcessID, with
  *  CAP_SETUID may specify arbitrary UserIDs and GroupIDs.
  *
- *  Once the socket option is set each received message will carry an implicit
+ *  Once the socket option is set, each received message will carry an implicit
  *  UnixCredentialsMessage, even if the peer did not send one. This is
  *  automatically filled in by the kernel with the process's PID and real
  *  UserID and GroupID.
@@ -252,6 +254,66 @@ public: // functions
 protected: // data
 
 	UnixCredentials m_creds;
+};
+
+/// Wrapper for the SCM_PIDFD ancillary message to receive PIDFDs from peer sockets.
+/**
+ * Once UnixOptions::setPassPidFd() is enabled, each receiveMessage() call on
+ * the socket will provide a PIDFD referring to the sender of the message.
+ * This helper type deserializes this type of ancillary message and allows to
+ * claim the PIDFD as a ProcessFile instance.
+ *
+ * After a successful call to `deserialize()` a ProcessFile corresponding to
+ * the receive FD will be filled in the object and is accessible via `fd()` or
+ * can be transferred to the caller via `takeFD()`.
+ *
+ * An unclaimed PIDFD will be closed during destruction of the object or when
+ * another call to `deserialize()` occurs.
+ **/
+class COSMOS_API PidFdMessage :
+		public AncillaryMessage<OptLevel::SOCKET, UnixMessage> {
+public: // functions
+	//
+	/// Returns whether the given `msg` contains a PidFdMessage.
+	static bool matches(const ReceiveMessageHeader::ControlMessage &msg) {
+		if (auto type = as_unix_message(msg); type) {
+			return *type == UnixMessage::PIDFD;
+		} else {
+			return false;
+		}
+	}
+
+	/// Parse a received PIDFD file descriptor from the given ControlMessage.
+	/**
+	 * If `msg` is not of the right type then an exception is thrown.
+	 *
+	 * On success use `fd()` to operate on the PIDFD or `takeFD()` to
+	 * transfer the file descriptor to the caller.
+	 **/
+	void deserialize(const ReceiveMessageHeader::ControlMessage &msg);
+
+	/// Returns whether a valid PIDFD is currently stored in the object.
+	bool hasFD() const {
+		return m_pidfd.open();
+	}
+
+	const ProcessFile& fd() const {
+		return m_pidfd;
+	}
+
+	/// Provides access to the stored PIDFD, if any.
+	ProcessFile& fd() {
+		return m_pidfd;
+	}
+
+	/// Transfer the stored PIDFD into `other`.
+	void takeFD(ProcessFile &&other) {
+		other = std::move(m_pidfd);
+	}
+
+protected: // data
+
+	ProcessFile m_pidfd;
 };
 
 using InQueueMessage = ScalarAuxInputMessage<OptLevel::SOCKET, UnixMessage,

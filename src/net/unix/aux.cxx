@@ -3,6 +3,7 @@
 #include <cstring>
 
 // Cosmos
+#include <cosmos/error/ParseError.hxx>
 #include <cosmos/error/UsageError.hxx>
 #include <cosmos/fs/FileDescriptor.hxx>
 #include <cosmos/net/unix/aux.hxx>
@@ -17,13 +18,13 @@ void UnixCredentials::setCurrentCreds() {
 	gid = to_integral(cosmos::proc::get_effective_group_id());
 }
 
-void UnixRightsMessage::deserialize(const ReceiveMessageHeader::ControlMessage &msg) {
+void UnixRightsMessage::deserialize(
+		const ReceiveMessageHeader::ControlMessage &msg) {
 	this->checkMsg(msg, UnixMessage::RIGHTS);
 
 	clearFDs();
 
 	const uint8_t *data = reinterpret_cast<const uint8_t*>(msg.data());
-
 	auto left = msg.dataLength();
 	FileNum fd;
 
@@ -37,6 +38,25 @@ void UnixRightsMessage::deserialize(const ReceiveMessageHeader::ControlMessage &
 	if (!m_fds.empty()) {
 		m_unclaimed_fds = true;
 	}
+}
+
+void PidFdMessage::deserialize(
+		const ReceiveMessageHeader::ControlMessage &msg) {
+	m_pidfd.close();
+	this->checkMsg(msg, UnixMessage::PIDFD);
+
+
+	const uint8_t *data = reinterpret_cast<const uint8_t*>(msg.data());
+
+	if (msg.dataLength() != sizeof(FileNum)) {
+		throw ParseError{"size mismatch in SCM_PIDFD ancillary message"};
+	}
+
+	FileNum pidfd;
+
+	std::memcpy(&pidfd, data, sizeof(pidfd));
+
+	m_pidfd = ProcessFile{PidFD{pidfd}};
 }
 
 SendMessageHeader::ControlMessage UnixRightsMessage::serialize() const {
