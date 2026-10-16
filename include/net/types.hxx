@@ -15,6 +15,7 @@
 // cosmos
 #include <cosmos/BitMask.hxx>
 #include <cosmos/net/byte_order.hxx>
+#include <cosmos/net/compat.hxx>
 
 /**
  * @file

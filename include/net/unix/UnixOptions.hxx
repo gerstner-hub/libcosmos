@@ -8,12 +8,6 @@
 #include <cosmos/net/unix/aux.hxx>
 #include <cosmos/proc/ProcessFile.hxx>
 
-#ifndef SO_RIGHTS_NOTRUNC
-	// this was only added in kernel 7.3, not yet found in most userspace
-	// headers
-#	define SO_RIGHTS_NOTRUNC 85 /* generic UAPI value */
-#endif
-
 namespace cosmos {
 
 /// UnixSocket level option setter/getter helper.
