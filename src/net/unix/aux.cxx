@@ -22,7 +22,7 @@ void UnixRightsMessage::deserialize(
 		const ReceiveMessageHeader::ControlMessage &msg) {
 	this->checkMsg(msg, UnixMessage::RIGHTS);
 
-	clearFDs();
+	clear();
 
 	const uint8_t *data = reinterpret_cast<const uint8_t*>(msg.data());
 	auto left = msg.dataLength();
@@ -32,7 +32,12 @@ void UnixRightsMessage::deserialize(
 		std::memcpy(&fd, data, sizeof(fd));
 		data += sizeof(fd);
 		left -= sizeof(fd);
-		m_fds.push_back(fd);
+		if (to_integral(fd) >= 0) {
+			m_fds.push_back(fd);
+		} else {
+			/* must be the SO_RIGHTS_NOTRUNC option in effect */
+			m_errors.push_back(Errno{to_integral(fd)});
+		}
 	}
 
 	if (!m_fds.empty()) {

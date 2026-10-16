@@ -8,6 +8,12 @@
 #include <cosmos/net/unix/aux.hxx>
 #include <cosmos/proc/ProcessFile.hxx>
 
+#ifndef SO_RIGHTS_NOTRUNC
+	// this was only added in kernel 7.3, not yet found in most userspace
+	// headers
+#	define SO_RIGHTS_NOTRUNC 85 /* generic UAPI value */
+#endif
+
 namespace cosmos {
 
 /// UnixSocket level option setter/getter helper.
@@ -44,6 +50,44 @@ public: // functions
 
 	bool getPassCredentials() const {
 		return getBoolOption(OptName{SO_PASSCRED});
+	}
+
+	/// Enable or disable the transfer of UnixMessage::RIGHTS ancillary messages.
+	/**
+	 * This is a rather new addition present in kernel 6.16 onwards. It
+	 * allows to _disable_ the generation of UnixMessage::RIGHTS, which is
+	 * historically enabled by default on UNIX systems. This is an opt-out
+	 * which allows for additional security, since reception of random
+	 * file descriptors on the end of a process not prepared to handle
+	 * this can cause bad effects (like file descriptor exhaustion).
+	 **/
+	void setPassRights(const bool on_off) {
+		setBoolOption(OptName{SO_PASSRIGHTS}, on_off);
+	}
+
+	bool getPassRights() const {
+		return getBoolOption(OptName{SO_PASSRIGHTS});
+	}
+
+	/// Control the error handling behaviour upon file descriptor reception.
+	/**
+	 * This option allows to control the behaviour when a Linux security
+	 * module (LSM) denies the transfer of a file descriptor from the peer
+	 * to this process via a UnixRightsMessage.
+	 *
+	 * By default the control message is truncated as soon as one such
+	 * file descriptor is encountered during processing. With this option
+	 * enabled a negative errno is passed instead of the file descriptor,
+	 * following file descriptors can still be received.
+	 *
+	 * This options is only available in kernel 7.3 onwards.
+	 **/
+	void setRightsNoTruncation(const bool on_off) {
+		setBoolOption(OptName{SO_RIGHTS_NOTRUNC}, on_off);
+	}
+
+	bool getRightsNoTruncation() const {
+		return getBoolOption(OptName{SO_RIGHTS_NOTRUNC});
 	}
 
 	/// Enable or disable the reception of UnixMessage::SECURITY ancillary messages.

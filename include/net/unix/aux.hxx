@@ -114,24 +114,28 @@ struct COSMOS_API UnixCredentials :
  * There are a number of pitfalls with this mechanism:
  *
  * - when sending a UnixRightsMessage it is best to send some actual payload
- *   in the SendMessageHeader used for this. On Linux when using a
+ *   in the SendMessageHeader used for this. On Linux when, using a
  *   UnixDatagramSocket then this is not strictly necessary. For all other
  *   socket types at least on byte of payload data is necessary for
- *   successfully passing the ancillary message though.
+ *   successfully passing the ancillary message, though.
  * - when receiving a UnixRightsMessage then the received file descriptors
  *   will automatically be allocated in the current process. If an application
- *   fails to parse the message or take ownership of the file descriptors then
- *   they will leak. This can lead to a denial-of-service situation especially
- *   if the process at the other end is from a different security domain.
+ *   fails to parse the message or take ownership of the file descriptor, they
+ *   will leak. This can lead to a denial-of-service situation especially if
+ *   the process at the other end is from a different security domain.
  * - when the control message buffer is too small upon reception of a
  *   UnixRightsMessage then the control message can be truncated (check
  *   Messageflag::CTL_WAS_TRUNCATED). In this case parts of the received file
  *   descriptors will be closed again (or not allocated in the first place).
- * - the order and payload/ancillary message combination used for sending the
- *   file descriptors can change on the receiving side. Design your
+ * - the order and combination of payload/ancillary message used when sending
+ *   the file descriptors can change on the receiving side. Design your
  *   application to accept ancillary messages on the receiving end for as long
  *   as you expect such a transmission. Don't wait for a specific payload
  *   message accompanied by the file descriptors.
+ * - when UnixOptions::setRightsNoTruncation() is enabled then error codes can
+ *   be received instead of file descriptors in case a Linux security module
+ *   (LSM) denies the transfer of the file descriptor. This type provides the
+ *   `hasErrors()` and `errors()` member to inspect any such conditions.
  **/
 class COSMOS_API UnixRightsMessage :
 		public AncillaryMessage<OptLevel::SOCKET, UnixMessage> {
@@ -139,6 +143,8 @@ public: // types
 
 	/// A vector to keep a series of FileNum file descriptor numbers to pass between processes.
 	using FileNumVector = std::vector<FileNum>;
+	/// A vector to keep a series of potential error reports.
+	using ErrnoVector = std::vector<Errno>;
 
 public: // data
 
@@ -181,9 +187,18 @@ public: // functions
 		m_fds.push_back(fd);
 	}
 
+	void clear() {
+		clearFDs();
+		clearErrors();
+	}
+
 	void clearFDs() {
 		closeUnclaimed();
 		m_fds.clear();
+	}
+
+	void clearErrors() {
+		m_errors.clear();
 	}
 
 	void takeFDs(FileNumVector &fds) {
@@ -200,6 +215,14 @@ public: // functions
 		return m_unclaimed_fds ? m_fds.size() : 0;
 	}
 
+	bool hasErrors() const {
+		return !m_errors.empty();
+	}
+
+	const ErrnoVector& errors() const {
+		return m_errors;
+	}
+
 protected: // functions
 
 	void closeUnclaimed();
@@ -207,6 +230,7 @@ protected: // functions
 protected: // data
 
 	FileNumVector m_fds;
+	ErrnoVector m_errors;
 	bool m_unclaimed_fds = false; ///< Flag whether "live" FDs in m_fds have not yet been collected.
 };
 
