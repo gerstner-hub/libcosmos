@@ -844,6 +844,7 @@ public:
 
 								break;
 							}
+							default: continue;
 						}
 					}
 				}
