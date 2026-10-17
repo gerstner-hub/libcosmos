@@ -165,12 +165,13 @@ public: // types
 		 * This is the location where the actual message data needs to
 		 * go.
 		 **/
-		uint8_t* data() {
-			return CMSG_DATA(m_header);
+		std::byte* data() {
+			return reinterpret_cast<std::byte*>(
+					CMSG_DATA(m_header));
 		}
 
-		const uint8_t* data() const {
-			return CMSG_DATA(m_header);
+		const std::byte* data() const {
+			return const_cast<ControlMessage&>(*this).data();
 		}
 
 		/// Returns the amount of bytes that can be stored at data().
@@ -191,7 +192,7 @@ public: // types
 	protected: // data
 
 		/// The raw data the control message is composed of.
-		std::vector<uint8_t> m_buffer;
+		std::vector<std::byte> m_buffer;
 		/// Pointer to the beginning of m_buffer for setting header data.
 		struct cmsghdr *m_header = nullptr;
 	};
@@ -435,7 +436,7 @@ protected: // functions
 protected: // data
 
 	/// Optional buffer used to receive ancillary messages.
-	std::vector<uint8_t> m_control_buffer;
+	std::vector<std::byte> m_control_buffer;
 };
 
 /// Base class for types that deal with (de)serializing ancillary socket messages.
@@ -459,7 +460,7 @@ protected: // functions
 		}
 	}
 
-	uint8_t* data(SendMessageHeader::ControlMessage &msg) const {
+	std::byte* data(SendMessageHeader::ControlMessage &msg) const {
 		return msg.data();
 	}
 };
