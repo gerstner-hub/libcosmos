@@ -78,4 +78,15 @@ SocketOptions::MemInfoArray SocketOptions::getMemInfo() const {
 	return getsockopt<MemInfoArray>(m_sock, M_LEVEL, OptName{SO_MEMINFO});
 }
 
+void SocketOptions::setTxTimeConfig(const TxTimeConfig &config) {
+	setsockopt(m_sock, M_LEVEL, OptName{SO_TXTIME}, *config.raw());
+}
+
+
+SocketOptions::TxTimeConfig SocketOptions::getTxTimeConfig() const {
+	static_assert(sizeof(TxTimeConfig) == sizeof(sock_txtime),
+			"TxTimeConfig size mismath");
+	return getsockopt<TxTimeConfig>(m_sock, M_LEVEL, OptName{SO_TXTIME});
+}
+
 } // end ns

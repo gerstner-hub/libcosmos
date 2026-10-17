@@ -200,6 +200,7 @@ public: // data
 
 	/// Memory regions to send.
 	WriteIOVector iovec;
+	/* TODO: support sending multiple control messages */
 	/// Control message to send, if any.
 	std::optional<ControlMessage> control_msg;
 

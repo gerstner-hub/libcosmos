@@ -81,6 +81,9 @@ public: // functions
 	}
 
 	bool isZero() const { return this->tv_sec == 0 && this->tv_nsec == 0; }
+	bool isNegative() const {
+		return this->tv_sec < 0 || this->tv_nsec < 0;
+	}
 	void reset() { this->tv_sec = 0; this->tv_nsec = 0; }
 
 	time_t getSeconds() const { return this->tv_sec; }

@@ -5,6 +5,7 @@
 
 // Linux
 #include <linux/sock_diag.h>
+#include <linux/net_tstamp.h>
 
 // cosmos
 #include <cosmos/BitMask.hxx>
@@ -688,6 +689,59 @@ public: // functions
 	bool getReceiveRxQueueOverflow() const {
 		return getBoolOption(OptName{SO_RXQ_OVFL});
 	}
+
+	/// Configuration for TxTime control messages.
+	/**
+	 * TxTime control messages can be sent together with a payload to
+	 * control when the kernel should actually hand out the data to the
+	 * protocol layer.
+	 *
+	 * The configuration is comprised of the clock to use and a number of
+	 * flags influencing the behaviour.
+	 **/
+	struct TxTimeConfig :
+			protected sock_txtime {
+	public: // types
+
+		enum class Flag : uint32_t {
+			/// Transmit packets even if their transmit time is already exceeded.
+			DEADLINE_MODE = SOF_TXTIME_DEADLINE_MODE,
+			/// Report asynchronous transmit errors via the socket's error queue.
+			REPORT_ERRORS = SOF_TXTIME_REPORT_ERRORS
+		};
+
+		using Flags = BitMask<Flag>;
+
+	public: // functions
+
+		ClockType getClock() const {
+			return ClockType{this->clockid};
+		}
+
+		void setClock(const ClockType clock) {
+			this->clockid = to_integral(clock);
+		}
+
+		void setFlags(const Flags _flags) {
+			this->flags = _flags.raw();
+		}
+
+		Flags getFlags() const {
+			return Flags{this->flags};
+		}
+
+		sock_txtime* raw() {
+			return this;
+		}
+
+		const sock_txtime* raw() const {
+			return this;
+		}
+	};
+
+	void setTxTimeConfig(const TxTimeConfig &config);
+
+	TxTimeConfig getTxTimeConfig() const;
 
 protected: // functions
 
