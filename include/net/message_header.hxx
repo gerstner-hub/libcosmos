@@ -107,6 +107,9 @@ protected: // data
 	size_t m_last_io_cnt = 0;
 };
 
+template <OptLevel LEVEL, typename MSG_TYPE>
+class AncillaryMessage;
+
 /// Wrapper for `struct msghdr` for sending messages via Socket::sendMessage().
 /**
  * This type holds extended data for sending a message over a socket. For one
@@ -158,7 +161,7 @@ public: // types
 		 * in advance and cannot be changed during the lifetime of an
 		 * object..
 		 **/
-		ControlMessage(const OptLevel level, int type, const size_t data_len);
+		ControlMessage(struct cmsghdr *hdr, const size_t data_len);
 
 		/// Returns the data portion of the control message.
 		/**
@@ -176,34 +179,79 @@ public: // types
 
 		/// Returns the amount of bytes that can be stored at data().
 		size_t dataSpace() const {
-			return data() - m_buffer.data();
-		}
-
-		/// Returns the pointer to the complete control message for the `msg_control` field in `struct msghdr`.
-		const void* raw() const {
-			return m_buffer.data();
-		}
-
-		/// Returns the size of the complete control message for the `msg_controllen` field in `struct msghdr`.
-		size_t size() const {
-			return m_buffer.size();
+			return m_len;
 		}
 
 	protected: // data
 
-		/// The raw data the control message is composed of.
-		std::vector<std::byte> m_buffer;
-		/// Pointer to the beginning of m_buffer for setting header data.
 		struct cmsghdr *m_header = nullptr;
+		const size_t m_len;
+	};
+
+	/// A serialized block of control messages.
+	/**
+	 * Control messages are serialized into a linear block of raw data
+	 * including certain alignment/padding requirements.
+	 *
+	 * This type takes care of the allocation of individual control
+	 * messages. Specializations of AncillaryMessage know how their size
+	 * requirements and how to serialize themselves. This type here
+	 * enables them to obtain a properly aligned block of memory for the
+	 * purposes of serialization.
+	 **/
+	class ControlMessageBlock {
+		template <OptLevel LEVEL, typename MSG_TYPE>
+		friend class AncillaryMessage;
+
+		friend class SendMessageHeader;
+
+	public: // functions
+
+		/// Returns the pointer to the complete control block.
+		/**
+		 * This is used for the `msg_control` field in `struct
+		 * msghdr`.
+		 **/
+		const std::byte* raw() const {
+			return m_buffer.data();
+		}
+
+		/// Returns the size of the complete control block.
+		/**
+		 * This is used for the `msg_controllen` field in `struct
+		 * msghdr`.
+		 **/
+		size_t size() const {
+			return m_buffer.size();
+		}
+
+		bool empty() const {
+			return m_buffer.empty();
+		}
+
+	protected: // functions
+
+		/// Append a new control message with the given properties.
+		ControlMessage create(const OptLevel level,
+				const int type,
+				const size_t data_len);
+
+		/// Discard any stored control message data.
+		void reset() {
+			m_buffer.clear();
+		}
+
+	protected: // data
+
+		std::vector<std::byte> m_buffer;
 	};
 
 public: // data
 
 	/// Memory regions to send.
 	WriteIOVector iovec;
-	/* TODO: support sending multiple control messages */
-	/// Control message to send, if any.
-	std::optional<ControlMessage> control_msg;
+	/// Block of optional control messages.
+	ControlMessageBlock ctrl;
 
 protected: // functions
 
@@ -213,7 +261,7 @@ protected: // functions
 	/// Perform any cleanup or bookkeeping after a successful `sendmsg()` operation.
 	void postSend(size_t sent) {
 		iovec.update(sent);
-		control_msg.reset();
+		ctrl.reset();
 		m_last_io_cnt = sent;
 	}
 
@@ -450,8 +498,11 @@ template <OptLevel LEVEL, typename MSG_TYPE>
 class AncillaryMessage {
 protected: // functions
 
-	SendMessageHeader::ControlMessage createMsg(MSG_TYPE type, const size_t data_len) const {
-		return SendMessageHeader::ControlMessage{LEVEL, to_integral(type), data_len};
+	SendMessageHeader::ControlMessage createMsg(
+			SendMessageHeader::ControlMessageBlock &block,
+			MSG_TYPE type,
+			const size_t data_len) const {
+		return block.create(LEVEL, to_integral(type), data_len);
 	}
 
 	void checkMsg(const ReceiveMessageHeader::ControlMessage &msg, MSG_TYPE type) const {

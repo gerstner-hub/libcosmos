@@ -179,9 +179,9 @@ public: // functions
 	/// Serialize a ControlMessage for passing file descriptors.
 	/**
 	 * This will serialize a ControlMessage containing all file
-	 * descriptors previously added via `addFD()`.
+	 * descriptors previously added via `addFD()` into `hdr`.
 	 **/
-	SendMessageHeader::ControlMessage serialize() const;
+	void serialize(SendMessageHeader &hdr) const;
 
 	void addFD(cosmos::FileNum fd) {
 		m_fds.push_back(fd);
@@ -254,7 +254,7 @@ class COSMOS_API UnixCredentialsMessage :
 		public AncillaryMessage<OptLevel::SOCKET, UnixMessage> {
 public: // functions
 
-	/// Returns whether the given `msg` contains a UnixRightsMessage.
+	/// Returns whether the given `msg` contains a UnixCredentialsMessage.
 	static bool matches(const ReceiveMessageHeader::ControlMessage &msg) {
 		if (const auto type = as_unix_message(msg); type) {
 			return *type == UnixMessage::CREDENTIALS;
@@ -265,7 +265,7 @@ public: // functions
 
 	void deserialize(const ReceiveMessageHeader::ControlMessage &msg);
 
-	SendMessageHeader::ControlMessage serialize() const;
+	void serialize(SendMessageHeader &hdr) const;
 
 	void setCreds(const UnixCredentials &creds) {
 		m_creds = creds;

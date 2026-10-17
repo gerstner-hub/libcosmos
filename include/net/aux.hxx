@@ -55,7 +55,7 @@ class COSMOS_API TxTimeMessage :
 		public AncillaryMessage<OptLevel::SOCKET, SocketMessage> {
 public: // functions
 
-	SendMessageHeader::ControlMessage serialize() const;
+	void serialize(SendMessageHeader &hdr) const;
 
 	template <ClockType CLOCK>
 	void setTime(const TimeSpec<CLOCK> &ts) {

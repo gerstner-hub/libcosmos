@@ -770,7 +770,7 @@ public:
 				msg.addFD(hosts.fd().raw());
 
 				cosmos::SendMessageHeader header;
-				header.control_msg = msg.serialize();
+				msg.serialize(header);
 				parent_sock.sendMessage(header);
 			}
 
@@ -781,7 +781,7 @@ public:
 				msg.setCreds(creds);
 
 				cosmos::SendMessageHeader header;
-				header.control_msg = msg.serialize();
+				msg.serialize(header);
 				parent_sock.sendMessage(header);
 			}
 

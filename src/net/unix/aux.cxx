@@ -64,21 +64,19 @@ void PidFdMessage::deserialize(
 	m_pidfd = ProcessFile{PidFD{pidfd}};
 }
 
-SendMessageHeader::ControlMessage UnixRightsMessage::serialize() const {
+void UnixRightsMessage::serialize(SendMessageHeader &hdr) const {
 	if (m_fds.empty()) {
 		throw UsageError{"Attempt to serialize empty vector of FileNum"};
 	}
 
-	auto ret = this->createMsg(UnixMessage::RIGHTS, sizeof(FileNum) * m_fds.size());
+	auto msg = this->createMsg(hdr.ctrl, UnixMessage::RIGHTS, sizeof(FileNum) * m_fds.size());
 
-	auto data = this->data(ret);
+	auto data = this->data(msg);
 
 	for (auto fd: m_fds) {
 		std::memcpy(data, &fd, sizeof(fd));
 		data += sizeof(fd);
 	}
-
-	return ret;
 }
 
 void UnixRightsMessage::closeUnclaimed() {
@@ -106,14 +104,15 @@ void UnixCredentialsMessage::deserialize(const ReceiveMessageHeader::ControlMess
 	std::memcpy(&m_creds, data, bytes);
 }
 
-SendMessageHeader::ControlMessage UnixCredentialsMessage::serialize() const {
-	auto ret = this->createMsg(UnixMessage::CREDENTIALS, sizeof(m_creds));
+void UnixCredentialsMessage::serialize(SendMessageHeader &hdr) const {
+	auto msg = this->createMsg(
+			hdr.ctrl,
+			UnixMessage::CREDENTIALS,
+			sizeof(m_creds));
 
-	auto data = this->data(ret);
+	auto data = this->data(msg);
 
 	std::memcpy(data, &m_creds, sizeof(m_creds));
-
-	return ret;
 }
 
 } // end ns
