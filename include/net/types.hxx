@@ -265,4 +265,8 @@ using MessageFlags = BitMask<MessageFlag>;
 enum class VLANTag : uint16_t {
 };
 
+/// A packet ID used in the context of SocketOption::setReceiveTimestamping().
+enum class TimestampPktId : uint32_t {
+};
+
 } // end ns

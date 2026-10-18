@@ -52,9 +52,11 @@ public: // types
 		ICMP     = SO_EE_ORIGIN_ICMP,
 		/// An ICMPv6 error was reported.
 		ICMP6    = SO_EE_ORIGIN_ICMP6,
+		/// Transmit status e.g. when SocketOption::setReceiveTimestamping() is enabled.
 		TXSTATUS = SO_EE_ORIGIN_TXSTATUS,
 		/// Status report for zerocopy operation (see Linux kernel documentation networking/msg_zerocopy.txt).
 		ZEROCOPY = SO_EE_ORIGIN_ZEROCOPY,
+		/// TX status report according to SocketOption::setTxTimeConfig().
 		TXTIME   = SO_EE_ORIGIN_TXTIME
 	};
 
@@ -68,6 +70,21 @@ public: // types
 	enum class TxTimeCode : uint8_t {
 		TXTIME_INVALID_PARAM = SO_EE_CODE_TXTIME_INVALID_PARAM,
 		TXTIME_MISSED        = SO_EE_CODE_TXTIME_MISSED
+	};
+
+	/// Info definitions for Origin::TXSTATUS.
+	/**
+	 * \see SocketOption::setReceiveTimestamping().
+	 **/
+	enum class TimestampType {
+		/// driver passed data to NIC or hardware.
+		SND        = SCM_TSTAMP_SND,
+		/// data entered the packet scheduler.
+		SCHED      = SCM_TSTAMP_SCHED,
+		/// data was acknowledged by peer.
+		ACK        = SCM_TSTAMP_ACK,
+		/// packet TX completion.
+		COMPLETION = SCM_TSTAMP_COMPLETION
 	};
 
 public: // functions
@@ -136,6 +153,41 @@ public: // functions
 	std::optional<uint8_t> icmpCode() const {
 		if (originIsICMP()) {
 			return this->ee_code;
+		}
+
+		return std::nullopt;
+	}
+
+	bool isTimestampingTxStatus() const {
+		/* according to kernel docs errno ENOMSG identifies TX
+		 * timestamp context */
+		return origin() == Origin::TXSTATUS &&
+				errnum() == Errno::NO_MESSAGE;
+	}
+
+	std::optional<TimestampType> timestampType() const {
+		if (isTimestampingTxStatus()) {
+			return TimestampType{this->ee_info};
+		}
+
+		return std::nullopt;
+	}
+
+	/// Returns the packet ID the timestamp refers to.
+	/**
+	 * This datum is only valid if
+	 * SocketOption::TimestampingConfig::OPT_ID was configured, otherwise
+	 * 0 is returned.
+	 *
+	 * The packet ID is a 32-bit counter initialized to 0 once the
+	 * TIMESTAMPING socket option is enabled accordingly. For
+	 * packet-oriented sockets the counter is incremented for every
+	 * packet. For stream-oriented sockets the counter is incremented for
+	 * every byte.
+	 **/
+	std::optional<TimestampPktId> timestampPktID() const {
+		if (isTimestampingTxStatus()) {
+			return TimestampPktId{this->ee_data};
 		}
 
 		return std::nullopt;

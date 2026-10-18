@@ -78,14 +78,26 @@ SocketOptions::MemInfoArray SocketOptions::getMemInfo() const {
 	return getsockopt<MemInfoArray>(m_sock, M_LEVEL, OptName{SO_MEMINFO});
 }
 
+void SocketOptions::setReceiveTimestamping(const TimestampingConfig config) {
+	setsockopt(m_sock, M_LEVEL,
+			OptName{SO_TIMESTAMPING_NEW}, *config.raw());
+}
+
+SocketOptions::TimestampingConfig SocketOptions::getReceiveTimestamping() const {
+	static_assert(sizeof(TimestampingConfig) == sizeof(so_timestamping),
+			"TimestampingConfig size mismatch");
+
+	return getsockopt<TimestampingConfig>(m_sock, M_LEVEL,
+			OptName{SO_TXTIME});
+}
+
 void SocketOptions::setTxTimeConfig(const TxTimeConfig &config) {
 	setsockopt(m_sock, M_LEVEL, OptName{SO_TXTIME}, *config.raw());
 }
 
-
 SocketOptions::TxTimeConfig SocketOptions::getTxTimeConfig() const {
 	static_assert(sizeof(TxTimeConfig) == sizeof(sock_txtime),
-			"TxTimeConfig size mismath");
+			"TxTimeConfig size mismatch");
 	return getsockopt<TxTimeConfig>(m_sock, M_LEVEL, OptName{SO_TXTIME});
 }
 

@@ -48,7 +48,8 @@ enum class ClockType : clockid_t {
 	PROCESS_CPUTIME  = CLOCK_PROCESS_CPUTIME_ID,
 	/// Counts the CPU time consumed by the calling thread.
 	THREAD_CPUTIME   = CLOCK_THREAD_CPUTIME_ID,
-	INVALID          = clockid_t{-1}
+	INVALID          = clockid_t{-1},
+	UNKNOWN          = clockid_t{-2}
 };
 
 /// A C++ wrapper around the POSIX struct timespec coupled to a specific CLOCK type.
@@ -202,6 +203,8 @@ using RealTime            = TimeSpec<ClockType::REALTIME>;
 using ThreadCpuTime       = TimeSpec<ClockType::THREAD_CPUTIME>;
 /// TimeSpec used for relative time specifications not based on absolute clock time.
 using IntervalTime        = TimeSpec<ClockType::INVALID>;
+/// Used for special time sources that are not modelled.
+using UnknownTime         = TimeSpec<ClockType::UNKNOWN>;
 
 /// A C++ wrapper around the BSD `struct timeval`.
 /**
