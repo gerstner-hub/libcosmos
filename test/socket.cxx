@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <iostream>
 #include <fstream>
+#include <cassert>
 
 // cosmos
 #include <cosmos/fs/File.hxx>
@@ -631,6 +632,50 @@ public:
 		subCheckUnixAncillaryMessage();
 		subCheckIPSocketError();
 		subCheckSocketAncillaryMessage();
+		subCheckControlBlockAlignment();
+	}
+
+	void subCheckControlBlockAlignment() {
+		/*
+		 * the way we assemble outgoing ancillary messages bypasses
+		 * some of the CMSG macros, therefore make sure size and
+		 * content of multiple messages result in the same control
+		 * buffer as when using CMSG macros as documented in man
+		 * pages.
+		 */
+
+		cosmos::SendMessageHeader hdr;
+		cosmos::TxTimeMessage time;
+		time.setTime(cosmos::RealTime{100, 544});
+		time.serialize(hdr);
+
+		cosmos::TimestampingOptIdMessage optid;
+		optid.setID(cosmos::TimestampPktId{500});
+		optid.serialize(hdr);
+
+		std::byte raw_block[CMSG_SPACE(sizeof(uint32_t)) + CMSG_SPACE(sizeof(uint64_t))];
+		std::memset(raw_block, 0, sizeof(raw_block));
+		struct msghdr raw_hdr;
+		raw_hdr.msg_control = raw_block;
+		raw_hdr.msg_controllen = sizeof(raw_block);
+
+		struct cmsghdr *raw_ctrl = CMSG_FIRSTHDR(&raw_hdr);
+		raw_ctrl->cmsg_level = SOL_SOCKET;
+		raw_ctrl->cmsg_type = SCM_TXTIME;
+		raw_ctrl->cmsg_len = CMSG_LEN(sizeof(uint64_t));
+		uint64_t txtime = 100ULL * 1000 * 1000 * 1000 + 544;
+		memcpy(CMSG_DATA(raw_ctrl), &txtime, sizeof(uint64_t));
+
+		raw_ctrl = CMSG_NXTHDR(&raw_hdr, raw_ctrl);
+		assert(raw_ctrl != nullptr);
+		raw_ctrl->cmsg_level = SOL_SOCKET;
+		raw_ctrl->cmsg_type = SCM_TS_OPT_ID;
+		raw_ctrl->cmsg_len = CMSG_LEN(sizeof(uint32_t));
+		uint32_t pkt_id = 500;
+		memcpy(CMSG_DATA(raw_ctrl), &pkt_id, sizeof(uint32_t));
+
+		RUN_STEP("block-size-equal", hdr.ctrl.size() == sizeof(raw_block));
+		RUN_STEP("blocks-equal", memcmp(hdr.ctrl.raw(), raw_block, hdr.ctrl.size()) == 0);
 	}
 
 	void subCheckTCPMsgHeaderThread() {
