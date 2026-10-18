@@ -7,6 +7,7 @@
 #include <cosmos/creds.hxx>
 #include <cosmos/dso_export.h>
 #include <cosmos/fs/types.hxx>
+#include <cosmos/net/ancillary.hxx>
 #include <cosmos/net/message_header.hxx>
 #include <cosmos/net/types.hxx>
 #include <cosmos/proc/ProcessFile.hxx>
@@ -32,14 +33,11 @@ enum class UnixMessage : int {
 	INQ         = SCM_INQ,         ///< remaining amount of bytes in kernel receive queue.
 };
 
-/// Return the UnixMessage ancillary message type stored in `msg`, if applicable.
-inline std::optional<UnixMessage> as_unix_message(const ReceiveMessageHeader::ControlMessage &msg) {
-	if (msg.level() == OptLevel::SOCKET) {
-		return UnixMessage{msg.raw().cmsg_type};
-	}
-
-	return std::nullopt;
-}
+template<>
+struct ControlMsgTraits<UnixMessage> {
+	/* for legacy reasons UnixMessage is based on SOL_SOCKET */
+	static constexpr OptLevel LEVEL = OptLevel::SOCKET;
+};
 
 /// User and group credentials of a peer process.
 /**
@@ -138,7 +136,7 @@ struct COSMOS_API UnixCredentials :
  *   `hasErrors()` and `errors()` member to inspect any such conditions.
  **/
 class COSMOS_API UnixRightsMessage :
-		public AncillaryMessage<OptLevel::SOCKET, UnixMessage> {
+		public AncillaryRxTxMessage<UnixMessage::RIGHTS> {
 public: // types
 
 	/// A vector to keep a series of FileNum file descriptor numbers to pass between processes.
@@ -157,15 +155,6 @@ public: // functions
 		closeUnclaimed();
 	}
 
-	/// Returns whether the given `msg` contains a UnixRightsMessage.
-	static bool matches(const ReceiveMessageHeader::ControlMessage &msg) {
-		if (auto type = as_unix_message(msg); type) {
-			return *type == UnixMessage::RIGHTS;
-		} else {
-			return false;
-		}
-	}
-
 	/// Parse received file descriptors from the given ControlMessage.
 	/**
 	 * If `msg` is not of the right type then an exception is thrown.
@@ -174,14 +163,14 @@ public: // functions
 	 * descriptors and use `takeFDs()` to transfer ownership of them to
 	 * the caller.
 	 **/
-	void deserialize(const ReceiveMessageHeader::ControlMessage &msg);
+	void deserialize(const ReceiveMessageHeader::ControlMessage &msg) override;
 
 	/// Serialize a ControlMessage for passing file descriptors.
 	/**
 	 * This will serialize a ControlMessage containing all file
 	 * descriptors previously added via `addFD()` into `hdr`.
 	 **/
-	void serialize(SendMessageHeader &hdr) const;
+	void serialize(SendMessageHeader &hdr) const override;
 
 	void addFD(cosmos::FileNum fd) {
 		m_fds.push_back(fd);
@@ -251,21 +240,12 @@ protected: // data
  *  UserID and GroupID.
  **/
 class COSMOS_API UnixCredentialsMessage :
-		public AncillaryMessage<OptLevel::SOCKET, UnixMessage> {
+		public AncillaryRxTxMessage<UnixMessage::CREDENTIALS> {
 public: // functions
 
-	/// Returns whether the given `msg` contains a UnixCredentialsMessage.
-	static bool matches(const ReceiveMessageHeader::ControlMessage &msg) {
-		if (const auto type = as_unix_message(msg); type) {
-			return *type == UnixMessage::CREDENTIALS;
-		} else {
-			return false;
-		}
-	}
+	void deserialize(const ReceiveMessageHeader::ControlMessage &msg) override;
 
-	void deserialize(const ReceiveMessageHeader::ControlMessage &msg);
-
-	void serialize(SendMessageHeader &hdr) const;
+	void serialize(SendMessageHeader &hdr) const override;
 
 	void setCreds(const UnixCredentials &creds) {
 		m_creds = creds;
@@ -295,17 +275,8 @@ protected: // data
  * another call to `deserialize()` occurs.
  **/
 class COSMOS_API PidFdMessage :
-		public AncillaryMessage<OptLevel::SOCKET, UnixMessage> {
+		public AncillaryRxMessage<UnixMessage::PIDFD> {
 public: // functions
-	//
-	/// Returns whether the given `msg` contains a PidFdMessage.
-	static bool matches(const ReceiveMessageHeader::ControlMessage &msg) {
-		if (auto type = as_unix_message(msg); type) {
-			return *type == UnixMessage::PIDFD;
-		} else {
-			return false;
-		}
-	}
 
 	/// Parse a received PIDFD file descriptor from the given ControlMessage.
 	/**
@@ -314,7 +285,7 @@ public: // functions
 	 * On success use `fd()` to operate on the PIDFD or `takeFD()` to
 	 * transfer the file descriptor to the caller.
 	 **/
-	void deserialize(const ReceiveMessageHeader::ControlMessage &msg);
+	void deserialize(const ReceiveMessageHeader::ControlMessage &msg) override;
 
 	/// Returns whether a valid PIDFD is currently stored in the object.
 	bool hasFD() const {
@@ -340,7 +311,6 @@ protected: // data
 	ProcessFile m_pidfd;
 };
 
-using InQueueMessage = ScalarAuxInputMessage<OptLevel::SOCKET, UnixMessage,
-      UnixMessage::INQ, uint32_t>;
+using InQueueMessage = ScalarAuxRxMessage<uint32_t, UnixMessage::INQ>;
 
 } // end ns

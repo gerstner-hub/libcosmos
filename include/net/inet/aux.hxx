@@ -5,9 +5,11 @@
 
 // cosmos
 #include <cosmos/dso_export.h>
+#include <cosmos/net/ancillary.hxx>
 #include <cosmos/net/inet/types.hxx>
 #include <cosmos/net/message_header.hxx>
 #include <cosmos/net/SocketError.hxx>
+#include <cosmos/net/traits.hxx>
 
 /**
  * @file
@@ -18,23 +20,17 @@
 
 namespace cosmos {
 
-/// Return the IP4Message ancillary message type stored in `msg`, if applicable.
-inline std::optional<IP4Message> as_ip4_message(const ReceiveMessageHeader::ControlMessage &msg) {
-	if (msg.level() == OptLevel::IP) {
-		return IP4Message{msg.raw().cmsg_type};
-	}
+template<>
+struct ControlMsgTraits<IP4Message> {
+	/* for legacy reasons UnixMessage is based on SOL_SOCKET */
+	static constexpr OptLevel LEVEL = OptLevel::IP;
+};
 
-	return std::nullopt;
-}
-
-/// Return the IP6Message ancillary message type stored in `msg`, if applicable.
-inline std::optional<IP6Message> as_ip6_message(const ReceiveMessageHeader::ControlMessage &msg) {
-	if (msg.level() == OptLevel::IPV6) {
-		return IP6Message{msg.raw().cmsg_type};
-	}
-
-	return std::nullopt;
-}
+template<>
+struct ControlMsgTraits<IP6Message> {
+	/* for legacy reasons UnixMessage is based on SOL_SOCKET */
+	static constexpr OptLevel LEVEL = OptLevel::IPV6;
+};
 
 /// Wrapper for the IPMessage::RECVERR ancillary message.
 /**
@@ -44,9 +40,7 @@ inline std::optional<IP6Message> as_ip6_message(const ReceiveMessageHeader::Cont
  **/
 template <SocketFamily FAMILY>
 class SocketErrorMessage :
-		public AncillaryMessage<
-			FamilyTraits<FAMILY>::OPT_LEVEL,
-			typename FamilyTraits<FAMILY>::CtrlMsg> {
+		public AncillaryRxMessage<FamilyTraits<FAMILY>::CtrlMsg::RECVERR> {
 public: // types
 
 	using SocketError = SocketErrorT<FAMILY>;
@@ -59,30 +53,13 @@ public: // functions
 		deserialize(msg);
 	}
 
-	/// Returns whether `msg` contains a SocketErrorMessage.
-	static bool matches(const ReceiveMessageHeader::ControlMessage &msg) {
-		if constexpr (FAMILY == SocketFamily::INET) {
-			if (const auto type4 = as_ip4_message(msg); type4) {
-				return *type4 == IP4Message::RECVERR;
-			}
-		}
-
-		if constexpr (FAMILY == SocketFamily::INET6) {
-			if (const auto type6 = as_ip6_message(msg); type6) {
-				return *type6 == IP6Message::RECVERR;
-			}
-		}
-
-		return false;
-	}
-
 	/*
 	 * disallow copy/assignment for now due to m_error ptr.
 	 */
 	SocketErrorMessage(const SocketErrorMessage &) = delete;
 	SocketErrorMessage& operator=(const SocketErrorMessage&)= delete;
 
-	void deserialize(const ReceiveMessageHeader::ControlMessage &msg);
+	void deserialize(const ReceiveMessageHeader::ControlMessage &msg) override;
 
 	/// Returns the currently deserialized SocketError, if any, otherwise nullptr.
 	const SocketError* error() const {

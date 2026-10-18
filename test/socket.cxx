@@ -847,7 +847,8 @@ public:
 				child_sock.receiveMessage(header);
 
 				for (const auto &ctrl_message: header) {
-					if (const auto unix_msg = cosmos::as_unix_message(ctrl_message); unix_msg) {
+					const auto type = ctrl_message.typeVariant();
+					if (auto unix_msg = std::get_if<cosmos::UnixMessage>(&type); unix_msg) {
 						switch(*unix_msg) {
 							case cosmos::UnixMessage::RIGHTS: {
 								saw_rights_msg = true;
@@ -918,9 +919,12 @@ public:
 		RUN_STEP("sockerr-payload-matches-msg", payload == testmsg);
 		bool found_sockerr = false;
 		for (const auto &ctrl: header) {
-			auto ip4_msg = cosmos::as_ip4_message(ctrl);
-			RUN_STEP("received-ip4-ctrl-msg", ip4_msg.has_value());
-			RUN_STEP("received-ip4-socket-error", *ip4_msg == cosmos::IP4Message::RECVERR);
+			const auto type = ctrl.typeVariant();
+
+			RUN_STEP("received-ip4-ctrl-msg",
+					std::holds_alternative<cosmos::IP4Message>(type));
+			const auto ip4_msg = std::get<cosmos::IP4Message>(type);
+			RUN_STEP("received-ip4-socket-error", ip4_msg == cosmos::IP4Message::RECVERR);
 			RUN_STEP("socket-error-matches", cosmos::IP4SocketErrorMessage::matches(ctrl) == true);
 			cosmos::IP4SocketErrorMessage errmsg;
 			errmsg.deserialize(ctrl);

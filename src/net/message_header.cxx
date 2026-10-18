@@ -1,6 +1,7 @@
 // cosmos
 #include <cosmos/error/RuntimeError.hxx>
 #include <cosmos/net/message_header.hxx>
+#include <cosmos/net/unix/aux.hxx>
 
 namespace cosmos {
 
@@ -82,6 +83,35 @@ void ReceiveMessageHeader::prepareReceive(SocketAddress *addr) {
 	if (!m_control_buffer.empty()) {
 		m_header.msg_control = m_control_buffer.data();
 		m_header.msg_controllen = m_control_buffer.size();
+	}
+}
+
+CtrlMessageVariant ReceiveMessageHeader::ControlMessage::typeVariant() const {
+	const auto raw = type();
+
+	switch (level()) {
+	case OptLevel::IP: return IP4Message{raw};
+	case OptLevel::IPV6: return IP6Message{raw};
+	case OptLevel::NETLINK: return NetlinkMessage{raw};
+	case OptLevel::PACKET: return PacketMessage{raw};
+	case OptLevel::SOCKET: {
+		/*
+		 * here we're encountering issues with the strong UnixMessage
+		 * type, which is not existing on OS level, because AF_UNIX
+		 * uses SOL_SOCKET as well. We need to inspect all known
+		 * AF_UNIX message types and assume anything else to be a
+		 * regular SocketMessage option.
+		 */
+		switch (UnixMessage{raw}) {
+			case UnixMessage::RIGHTS:
+			case UnixMessage::CREDENTIALS:
+			case UnixMessage::PIDFD:
+			case UnixMessage::SECURITY:
+			case UnixMessage::INQ: return UnixMessage{raw};
+			default: return SocketMessage{raw};
+		}
+	}
+	default: return std::monostate{};
 	}
 }
 

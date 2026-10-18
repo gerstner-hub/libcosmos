@@ -2,6 +2,7 @@
 
 // cosmos
 #include <cosmos/namespace.hxx>
+#include <cosmos/net/ancillary.hxx>
 #include <cosmos/net/message_header.hxx>
 #include <cosmos/net/netlink/types.hxx>
 
@@ -24,14 +25,10 @@ enum class NetlinkMessage : int {
 	NSID        = NETLINK_LISTEN_ALL_NSID
 };
 
-/// Return the NetlinkMessage ancillary message type stored in `msg`, if applicable.
-inline std::optional<NetlinkMessage> as_netlink_message(const ReceiveMessageHeader::ControlMessage &msg) {
-	if (msg.level() == OptLevel::NETLINK) {
-		return NetlinkMessage{msg.raw().cmsg_type};
-	}
-
-	return std::nullopt;
-}
+template<>
+struct ControlMsgTraits<NetlinkMessage> {
+	static constexpr OptLevel LEVEL = OptLevel::NETLINK;
+};
 
 /// `struct nl_pktinfo` auxiliary message for Netlink sockets.
 /**
@@ -63,7 +60,7 @@ protected: // functions
 
 /// (De)serialization helper for NetlinkPacketInfo ancillary messages.
 class COSMOS_API NetlinkPacketInfoMessage :
-		public AncillaryMessage<OptLevel::NETLINK, NetlinkMessage> {
+		public AncillaryRxMessage<NetlinkMessage::PACKET_INFO> {
 public: // functions
 
 	NetlinkPacketInfoMessage() = default;
@@ -72,15 +69,8 @@ public: // functions
 		deserialize(msg);
 	}
 
-	static bool matches(const ReceiveMessageHeader::ControlMessage &msg) {
-		if (auto type = as_netlink_message(msg); type) {
-			return *type == NetlinkMessage::PACKET_INFO;
-		}
-
-		return false;
-	}
-
-	void deserialize(const ReceiveMessageHeader::ControlMessage &msg);
+	void deserialize(const ReceiveMessageHeader::ControlMessage &msg)
+		override;
 
 	/// Returns the last deserialized structure.
 	const NetlinkPacketInfo& info() const {
@@ -93,7 +83,7 @@ protected: // data
 };
 
 class COSMOS_API NetlinkNamespaceIDMessage :
-		public AncillaryMessage<OptLevel::NETLINK, NetlinkMessage> {
+		public AncillaryRxMessage<NetlinkMessage::NSID> {
 public: // functions
 
 	NetlinkNamespaceIDMessage() = default;
@@ -102,15 +92,7 @@ public: // functions
 		deserialize(msg);
 	}
 
-	static bool matches(const ReceiveMessageHeader::ControlMessage &msg) {
-		if (auto type = as_netlink_message(msg); type) {
-			return *type == NetlinkMessage::NSID;
-		}
-
-		return false;
-	}
-
-	void deserialize(const ReceiveMessageHeader::ControlMessage &msg);
+	void deserialize(const ReceiveMessageHeader::ControlMessage &msg) override;
 
 	/// Returns the last network namespace ID which was deserialized.
 	NetlinkNSID networkNSID() const {

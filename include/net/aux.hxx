@@ -10,9 +10,17 @@
 
 // cosmos
 #include <cosmos/error/UsageError.hxx>
+#include <cosmos/net/ancillary.hxx>
 #include <cosmos/net/message_header.hxx>
 #include <cosmos/net/SocketOptions.hxx>
 #include <cosmos/time/time.hxx>
+
+/**
+ * @file
+ *
+ * The types in this header support serialization and deserialization of
+ * ancillary messages used on generic socket level.
+ **/
 
 namespace cosmos {
 
@@ -34,20 +42,10 @@ enum class SocketMessage : int {
 	TS_OPT_ID            = SCM_TS_OPT_ID,
 };
 
-inline std::optional<SocketMessage> as_socket_message(const ReceiveMessageHeader::ControlMessage &msg) {
-	if (msg.level() == OptLevel::SOCKET) {
-		return SocketMessage{msg.raw().cmsg_type};
-	}
-
-	return std::nullopt;
-}
-
-/**
- * @file
- *
- * The types in this header support serialization and deserialization of
- * ancillary messages used on generic socket level.
- **/
+template<>
+struct ControlMsgTraits<SocketMessage> {
+	static constexpr OptLevel LEVEL = OptLevel::SOCKET;
+};
 
 /// Transmit time control message telling the kernel when to transmit the payload.
 /**
@@ -67,10 +65,10 @@ inline std::optional<SocketMessage> as_socket_message(const ReceiveMessageHeader
  * clock configured at the socket.
  **/
 class COSMOS_API TxTimeMessage :
-		public AncillaryMessage<OptLevel::SOCKET, SocketMessage> {
+		public AncillaryTxMessage<SocketMessage::TXTIME> {
 public: // functions
 
-	void serialize(SendMessageHeader &hdr) const;
+	void serialize(SendMessageHeader &hdr) const override;
 
 	template <ClockType CLOCK>
 	void setTime(const TimeSpec<CLOCK> &ts) {
@@ -116,7 +114,7 @@ protected: // data
  * \see SocketOptions::setReceiveTimestamping().
  **/
 class COSMOS_API TimestampingMessage :
-		public AncillaryMessage<OptLevel::SOCKET, SocketMessage> {
+		public AncillaryRxMessage<SocketMessage::TIMESTAMPING> {
 
 protected: // functions
 
@@ -134,15 +132,7 @@ protected: // functions
 
 public: // functions
 
-	static bool matches(const ReceiveMessageHeader::ControlMessage &msg) {
-		if (auto type = as_socket_message(msg); type) {
-			return *type == SocketMessage::TIMESTAMPING;
-		} else {
-			return false;
-		}
-	}
-
-	void deserialize(const ReceiveMessageHeader::ControlMessage &msg);
+	void deserialize(const ReceiveMessageHeader::ControlMessage &msg) override;
 
 	bool hasSoftwareStamp() const {
 		return !isZero(swStamp());
@@ -181,13 +171,13 @@ protected: // data
  * SocketOption::setReceiveTimestamping() is in effect with the
  * SocketOption::TimestampingConfig::OPT_ID flag set. It will explicitly
  * configure a starting point for packet IDs reported via the socket's error
- * queue..
+ * queue.
  **/
 class COSMOS_API TimestampingOptIdMessage :
-		public AncillaryMessage<OptLevel::SOCKET, SocketMessage> {
+		public AncillaryTxMessage<SocketMessage::TS_OPT_ID> {
 public: // functions
 
-	void serialize(SendMessageHeader &hdr) const;
+	void serialize(SendMessageHeader &hdr) const override;
 
 	void setID(const TimestampPktId id) {
 		m_id = id;
@@ -207,7 +197,7 @@ protected: // data
  * generally enabled via the socket option already for this to work..
  **/
 class COSMOS_API TimestampingTxConfigMessage :
-		public AncillaryMessage<OptLevel::SOCKET, SocketMessage> {
+		public AncillaryTxMessage<SocketMessage::TIMESTAMPING> {
 public: // types
 
 	using Flags = SocketOptions::TimestampingConfig::Flags;
@@ -215,7 +205,7 @@ public: // types
 
 public: // functions
 
-	void serialize(SendMessageHeader &hdr) const;
+	void serialize(SendMessageHeader &hdr) const override;
 
 	void setFlags(const Flags flags) {
 		m_flags = flags;
@@ -235,7 +225,7 @@ protected: // data
  * CONFIG_NET_RX_BUSY_POLL to be enabled.
  **/
 class COSMOS_API TimestampingPacketInfo :
-		public AncillaryMessage<OptLevel::SOCKET, SocketMessage> {
+		public AncillaryRxMessage<SocketMessage::TIMESTAMPING_PKTINFO > {
 public: // types
 
 	struct PacketInfo :
@@ -264,15 +254,7 @@ public: // types
 
 public: // functions
 
-	static bool matches(const ReceiveMessageHeader::ControlMessage &msg) {
-		if (auto type = as_socket_message(msg); type) {
-			return *type == SocketMessage::TIMESTAMPING_PKTINFO;
-		} else {
-			return false;
-		}
-	}
-
-	void deserialize(const ReceiveMessageHeader::ControlMessage &msg);
+	void deserialize(const ReceiveMessageHeader::ControlMessage &msg) override;
 
 	/// Access the currently deserialized data.
 	/**
@@ -288,13 +270,10 @@ protected:
 	PacketInfo m_info{};
 };
 
-using MarkMessage = ScalarAuxInputMessage<OptLevel::SOCKET, SocketMessage,
-      SocketMessage::MARK, uint32_t>;
+using MarkMessage = ScalarAuxRxMessage<uint32_t, SocketMessage::MARK>;
 
-using PriorityMessage = ScalarAuxInputMessage<OptLevel::SOCKET, SocketMessage,
-      SocketMessage::PRIORITY, uint32_t>;
+using PriorityMessage = ScalarAuxRxMessage<uint32_t, SocketMessage::PRIORITY>;
 
-using RxQueueOverflowMessage = ScalarAuxInputMessage<OptLevel::SOCKET, SocketMessage,
-      SocketMessage::RX_QUEUE_OVERFLOW, uint32_t>;
+using RxQueueOverflowMessage = ScalarAuxRxMessage<uint32_t, SocketMessage::RX_QUEUE_OVERFLOW>;
 
 } // end ns

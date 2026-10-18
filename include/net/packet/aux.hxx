@@ -24,14 +24,11 @@ enum class PacketMessage : int {
 	AUXDATA = PACKET_AUXDATA
 };
 
-/// Return the PacketMessage ancillary message type stored in `msg`, if applicable.
-inline std::optional<PacketMessage> as_packet_message(const ReceiveMessageHeader::ControlMessage &msg) {
-	if (msg.level() == OptLevel::PACKET) {
-		return PacketMessage{msg.raw().cmsg_type};
-	}
-
-	return std::nullopt;
-}
+template<>
+struct ControlMsgTraits<PacketMessage> {
+	/* for legacy reasons UnixMessage is based on SOL_SOCKET */
+	static constexpr OptLevel LEVEL = OptLevel::PACKET;
+};
 
 /// Data structure which will be deserialized in PacketAuxDataMessage.
 /**
@@ -126,7 +123,7 @@ public: // functions
 
 /// Deserialization helper for PacketSocket aux messages.
 class COSMOS_API PacketAuxDataMessage :
-		public AncillaryMessage<OptLevel::PACKET, PacketMessage> {
+		public AncillaryRxMessage<PacketMessage::AUXDATA> {
 public: // functions
 
 	/// Stores a zero-initialized aux data object.
@@ -142,15 +139,11 @@ public: // functions
 	 * This is only valid if `msg` contains an OptLevel::PACKET ancillary
 	 * message. Otherwise an exception is thrown.
 	 **/
-	void deserialize(const ReceiveMessageHeader::ControlMessage &msg);
+	void deserialize(const ReceiveMessageHeader::ControlMessage &msg) override;
 
 	/// Access to the currently deserialized auxiliary data.
 	const PacketAuxData& data() const {
 		return m_data;
-	}
-
-	static bool matches(const ReceiveMessageHeader::ControlMessage &msg) {
-		return as_packet_message(msg) != std::nullopt;
 	}
 
 protected: // data

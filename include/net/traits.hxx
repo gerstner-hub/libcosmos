@@ -42,4 +42,12 @@ struct FamilyTraits<SocketFamily::INET6> {
 	using CtrlMsg = IP6Message;
 };
 
+/*
+ * this maps a concrete control message type like SocketMessage to its
+ * OptLevel.
+ */
+template <class MSG_TYPE>
+struct ControlMsgTraits {
+};
+
 }; // end ns

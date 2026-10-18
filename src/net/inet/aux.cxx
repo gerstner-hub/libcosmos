@@ -1,6 +1,3 @@
-// C++
-#include <type_traits>
-
 // Cosmos
 #include <cosmos/error/RuntimeError.hxx>
 #include <cosmos/net/inet/IPAddress.hxx>
@@ -13,7 +10,7 @@ static_assert(sizeof(IP4SocketError) == sizeof(struct sock_extended_err), "size 
 
 template <SocketFamily FAMILY>
 void SocketErrorMessage<FAMILY>::deserialize(const ReceiveMessageHeader::ControlMessage &msg) {
-	this->checkMsg(msg, FamilyTraits<FAMILY>::CtrlMsg::RECVERR);
+	this->checkMsg(msg);
 
 	m_data.clear();
 	m_error = nullptr;

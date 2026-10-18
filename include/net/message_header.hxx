@@ -2,9 +2,8 @@
 
 // C++
 #include <cstring>
-#include <optional>
 
-// Cosmos
+// cosmos
 #include <cosmos/dso_export.h>
 #include <cosmos/error/RuntimeError.hxx>
 #include <cosmos/io/iovector.hxx>
@@ -145,6 +144,10 @@ public: // types
 	class ControlMessage {
 		template <OptLevel, typename MSG_TYPE>
 		friend class AncillaryMessage;
+
+		template <auto TYPE>
+		friend class AncillaryTxMessage;
+
 		friend class SendMessageHeader;
 	protected: // functions
 
@@ -177,6 +180,16 @@ public: // types
 			return const_cast<ControlMessage&>(*this).data();
 		}
 
+		template <typename T>
+		T* dataAs() {
+			return reinterpret_cast<T*>(data());
+		}
+
+		template <typename T>
+		const T* dataAs() const {
+			return const_cast<const T*>(dataAs<T>());
+		}
+
 		/// Returns the amount of bytes that can be stored at data().
 		size_t dataSpace() const {
 			return m_len;
@@ -202,6 +215,9 @@ public: // types
 	class ControlMessageBlock {
 		template <OptLevel LEVEL, typename MSG_TYPE>
 		friend class AncillaryMessage;
+
+		template <auto TYPE>
+		friend class AncillaryTxMessage;
 
 		friend class SendMessageHeader;
 
@@ -295,6 +311,9 @@ public: // types
 
 	/// Wrapper for `struct cmsghdr` used for iterating over received control messages.
 	class ControlMessage {
+		template <auto TYPE>
+		friend class AncillaryRxMessage;
+
 		template <OptLevel, typename MSG_TYPE>
 		friend class AncillaryMessage;
 	protected: // functions
@@ -336,6 +355,11 @@ public: // types
 			return CMSG_DATA(&m_header);
 		}
 
+		template <typename T>
+		const T* dataAs() const {
+			return reinterpret_cast<const T*>(data());
+		}
+
 		/// The amount of bytes found at data().
 		size_t dataLength() const {
 			return length() - sizeof(m_header);
@@ -344,6 +368,14 @@ public: // types
 		const struct cmsghdr& raw() const {
 			return m_header;
 		}
+
+		/// Returns a variant of the concrete control message type.
+		/**
+		 * Depending on the current level() this returns the proper
+		 * concrete control message type like SocketMessage for use
+		 * with std::visit.
+		 **/
+		CtrlMessageVariant typeVariant() const;
 
 	protected: // data
 
@@ -485,77 +517,6 @@ protected: // data
 
 	/// Optional buffer used to receive ancillary messages.
 	std::vector<std::byte> m_control_buffer;
-};
-
-/// Base class for types that deal with (de)serializing ancillary socket messages.
-/**
- * This base class keeps some common logic that is shared between ancillary
- * socket message types. More importantly this type is here to allow access to
- * the API of SendMessageHeader::ControlMessage without adding a lot of friend
- * declarations for each type of ancillary message.
- **/
-template <OptLevel LEVEL, typename MSG_TYPE>
-class AncillaryMessage {
-protected: // functions
-
-	SendMessageHeader::ControlMessage createMsg(
-			SendMessageHeader::ControlMessageBlock &block,
-			MSG_TYPE type,
-			const size_t data_len) const {
-		return block.create(LEVEL, to_integral(type), data_len);
-	}
-
-	void checkMsg(const ReceiveMessageHeader::ControlMessage &msg, MSG_TYPE type) const {
-		if (msg.level() != LEVEL || type != MSG_TYPE(msg.type())) {
-			throw RuntimeError{"ancillary message type mismatch"};
-		}
-	}
-
-	std::byte* data(SendMessageHeader::ControlMessage &msg) const {
-		return msg.data();
-	}
-};
-
-/// Base class for simple ancilarry receive messages containing a single scalar data type.
-template <OptLevel LEVEL, typename MSG_TYPE, MSG_TYPE MSG, typename ITEM>
-class ScalarAuxInputMessage :
-		public AncillaryMessage<LEVEL, MSG_TYPE> {
-public: // functions
-
-	ScalarAuxInputMessage() = default;
-
-	explicit ScalarAuxInputMessage(const ReceiveMessageHeader::ControlMessage &msg) {
-		deserialize(msg);
-	}
-
-	static bool matches(const ReceiveMessageHeader::ControlMessage &msg) {
-		if (msg.level() != LEVEL) {
-			return false;
-		}
-
-		const MSG_TYPE type{msg.raw().cmsg_type};
-
-		return type == MSG;
-	}
-
-	void deserialize(const ReceiveMessageHeader::ControlMessage &msg) {
-		this->checkMsg(msg, MSG);
-
-		if (msg.dataLength() != sizeof(m_item)) {
-			throw RuntimeError{"unexpected ancillary data size"};
-		}
-
-		std::memcpy(&m_item, msg.data(), sizeof(m_item));
-	}
-
-	/// Provides access to the last deserialized data item.
-	const ITEM item() const {
-		return m_item;
-	}
-
-protected: // data
-
-	ITEM m_item{};
 };
 
 } // end ns

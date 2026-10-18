@@ -4,10 +4,7 @@
 namespace cosmos {
 
 void TxTimeMessage::serialize(SendMessageHeader &hdr) const {
-	auto cmsg = this->createMsg(hdr.ctrl,
-			SocketMessage::TXTIME,
-			sizeof(m_abstime));
-
+	auto cmsg = this->createMsg(hdr.ctrl, sizeof(m_abstime));
 	auto data = this->data(cmsg);
 
 	std::memcpy(data, &m_abstime, sizeof(m_abstime));
@@ -15,22 +12,13 @@ void TxTimeMessage::serialize(SendMessageHeader &hdr) const {
 
 void TimestampingMessage::deserialize(
 		const ReceiveMessageHeader::ControlMessage &msg) {
-	checkMsg(msg, SocketMessage::TIMESTAMPING);
+	checkMsg(msg, sizeof(m_ts));
 
-	const auto bytes = msg.dataLength();
-
-	if (bytes != sizeof(m_ts)) {
-		throw RuntimeError{"SO_TIMESTAMPING_NEW message with mismatching length encountered"};
-	}
-
-	std::memcpy(&m_ts, msg.data(), bytes);
+	std::memcpy(&m_ts, msg.data(), sizeof(m_ts));
 }
 
 void TimestampingOptIdMessage::serialize(SendMessageHeader &hdr) const {
-	auto cmsg = this->createMsg(hdr.ctrl,
-			SocketMessage::TS_OPT_ID,
-			sizeof(m_id));
-
+	auto cmsg = this->createMsg(hdr.ctrl, sizeof(m_id));
 	auto data = this->data(cmsg);
 
 	std::memcpy(data, &m_id, sizeof(m_id));
@@ -38,10 +26,7 @@ void TimestampingOptIdMessage::serialize(SendMessageHeader &hdr) const {
 
 void TimestampingTxConfigMessage::serialize(SendMessageHeader &hdr) const {
 	const auto raw_flags = m_flags.raw();
-	auto cmsg = this->createMsg(hdr.ctrl,
-			SocketMessage::TIMESTAMPING,
-			sizeof(raw_flags));
-
+	auto cmsg = this->createMsg(hdr.ctrl, sizeof(raw_flags));
 	auto data = this->data(cmsg);
 
 	std::memcpy(data, &raw_flags, sizeof(raw_flags));
@@ -49,15 +34,9 @@ void TimestampingTxConfigMessage::serialize(SendMessageHeader &hdr) const {
 
 void TimestampingPacketInfo::deserialize(
 		const ReceiveMessageHeader::ControlMessage &msg) {
-	checkMsg(msg, SocketMessage::TIMESTAMPING_PKTINFO);
+	checkMsg(msg, sizeof(m_info));
 
-	const auto bytes = msg.dataLength();
-
-	if (bytes != sizeof(m_info)) {
-		throw RuntimeError{"SO_TIMESTAMPING_PKTINFO message with mismatching length encountered"};
-	}
-
-	std::memcpy(&m_info, msg.data(), bytes);
+	std::memcpy(&m_info, msg.data(), sizeof(m_info));
 }
 
 } // end ns

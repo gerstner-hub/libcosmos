@@ -2,6 +2,7 @@
 
 // C++
 #include <array>
+#include <variant>
 
 // Linux
 #include <net/if.h>
@@ -268,5 +269,27 @@ enum class VLANTag : uint16_t {
 /// A packet ID used in the context of SocketOption::setReceiveTimestamping().
 enum class TimestampPktId : uint32_t {
 };
+
+/*
+ * forward declarations of protocol-specific aux message enums. include the
+ * proper net/<prot>/aux.hxx to get the full definitions.
+ */
+
+enum class SocketMessage;
+enum class NetlinkMessage;
+enum class UnixMessage;
+enum class PacketMessage;
+enum class IP4Message;
+enum class IP6Message;
+
+using CtrlMessageVariant = std::variant<
+	SocketMessage,
+	NetlinkMessage,
+	UnixMessage,
+	PacketMessage,
+	IP4Message,
+	IP6Message,
+	std::monostate /* returned when an unknown option level is encountered */
+>;
 
 } // end ns

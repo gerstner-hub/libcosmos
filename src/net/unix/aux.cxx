@@ -20,11 +20,11 @@ void UnixCredentials::setCurrentCreds() {
 
 void UnixRightsMessage::deserialize(
 		const ReceiveMessageHeader::ControlMessage &msg) {
-	this->checkMsg(msg, UnixMessage::RIGHTS);
+	this->checkMsg(msg);
 
 	clear();
 
-	const uint8_t *data = reinterpret_cast<const uint8_t*>(msg.data());
+	auto data = msg.dataAs<std::byte>();
 	auto left = msg.dataLength();
 	FileNum fd;
 
@@ -48,18 +48,11 @@ void UnixRightsMessage::deserialize(
 void PidFdMessage::deserialize(
 		const ReceiveMessageHeader::ControlMessage &msg) {
 	m_pidfd.close();
-	this->checkMsg(msg, UnixMessage::PIDFD);
+	this->checkMsg(msg, sizeof(FileNum));
 
-
-	const uint8_t *data = reinterpret_cast<const uint8_t*>(msg.data());
-
-	if (msg.dataLength() != sizeof(FileNum)) {
-		throw ParseError{"size mismatch in SCM_PIDFD ancillary message"};
-	}
 
 	FileNum pidfd;
-
-	std::memcpy(&pidfd, data, sizeof(pidfd));
+	std::memcpy(&pidfd, msg.data(), sizeof(pidfd));
 
 	m_pidfd = ProcessFile{PidFD{pidfd}};
 }
@@ -69,8 +62,7 @@ void UnixRightsMessage::serialize(SendMessageHeader &hdr) const {
 		throw UsageError{"Attempt to serialize empty vector of FileNum"};
 	}
 
-	auto msg = this->createMsg(hdr.ctrl, UnixMessage::RIGHTS, sizeof(FileNum) * m_fds.size());
-
+	auto msg = this->createMsg(hdr.ctrl, sizeof(FileNum) * m_fds.size());
 	auto data = this->data(msg);
 
 	for (auto fd: m_fds) {
@@ -92,26 +84,13 @@ void UnixRightsMessage::closeUnclaimed() {
 }
 
 void UnixCredentialsMessage::deserialize(const ReceiveMessageHeader::ControlMessage &msg) {
-	checkMsg(msg, UnixMessage::CREDENTIALS);
-
-	const uint8_t *data = reinterpret_cast<const uint8_t*>(msg.data());
-	const auto bytes = msg.dataLength();
-
-	if (bytes != sizeof(m_creds)) {
-		throw RuntimeError{"SCM_CREDS message with mismatching length encountered"};
-	}
-
-	std::memcpy(&m_creds, data, bytes);
+	checkMsg(msg, sizeof(m_creds));
+	std::memcpy(&m_creds, msg.data(), sizeof(m_creds));
 }
 
 void UnixCredentialsMessage::serialize(SendMessageHeader &hdr) const {
-	auto msg = this->createMsg(
-			hdr.ctrl,
-			UnixMessage::CREDENTIALS,
-			sizeof(m_creds));
-
+	auto msg = this->createMsg( hdr.ctrl, sizeof(m_creds));
 	auto data = this->data(msg);
-
 	std::memcpy(data, &m_creds, sizeof(m_creds));
 }
 
