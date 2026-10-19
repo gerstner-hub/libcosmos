@@ -2,7 +2,7 @@ name: Build libcosmos and run unit tests
 on: [push, pull_request]
 jobs:
   build_libcosmos:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - run: echo "The job was automatically triggered by a ${{ github.event_name }} event."
       - name: Check image version
