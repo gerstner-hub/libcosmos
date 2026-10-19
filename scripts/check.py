@@ -72,7 +72,7 @@ def buildConfig(label, config, abi=None):
             except FileNotFoundError:
                 pass
 
-    cmdline = ['scons', '-j5'] + config.split() + ['docs=0', f'buildroot={buildroot}', f'instroot={instroot}']
+    cmdline = ['scons', '-j5', "--config=force"] + config.split() + ['docs=0', f'buildroot={buildroot}', f'instroot={instroot}']
     if abi:
         cmdline.append(f"abi={abi}")
     # build all targets
