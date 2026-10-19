@@ -37,3 +37,5 @@ if install_dev_files or env['libtype'] == 'shared':
 
 if install_dev_files:
     env.InstallHeaders('cosmos')
+    config_header = env.Install(env['instroot'] + "/include/cosmos", env['config_header'])
+    env.Alias('install', config_header)

@@ -3,6 +3,9 @@
 // Linux
 #include <sys/socket.h>
 
+// cosmos
+#include <cosmos/config.hxx>
+
 /**
  * @file
  *
@@ -38,4 +41,17 @@
 
 #ifndef MSG_SOCK_DEVMEM
 #	define MSG_SOCK_DEVMEM 0x2000000
+#endif
+
+/*
+ * these are enum constants and cannot be checked via the preprocessor, thus
+ * we need to rely on configure-style checks.
+ */
+
+#ifndef HAVE_DECL_SOF_TIMESTAMPING_OPT_RX_FILTER
+#	define SOF_TIMESTAMPING_OPT_RX_FILTER ((1 << 17))
+#endif
+
+#ifndef HAVE_DECL_SOF_TIMESTAMPING_TX_COMPLETION
+#	define SOF_TIMESTAMPING_TX_COMPLETION ((1 << 18))
 #endif

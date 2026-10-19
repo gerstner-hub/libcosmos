@@ -573,11 +573,13 @@ def initSCons(project, rtti=True, deflibtype='shared'):
         # add user specified linker flags
         env.MergeFlags({'LINKFLAGS': os.environ['LDFLAGS']}, False)
 
-    buildroot = Dir(getBuildroot()).srcnode().abspath + '/'
+    buildroot_base = getBuildroot()
+    buildroot = Dir(buildroot_base).srcnode().abspath + '/'
 
     env.VariantDir(buildroot, '.', duplicate=False)
 
     env['buildroot'] = buildroot
+    env['buildroot_base'] = buildroot_base
     env['instroot'] = getInstroot()
     env['generated_headers'] = []
     env['lib_base_dir'] = getLibBaseDir()

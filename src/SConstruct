@@ -2,12 +2,30 @@ Import('env')
 
 libenv = env.Clone()
 public_includes = Dir('.').srcnode().abspath + '/../include'
+generated_includes = env['buildroot'] + "include"
 libenv.Append(LINKFLAGS='-pthread')
 libenv.Append(CPPPATH=['.'])
 libenv.Append(CPPPATH=public_includes)
+libenv.Append(CPPPATH=generated_includes)
 
 libcosmos_srcs = env.GatherSources(suffixes=['.cxx'])
 
+env['config_header'] = env['buildroot'] + "include/cosmos/config.hxx"
+
+configure = env.Configure(
+    conf_dir=env['buildroot'] + "/.sconf",
+    # there's some bug in SCons that "normalizes" buildroot back to
+    # srcroot; using a relative path helps
+    log_file="../" + env['buildroot_base'] + "/config.log",
+    config_h=env['config_header'],
+    clean=False, help=False)
+
+configure.CheckDeclaration(
+    "SOF_TIMESTAMPING_TX_COMPLETION", includes="#include <linux/net_tstamp.h>")
+configure.CheckDeclaration(
+    "SOF_TIMESTAMPING_OPT_RX_FILTER", includes="#include <linux/net_tstamp.h>")
+
+configure.Finish()
 
 # the SONAME and SHLIBVERSION are the knobs to tune for ABI versioning, but
 # libcosmos currently doesn't really have a concept for that.
@@ -41,7 +59,7 @@ env.RegisterLibConfig(
     'libcosmos',
     libcosmos,
     {
-        'CPPPATH': [public_includes],
+        'CPPPATH': [public_includes, generated_includes],
         'LINKFLAGS': ['-pthread']
     },
     {
