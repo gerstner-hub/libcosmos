@@ -203,7 +203,8 @@ class ProcessTest :
 			RUN_STEP("exec_at-true-works", info->exited() && info->status == cosmos::ExitStatus{0});
 		} else {
 			cosmos::Directory bin{"/bin"};
-			cosmos::proc::exec_at(bin.fd(), "true");
+			/* on Ubuntu16 this is a symbolic link */
+			cosmos::proc::exec_at(bin.fd(), "true", {}, cosmos::FollowSymlinks{true});
 			cosmos::proc::exit(cosmos::ExitStatus{10});
 		}
 
