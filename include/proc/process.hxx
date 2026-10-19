@@ -410,8 +410,10 @@ std::optional<ChildState> wait(const PidFD fd, const WaitFlags flags = WaitFlags
  * process's environment variable block. By default the current environment
  * will be passed on.
  *
- * Both `args` and `env` need to have a nullptr terminator element at the
- * end. If it is missing, then a UsageError is thrown.
+ * If provided, both `args` and `env` need to have a nullptr terminator
+ * element at the end. If it is missing, then a UsageError is thrown. As an
+ * exception it is allowed to pass empty vectors for `args` and `env` in which
+ * case they will be treated the same as nullptr.
  *
  * As a result of this call the calling process will be completely replaced by
  * the new program. Only file descriptors not marked close-on-exec will be
@@ -513,13 +515,15 @@ inline void exec(const SysString path, const StringVector &args, const StringVec
 /// Variant of exec() that looks up a program relative to `dir_fd`.
 /**
  * If `path` is an absolute path then `dir_fd` is ignored and the call
- * behaves just like exec(), except for the `follow_symlinks` setting.
+ * behaves just like `exec()`, except for the `follow_symlinks` setting.
  *
  * Otherwise `path` is looked up relative to `dir_fd`, possibly relative to
  * the current working directory if `dir_fd` is set to cosmos::AT_CWD.
  *
  * If `follow_symlinks` is unset and the resulting path is a symbolic link
  * then the execution fails with an ApiError and Errno::LINK_LOOP.
+ *
+ * `args` and `env` are interpreted as in `exec()`.
  **/
 void exec_at(const DirFD dir_fd, const SysString path,
 		const CStringVector *args = nullptr, const CStringVector *env = nullptr,

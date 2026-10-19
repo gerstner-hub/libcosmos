@@ -261,9 +261,12 @@ namespace {
 	// wrapper to reuse execve style invocation logic
 	void exec_wrapper(ExecFunc exec_func, const SysString path,
 			const CStringVector *args, const CStringVector *env) {
-		if (args && args->back() != nullptr) {
+		const auto have_args = args && !args->empty();
+		const auto have_env = env && !env->empty();
+
+		if (have_args && args->back() != nullptr) {
 			throw UsageError{"argument vector without nullptr terminator encountered"};
-		} else if(env && env->back() != nullptr) {
+		} else if (have_env && env->back() != nullptr) {
 			throw UsageError{"environment vector without nullptr terminator encountered"};
 		}
 
@@ -274,8 +277,8 @@ namespace {
 		// C this could be expressed better without breaking compatibility.
 		// There is a kind of contract that the arrays aren't modified by the
 		// implementation. Thus const_cast it.
-		auto casted_args = const_cast<char**>(args ? args->data() : defargs.data());
-		auto casted_env = const_cast<char**>(env ? env->data() : environ);
+		auto casted_args = const_cast<char**>(have_args ? args->data() : defargs.data());
+		auto casted_env = const_cast<char**>(have_env ? env->data() : environ);
 
 		exec_func(path.raw(), casted_args, casted_env);
 	}
