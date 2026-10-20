@@ -206,9 +206,9 @@ def addLocalLibrary(self, name):
         return
 
     lib_env = self.Clone()
-    lib_env['buildroot'] = ''
+    lib_env['buildroot'] = self['buildroot'] + f'{name}/'
     SConscript(f'{name}/SConstruct', duplicate=0,
-               variant_dir=self['buildroot'] + f'{name}/',
+               variant_dir=lib_env['buildroot'],
                exports={'env': lib_env})
 
 
