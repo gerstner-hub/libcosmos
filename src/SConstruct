@@ -15,8 +15,8 @@ env['config_header'] = env['buildroot'] + "include/cosmos/config.hxx"
 configure = env.Configure(
     conf_dir=env['buildroot'] + "/.sconf",
     # there's some bug in SCons that "normalizes" buildroot back to
-    # srcroot; using a relative path helps
-    log_file="../" + env['buildroot_base'] + "/config.log",
+    # srcroot; discard log for the time being.
+    log_file="/dev/null",
     config_h=env['config_header'],
     clean=False, help=False)
 
